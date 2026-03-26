@@ -1,0 +1,75 @@
+---
+title: "API Reference"
+sidebarTitle: "Introduction"
+description: "Integrate with the 1Club platform to access clubs, classes, plans, instructors, and more."
+---
+
+## Base URL
+
+All API requests are made to:
+
+```
+https://api.1club.ai
+```
+
+## Authentication
+
+Most public endpoints work without authentication. However, some endpoints return richer data when a valid JWT Bearer token is provided (e.g., member-specific pricing, availability for authorized members).
+
+```bash
+curl https://api.1club.ai/v1/public/clubs \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+<Note>
+  API keys with per-customer rate limits are coming soon. For now, all public endpoints are openly accessible.
+</Note>
+
+## Quick start
+
+Fetch the list of clubs for an organization:
+
+```bash
+curl https://api.1club.ai/v1/public/clubs?organizationId=YOUR_ORG_ID
+```
+
+Get a specific club by slug:
+
+```bash
+curl https://api.1club.ai/v1/public/clubs/my-club-slug
+```
+
+Browse class schedules:
+
+```bash
+curl https://api.1club.ai/v1/public/classes?clubId=CLUB_ID&date=2026-03-26
+```
+
+## Response format
+
+All responses are JSON. Successful responses return the data directly or wrapped in a standard envelope. Errors follow this shape:
+
+```json
+{
+  "error": "Description of what went wrong",
+  "code": "ERROR_CODE"
+}
+```
+
+Common HTTP status codes:
+
+| Status | Meaning |
+|--------|---------|
+| `200`  | Success |
+| `400`  | Bad request — check query parameters |
+| `404`  | Resource not found |
+| `429`  | Rate limited — slow down |
+| `500`  | Server error — contact support |
+
+## Rate limits
+
+Public endpoints currently have generous rate limits enforced at the infrastructure level. Per-customer API key quotas will be introduced in a future release.
+
+## Need help?
+
+Contact us at [support@1club.ai](mailto:support@1club.ai) for API access questions or integration support.

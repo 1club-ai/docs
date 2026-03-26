@@ -671,6 +671,109 @@
         }
       }
     },
+    "/v1/public/organizations/{orgSlug}/content": {
+      "get": {
+        "summary": "Get published CMS content for an organization",
+        "description": "Retrieve published CMS content by type for portal display",
+        "tags": [
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgSlug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization slug"
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Content type filter (announcement, faq, how-to-guide, etc.)"
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Preferred locale for content (e.g. en, es). Defaults to \"en\" when omitted."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of published content"
+          },
+          "404": {
+            "description": "Organization not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/v1/public/organizations/{orgSlug}/content/{contentSlug}": {
+      "get": {
+        "summary": "Get published CMS content by slug for an organization",
+        "description": "Retrieve a single published CMS content item by slug",
+        "tags": [
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgSlug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization slug"
+          },
+          {
+            "in": "path",
+            "name": "contentSlug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Content slug"
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Content type filter (optional)"
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Preferred locale for content (e.g. en, es). Defaults to \"en\" when omitted."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Content item"
+          },
+          "404": {
+            "description": "Content not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/v1/public/instructors": {
       "get": {
         "summary": "Get public instructors",

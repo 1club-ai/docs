@@ -1,0 +1,259 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "1Club Platform API",
+    "version": "1.0.0",
+    "description": "The 1Club Platform API lets you programmatically access and manage your organization's data.\n\n## Authentication\n\nAll requests require a customer API key passed as a Bearer token:\n\n```\nAuthorization: Bearer 1club_sk_live_...\n```\n\nGenerate API keys from the admin portal under **Settings > API Tokens**.\nThe key is tied to your organization — all responses are scoped to your org's data.\n\n## Rate Limiting\n\n- **100 requests per minute** per API key\n- When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header\n- Rate limit headers are included in every response:\n  - `X-RateLimit-Limit` — max requests per window\n  - `X-RateLimit-Remaining` — requests remaining\n  - `X-RateLimit-Reset` — seconds until the window resets\n\n## Errors\n\n| Status | Meaning |\n|--------|---------|\n| `400` | Invalid request parameters |\n| `401` | Missing or invalid API key |\n| `404` | Resource not found (or doesn't belong to your organization) |\n| `429` | Rate limit exceeded |\n| `500` | Internal server error |",
+    "contact": {
+      "name": "1Club API Support",
+      "email": "support@1club.ai"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Development server"
+    },
+    {
+      "url": "https://api.1club.ai",
+      "description": "Production API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "customerApiAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Customer API key obtained from the admin portal (e.g. 1club_sk_live_...)"
+      }
+    }
+  },
+  "security": [
+    {
+      "customerApiAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/platform/classes": {
+      "get": {
+        "summary": "List classes for the organization",
+        "description": "Returns all classes for the organization associated with the API token.\n",
+        "tags": [
+          "Classes"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "startDate",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Filter classes starting from this date"
+          },
+          {
+            "in": "query",
+            "name": "endDate",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Filter classes ending before this date"
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Locale for translations (e.g. \"en\", \"es\")"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of classes"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        }
+      }
+    },
+    "/v1/platform/classes/{id}": {
+      "get": {
+        "summary": "Get a class by ID",
+        "description": "Returns a single class. The class must belong to the organization associated with the API token.\n",
+        "tags": [
+          "Classes"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Class ID"
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Locale for translations"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Class details"
+          },
+          "404": {
+            "description": "Class not found"
+          }
+        }
+      }
+    },
+    "/v1/platform/clubs/{slug}": {
+      "get": {
+        "summary": "Get club details by slug",
+        "description": "Returns club details including amenities, rating, and images. The club must belong to the organization associated with the API token.\n",
+        "tags": [
+          "Clubs"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Club slug"
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Locale for amenity translations"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Club details"
+          },
+          "404": {
+            "description": "Club not found"
+          }
+        }
+      }
+    },
+    "/v1/platform/content": {
+      "get": {
+        "summary": "List published content",
+        "description": "Returns published content for the organization. Optionally filter by type.\n",
+        "tags": [
+          "Content"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "faq",
+                "post",
+                "announcement",
+                "document",
+                "rich-text"
+              ]
+            },
+            "description": "Filter by content type"
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Locale for content resolution"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of published content"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        }
+      }
+    },
+    "/v1/platform/content/{slug}": {
+      "get": {
+        "summary": "Get content by slug",
+        "description": "Returns a single published content item by slug.\n",
+        "tags": [
+          "Content"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Content slug"
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Locale for content resolution"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Content item"
+          },
+          "404": {
+            "description": "Content not found"
+          }
+        }
+      }
+    }
+  },
+  "tags": []
+}

@@ -4,6 +4,8 @@ sidebarTitle: "Introduction"
 description: "Integrate with the 1Club platform to access clubs, classes, plans, instructors, and more."
 ---
 
+The 1Club Platform API lets you programmatically access and manage your organization's data.
+
 ## Base URL
 
 All API requests are made to:
@@ -12,63 +14,64 @@ All API requests are made to:
 https://api.1club.ai
 ```
 
+## Official API contract
+
+This documentation is the official source of truth for the 1Club Platform API.
+If an integration relies on undocumented endpoints, fields, response shapes, or internal behavior outside this spec, we can't guarantee backward compatibility.
+Build against what's documented here to stay stable as the platform evolves.
+
 ## Authentication
 
-Most public endpoints work without authentication. However, some endpoints return richer data when a valid JWT Bearer token is provided (e.g., member-specific pricing, availability for authorized members).
+All requests require a customer API key passed as a Bearer token:
 
-```bash
-curl https://api.1club.ai/v1/public/clubs \
-  -H "Authorization: Bearer YOUR_TOKEN"
+```
+Authorization: Bearer 1club_sk_live_...
 ```
 
-<Note>
-  API keys with per-customer rate limits are coming soon.
-</Note>
+Generate API keys from the admin portal under **Settings > API Tokens**.
+The key is tied to your organization, and all responses are scoped to your organization's data.
 
 ## Quick start
 
-Fetch the list of clubs for an organization:
+Fetch the list of clubs:
 
 ```bash
-curl https://api.1club.ai/v1/public/clubs?organizationId=YOUR_ORG_ID
+curl https://api.1club.ai/v1/public/clubs \
+  -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
 Get a specific club by slug:
 
 ```bash
-curl https://api.1club.ai/v1/public/clubs/my-club-slug
+curl https://api.1club.ai/v1/public/clubs/my-club-slug \
+  -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
 Browse class schedules:
 
 ```bash
-curl https://api.1club.ai/v1/public/classes?clubId=CLUB_ID&date=2026-03-26
+curl "https://api.1club.ai/v1/public/classes?clubId=CLUB_ID&date=2026-03-26" \
+  -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
-## Response format
+## Rate limiting
 
-All responses are JSON. Successful responses return the data directly or wrapped in a standard envelope. Errors follow this shape:
+- **100 requests per minute** per API key
+- When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header
+- Rate limit headers are included in every response:
+  - `X-RateLimit-Limit` — max requests per window
+  - `X-RateLimit-Remaining` — requests remaining
+  - `X-RateLimit-Reset` — seconds until the window resets
 
-```json
-{
-  "error": "Description of what went wrong",
-  "code": "ERROR_CODE"
-}
-```
-
-Common HTTP status codes:
+## Errors
 
 | Status | Meaning |
 |--------|---------|
-| `200`  | Success |
-| `400`  | Bad request — check query parameters |
-| `404`  | Resource not found |
-| `429`  | Rate limited — slow down |
-| `500`  | Server error — contact support |
-
-## Rate limits
-
-Public endpoints currently have generous rate limits enforced at the infrastructure level. Per-customer API key quotas will be introduced in a future release.
+| `400` | Invalid request parameters |
+| `401` | Missing or invalid API key |
+| `404` | Resource not found (or doesn't belong to your organization) |
+| `429` | Rate limit exceeded |
+| `500` | Internal server error |
 
 ## Need help?
 

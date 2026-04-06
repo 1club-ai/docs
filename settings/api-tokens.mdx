@@ -1,0 +1,65 @@
+---
+title: API Tokens
+description: Create and manage API keys for programmatic access to your organization's data.
+---
+
+**In a nutshell:** API Tokens let you generate keys that external systems (websites, integrations, scripts) can use to access your organization's data via the public API.
+
+## Overview
+
+Navigate to **Settings → API Tokens** to create and manage API keys for your organization. Each token grants scoped, programmatic access to your data without sharing your admin credentials.
+
+## Creating an API Token
+
+1. Click **Create Token**
+2. Fill in the token details:
+   - **Name** — A label to identify where this token is used (e.g. "Website Integration")
+   - **Description** — Optional note on what the token is used for
+   - **Scopes** — Select the resources and permission level (Read or Write) for each
+   - **Expires** — Set an expiry date or leave empty for a token that never expires
+3. Click **Save**
+4. Copy the token immediately — it will not be shown again after you close the dialog
+
+## Token scopes
+
+Each token is granted access to specific resources with either **Read** or **Write** permission:
+
+- **Read** — Allows fetching data (GET requests)
+- **Write** — Allows creating and updating data (POST/PUT/PATCH requests)
+
+Select only the scopes needed for the integration. Avoid granting write access unless the external system needs to create or modify data.
+
+## Token expiry
+
+| Option | Use when |
+|--------|----------|
+| 1 hour / 6 hours / 1 day | Short-lived scripts or one-time operations |
+| 1 week / 2 weeks / 1 month | Temporary integrations or testing |
+| No expiry | Long-running integrations that you actively manage |
+
+Tokens with no expiry remain active until you revoke them manually.
+
+## Revoking a token
+
+1. Find the token in the list
+2. Click **Revoke Token**
+3. Confirm the action
+
+Revoking a token is immediate and permanent. Any integration using that token will stop working. Create a new token if the integration needs to continue.
+
+## Access and permissions
+
+Creating and revoking API tokens requires the **settings.manage.organization** permission. This means only admins and users with full settings management can access this page — managers and other roles cannot create or view API tokens.
+
+## Security best practices
+
+- **Give tokens descriptive names** so you know what each one is for
+- **Use the minimum required scopes** — do not grant write access if only read is needed
+- **Set an expiry** for tokens used in short-term scripts or testing
+- **Revoke unused tokens** — regularly audit the token list and remove tokens that are no longer in use
+- **Never share tokens** in source code, emails, or public channels
+
+## Related
+
+- [Integrations](/settings/integrations) — Connect third-party services like Stripe and Google.
+- [Public API](/api-reference) — API reference documentation.

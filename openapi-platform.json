@@ -26,6 +26,192 @@
         "scheme": "bearer",
         "description": "Customer API key obtained from the admin portal (e.g. 1club_sk_live_...)"
       }
+    },
+    "schemas": {
+      "PlatformContact": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string", "nullable": true },
+          "email": { "type": "string", "nullable": true },
+          "phone": { "type": "string", "nullable": true },
+          "profileImage": { "type": "string", "nullable": true },
+          "address": { "type": "string", "nullable": true }
+        }
+      },
+      "PlatformInstructor": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "contacts": { "$ref": "#/components/schemas/PlatformContact" }
+        }
+      },
+      "PlatformArea": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "area_types": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "sports": { "type": "string", "nullable": true },
+              "name": { "type": "string" }
+            }
+          }
+        }
+      },
+      "PlatformClass": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "startTime": { "type": "string", "format": "date-time" },
+          "endTime": { "type": "string", "format": "date-time" },
+          "price": { "type": "number", "nullable": true },
+          "isFree": { "type": "boolean" },
+          "instructors": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlatformInstructor" }
+          }
+        }
+      },
+      "PlatformClub": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "slug": { "type": "string" },
+          "address": { "type": "string", "nullable": true },
+          "phone": { "type": "string", "nullable": true },
+          "email": { "type": "string", "nullable": true }
+        }
+      },
+      "PlatformPaymentMethod": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" }
+        }
+      },
+      "PlatformMembership": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "usesRemaining": { "type": "integer", "nullable": true },
+          "maxUses": { "type": "integer", "nullable": true },
+          "status": { "type": "string" },
+          "plans": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": { "type": "integer" },
+              "name": { "type": "string" }
+            }
+          }
+        }
+      },
+      "PlatformTransaction": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "amount": { "type": "number" },
+          "taxAmount": { "type": "number", "nullable": true },
+          "totalAmount": { "type": "number" },
+          "currency": { "type": "string" },
+          "paymentStatus": { "type": "string" },
+          "transactionType": { "type": "string" },
+          "tax_rates": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": { "type": "integer" },
+              "name": { "type": "string" },
+              "rate": { "type": "number" },
+              "description": { "type": "string", "nullable": true }
+            }
+          }
+        }
+      },
+      "PlatformBooking": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "userId": { "type": "integer", "nullable": true },
+          "sport": { "type": "string", "nullable": true },
+          "startTime": { "type": "string", "format": "date-time" },
+          "endTime": { "type": "string", "format": "date-time" },
+          "totalPrice": { "type": "number" },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "confirmed", "cancelled"]
+          },
+          "notes": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "playerEmails": { "type": "array", "items": { "type": "string" }, "nullable": true },
+          "entranceMethod": { "type": "string", "nullable": true },
+          "preferredPaymentMethod": {
+            "nullable": true,
+            "$ref": "#/components/schemas/PlatformPaymentMethod"
+          },
+          "areas": {
+            "nullable": true,
+            "$ref": "#/components/schemas/PlatformArea"
+          },
+          "classes": {
+            "nullable": true,
+            "$ref": "#/components/schemas/PlatformClass"
+          },
+          "instructors": {
+            "nullable": true,
+            "$ref": "#/components/schemas/PlatformInstructor"
+          },
+          "clubs": {
+            "nullable": true,
+            "$ref": "#/components/schemas/PlatformClub"
+          },
+          "contacts": {
+            "nullable": true,
+            "$ref": "#/components/schemas/PlatformContact"
+          },
+          "organizations": {
+            "type": "object",
+            "properties": {
+              "currency": { "type": "string" }
+            }
+          },
+          "memberships": {
+            "nullable": true,
+            "$ref": "#/components/schemas/PlatformMembership"
+          },
+          "transactions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlatformTransaction" }
+          },
+          "duration": {
+            "type": "number",
+            "description": "Booking duration in hours (derived)"
+          },
+          "amountDue": {
+            "type": "number",
+            "description": "Outstanding amount due (derived)"
+          },
+          "isPast": {
+            "type": "boolean",
+            "description": "Whether the booking is in the past (derived)"
+          },
+          "paymentStatus": {
+            "type": "string",
+            "description": "Payment status from the latest transaction (derived)"
+          },
+          "paidStatus": {
+            "type": "string",
+            "enum": ["paid", "unpaid", "not_required"],
+            "description": "Simplified paid status (derived)"
+          }
+        }
+      }
     }
   },
   "security": [
@@ -34,6 +220,161 @@
     }
   ],
   "paths": {
+    "/v1/platform/bookings": {
+      "get": {
+        "summary": "List bookings for the organization",
+        "description": "Returns bookings for the organization associated with the API token. Supports filtering by club, area, class, instructor, contact, status, and date range. Cancelled bookings are excluded by default.\n",
+        "tags": [
+          "Bookings"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "clubId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by club ID"
+          },
+          {
+            "in": "query",
+            "name": "areaId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by area ID"
+          },
+          {
+            "in": "query",
+            "name": "classId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by class ID"
+          },
+          {
+            "in": "query",
+            "name": "instructorId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by instructor ID"
+          },
+          {
+            "in": "query",
+            "name": "contactId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by contact ID"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": ["pending", "confirmed", "cancelled"]
+            },
+            "description": "Filter by booking status"
+          },
+          {
+            "in": "query",
+            "name": "startDate",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Filter bookings starting from this date"
+          },
+          {
+            "in": "query",
+            "name": "endDate",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Filter bookings ending before this date"
+          },
+          {
+            "in": "query",
+            "name": "includeCancelled",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include cancelled bookings (excluded by default)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of bookings with details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlatformBooking"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "403": {
+            "description": "Missing required scope (bookings:read)"
+          }
+        }
+      }
+    },
+    "/v1/platform/bookings/{id}": {
+      "get": {
+        "summary": "Get a booking by ID",
+        "description": "Returns a single booking with full details. The booking must belong to the organization associated with the API token.\n",
+        "tags": [
+          "Bookings"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Booking ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformBooking"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid booking ID"
+          },
+          "404": {
+            "description": "Booking not found"
+          }
+        }
+      }
+    },
     "/v1/platform/classes": {
       "get": {
         "summary": "List classes for the organization",

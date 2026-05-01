@@ -1,10 +1,10 @@
 ---
 title: "API Reference"
 sidebarTitle: "Introduction"
-description: "Integrate with the 1Club platform to access clubs, classes, plans, instructors, and more."
+description: "Integrate with the 1Club platform to access clubs, classes, bookings, plans, instructors, and more."
 ---
 
-The 1Club Platform API lets you programmatically access and manage your organization's data.
+The 1Club Platform API lets you programmatically access and manage your organization's data — clubs, classes, bookings, content, and more — from your own websites, integrations, and back-office scripts.
 
 ## Base URL
 
@@ -28,29 +28,62 @@ All requests require a customer API key passed as a Bearer token:
 Authorization: Bearer 1club_sk_live_...
 ```
 
-Generate API keys from the admin portal under **Settings > API Tokens**.
 The key is tied to your organization, and all responses are scoped to your organization's data.
+
+### Creating an API token
+
+API tokens are created from the admin dashboard at [admin.1club.ai](https://admin.1club.ai).
+
+1. Sign in to the admin dashboard
+2. Open **Settings → API Tokens**
+3. Click **Create Token**
+4. Fill in the token details:
+   - **Name** — a label to identify where this token is used (e.g. "Website Integration")
+   - **Description** — optional note on what the token is used for
+   - **Scopes** — pick the resources the token can access, and whether each is **Read** or **Write**
+   - **Expires** — set an expiry date, or leave empty for a token that never expires
+5. Click **Save**
+6. **Copy the token immediately** — it is shown only once and cannot be retrieved later
+
+<Note>
+  Creating and revoking API tokens requires the **settings.manage.organization** permission. Admins and users with full settings management can access this page; managers and other roles cannot.
+</Note>
+
+For the full guide — including scope selection, expiry options, revocation, and security best practices — see the [API Tokens](/settings/api-tokens) page.
+
+### Token scopes
+
+Each token is granted access to specific resources with either **Read** or **Write** permission:
+
+- **Read** — allows fetching data (GET requests)
+- **Write** — allows creating and updating data (POST/PUT/PATCH requests)
+
+Grant only the scopes the integration actually needs. For example, the Bookings endpoints require the `bookings:read` scope.
+
+### Revoking a token
+
+If a token is leaked or no longer needed, revoke it from **Settings → API Tokens**. Revocation is immediate — any integration using that token will stop working on its next request.
 
 ## Quick start
 
 Fetch the list of clubs:
 
 ```bash
-curl https://api.1club.ai/v1/public/clubs \
+curl https://api.1club.ai/v1/platform/clubs/my-club-slug \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
-Get a specific club by slug:
+List bookings for a date range:
 
 ```bash
-curl https://api.1club.ai/v1/public/clubs/my-club-slug \
+curl "https://api.1club.ai/v1/platform/bookings?startDate=2026-05-01&endDate=2026-05-31" \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
 Browse class schedules:
 
 ```bash
-curl "https://api.1club.ai/v1/public/classes?clubId=CLUB_ID&date=2026-03-26" \
+curl "https://api.1club.ai/v1/platform/classes?startDate=2026-05-01" \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
@@ -69,9 +102,18 @@ curl "https://api.1club.ai/v1/public/classes?clubId=CLUB_ID&date=2026-03-26" \
 |--------|---------|
 | `400` | Invalid request parameters |
 | `401` | Missing or invalid API key |
+| `403` | Token is missing the required scope for this endpoint |
 | `404` | Resource not found (or doesn't belong to your organization) |
 | `429` | Rate limit exceeded |
 | `500` | Internal server error |
+
+## Security best practices
+
+- **Never commit tokens to source control.** Store them in environment variables or a secrets manager.
+- **Use the minimum required scopes.** Don't grant write access if only read is needed.
+- **Set an expiry** on tokens used for short-term scripts or testing.
+- **Rotate tokens regularly** and revoke any that are no longer in use.
+- **Never share tokens** in emails, chat messages, or public channels.
 
 ## Need help?
 

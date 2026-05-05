@@ -17,15 +17,19 @@
 <!-- Add product-specific terms and preferred usage -->
 <!-- Example: Use "workspace" not "project", "member" not "user" -->
 
+- When referring to sport clubs, use "gym" instead of "club". Exception: do not rename the "Club" / "Clubs" menu items in the UI - keep those as-is.
+
 ## Style preferences
 
 <!-- Add any project-specific style rules below -->
 
 - Use active voice and second person ("you")
-- Keep sentences concise — one idea per sentence
+- Keep sentences concise - one idea per sentence
 - Use sentence case for headings
 - Bold for UI elements: Click **Settings**
 - Code formatting for file names, commands, paths, and code references
+- Never use em dashes or en dashes (—, –). Always use a single hyphen (-) instead, in both prose and code.
+- Don't start sentences with "In a nutshell".
 
 ## Content boundaries
 

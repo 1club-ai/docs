@@ -11,7 +11,7 @@ A booking policy is a reusable configuration that applies to a set of bookings. 
 
 Key capabilities:
 
-- **Payment timing** - Require payment at booking, at check-in, or not at all.
+- **Enforce payment** - Pick a single point at which payment is enforced: at booking, at check-in, or not at all.
 - **Anonymous bookings** - Let admins book on behalf of someone who doesn't have a profile yet.
 - **Check-in rules** - Require check-in to avoid no-shows, or auto-check-in at booking start.
 - **Booking duration limits** - Set min and max slot lengths and step sizes.
@@ -54,27 +54,26 @@ This is the heart of the policy. Every toggle and field below lives in the **Boo
 
 When a spot opens 2–12 hours before a class, the first person on the waitlist has this many minutes to claim it. The default is 15. Leave empty to use 15.
 
-### Require Payment Upfront
+### Enforce payment
 
-> Require payment (or wallet) before confirmation.
+A single dropdown that decides when payment is enforced. Pick one of three options:
 
-When this is on, the booking will not be confirmed until the member has paid (or the cost is fully covered by their wallet/membership).
+- **At booking** - Members must pay in the portal before the booking is confirmed. Any booking that still has unpaid transactions is also blocked at check-in.
+- **At check-in** - Members can create bookings without paying in advance, but reception cannot complete the check-in until the payment is collected (or an active membership / external program covers the visit).
+- **None** - Payment is not enforced. Members can be checked in even if they still have unresolved payments. The front desk uses judgment to follow up.
 
-Use this when:
+Pick **At booking** when you sell classes online and want guaranteed revenue per booking, or when you don't want the front desk to chase payment at the door.
 
-- You sell classes online and want guaranteed revenue per booking.
-- You don't want the front desk to chase payment at the door.
+Pick **At check-in** when bookings can happen without immediate payment but the front desk must collect payment before letting the member through the door. This is the typical drop-in or walk-in model.
 
-When the member tries to book without enough credit or payment, the booking fails and they're prompted to pay.
-
-### Require Payment at Check-in
-
-> Block check-in if the booking (or its underlying membership) has unpaid transactions. Use this when bookings can be made without paying upfront, but reception must collect payment before letting the member in.
-
-Use this when bookings can happen without immediate payment, but the front desk must collect payment (or confirm an active membership / external program) before letting the member through the door.
+Pick **None** for community gyms, martial-arts schools, kids' programs, and other settings where staff log attendance on the spot and handle payment separately.
 
 <Note>
-  This toggle is greyed out when **Require Payment Upfront** is on. The in-app helper reads "Already enforced by 'Require Payment Upfront'." — payment is already guaranteed at booking time, so re-checking at check-in is redundant.
+  This replaces the older **Require Payment Upfront** and **Require Payment at Check-in** toggles. The two are now mutually exclusive options in a single dropdown - you can no longer enable both at once. Existing policies are migrated automatically: upfront wins if both were on, otherwise the matching single toggle is preserved, and policies with neither toggle land on **None**.
+</Note>
+
+<Note>
+  **Admin override** - When an admin creates a booking from the admin dashboard, the **At booking** enforcement is bypassed so staff can record bookings that will be paid later. Check-in still respects the policy: if the balance is unpaid when the member arrives, the check-in is blocked until the payment is collected.
 </Note>
 
 ### Upsell available plans
@@ -135,8 +134,7 @@ The **Product categories offered with the bookings** field let you allow specifi
 
 You want walk-ins to be welcome but the front desk must collect payment.
 
-- **Require Payment Upfront** - off
-- **Require Payment at Check-in** - on
+- **Enforce payment** - At check-in
 - **Allow anonymous bookings** - off
 - **Check-in required** - off (members may walk in without a booking)
 
@@ -146,11 +144,10 @@ Pair this with **Check-in Mode = Flexible** in [Access Control](/settings/access
 
 You sell classes online and the schedule is the source of truth.
 
-- **Require Payment Upfront** - on
-- **Require Payment at Check-in** - automatically off (greyed out)
+- **Enforce payment** - At booking
 - **Check-in required** - on (so unclaimed bookings auto-mark as no-shows)
-- **Auto check-in at booking start** — off (staff scan members in)
-- **Allow anonymous bookings** — off
+- **Auto check-in at booking start** - off (staff scan members in)
+- **Allow anonymous bookings** - off
 
 ### Personal training booked over the phone
 
@@ -158,28 +155,28 @@ You let admins book PT for callers who haven't signed up yet.
 
 - Scope the policy to your _Personal Training_ class type or instructor type.
 - **Allow anonymous bookings** - on
-- **Require Payment Upfront** - your call (off if you collect payment when the client arrives, on if you charge a card-on-file)
+- **Enforce payment** - your call (At check-in if you collect when the client arrives, At booking if you charge a card-on-file). Admins can always create the booking even with **At booking** selected; the balance is then collected before check-in.
 
 ## Tips & best practices
 
 - **Start broad, narrow as needed** - One org-wide policy is easier to reason about than five overlapping ones. Add scoped policies only when a specific area or class needs different rules.
-- **Mirror your front desk** - The toggles should match what your staff actually do. If reception always collects payment at the door, **Require Payment at Check-in** belongs on.
+- **Mirror your front desk** - The settings should match what your staff actually do. If reception always collects payment at the door, set **Enforce payment** to **At check-in**.
 - **Test with a real booking** - After saving a policy, create a test booking and walk through it end-to-end before going live.
 - **Don't combine Auto check-in with Check-in required without thought** - Auto check-in defeats the no-show detection of Check-in required.
 
 ## Troubleshooting
 
-**Issue**: Member can't book - system says payment required. 
+**Issue**: Member can't book - system says payment required.
 
-**Solution**: The matching policy has **Require Payment Upfront** on. Either pay through the booking flow, or change the policy if upfront payment isn't your intent.
+**Solution**: The matching policy has **Enforce payment** set to **At booking**. Either pay through the booking flow, or switch the policy to **At check-in** (or **None**) if upfront payment isn't your intent. Note that admins booking from the admin dashboard are not blocked by **At booking** - they can record the booking and collect the balance before check-in.
 
-**Issue**: Front desk can't check the member in - payment blocked **Solution**: 
+**Issue**: Front desk can't check the member in - payment blocked.
 
-The policy has **Require Payment at Check-in** on. Have the reception collect payment, confirm the member's active membership, or apply an external program before completing the check-in. See [Check-in Models](/reference/check-in-models) for entrance methods.
+**Solution**: The policy has **Enforce payment** set to **At check-in** (or **At booking** with an outstanding balance). Have reception collect payment, confirm the member's active membership, or apply an external program before completing the check-in. See [Check-in Models](/reference/check-in-models) for entrance methods.
 
-**Issue**: The "Require Payment at Check-in" toggle is greyed out 
+**Issue**: I want to require payment at booking _and_ block check-in on overdue balances.
 
-**Solution**: This is intentional when **Require Payment Upfront** is on — payment is already enforced at booking. Turn off the upfront toggle if you want to enforce at check-in instead.
+**Solution**: Set **Enforce payment** to **At booking**. The check-in is still blocked automatically when a booking has unpaid transactions, so the at-check-in safeguard is already covered.
 
 **Issue**: Two policies seem to apply to the same booking 
 

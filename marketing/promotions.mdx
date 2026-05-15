@@ -1,0 +1,147 @@
+---
+title: Promotions
+description: Create vouchers and discounts with schedules, codes, audience targeting, and usage caps
+---
+
+**In a nutshell:** Promotions are time-bound offers you run from **Marketing → Promotions**. They come in two flavours — **Vouchers** credit a member's wallet when the member redeems a code, and **Discounts** reduce the price of a booking or product order at checkout. Both share the same controls for scheduling, codes, redemption caps, audience targeting and scope.
+
+## Vouchers vs. discounts
+
+Promotions are always one of two types. Pick the type when you create the promotion; you cannot change it afterwards.
+
+| | Voucher | Discount |
+| --- | --- | --- |
+| **What it does** | Adds credit to the member's wallet | Reduces the price at checkout |
+| **Who triggers it** | The member (or staff on their behalf) | Applied automatically or by entering a code at checkout |
+| **Value format** | Fixed amount only | Percentage **or** fixed amount |
+| **Where the code is entered** | Member portal → **Account → Add voucher** | Booking dialog or order checkout |
+| **Can be scoped to a class/area/instructor?** | No — wallet credit is universal | Yes (see **Scope** below) |
+| **Effect on the ledger** | Creates a wallet transaction | Reduces the booking/order total |
+
+## Creating a promotion
+
+1. Go to **Marketing → Promotions**.
+2. Click **Add** and choose **Voucher** or **Discount**.
+3. Fill in:
+   - **Name** — internal label shown to staff and on the member-facing receipt.
+   - **Code** *(optional)* — what members type. Codes are normalised to UPPERCASE and must be unique within the organization. If you leave it blank, the promotion can still be applied by staff from the dashboard but won't have a code to share.
+   - **Description** — shown to members where the promotion appears.
+   - **Value** — for vouchers, the credit amount; for discounts, either a percentage (max 100) or a fixed amount, depending on **Discount format**.
+4. Set the active window, caps, visibility, audience and scope (see below).
+5. **Save.**
+
+## Scheduling (active window)
+
+Each promotion has an optional **Starts at** and **Ends at**. The list view shows a status badge:
+
+- **Scheduled** — created but the start time hasn't passed yet. Codes won't validate.
+- **Live** — within the active window. Available to redeem.
+- **Ended** — past the end time. Codes return an "expired" reason and the promotion stops accruing redemptions.
+
+Leaving both fields empty makes the promotion live indefinitely.
+
+## Usage caps
+
+Two independent limits control how often a promotion can be redeemed:
+
+- **Max redemptions** — total across all members. Once reached, the promotion stops working for everyone.
+- **Max redemptions per member** — how many times a single member can use it. Must be less than or equal to the global cap.
+
+If a booking that consumed a promotion is later cancelled, the redemption is rolled back automatically — the global counter decrements and the member's per-member allowance is freed.
+
+## Visibility
+
+Controls where the promotion shows up in the member portal:
+
+- **Public** — listed publicly (e.g. signup flow), visible to non-members.
+- **Member-only** — visible to signed-in members.
+- **Private** — never listed; can only be applied by typing the code or by staff action. Use this for codes you distribute through email, social, or partner channels.
+
+## Audience targeting (segment filter)
+
+Restrict who can redeem by:
+
+- **Member types** — only contacts of these types can redeem.
+- **Tags** — only contacts carrying at least one of these tags.
+
+Within a list the match is **OR** (any tag matches). Between lists it's **AND** (the member must match both the type filter and the tag filter when both are set). Leave both empty to allow everyone in the audience defined by **Visibility**.
+
+## Scope (valid for) — discounts only
+
+For discounts you can require that the booking or order matches a specific kind of thing:
+
+- **Class types** — applies only when the booking is for one of these class types.
+- **Area types** — applies only when the booking targets one of these area types.
+- **Instructor types** — applies only when the assigned instructor is one of these types.
+
+Vouchers are wallet credit, so they aren't scoped — once a voucher is redeemed the credit can be spent on anything the wallet can pay for.
+
+## Stacking
+
+Only **one** promotion can be applied per booking or order. Discounts don't stack with other discounts, and a voucher's wallet credit is paid out at checkout independently of any discount applied to the same order.
+
+## How members redeem
+
+### Vouchers
+
+1. Member signs into the portal and opens **Account**.
+2. Taps **Add voucher** and enters the code.
+3. The credit is added to their wallet immediately and recorded as a wallet transaction labelled with the promotion name.
+
+The wallet balance can then be spent at checkout the next time they book a class or buy a product.
+
+### Discount codes
+
+Members enter a discount code during checkout (booking or product order). The portal validates it live, shows the resulting savings, and applies it when they submit. Invalid codes return a generic error on the member side — this is intentional, to prevent code-guessing. Staff using the admin dashboard see the specific reason (see **Validation reasons** below).
+
+## Staff redemption
+
+Staff can apply promotions on a member's behalf:
+
+- **Vouchers** — open the contact and use **Redeem voucher**. Enter the code; the credit posts to their wallet.
+- **Discounts** — when creating a booking or order in the admin, paste the code into the promotion field on the dialog. The dashboard validates it inline and tells you why a code is rejected if it is.
+
+## Analytics
+
+From **Marketing → Promotions → View analytics** you'll find:
+
+- KPI cards: total promotions, live promotions, total redemptions, credit issued, discount given.
+- Breakdown of redemptions by promotion type.
+- A redemption-over-time trend.
+- A per-promotion summary table with uses, revenue impact, discount given, members acquired, and average order value.
+- A per-member summary showing who redeemed which promotion, how many times, and the cumulative amount.
+
+## Retiring a promotion
+
+- **Promotions with no redemptions** can be deleted outright.
+- **Promotions that have ever been redeemed** cannot be deleted — this preserves the audit trail on past bookings and wallet transactions. To stop them being used, set **Ends at** to a time in the past (or to now). The status badge becomes **Ended** and validation returns "expired".
+
+## Validation reasons (admin reference)
+
+When validating a code in the admin (for example, on a booking dialog) you may see one of these reasons. Members always see a single generic "invalid code" message.
+
+- **not_found** — code doesn't exist in this organization.
+- **not_started** — the active window hasn't begun.
+- **expired** — past the end time.
+- **max_redemptions_reached** — global cap hit.
+- **max_redemptions_per_contact_reached** — this member has used it as many times as allowed.
+- **member_type_mismatch** — the contact's type isn't in the segment filter.
+- **tag_mismatch** — the contact has none of the required tags.
+- **class_type_not_eligible** — discount is scoped to class types and this booking isn't one of them.
+- **area_type_not_eligible** — discount is scoped to area types and this area isn't one of them.
+- **instructor_type_not_eligible** — discount is scoped to instructor types and this instructor isn't one of them.
+- **wrong_type** — a voucher code was entered at checkout (vouchers credit the wallet; they aren't applied as a discount).
+
+## Best practices
+
+- **Cap per-member use** for codes you intend to share publicly. A per-member limit of 1 prevents the same member redeeming a public code repeatedly.
+- **Prefer Ends at over deletion.** Setting an end date is reversible and keeps the redemption history intact.
+- **Use segment filters for re-engagement campaigns.** Combine a "lapsed" tag with a generous voucher to bring members back.
+- **Scope discounts to fill specific inventory.** A 30% discount valid only for low-demand class types is a more efficient lever than a blanket discount.
+- **Don't confuse promotions with deals.** [Deals](/marketing/deals) are sales opportunities tracked in your pipeline — a completely separate feature from promotions.
+
+## Related
+
+- [Pipeline](/marketing/pipeline) — sales-opportunity tracking (this is what "deals" means in 1Club).
+- [Plans](/billing/plans) — membership plan pricing.
+- [Transactions](/billing/transactions) — where voucher redemptions and discount adjustments appear on a member's ledger.

@@ -1,0 +1,139 @@
+---
+title: Smart Tagging
+description: Rule-based, automatically applied tags that segment your members by behaviour, money, lifecycle, age, and more
+---
+
+**In a nutshell:** Smart Tagging assigns tags to your members automatically based on rules — how often they check in, whether they owe money, how long they've been with you, when their membership expires, how active they are overall, their age, and which sports they book. You configure the rules once under **Settings → Smart tagging**, and the system keeps every member's tags in sync from then on. Smart tags appear next to manual tags everywhere — member lists, [promotion segments](/marketing/promotions), and messaging — but they can't be added or removed from an individual member's profile; only the rules can be edited.
+
+## How it differs from manual tags
+
+You can attach two kinds of tags to a contact:
+
+| | Manual tags | Smart tags |
+| --- | --- | --- |
+| **Where they come from** | You create them and apply them to specific contacts | The system applies them automatically based on rules |
+| **Who controls membership** | You add or remove them per contact | The engine, based on the member's current data |
+| **Configured in** | Anywhere a tag chip appears on a contact | **Settings → Smart tagging** |
+| **Editable per contact** | Yes | No — change the rule, not the tag on the contact |
+| **Examples** | "VIP", "Family of John", "Yoga teacher" | "Regular", "Lapsed", "Expiring soon", "Adult" |
+
+Both types are interchangeable when you filter or segment — a campaign or promotion that targets the "Lapsed" tag works exactly the same whether that tag is manual or smart.
+
+## Categories
+
+Smart Tagging is organised into eight rule categories. Each category can be **enabled or disabled** independently, and within each category a contact receives **at most one tag** — the highest-matching tier. Disable a category and every tag it produced is removed from every contact.
+
+### Attendance
+
+Groups members by how often they check in over a recent window. Each rule defines a **minimum number of visits** in a **period** (in days).
+
+Defaults: **All-Star** (16+ in 30 days), **Regular** (8+), **Casual** (4+), **Low Activity** (1+), **Ghost** (0). Period and thresholds are fully editable.
+
+### Financial
+
+Reflects how a member is doing with payments. Each rule defines how many days a payment can be overdue before the tag applies.
+
+Defaults: **Unpaid** (owes money but nothing past due yet), **Failed** (1+ day overdue), **Overdue** (8+ days), **Lapsed** (22+ days). Enabled by default.
+
+### Lifecycle
+
+How long the member has been with you, counted from their first active membership.
+
+Defaults: **Trial** (day 1+), **Probation** (day 15+), **Active** (day 46+). Enabled by default.
+
+### Membership
+
+Where the member is relative to their current membership's expiry date.
+
+Defaults: **Expiring** (7 days before expiry), **Expiring Soon** (3 days before), **Expired** (7 days after). Enabled by default.
+
+### Loyalty
+
+A lifetime activity score (total bookings + check-ins).
+
+Defaults: **Legend** (50+), **Champion** (25+), **Pro** (10+), **Rising Star** (5+), **Beginner** (fewer). Use Loyalty for tenure-style recognition; use **Attendance** for recent engagement.
+
+### Age
+
+From the member's date of birth.
+
+Defaults: **Infant** (0–4), **Child** (5–12), **Junior** (13–17), **Adult** (18–64), **Senior** (65+). Edit the bounds to match how you market and price.
+
+### Interest
+
+Sport-by-sport tags applied to members who've booked the same sport at least N times. Tags are generated dynamically — one per sport that crosses the threshold. Use these to target audiences with offers relevant to what they already do.
+
+### New contact
+
+A short-lived tag for recently created contacts, defined by **maximum days since creation**.
+
+Default: **New** (within 14 days). Enabled by default.
+
+## Configuring rules
+
+1. Go to **Settings → Smart tagging**.
+2. Pick the **Smart tags** tab (the other tab manages plain manual tags).
+3. For each category:
+   - Toggle the category on or off.
+   - Edit the existing tiers — adjust the threshold (visits, days, age range, etc.) and rename the tag if you want.
+   - Add a new tier with **Add tag**.
+   - Delete a tier you don't need.
+4. **Save** when you're happy with the changes.
+
+Tag names must be unique within a category. The dialog validates thresholds so, for example, you can't define an Attendance tier with negative visits or a percentage above 100 where it doesn't make sense.
+
+After you save, the system schedules a re-evaluation so members pick up (or lose) the affected tags. You can also trigger this on demand — see **Sync now** below.
+
+## How and when tags are kept in sync
+
+Smart tags are recomputed automatically:
+
+- **Nightly**, for every contact in the organization (runs at 03:00 UTC).
+- **On data changes** that could shift a tag — for example, when a payment is recorded, a booking is created or cancelled, or a membership starts or ends.
+- **On demand**, via the **Sync now** button on the Smart tagging page. Use this after a big rule change to see the effect immediately.
+
+Re-evaluation only touches tags the engine manages. Manual tags are never removed by a sync.
+
+## Where smart tags show up
+
+Smart tags behave exactly like manual tags everywhere they're consumed:
+
+- **Member lists** — filter the list by tag; hover any tag chip on a contact to see whether it's manual or smart, and which rule it came from.
+- **Contact profile** — both kinds appear in the same Tags section.
+- **[Promotion segments](/marketing/promotions)** — restrict a voucher or discount to members carrying specific tags.
+- **Messaging campaigns** — segment recipients by tag.
+- **Reports and analytics** — break down KPIs by tag to compare cohorts (e.g. revenue from "Regular" vs. "Lapsed").
+
+Because a smart-tag membership is recomputed continuously, segments stay current without anyone curating lists.
+
+## Editing tags on a contact
+
+You **cannot** add a smart tag to a single contact, or remove one, from the contact's profile. The reason: a smart tag is the output of a rule, and the engine would simply put it back (or take it off) on the next evaluation. To change who has a tag:
+
+- **Change the rule** under **Settings → Smart tagging** (this affects all contacts).
+- Or, if the goal is to flag this one person, use a **manual tag** instead.
+
+Manual tags can be added and removed per contact at any time.
+
+## Renaming or disabling categories
+
+- **Renaming a tier** updates the tag name in place across every contact that has it. No re-evaluation needed.
+- **Disabling a category** removes every tag in that category from every contact on the next sync.
+- **Re-enabling a category** re-applies tags on the next sync.
+- **Deleting a tier** removes it from contacts that currently have it (next sync), and keeps the rest of the category intact.
+
+Promotion and campaign filters that referenced a disabled or deleted tag will simply stop matching anyone — they don't break.
+
+## Best practices
+
+- **Start with the defaults.** Financial, Lifecycle, Membership and New Contact are enabled out of the box because almost every club needs them. Add Attendance and Loyalty when you're ready to act on engagement.
+- **Use Attendance for short-term campaigns** and **Loyalty for long-term recognition.** The two answer different questions ("who's been quiet recently?" vs. "who's been with us forever?").
+- **Pair Membership tags with promotions.** A "Expiring Soon" segment plus a renewal discount is one of the easiest wins.
+- **Don't duplicate categories with manual tags.** If you find yourself manually tagging members "Lapsed", that's what the Financial category is for — adjust its thresholds instead.
+- **Re-check thresholds quarterly.** What counted as "Regular" attendance a year ago may not match how your club operates today.
+
+## Related
+
+- [Members](/members/overview) — where tags are surfaced and used.
+- [Promotions](/marketing/promotions) — restrict offers to specific tags via segment filters.
+- [Marketing analytics](/analytics/marketing) — break down marketing performance by member segment.

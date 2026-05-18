@@ -64,7 +64,8 @@ The top of the page shows:
    - **Duration**: Automatically calculated
    - **Notes**: Additional information
    - **Status**: Confirmed or pending
-3. Click **"Save"** to create the booking
+3. At the bottom of the dialog, the **Send confirmation email** checkbox controls whether the member receives the booking confirmation email. It's checked by default - uncheck it when an admin is recording a booking that was already communicated to the member out-of-band (phone, in person, etc.). The checkbox only appears on create; editing an existing booking does not re-send the confirmation.
+4. Click **"Save"** to create the booking
 
 ### Booking Types
 
@@ -104,11 +105,15 @@ The top of the page shows:
 ### Viewing Booking Information
 
 1. Click on any booking in the grid
-2. View comprehensive booking details:
-   - **Booking Information**: Date, time, duration, status
-   - **Member Details**: Contact information and history
-   - **Area/Class Details**: Facility or class information
-   - **Payment Information**: Pricing and payment status
+2. View comprehensive booking details. The details page uses a two-column layout:
+   - **Left column (info table)**: Created At, **Created by** (and the source - admin, member portal, public website, or system), Customer / Coach, Recurrence / Entrance method, Discount.
+   - **Right column**: Players list and, for bookings with notes, a yellow note card.
+   - **Status chips** (confirmed, pending, cancelled, paid/unpaid) appear next to the page title.
+   - **Tabs** below: Payment information, audit log, and - for recurring bookings - a **Bookings** tab that lists sibling occurrences in the series.
+
+### Pay multiple transactions at once
+
+The **Add Payment** action on the booking details page (also available from the right-click and mobile-tap menus on the scheduler) supports paying multiple outstanding transactions in one shot. When you open the payment dialog from a booking with several unpaid transactions, the amount is locked to the sum of remaining balances and all selected transactions are settled atomically. Partial multi-transaction payments are not supported - settle the full sum or use Transactions to pay one at a time.
 
 ### Booking Status Management
 
@@ -203,6 +208,9 @@ Payment timing - whether members pay at booking, at check-in, or not at all - is
 
 **Issue**: Cannot create booking
 **Solution**: Check area availability and operating hours
+
+**Issue**: "Class has already ended" when booking a class
+**Solution**: The class occurrence is in the past and its status is `completed`. Classes that have ended cannot be booked retroactively. If you need to log attendance for a past class, create the booking against a future or current occurrence, or contact support. (Previously this returned a misleading "Class is cancelled" message.)
 
 **Issue**: Booking not showing in calendar
 **Solution**: Verify booking status and date range

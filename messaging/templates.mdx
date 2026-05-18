@@ -52,14 +52,62 @@ Message templates are pre-written messages that you can use as starting points f
 
 ### **Template Variables**
 
-Use these placeholders in your templates:
+Variables are written as `{{variableName}}` and substituted at send time. Use the **Insert variable** picker in the editor toolbar to browse and insert variables without typing them by hand. The picker groups variables by category (Contact, Organization, Booking, Membership) and shows a short description for each.
 
-- `{{contact.name}}` - Recipient's name
-- `{{contact.email}}` - Recipient's email
-- `{{club.name}}` - Your club name
-- `{{club.address}}` - Your club address
-- `{{class.name}}` - Class name (if applicable)
-- `{{class.date}}` - Class date (if applicable)
+For automations, the available variables depend on the **trigger**. Booking-triggered messages get the booking variables; membership-triggered messages get the membership variables. Variables that aren't available for the current trigger ship as literal `{{variableName}}` text, so always insert from the picker rather than typing.
+
+#### Available everywhere
+
+Available on every trigger and in any manual message.
+
+| Variable | Description |
+| --- | --- |
+| `{{contactFirstName}}` | Recipient's first name (use for greetings) |
+| `{{contactName}}` | Recipient's full name |
+| `{{contactLastName}}` | Recipient's last name |
+| `{{contactEmail}}` | Recipient's email address |
+| `{{organizationName}}` | Your organization's name |
+| `{{organizationEmail}}` | Your organization's email |
+| `{{organizationPhone}}` | Your organization's phone number |
+| `{{clubName}}` | Club name |
+| `{{orgBaseUrl}}` | Your organization's base URL |
+| `{{orgLogoUrl}}` | Your organization's logo URL |
+
+#### Booking triggers
+
+Available on booking-related triggers: booking created, cancelled, no-show, checked-in, and upcoming reminders.
+
+| Variable | Description |
+| --- | --- |
+| `{{entityName}}` | The booked class, area or instructor (no club name) |
+| `{{bookingResource}}` | Joined display of class, area, instructor and club on the booking |
+| `{{bookingDate}}` | Booking date, e.g. "Mar 12, 2026" |
+| `{{bookingTime}}` | Booking time range, e.g. "10:00 - 11:00" |
+| `{{bookingStartTime}}` | Booking start time |
+| `{{bookingEndTime}}` | Booking end time |
+| `{{bookingDuration}}` | Booking length, e.g. "1h" or "1h 30min" |
+| `{{accessPin}}` | The member's access PIN, or empty if they don't have one |
+
+#### Membership triggers
+
+Available on membership-related triggers: created, cancelled, and expiring.
+
+| Variable | Description |
+| --- | --- |
+| `{{planName}}` | Membership plan name |
+| `{{renewalPrice}}` | Renewal amount with currency |
+| `{{membershipExpiresAt}}` | Membership expiration date |
+| `{{daysUntilExpiration}}` | Days until membership expires |
+
+#### Membership expiring only
+
+| Variable | Description |
+| --- | --- |
+| `{{renewUrl}}` | Deep link to the member portal renewal page |
+
+<Note>
+  `{{accessPin}}` returns only the raw PIN (or empty). Write any surrounding label as plain text, for example: `Door code: {{accessPin}}`. The older `{{accessPinLine}}` token that rendered a full English sentence has been removed.
+</Note>
 
 ## Template Categories
 
@@ -159,46 +207,38 @@ Use these placeholders in your templates:
 ### **Welcome Email Template**
 
 ```text
-Subject: Welcome to {{club.name}}!
+Subject: Welcome to {{organizationName}}!
 
-Hi {{contact.name}},
+Hi {{contactFirstName}},
 
-Welcome to {{club.name}}! We're excited to have you as a new member.
+Welcome to {{organizationName}}! We're excited to have you as a new member.
 
-Your membership includes:
-- Access to all our facilities
-- Free classes and workshops
-- Member-only events
-- 24/7 facility access
-
-We're located at {{club.address}} and open 24/7 for your convenience.
-
-If you have any questions, don't hesitate to reach out!
+If you have any questions, don't hesitate to reach out at {{organizationEmail}}.
 
 Best regards,
-The {{club.name}} Team
+The {{organizationName}} Team
 ```
 
-### **Class Reminder Template**
+### **Booking Reminder Template**
+
+Use on a booking trigger so that `{{entityName}}`, `{{bookingDate}}`, `{{bookingTime}}` and `{{bookingDuration}}` are available.
 
 ```text
-Subject: Reminder: {{class.name}} tomorrow at {{class.time}}
+Subject: Reminder: {{entityName}} at {{clubName}}
 
-Hi {{contact.name}},
+Hi {{contactFirstName}},
 
-This is a friendly reminder that you have {{class.name}} scheduled for tomorrow at {{class.time}}.
+This is a friendly reminder for your upcoming session:
 
-Class details:
-- Date: {{class.date}}
-- Time: {{class.time}}
-- Instructor: {{class.instructor}}
-- Location: {{class.location}}
+- What: {{entityName}}
+- When: {{bookingDate}}, {{bookingTime}} ({{bookingDuration}})
+- Where: {{clubName}}
+- Door code: {{accessPin}}
 
-Please arrive 10 minutes early to check in.
+Please arrive a few minutes early to check in.
 
 See you there!
-
-The {{club.name}} Team
+The {{organizationName}} Team
 ```
 
 ## Advanced Features

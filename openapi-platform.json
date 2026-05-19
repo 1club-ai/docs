@@ -3,7 +3,7 @@
   "info": {
     "title": "1Club Platform API",
     "version": "1.0.0",
-    "description": "The 1Club Platform API lets you programmatically access and manage your organization's data.\n\n## Authentication\n\nAll requests require a customer API key passed as a Bearer token:\n\n```\nAuthorization: Bearer 1club_sk_live_...\n```\n\nGenerate API keys from the admin portal under **Settings > API Tokens**.\nThe key is tied to your organization — all responses are scoped to your org's data.\n\n## Rate Limiting\n\n- **100 requests per minute** per API key\n- When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header\n- Rate limit headers are included in every response:\n  - `X-RateLimit-Limit` — max requests per window\n  - `X-RateLimit-Remaining` — requests remaining\n  - `X-RateLimit-Reset` — seconds until the window resets\n\n## Errors\n\n| Status | Meaning |\n|--------|---------|\n| `400` | Invalid request parameters |\n| `401` | Missing or invalid API key |\n| `404` | Resource not found (or doesn't belong to your organization) |\n| `429` | Rate limit exceeded |\n| `500` | Internal server error |",
+    "description": "The 1Club Platform API lets you programmatically access and manage your organization's data.\n\n## Authentication\n\nAll requests require a customer API key passed as a Bearer token:\n\n```\nAuthorization: Bearer 1club_sk_live_...\n```\n\nGenerate API keys from the admin portal under **Settings > API Tokens**.\nThe key is tied to your organization - all responses are scoped to your org's data.\n\n## Rate Limiting\n\n- **100 requests per minute** per organization\n- When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header\n- Rate limit headers are included in every response:\n  - `X-RateLimit-Limit` - max requests per window\n  - `X-RateLimit-Remaining` - requests remaining\n  - `X-RateLimit-Reset` - seconds until the window resets\n\n## Errors\n\n| Status | Meaning |\n|--------|---------|\n| `400` | Invalid request parameters |\n| `401` | Missing or invalid API key |\n| `403` | API key is missing the required scope |\n| `404` | Resource not found (or doesn't belong to your organization) |\n| `429` | Rate limit exceeded |\n| `500` | Internal server error |",
     "contact": {
       "name": "1Club API Support",
       "email": "support@1club.ai"
@@ -15,6 +15,17 @@
       "description": "Production API"
     }
   ],
+  "tags": [
+    { "name": "Classes", "description": "Browse class schedules, pricing, and availability." },
+    { "name": "Content", "description": "Read published content (FAQs, posts, documents, blocks)." },
+    { "name": "Clubs", "description": "Look up club details by slug." },
+    { "name": "Transactions", "description": "List and inspect billing transactions." }
+  ],
+  "security": [
+    {
+      "customerApiAuth": []
+    }
+  ],
   "components": {
     "securitySchemes": {
       "customerApiAuth": {
@@ -24,399 +35,382 @@
       }
     },
     "schemas": {
-      "PlatformContact": {
+      "PlatformError": {
         "type": "object",
         "properties": {
-          "id": { "type": "integer" },
-          "name": { "type": "string", "nullable": true },
-          "email": { "type": "string", "nullable": true },
-          "phone": { "type": "string", "nullable": true },
-          "profileImage": { "type": "string", "nullable": true },
-          "address": { "type": "string", "nullable": true }
+          "error": { "type": "string" }
         }
       },
       "PlatformInstructor": {
         "type": "object",
+        "description": "Public instructor shape returned alongside classes.",
         "properties": {
           "id": { "type": "integer" },
-          "contacts": { "$ref": "#/components/schemas/PlatformContact" }
-        }
-      },
-      "PlatformArea": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer" },
-          "name": { "type": "string" },
-          "area_types": {
+          "contactId": { "type": "integer" },
+          "sports": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "typeId": { "type": "integer", "nullable": true },
+          "type": {
             "type": "object",
             "nullable": true,
             "properties": {
-              "sports": { "type": "string", "nullable": true },
+              "id": { "type": "integer" },
               "name": { "type": "string" }
+            }
+          },
+          "experience": { "type": "string", "nullable": true },
+          "hourlyRate": { "type": "number", "format": "float", "nullable": true },
+          "bio": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "EditorJS document for the instructor bio."
+          },
+          "certifications": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "isActive": { "type": "boolean" },
+          "isBookable": { "type": "boolean" },
+          "contact": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "name": { "type": "string", "nullable": true },
+              "profileImage": { "type": "string", "nullable": true }
             }
           }
         }
       },
       "PlatformClass": {
         "type": "object",
+        "description": "A class returned by the platform API, including scheduling, capacity, pricing (with tax), club/area context, instructors, and computed status fields.",
         "properties": {
           "id": { "type": "integer" },
-          "slug": { "type": "string" },
           "name": { "type": "string" },
+          "slug": { "type": "string", "nullable": true },
+          "description": { "type": "string", "nullable": true },
+          "images": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "classType": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": { "type": "integer" },
+              "name": { "type": "string", "nullable": true },
+              "slug": { "type": "string", "nullable": true }
+            }
+          },
+          "isMultiDay": { "type": "boolean" },
           "startTime": { "type": "string", "format": "date-time" },
           "endTime": { "type": "string", "format": "date-time" },
-          "price": { "type": "number", "nullable": true },
+          "duration": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Duration in hours when present."
+          },
+          "maxCapacity": { "type": "integer", "nullable": true },
+          "price": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Price including any applicable default tax."
+          },
           "isFree": { "type": "boolean" },
-          "instructors": {
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/PlatformInstructor" }
-          }
-        }
-      },
-      "PlatformClub": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer" },
-          "name": { "type": "string" },
-          "slug": { "type": "string" },
-          "address": { "type": "string", "nullable": true },
-          "phone": { "type": "string", "nullable": true },
-          "email": { "type": "string", "nullable": true }
-        }
-      },
-      "PlatformPaymentMethod": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer" },
-          "name": { "type": "string" }
-        }
-      },
-      "PlatformMembership": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer" },
-          "usesRemaining": { "type": "integer", "nullable": true },
-          "maxUses": { "type": "integer", "nullable": true },
+          "visibility": {
+            "type": "string",
+            "enum": ["Public", "Member_only", "Private"]
+          },
           "status": { "type": "string" },
-          "plans": {
+          "recurrence": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "sport": { "type": "string", "nullable": true },
+          "color": { "type": "string", "nullable": true },
+          "club": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": { "type": "integer" },
+              "name": { "type": "string" },
+              "slug": { "type": "string", "nullable": true }
+            }
+          },
+          "area": {
             "type": "object",
             "nullable": true,
             "properties": {
               "id": { "type": "integer" },
               "name": { "type": "string" }
             }
+          },
+          "instructors": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlatformInstructor" }
+          },
+          "timeStatus": { "type": "string", "nullable": true },
+          "availabilityStatus": { "type": "string", "nullable": true },
+          "userStatus": { "type": "string", "nullable": true },
+          "waitlistPosition": { "type": "integer", "nullable": true },
+          "currentBookings": { "type": "integer", "nullable": true },
+          "translations": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "Per-locale translations keyed by language code (e.g. 'es', 'fr')."
           }
         }
       },
-      "PlatformTransaction": {
+      "PlatformClub": {
         "type": "object",
+        "description": "A club with its address, contact info, amenities, sports, aggregated images, and average rating.",
         "properties": {
           "id": { "type": "integer" },
-          "amount": { "type": "number" },
-          "taxAmount": { "type": "number", "nullable": true },
-          "totalAmount": { "type": "number" },
-          "currency": { "type": "string" },
-          "paymentStatus": { "type": "string" },
-          "transactionType": { "type": "string" },
-          "tax_rates": {
+          "name": { "type": "string" },
+          "slug": { "type": "string", "nullable": true },
+          "address": { "type": "string", "nullable": true },
+          "city": { "type": "string", "nullable": true },
+          "state": { "type": "string", "nullable": true },
+          "country": { "type": "string", "nullable": true },
+          "postalCode": { "type": "string", "nullable": true },
+          "phone": { "type": "string", "nullable": true },
+          "email": { "type": "string", "nullable": true },
+          "website": { "type": "string", "nullable": true },
+          "logo": { "type": "string", "nullable": true },
+          "images": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "All images aggregated from the club and its active areas."
+          },
+          "amenities": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Raw amenity IDs stored on the club."
+          },
+          "amenitiesResolved": {
+            "type": "array",
+            "description": "Amenities resolved to display objects (id, name, locale-aware).",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "icon": { "type": "string", "nullable": true },
+                "category": { "type": "string", "nullable": true }
+              }
+            }
+          },
+          "sports": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "rating": {
+            "type": "object",
+            "nullable": true,
+            "description": "Average and total of public reviews. Omitted when there are no public reviews.",
+            "properties": {
+              "average": { "type": "number", "format": "float" },
+              "total": { "type": "integer" }
+            }
+          },
+          "socialProfiles": {
+            "type": "object",
+            "additionalProperties": { "type": "string" },
+            "description": "Map of social network keys (e.g. 'instagram') to profile URLs."
+          }
+        }
+      },
+      "PlatformContent": {
+        "type": "object",
+        "description": "A published content item (FAQ, post, document, or block) for the organization.",
+        "properties": {
+          "id": { "type": "integer" },
+          "organizationId": { "type": "integer" },
+          "title": { "type": "string" },
+          "slug": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["faq", "post", "document", "block"]
+          },
+          "status": { "type": "string" },
+          "visibility": {
+            "type": "string",
+            "enum": ["Public", "Member_only", "Private"]
+          },
+          "content": {
+            "type": "object",
+            "description": "Body of the content item. May contain HTML, EditorJS blocks, a summary, and keywords.",
+            "properties": {
+              "html": { "type": "string", "nullable": true },
+              "blocks": {
+                "type": "object",
+                "nullable": true,
+                "additionalProperties": true,
+                "description": "EditorJS document."
+              },
+              "summary": { "type": "string", "nullable": true },
+              "keywords": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "excerpt": { "type": "string", "nullable": true },
+          "metaTitle": { "type": "string", "nullable": true },
+          "metaDescription": { "type": "string", "nullable": true },
+          "metaKeywords": { "type": "string", "nullable": true },
+          "canonicalUrl": { "type": "string", "nullable": true },
+          "template": { "type": "string", "nullable": true },
+          "layout": { "type": "string", "nullable": true },
+          "customFields": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "summary": { "type": "string", "nullable": true },
+          "keywords": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "images": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "featured": { "type": "boolean", "nullable": true },
+          "authorId": { "type": "integer", "nullable": true },
+          "author": {
             "type": "object",
             "nullable": true,
             "properties": {
               "id": { "type": "integer" },
               "name": { "type": "string" },
-              "rate": { "type": "number" },
-              "description": { "type": "string", "nullable": true }
+              "email": { "type": "string" },
+              "profileImage": { "type": "string", "nullable": true }
             }
-          }
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "language": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
         }
       },
-      "PlatformBooking": {
+      "PlatformTransaction": {
         "type": "object",
+        "description": "A billing transaction with amounts, payment status, and links to the originating booking or membership.",
         "properties": {
           "id": { "type": "integer" },
-          "userId": { "type": "integer", "nullable": true },
-          "sport": { "type": "string", "nullable": true },
-          "startTime": { "type": "string", "format": "date-time" },
-          "endTime": { "type": "string", "format": "date-time" },
-          "totalPrice": { "type": "number" },
-          "status": {
+          "description": { "type": "string", "nullable": true },
+          "transactionType": {
             "type": "string",
-            "enum": ["pending", "confirmed", "cancelled"]
+            "nullable": true,
+            "description": "TransactionType enum value (e.g. booking_creation, membership_creation, product_sale, membership_recurrence, etc.)."
           },
-          "notes": { "type": "string", "nullable": true },
+          "bookingId": { "type": "integer", "nullable": true },
+          "membershipId": { "type": "integer", "nullable": true },
           "createdAt": { "type": "string", "format": "date-time" },
-          "playerEmails": { "type": "array", "items": { "type": "string" }, "nullable": true },
-          "entranceMethod": { "type": "string", "nullable": true },
-          "preferredPaymentMethod": {
-            "nullable": true,
-            "$ref": "#/components/schemas/PlatformPaymentMethod"
-          },
-          "areas": {
-            "nullable": true,
-            "$ref": "#/components/schemas/PlatformArea"
-          },
-          "classes": {
-            "nullable": true,
-            "$ref": "#/components/schemas/PlatformClass"
-          },
-          "instructors": {
-            "nullable": true,
-            "$ref": "#/components/schemas/PlatformInstructor"
-          },
-          "clubs": {
-            "nullable": true,
-            "$ref": "#/components/schemas/PlatformClub"
-          },
-          "contacts": {
-            "nullable": true,
-            "$ref": "#/components/schemas/PlatformContact"
-          },
-          "organizations": {
-            "type": "object",
-            "properties": {
-              "currency": { "type": "string" }
-            }
-          },
-          "memberships": {
-            "nullable": true,
-            "$ref": "#/components/schemas/PlatformMembership"
-          },
-          "transactions": {
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/PlatformTransaction" }
-          },
-          "duration": {
-            "type": "number",
-            "description": "Booking duration in hours (derived)"
-          },
-          "amountDue": {
-            "type": "number",
-            "description": "Outstanding amount due (derived)"
-          },
-          "isPast": {
-            "type": "boolean",
-            "description": "Whether the booking is in the past (derived)"
-          },
+          "date": { "type": "string", "format": "date-time" },
           "paymentStatus": {
             "type": "string",
-            "description": "Payment status from the latest transaction (derived)"
+            "enum": [
+              "pending",
+              "paid",
+              "void",
+              "failed",
+              "settled",
+              "overdue",
+              "partially_paid",
+              "refunded",
+              "cancelled"
+            ]
           },
-          "paidStatus": {
-            "type": "string",
-            "enum": ["paid", "unpaid", "not_required"],
-            "description": "Simplified paid status (derived)"
+          "amount": {
+            "type": "number",
+            "format": "decimal",
+            "description": "Pre-tax amount. Serialized as a decimal string on the wire (e.g. \"25.00\") to preserve precision - parse rather than relying on JSON number behavior."
+          },
+          "taxAmount": {
+            "type": "number",
+            "format": "decimal",
+            "description": "Tax portion. Serialized as a decimal string on the wire to preserve precision."
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "decimal",
+            "description": "Total billed amount (amount + taxAmount). Serialized as a decimal string on the wire to preserve precision."
           }
         }
       }
     }
   },
-  "security": [
-    {
-      "customerApiAuth": []
-    }
-  ],
   "paths": {
-    "/v1/platform/bookings": {
-      "get": {
-        "summary": "List bookings for the organization",
-        "description": "Returns bookings for the organization associated with the API token. Supports filtering by club, area, class, instructor, contact, status, and date range. Cancelled bookings are excluded by default.\n",
-        "tags": [
-          "Bookings"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "clubId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Filter by club ID"
-          },
-          {
-            "in": "query",
-            "name": "areaId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Filter by area ID"
-          },
-          {
-            "in": "query",
-            "name": "classId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Filter by class ID"
-          },
-          {
-            "in": "query",
-            "name": "instructorId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Filter by instructor ID"
-          },
-          {
-            "in": "query",
-            "name": "contactId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Filter by contact ID"
-          },
-          {
-            "in": "query",
-            "name": "status",
-            "schema": {
-              "type": "string",
-              "enum": ["pending", "confirmed", "cancelled"]
-            },
-            "description": "Filter by booking status"
-          },
-          {
-            "in": "query",
-            "name": "startDate",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "description": "Filter bookings starting from this date"
-          },
-          {
-            "in": "query",
-            "name": "endDate",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "description": "Filter bookings ending before this date"
-          },
-          {
-            "in": "query",
-            "name": "includeCancelled",
-            "schema": {
-              "type": "boolean"
-            },
-            "description": "Include cancelled bookings (excluded by default)"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of bookings with details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PlatformBooking"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid or missing API key"
-          },
-          "403": {
-            "description": "Missing required scope (bookings:read)"
-          }
-        }
-      }
-    },
-    "/v1/platform/bookings/{id}": {
-      "get": {
-        "summary": "Get a booking by ID",
-        "description": "Returns a single booking with full details. The booking must belong to the organization associated with the API token.\n",
-        "tags": [
-          "Bookings"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Booking ID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Booking details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformBooking"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid booking ID"
-          },
-          "404": {
-            "description": "Booking not found"
-          }
-        }
-      }
-    },
     "/v1/platform/classes": {
       "get": {
         "summary": "List classes for the organization",
-        "description": "Returns all classes for the organization associated with the API token.\n",
-        "tags": [
-          "Classes"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
+        "description": "Returns all classes for the organization associated with the API token. Requires the `classes:read` scope.\n",
+        "tags": ["Classes"],
+        "security": [{ "customerApiAuth": [] }],
         "parameters": [
           {
             "in": "query",
             "name": "startDate",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            },
+            "schema": { "type": "string", "format": "date-time" },
             "description": "Filter classes starting from this date"
           },
           {
             "in": "query",
             "name": "endDate",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            },
+            "schema": { "type": "string", "format": "date-time" },
             "description": "Filter classes ending before this date"
           },
           {
             "in": "query",
             "name": "locale",
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "description": "Locale for translations (e.g. \"en\", \"es\")"
           }
         ],
         "responses": {
           "200": {
-            "description": "List of classes"
+            "description": "List of classes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/PlatformClass" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Invalid or missing API key",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "403": {
+            "description": "API key is missing the required `classes:read` scope",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
           }
         }
       }
@@ -424,40 +418,52 @@
     "/v1/platform/classes/{id}": {
       "get": {
         "summary": "Get a class by ID",
-        "description": "Returns a single class. The class must belong to the organization associated with the API token.\n",
-        "tags": [
-          "Classes"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
+        "description": "Returns a single class. The class must belong to the organization associated with the API token. Requires the `classes:read` scope.\n",
+        "tags": ["Classes"],
+        "security": [{ "customerApiAuth": [] }],
         "parameters": [
           {
             "in": "path",
             "name": "id",
             "required": true,
-            "schema": {
-              "type": "integer"
-            },
+            "schema": { "type": "integer" },
             "description": "Class ID"
           },
           {
             "in": "query",
             "name": "locale",
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "description": "Locale for translations"
           }
         ],
         "responses": {
           "200": {
-            "description": "Class details"
+            "description": "Class details",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PlatformClass" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid class ID",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "403": {
+            "description": "API key is missing the required `classes:read` scope",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
           },
           "404": {
-            "description": "Class not found"
+            "description": "Class not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
           }
         }
       }
@@ -465,40 +471,48 @@
     "/v1/platform/clubs/{slug}": {
       "get": {
         "summary": "Get club details by slug",
-        "description": "Returns club details including amenities, rating, and images. The club must belong to the organization associated with the API token.\n",
-        "tags": [
-          "Clubs"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
+        "description": "Returns club details including amenities, rating, and images. The club must belong to the organization associated with the API token. Requires the `clubs:read` scope.\n",
+        "tags": ["Clubs"],
+        "security": [{ "customerApiAuth": [] }],
         "parameters": [
           {
             "in": "path",
             "name": "slug",
             "required": true,
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "description": "Club slug"
           },
           {
             "in": "query",
             "name": "locale",
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "description": "Locale for amenity translations"
           }
         ],
         "responses": {
           "200": {
-            "description": "Club details"
+            "description": "Club details",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PlatformClub" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "403": {
+            "description": "API key is missing the required `clubs:read` scope",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
           },
           "404": {
-            "description": "Club not found"
+            "description": "Club not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
           }
         }
       }
@@ -506,46 +520,53 @@
     "/v1/platform/content": {
       "get": {
         "summary": "List published content",
-        "description": "Returns published content for the organization. Optionally filter by type.\n",
-        "tags": [
-          "Content"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
+        "description": "Returns published content for the organization. Optionally filter by type. Requires the `content:read` scope.\n",
+        "tags": ["Content"],
+        "security": [{ "customerApiAuth": [] }],
         "parameters": [
           {
             "in": "query",
             "name": "type",
             "schema": {
               "type": "string",
-              "enum": [
-                "faq",
-                "post",
-                "announcement",
-                "document",
-                "rich-text"
-              ]
+              "enum": ["faq", "post", "document", "block"]
             },
             "description": "Filter by content type"
           },
           {
             "in": "query",
             "name": "locale",
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "description": "Locale for content resolution"
           }
         ],
         "responses": {
           "200": {
-            "description": "List of published content"
+            "description": "List of published content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/PlatformContent" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Invalid or missing API key",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "403": {
+            "description": "API key is missing the required `content:read` scope",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
           }
         }
       }
@@ -553,44 +574,189 @@
     "/v1/platform/content/{slug}": {
       "get": {
         "summary": "Get content by slug",
-        "description": "Returns a single published content item by slug.\n",
-        "tags": [
-          "Content"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
+        "description": "Returns a single published content item by slug. Requires the `content:read` scope.\n",
+        "tags": ["Content"],
+        "security": [{ "customerApiAuth": [] }],
         "parameters": [
           {
             "in": "path",
             "name": "slug",
             "required": true,
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "description": "Content slug"
           },
           {
             "in": "query",
             "name": "locale",
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "description": "Locale for content resolution"
           }
         ],
         "responses": {
           "200": {
-            "description": "Content item"
+            "description": "Content item",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PlatformContent" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "403": {
+            "description": "API key is missing the required `content:read` scope",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
           },
           "404": {
-            "description": "Content not found"
+            "description": "Content not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          }
+        }
+      }
+    },
+    "/v1/platform/transactions": {
+      "get": {
+        "summary": "List transactions for the organization",
+        "description": "Returns transactions for the organization associated with the API token, filtered by transaction creation time to a window of at most 24 hours and ordered by `createdAt` descending. When `startDate` and `endDate` are omitted, the window defaults to the last 24 hours (`endDate = now`, `startDate = now - 24h`). When only one of the two is provided, the other is derived from the 24-hour window. Transactions with `amount = 0` are excluded. Requires the `transactions:read` scope.\n",
+        "tags": ["Transactions"],
+        "security": [{ "customerApiAuth": [] }],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "startDate",
+            "schema": { "type": "string", "format": "date-time" },
+            "description": "Inclusive lower bound on transaction `createdAt`. Defaults to `endDate - 24h`."
+          },
+          {
+            "in": "query",
+            "name": "endDate",
+            "schema": { "type": "string", "format": "date-time" },
+            "description": "Inclusive upper bound on transaction `createdAt`. Defaults to `now`."
+          },
+          {
+            "in": "query",
+            "name": "paymentStatus",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "paid",
+                "void",
+                "failed",
+                "settled",
+                "overdue",
+                "partially_paid",
+                "refunded",
+                "cancelled"
+              ]
+            },
+            "description": "Filter by payment status. When omitted, all statuses are returned."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100
+            },
+            "description": "Maximum number of transactions to return."
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "Number of transactions to skip."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of transactions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/PlatformTransaction" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters (e.g. malformed date, window > 24h)",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "403": {
+            "description": "API key is missing the required `transactions:read` scope",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          }
+        }
+      }
+    },
+    "/v1/platform/transactions/{id}": {
+      "get": {
+        "summary": "Get a transaction by ID",
+        "description": "Returns a single transaction. The transaction must belong to the organization associated with the API token. Requires the `transactions:read` scope.\n",
+        "tags": ["Transactions"],
+        "security": [{ "customerApiAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "Transaction ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction details",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PlatformTransaction" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid transaction ID",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "403": {
+            "description": "API key is missing the required `transactions:read` scope",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "404": {
+            "description": "Transaction not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
           }
         }
       }
     }
-  },
-  "tags": []
+  }
 }

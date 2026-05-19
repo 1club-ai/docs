@@ -1,10 +1,10 @@
 ---
 title: "API Reference"
 sidebarTitle: "Introduction"
-description: "Integrate with the 1Club platform to access clubs, classes, bookings, plans, instructors, and more."
+description: "Integrate with the 1Club platform to access clubs, classes, content, and transactions."
 ---
 
-The 1Club Platform API lets you programmatically access and manage your organization's data — clubs, classes, bookings, content, and more — from your own websites, integrations, and back-office scripts.
+The 1Club Platform API lets you programmatically access and manage your organization's data - clubs, classes, content, and transactions - from your own websites, integrations, and back-office scripts.
 
 ## Base URL
 
@@ -58,7 +58,12 @@ Each token is granted access to specific resources with either **Read** or **Wri
 - **Read** — allows fetching data (GET requests)
 - **Write** — allows creating and updating data (POST/PUT/PATCH requests)
 
-Grant only the scopes the integration actually needs. For example, the Bookings endpoints require the `bookings:read` scope.
+Grant only the scopes the integration actually needs. The Platform API currently supports these read scopes:
+
+- `classes:read` - list and read classes
+- `content:read` - list and read published content
+- `clubs:read` - look up clubs by slug
+- `transactions:read` - list and read billing transactions
 
 ### Revoking a token
 
@@ -73,10 +78,10 @@ curl https://api.1club.ai/v1/platform/clubs/my-club-slug \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
-List bookings for a date range:
+List recent paid transactions (the last 24 hours by default):
 
 ```bash
-curl "https://api.1club.ai/v1/platform/bookings?startDate=2026-05-01&endDate=2026-05-31" \
+curl "https://api.1club.ai/v1/platform/transactions?paymentStatus=paid" \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
@@ -89,7 +94,7 @@ curl "https://api.1club.ai/v1/platform/classes?startDate=2026-05-01" \
 
 ## Rate limiting
 
-- **100 requests per minute** per API key
+- **100 requests per minute** per organization
 - When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header
 - Rate limit headers are included in every response:
   - `X-RateLimit-Limit` — max requests per window

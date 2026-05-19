@@ -77,6 +77,25 @@ Member onboarding is the process of welcoming new members to your club and helpi
 - **Membership Selection** - Plan type and duration
 - **Payment Information** - Credit card or bank details
 
+#### Configuring which fields appear
+
+The visibility of optional system fields on the public signup form is set per organization under **Settings → Contacts**. For each of **Phone**, **Date of birth**, and **Gender** you choose one of:
+
+- **Required** - the field is shown and must be filled in to submit.
+- **Optional** - the field is shown but can be left empty.
+- **Hidden** - the field is not shown at all.
+
+The server enforces these choices on submission - a hidden field cannot be back-filled by editing the request, and a required field that is empty rejects the signup.
+
+### Family members on signup
+
+The same **Settings → Contacts** page has a **Show family members on signup** toggle. Behavior:
+
+- **On** - the signup form shows a "Family members" section where the primary signer can add additional members (children, partner, etc.) in the same flow. Each family member submitted carries its own date of birth.
+- **Off** - the family-members section is hidden. The server rejects any request that includes family members with HTTP 400; this protects you against forged requests that try to enrol additional people while the feature is disabled.
+
+When **Date of birth** is set to **Required** under signup fields, the requirement applies to **every** family member as well - submitting a family member without a DOB fails the signup. The public website and member portal validate this client-side in all supported locales before the request is sent, so the user sees an inline message rather than a server error.
+
 ### **Account Verification**
 
 - **Email verification** to confirm valid address

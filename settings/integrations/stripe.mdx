@@ -1,0 +1,67 @@
+---
+title: Stripe
+description: Accept card and digital wallet payments through Stripe, with a test sandbox and live Stripe Connect onboarding
+---
+
+Stripe powers card and digital wallet payments across 1Club: member checkout in the portal and kiosk, admin-initiated charges, payment links, and recurring billing. You can start in test mode against the 1Club sandbox without any Stripe account, then switch to live mode to onboard your own Stripe Connect account and start accepting real money.
+
+## Before you start
+
+- You don't need anything to try test mode - 1Club ships a sandbox you can use immediately.
+- To go live you need a Stripe account (or you can create one during onboarding) with the business details, bank account, and identity verification documents Stripe requires for your country.
+
+## Connect Stripe
+
+1. Go to **Settings → Integrations**.
+2. On the Stripe card, click **Activate**, or open the existing Stripe page and click **Enable Stripe**.
+3. 1Club creates a Stripe Connect account behind the scenes and opens Stripe's onboarding in a new tab.
+4. Complete Stripe's onboarding form: business details, representative, bank account, and any identity documents Stripe asks for.
+5. When you return to 1Club, the page automatically refreshes your account status after a couple of seconds.
+
+If you close the onboarding tab early, click **Complete Setup** to reopen the same flow.
+
+## Test mode vs. live mode
+
+The **Live mode** toggle on the Stripe page controls where payments go:
+
+- **Test mode (off)** uses the 1Club sandbox. Real cards are not charged - use Stripe's [test card numbers](https://stripe.com/docs/testing) to simulate payments.
+- **Live mode (on)** uses your own Stripe Connect account. Customers are charged for real and payouts go to your bank account.
+
+Switching to live mode for the first time triggers Stripe onboarding if your Connect account is not complete. If your account is missing information, 1Club blocks the toggle and surfaces a **Complete Setup** action.
+
+## Account capabilities
+
+Once you have a Connect account, the page shows three flags pulled from Stripe:
+
+- **Charges** - whether Stripe will accept new payments on this account.
+- **Payouts** - whether Stripe will send money from your Stripe balance to your bank.
+- **Setup** - whether Stripe considers your account verification complete.
+
+Click **Refresh Status** to re-pull these from Stripe. Click **View Dashboard** to open `dashboard.stripe.com` in a new tab.
+
+## Setup progress and requirements
+
+If Stripe still needs information from you, 1Club shows a **Setup Progress** card with three lists:
+
+- **Currently due** - blocking. Charges or payouts will not work until these are submitted.
+- **Pending verification** - Stripe is reviewing documents you have already submitted.
+- **Eventually due** - non-blocking. Payments work today, but Stripe will require these later to avoid restrictions.
+
+The **Complete Setup** button reopens Stripe's hosted onboarding flow so you can submit the missing items.
+
+## Disconnect
+
+Click **Disconnect** on the Stripe page to remove the integration. This stops 1Club from creating new charges on your Stripe account. Existing payments and payouts are unaffected on Stripe's side - manage refunds and disputes from the Stripe Dashboard.
+
+## What syncs
+
+- Charges, refunds, and disputes initiated from 1Club appear in your Stripe Dashboard.
+- Payment status updates from Stripe (succeeded, failed, refunded, disputed) flow back to 1Club via webhooks - no setup needed on your side.
+- Payouts go from Stripe to the bank account you configured during onboarding. Schedule and currency are controlled in the Stripe Dashboard.
+
+## Troubleshooting
+
+- **"Account needs additional information"** - open **Setup Progress** and submit everything under **Currently due**.
+- **Live mode toggle is blocked** - your Connect account is not ready. Click **Complete Setup** to finish onboarding.
+- **Payments succeed in test mode but fail live** - confirm you are in live mode (the toggle is on) and that **Charges** is enabled on the account.
+- **Charge succeeded in Stripe but not visible in 1Club** - click **Refresh Status**. If the discrepancy persists, contact support with the Stripe payment intent ID.

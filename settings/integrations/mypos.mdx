@@ -1,0 +1,59 @@
+---
+title: myPOS
+description: Accept card payments through myPOS hosted checkout, with sandbox and live modes
+---
+
+myPOS is an alternative payment provider available alongside Stripe. Customers are redirected to myPOS's hosted checkout page to enter their card details and bounced back to 1Club once the payment is complete. Card data never touches 1Club servers - all processing happens on myPOS's PCI-certified infrastructure.
+
+## Before you start
+
+- For test mode you don't need any credentials - 1Club ships a sandbox configuration.
+- For live mode you need a myPOS merchant account and the following from your myPOS dashboard:
+  - **SID** - your store identifier
+  - **Wallet Number** - the myPOS wallet that will receive funds
+  - **Key Index** - the index of the signing key pair (1-99)
+  - **Private Key** - the RSA private key that pairs with the public certificate registered with myPOS
+
+## Connect myPOS
+
+1. Go to **Settings → Integrations** and click **Activate** on the myPOS card.
+2. On the myPOS page, choose a mode:
+   - **Test** - uses the myPOS sandbox; no credentials needed.
+   - **Live** - reveals fields for SID, Wallet Number, Key Index, and Private Key.
+3. In live mode, paste each credential into the matching field. The private key field is masked once saved - leaving it blank when editing keeps the existing key.
+4. Click **Test connection** to validate credentials against myPOS before saving.
+5. Click **Save**.
+
+## Capabilities
+
+The **Capabilities** section controls which payment surfaces the integration supports:
+
+- **Online payments** - hosted checkout for portal, kiosk, and admin charges. Enabled by default.
+- **Terminal payments** - physical card terminal flow. Marked **Coming Soon** and currently disabled.
+
+## Test mode vs. live mode
+
+- **Test** uses myPOS sandbox endpoints. Cards are never charged - use myPOS test cards.
+- **Live** uses your myPOS merchant account. Real payments are taken and settled to your wallet.
+
+Switching from Live back to Test does not delete your saved credentials - they remain on file so you can switch back.
+
+## Test connection
+
+The **Test connection** button verifies that your saved credentials can sign a request myPOS accepts. It does not move money. Run it after any credential change to catch a wrong SID, mistyped wallet number, or mismatched key index before customers see a failed checkout.
+
+## What syncs
+
+- Payment requests created in 1Club open a myPOS checkout URL that your customer is redirected to.
+- After payment, myPOS notifies 1Club through a signed webhook (IPN). Payment status, transaction reference, and order ID are stored on the 1Club payment record.
+- Refunds initiated from 1Club go through the myPOS API.
+
+## Disconnect
+
+Click **Disconnect** on the myPOS page. This removes the integration and clears stored credentials. In-flight payments already on myPOS are unaffected.
+
+## Troubleshooting
+
+- **Test connection fails** - confirm the SID, Wallet Number, and Key Index match what is shown in your myPOS dashboard, and that the Private Key is the one paired with the public certificate uploaded to myPOS.
+- **Customers see "signature invalid" on the checkout page** - the public certificate registered with myPOS does not match the private key on file. Regenerate the key pair and re-upload to myPOS, then paste the new private key here.
+- **Payment succeeded on myPOS but stays Pending in 1Club** - the IPN webhook did not reach 1Club. Check that the webhook URL is whitelisted in your myPOS settings and re-trigger from myPOS.

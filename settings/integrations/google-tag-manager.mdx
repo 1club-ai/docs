@@ -1,0 +1,38 @@
+---
+title: Google Tag Manager
+description: Inject Google Tag Manager and GA4 tracking into your 1Club public surfaces
+---
+
+This integration adds Google Tag Manager (GTM) and Google Analytics 4 (GA4) tracking to your 1Club public-facing surfaces - the CMS website and the member portal - without code changes. Configure your container or measurement ID once and 1Club injects the tags on every page load.
+
+## Before you start
+
+- A GTM container ID (format `GTM-XXXXXXX`) or a GA4 measurement ID (format `G-XXXXXXXXXX`), or both. You can find these in [tagmanager.google.com](https://tagmanager.google.com) and [analytics.google.com](https://analytics.google.com).
+- Either field is optional, so you can use just GTM, just GA4, or both side by side.
+
+## Connect Google Tag Manager
+
+1. Go to **Settings → Integrations** and click **Activate** on the Google Tag Manager card.
+2. On the integration page, paste your **GTM Container ID** and/or **GA4 Measurement ID**.
+3. Click **Save**.
+
+The IDs are stored on your organization and used the next time a public page is rendered. No deployment or cache flush is required.
+
+## What gets tracked
+
+1Club only injects the tag - what it tracks is entirely up to your GTM workspace and GA4 property. Typical setups include:
+
+- Page views on the marketing site and member portal.
+- Conversion events for sign-up, booking confirmation, or purchase.
+- Custom dataLayer events you trigger from GTM tags.
+
+If you only configure the GA4 measurement ID, 1Club emits a basic `gtag.js` snippet. If you configure GTM, the container loads and any GA4 tag inside the container runs as you configured it there.
+
+## Disconnect
+
+Clear both fields and save. The tags stop being injected on subsequent page loads.
+
+## Troubleshooting
+
+- **Tag not firing** - confirm the ID format (`GTM-` or `G-` prefix, all uppercase) and that you saved the form. Then use the [Tag Assistant](https://tagassistant.google.com) on the public site to confirm the container loaded.
+- **Events missing in GA4** - check that the GA4 tag inside your GTM container is firing on the right triggers. GTM publishes are independent of 1Club - changes you make in GTM go live on the next publish there.

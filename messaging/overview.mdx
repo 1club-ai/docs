@@ -33,7 +33,7 @@ The relevant permissions are `messages.read.own` for viewing the inbox and `mess
 
 ## Plan limits
 
-Outbound sends count against your plan's email quota; SMS sends use Twilio capacity. Hitting either limit returns a `PLAN_LIMIT_EXCEEDED_HANDLED` error and surfaces a dialog instead of toasting a generic failure. The compose pane and quota check live behind the same `requireEmailCapacity` middleware on the server.
+Outbound email sends count against your plan's email quota. Hitting the limit returns a `PLAN_LIMIT_EXCEEDED` error and surfaces a dialog rather than a generic toast. The quota check runs through the `requireEmailCapacity` middleware on the server and applies to email only; SMS sends are not gated by this middleware.
 
 ## Related
 

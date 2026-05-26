@@ -63,11 +63,12 @@ Invoice status is normally derived from the linked transactions:
 
 ## Collecting on an invoice
 
-You have three options from the invoice:
+You have two options from the invoice detail page:
 
 - **Send a payment link** to the contact. They pay through a hosted Stripe Payment Element. On success, the linked transactions flip to `paid`, any pending bookings on those transactions become `confirmed`, and the invoice integrations JSON is updated with the Stripe payment ID.
 - **Add payment** to record what you collected outside Stripe (cash, bank transfer, manual card terminal). This creates a payment row, links it to the invoice's transactions, and updates status.
-- **Charge** the contact's stored Stripe payment method (when one is on file). This calls Stripe immediately. If it succeeds, transactions are marked paid; if it fails, the invoice's Stripe integration block records the failure.
+
+There's no "Charge stored card" action on the invoice details page. Charges against a saved payment method happen at the transaction level - go to [Transactions](/billing/transactions) and use **Batch charge** there, or use the per-transaction action from the Transactions tab on the booking.
 
 The invoice's totals are derived from its line items, which point at transaction IDs - editing the underlying transaction prices after issuing the invoice will not retroactively change the invoice total.
 

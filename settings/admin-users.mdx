@@ -1,263 +1,76 @@
 ---
-title: Admin User Management
-description: Learn how to manage admin users, roles, and permissions for your club management system
+title: Users
+description: Invite admin staff, assign one of five fixed roles, and manage invitations from Settings > Users.
 ---
 
-**In a nutshell:** Manage who has access to your admin panel, what they can do, and how they can help run your club effectively.
+**Settings > Users** is where you control who can sign into the admin and what they can do once they're in. Every organization user holds exactly one of five fixed roles. There is no custom-role builder - the role list is the same across every org.
 
-## What is Admin User Management?
+## The roles
 
-Admin user management controls who can access your club's admin panel and what features they can use. It helps you organize your team, assign appropriate permissions, and ensure security by giving each person access only to what they need.
+1Club ships with five canonical roles. Pick the one closest to what the person actually does day-to-day.
 
-## Key Features
+| Role | Typical use | What it can do |
+|------|-------------|----------------|
+| **Admin** | Owner or main administrator | Full access to every module (members, marketing, website, operations, billing, analytics, settings). |
+| **Manager** | Club or department manager | Members and operations full management, marketing manage, analytics manage, inventory manage, billing read and create. No settings. |
+| **Front desk** | Receptionist or front-of-house staff | Members create and read, messaging full, operations create and read, billing read and create. No settings, no analytics beyond their own. |
+| **Instructor** | Coach or teacher | Manages only their own classes, bookings, and check-ins. Reads their own analytics and messages. |
+| **Member** | End member | No admin portal access. Uses the member portal and public apps. |
 
-### **User Management**
+The full permission matrix lives in [Roles and permissions](/reference/roles-permissions).
 
-- **Add new admin users** to your team
-- **Edit user information** and contact details
-- **Deactivate users** who no longer need access
-- **View user activity** and login history
+### Owner flag
 
-### **Role Management**
+Owner is a separate flag on the user, not a sixth role. An Admin can be marked as **owner**, and only owners can delete the organization. Setting **Account owner** in the invite dialog forces the role to Admin.
 
-- **Create custom roles** for different job functions
-- **Assign permissions** to each role
-- **Modify role permissions** as needed
-- **Delete unused roles** to keep things organized
+## The Users page
 
-### **Permission Control**
+Open **Settings > Users**. The page is a single table of every organization user with these tabs at the top:
 
-- **Granular permissions** for each feature
-- **Read-only access** for viewing data
-- **Full access** for managing data
-- **No access** for restricted features
+- **All** - everyone in the organization.
+- **Admin**, **Manager**, **Front desk**, **Instructor**, **Member** - filtered by role.
 
-## User Roles
+Each tab shows a badge with the count. The search box filters by name or email and resets pagination.
 
-### **Super Admin**
+Each row shows the user's name, role chip (with an **Owner** chip if applicable), status (Active, Invited, Pending invite, Expired), and join date.
 
-- **Full system access** to all features
-- **User management** and role assignment
-- **System settings** and configuration
-- **Billing and payment** management
+## Inviting a user
 
-### **Manager**
+Click **Invite user** in the top right. The dialog has two modes:
 
-- **Most features** except user management
-- **Member management** and operations
-- **Reporting and analytics** access
-- **Billing oversight** and monitoring
+- **From a contact** - pick someone who already exists in your contact list.
+- **New person** - enter first name, last name, and email.
 
-### **Staff**
+Then choose a role from the five listed above. Tick **Account owner** if this person should be allowed to delete the organization (forces Admin). Submit, and 1Club sends an invitation email. The user appears in the table with status **Invited** until they accept.
 
-- **Limited access** to daily operations
-- **Member check-ins** and basic management
-- **Class scheduling** and management
-- **Basic reporting** and data viewing
+If you pick **Instructor** for someone who doesn't yet have an instructor profile, the dialog walks you through creating one before the role is saved. This is so an instructor always has a profile to attach classes, bookings, and schedule slots to.
 
-### **Receptionist**
+## Editing, resending, and removing
 
-- **Member check-ins** and basic information
-- **Class bookings** and cancellations
-- **Basic member** support
-- **Limited reporting** access
+Click any active user row to open the edit dialog. You can change their role, toggle the owner flag, or (if they have an instructor profile) edit instructor-specific details. You can't edit your own role from this page.
 
-## Managing Users
+From the row's actions menu:
 
-### **Adding New Users**
+- **Resend invitation** - available for users still in **Invited** or **Pending invite** state. Sends a fresh email.
+- **Set password** - admins can set a password directly for any other user instead of waiting for them to use the reset flow.
+- **Delete invitation** - cancels an unaccepted invite.
+- **Remove user** - removes an active user from the organization. The contact record (if any) stays; only the organization-user link is deleted.
 
-1. Go to **Settings** → **Admin Users**
-2. Click **Add User**
-3. **Enter user details** (name, email, etc.)
-4. **Assign a role** based on their job function
-5. **Set permissions** for specific features
-6. **Send invitation** to the new user
+## Statuses
 
-### **User Information**
+- **Active** - signed up and using the admin.
+- **Invited** - invitation sent, waiting for the user to accept.
+- **Pending invite** - the invitation hasn't been sent yet (e.g. created from a contact without an email yet).
+- **Expired** - the invitation link expired. Use **Resend invitation** to send a new one.
 
-- **Full Name** - User's complete name
-- **Email Address** - Login and notification email
-- **Phone Number** - Contact information
-- **Role** - Assigned permission level
-- **Status** - Active, inactive, or pending
+## What changing a role does
 
-### **User Status**
+Roles replace each other - there's no permission delta or stacking. When you move someone from Front desk to Manager, their old permissions are dropped and the Manager set is applied wholesale. The owner flag is preserved across role changes (but the system still requires Admin if the owner flag is on).
 
-- **Active** - Can log in and use the system
-- **Inactive** - Cannot log in but account remains
-- **Pending** - Invited but hasn't accepted yet
-- **Suspended** - Temporarily disabled access
+Existing sessions pick up the new role on their next request. There's no "force sign-out" button - if you need someone out immediately, **Remove user**.
 
-## Role Management
+## Related
 
-### **Creating Custom Roles**
-
-1. Go to **Settings** → **Roles & Permissions**
-2. Click **Create Role**
-3. **Enter role name** and description
-4. **Select permissions** for this role
-5. **Save the role** for use
-
-### **Role Permissions**
-
-- **Members** - View, edit, add, delete members
-- **Classes** - Manage classes and schedules
-- **Billing** - Access billing and payment features
-- **Analytics** - View reports and analytics
-- **Settings** - Modify system settings
-- **Users** - Manage other admin users
-
-### **Permission Levels**
-
-- **No Access** - Cannot see or use the feature
-- **Read Only** - Can view but not modify data
-- **Full Access** - Can view, edit, and delete data
-- **Admin Only** - Restricted to super admins
-
-## User Permissions
-
-### **Member Management**
-
-- **View Members** - See member list and details
-- **Edit Members** - Modify member information
-- **Add Members** - Create new member accounts
-- **Delete Members** - Remove member accounts
-
-### **Operations**
-
-- **Class Management** - Create and edit classes
-- **Schedule Management** - Manage schedules and bookings
-- **Area Management** - Manage facilities and areas
-- **Task Management** - Assign and track tasks
-
-### **Billing & Finance**
-
-- **View Billing** - See billing information
-- **Process Payments** - Handle payment transactions
-- **Manage Plans** - Create and edit membership plans
-- **Financial Reports** - Access financial analytics
-
-### **System Administration**
-
-- **User Management** - Manage admin users
-- **System Settings** - Modify system configuration
-- **Backup & Restore** - Manage data backups
-- **Audit Logs** - View system activity logs
-
-## User Activities
-
-### **Login Tracking**
-
-- **Last login** date and time
-- **Login frequency** and patterns
-- **Failed login** attempts
-- **IP address** tracking
-
-### **Activity Monitoring**
-
-- **Feature usage** statistics
-- **Data modifications** made
-- **Reports generated** and viewed
-- **System changes** performed
-
-### **Security Features**
-
-- **Password requirements** and expiration
-- **Two-factor authentication** options
-- **Session timeout** settings
-- **Login attempt** limits
-
-## Best Practices
-
-### **User Organization**
-
-- **Create roles** that match job functions
-- **Assign minimal permissions** needed for each role
-- **Regularly review** user access and permissions
-- **Remove access** for users who no longer need it
-
-### **Security Management**
-
-- **Use strong passwords** and require regular changes
-- **Enable two-factor authentication** for sensitive roles
-- **Monitor user activity** for unusual behavior
-- **Keep user information** up to date
-
-### **Team Collaboration**
-
-- **Communicate role changes** to affected users
-- **Provide training** on new features and permissions
-- **Document procedures** for common tasks
-- **Regularly review** and update permissions
-
-## User Invitations
-
-### **Sending Invitations**
-
-1. **Create user account** with basic information
-2. **Assign appropriate role** and permissions
-3. **Send invitation email** with login instructions
-4. **Follow up** if invitation isn't accepted
-
-### **Invitation Process**
-
-- **Email sent** to user's email address
-- **Link expires** after specified time
-- **User sets password** during first login
-- **Account activated** after successful setup
-
-### **Invitation Management**
-
-- **Resend invitations** if needed
-- **Cancel invitations** for users who won't join
-- **Track invitation status** and responses
-- **Follow up** on pending invitations
-
-## Troubleshooting
-
-### **Common Issues**
-
-- **User can't log in** - Check account status and password
-- **Missing permissions** - Verify role assignments
-- **Invitation not received** - Check email address and spam folder
-- **Access denied** - Review permission settings
-
-### **User Problems**
-
-- **Forgotten password** - Use password reset feature
-- **Account locked** - Check for too many failed login attempts
-- **Permission errors** - Verify role and permission assignments
-- **Login issues** - Check internet connection and browser settings
-
-## Advanced Features
-
-### **Bulk User Management**
-
-- **Import users** from CSV files
-- **Bulk role changes** for multiple users
-- **Mass permission** updates
-- **Bulk user** activation/deactivation
-
-### **Audit and Compliance**
-
-- **Activity logs** for all user actions
-- **Permission changes** tracking
-- **Data access** monitoring
-- **Compliance reporting** for regulations
-
-### **Integration Features**
-
-- **Single sign-on** with external systems
-- **LDAP integration** for enterprise authentication
-- **API access** for automated user management
-- **Webhook notifications** for user changes
-
-## Getting Started
-
-1. **Create your first admin user** with super admin access
-2. **Set up basic roles** for your team members
-3. **Invite team members** with appropriate permissions
-4. **Train users** on their assigned features
-5. **Monitor usage** and adjust permissions as needed
-
-Admin user management helps you control access to your club management system while ensuring your team can work effectively. Start with basic roles and gradually refine permissions as you learn what each team member needs.
+- [Roles and permissions](/reference/roles-permissions) - The full module-by-module permission matrix.
+- [Access control](/settings/access-control) - Door check-in modes, separate from admin roles.
+- [API tokens](/settings/api-tokens) - Service tokens for programmatic access; not the same as user invites.

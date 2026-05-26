@@ -1,193 +1,81 @@
 ---
-title: Schedule Management
+title: "Schedule"
+description: "The unified day/week calendar that drives bookings, classes, instructor time off, and check-in."
 ---
 
-In a nutshell, the schedule system provides a visual calendar interface where you can view all classes and bookings, create new ones by clicking on time slots, and manage your club's daily operations.
+The schedule is the operations hub. It pulls classes, bookings, and instructor time off for the visible date range and renders them as colored blocks across resource columns. Most reservations and check-ins start here.
 
-## Overview
+Open it via the **Schedule** menu in the admin, or the **Operations > Schedule** route.
 
-The schedule management system is your central hub for viewing and managing all club activities. It combines classes, bookings, instructors, and areas into a unified calendar view that makes it easy to see what's happening when and where.
+## Layout
 
-Key capabilities:
+The calendar has two view types saved per browser: **Day** and **Week**.
 
-- **Visual Calendar**: Day and week views of all activities
-- **Resource Management**: View classes, instructors, and areas as separate resources
-- **Quick Creation**: Click on time slots to create new bookings or classes
-- **Real-time Updates**: See changes immediately across all views
-- **Filtering**: Show or hide specific resources to focus on what matters
-- **URL Sharing**: Share specific dates and views via URL parameters
+**Day view** is a vertical time grid with one column per resource, grouped left-to-right by type: class-type columns first, then a fallback "Classes" column, then instructor columns A-Z, then area columns grouped by area type. The time axis runs 6 AM to 10 PM in 30-minute increments by default.
 
-## Viewing the Schedule
+**Week view** is a horizontal grid with days as columns. Resources are merged - you see all activities for the week, not one column per resource - because the day-column layout would be unreadably wide.
 
-### Accessing the Schedule
+The mini calendar on the left navigates dates; the **Today** button returns to today. The selected date is pushed to the URL as `?date=YYYY-MM-DD` so you can share a link to a specific day.
 
-1. Navigate to **Operations → Schedule** in the admin panel
-2. The schedule opens to today's date in day view
-3. Use the mini calendar on the left to navigate dates
-4. Switch between day and week views using the view buttons
+## Resources and what shows up where
 
-### Understanding the Calendar Layout
+The schedule reads three live data sources for the visible range:
 
-The schedule displays:
+- **Classes** - shown as blocks on their class-type column (or the fallback "Classes" column for classes without a type). Each class with assigned instructors also produces a mirror "teaching" block on each instructor's column in day view, so the instructor reads as busy.
+- **Bookings** - shown on the area column if they have an area, on the instructor column if they have an instructor (both, if they have both), or on the relevant class-type column if they're class-bound. Class-bound bookings are suppressed in week view because the class itself already represents them.
+- **Instructor time off** - shown as grey blocks on the instructor's column.
 
-- **Time Slots**: 30-minute intervals from 6 AM to 10 PM
-- **Resource Columns**: Classes, instructors, and areas as separate columns
-- **Events**: Bookings and classes shown as colored blocks
-- **Navigation**: Previous/next day or week buttons
+Active areas (`status=active`) and bookable instructors (`isBookable=true`) are the only ones included. Inactive or non-bookable resources don't get a column.
 
-### Calendar Views
+## Filtering what you see
 
-#### Day View
+The **Resource filter panel** in the calendar header lets you toggle individual resources on or off. Your overrides are saved per view (day vs week) in browser storage.
 
-- Shows a single day with all resources
-- Perfect for detailed daily planning
-- Click on time slots to create new activities
-- See all bookings and classes for one day
+The organization-level defaults for what's hidden come from **Settings > Operations > Schedule display**, which lets you hide entire class types, instructor types, or area types, plus a flag for uncategorized instructors and areas. The toggle in the filter panel layers on top of these defaults: if you flip a resource to a state that matches the default, the override drops so future settings changes still take effect.
 
-#### Week View
+## Coloring
 
-- Shows Monday through Sunday
-- Great for weekly planning overview
-- See patterns and conflicts across the week
-- Click on any day's time slot to create activities
+Blocks color from one of three sources, in order of precedence:
 
-## Creating Activities
+1. **Staff color** - the profile color of the user who created the booking, used when **Staff coloring** is on in schedule display settings.
+2. **Resource color** - the area's configured color or a hash of the resource name.
+3. **Class color** - the class's own color, when set.
 
-### Adding New Bookings
+A second border color shows the booking **source** (admin, member portal, public website, kiosk) when source coloring is enabled. Source colors are configurable under **Settings > Operations > Booking sources**.
 
-1. Click **"Add Booking"** in the top right
-2. Or click on a time slot in an area or instructor column
-3. Fill in the booking details:
-   - **Member**: Select from your contacts
-   - **Area/Instructor**: Choose the resource
-   - **Date & Time**: Confirm the selected time
-   - **Duration**: Set how long the booking lasts
-4. Click **"Save"** to create the booking
+## Creating activities
 
-### Adding New Classes
+Click an empty time slot to open the create dialog. The dialog is pre-filled based on which column you clicked:
 
-1. Click **"Add Class"** in the top right
-2. Or click on a time slot in the Classes column
-3. Fill in the class details:
-   - **Class Name**: Descriptive title
-   - **Instructor**: Assign an instructor
-   - **Date & Time**: Confirm the selected time
-   - **Duration**: Set class length
-   - **Capacity**: Maximum participants
-4. Click **"Save"** to create the class
+- Click a class-type column to open the class dialog with the class type and time range pre-set.
+- Click an area column to open the booking dialog with the area and time range pre-set.
+- Click an instructor column to open the booking dialog with the instructor and time range pre-set.
 
-### Quick Slot Creation
+You can drag-select multiple consecutive slots to extend the duration before the dialog opens.
 
-1. Click on any empty time slot
-2. The system automatically:
-   - Sets the start time to the slot time
-   - Sets the end time to 30 minutes later
-   - Pre-selects the appropriate resource
-3. Fill in the remaining details and save
+In **week view**, clicking a slot opens a small menu instead of a dialog so you can pick between **Add booking**, **Add class**, or **Add time off** (the last option is shown only on instructor columns).
 
-## Managing Resources
+The header has an **Add** button that opens a menu with **Booking**, **Class**, and **Check-in** options, plus an overflow menu linking to the [Bookings](/operations/bookings) list, [Classes](/operations/classes) list, [Attendance](/members/attendance), and the schedule display settings.
 
-### Resource Types
+## Acting on existing blocks
 
-The schedule shows three types of resources:
+Click a block to open the matching dialog: bookings open the booking dialog, classes default to the add-booking flow for that class (so the most common case - someone wants to book into the class - is one click), time-off entries open the time-off dialog.
 
-- **Classes**: Group activities and fitness classes
-- **Instructors**: Individual staff members and coaches
-- **Areas**: Physical spaces like courts, rooms, and fields
+Right-click a block (or use the mobile tap menu) for the full set of actions: **View** (open the detail page), **Edit**, **Cancel**, **Delete**, **Add check-in**, **Add payment**, **Add booking** (for classes), and **Notify participants**.
 
-### Filtering Resources
+**Add payment** is smart about split balances: if the booking has one outstanding transaction, you get a single-transaction payment dialog with an editable amount. If it has multiple, the amount is locked to the full sum and the server settles them atomically. See [Bookings](/operations/bookings) for the full story.
 
-1. Use the **Resource Filter Panel** on the left
-2. Toggle resources on/off to focus on specific types
-3. Show only instructors, only areas, or any combination
-4. Changes apply immediately to the calendar view
+## Bookings created with a member pre-selected
 
-### Resource Colors
+If you arrive at the schedule from a member profile with **Book a slot**, the URL carries `?contactId=X`. A toast prompts you to pick a slot, and every booking dialog you open from a slot click is pre-filled with that contact.
 
-- Each resource gets a unique color for easy identification
-- Colors are automatically generated based on resource names
-- Classes, instructors, and areas have different color schemes
-- Colors help distinguish between different types of activities
+## Instructor-only and mixed-role views
 
-## Navigating the Schedule
+Instructor-only accounts get a streamlined **My teaching schedule** view that hides resources they don't own. Mixed-role accounts (instructor + manager or admin) get an **All / My schedule** toggle at the top of the calendar. The toggle preference is per-session.
 
-### Date Navigation
+## Related
 
-1. **Mini Calendar**: Click any date to jump to that day
-2. **Navigation Buttons**: Use previous/next arrows
-3. **Week Selection**: Click and drag on mini calendar for week view
-4. **Today Button**: Quickly return to current date
-
-### View Switching
-
-1. **Day View**: Click the day button for single-day view
-2. **Week View**: Click the week button for weekly overview
-3. **URL Parameters**: Views are saved in the URL for sharing
-
-### Event Interaction
-
-1. **Click Events**: Click any booking or class to edit it
-2. **Hover Details**: Hover over events to see basic information
-3. **Drag Selection**: Click and drag to select multiple time slots
-4. **Clear Selection**: Click elsewhere to clear selections
-
-## Common Tasks
-
-### Daily Planning
-
-1. Open the schedule in day view
-2. Review all activities for the day
-3. Check for conflicts or gaps
-4. Add new bookings or classes as needed
-5. Verify instructor assignments
-
-### Weekly Overview
-
-1. Switch to week view
-2. See the full week's schedule at a glance
-3. Identify busy and quiet periods
-4. Plan for upcoming activities
-5. Check instructor availability
-
-### Resource Management
-
-1. Use filters to focus on specific resources
-2. Check instructor schedules for conflicts
-3. Monitor area usage and availability
-4. Plan maintenance or cleaning times
-
-### Quick Booking
-
-1. Click on an empty time slot
-2. Select the member from the dropdown
-3. Confirm the time and duration
-4. Save the booking instantly
-
-## Tips & Best Practices
-
-- **Regular Updates**: Check the schedule frequently for changes
-- **Resource Filtering**: Use filters to focus on what you need to see
-- **Color Coding**: Learn the color patterns to quickly identify resource types
-- **URL Sharing**: Share specific dates with staff using the URL
-- **Quick Creation**: Use time slot clicking for faster booking creation
-- **Conflict Checking**: Always check for scheduling conflicts before confirming
-
-## Troubleshooting
-
-**Issue**: Schedule not loading
-**Solution**: Refresh the page and check your internet connection
-
-**Issue**: Cannot create booking in time slot
-**Solution**: Ensure the resource (area/instructor) is available and active
-
-**Issue**: Events not showing up
-**Solution**: Check the date range and resource filters
-
-**Issue**: Wrong time zone displayed
-**Solution**: Check your organization's time zone settings
-
-**Issue**: Cannot switch between day/week view
-**Solution**: Clear your browser cache or try a different browser
-
-**Issue**: Resource colors not showing
-**Solution**: Refresh the page - colors are generated dynamically
+- [Bookings](/operations/bookings) - The list view and detail page for reservations.
+- [Classes](/operations/classes) - Class creation, capacity, and attendance.
+- [Booking policies](/operations/booking-policies) - Rules that govern payment timing and cancellation.
+- [Check-in models](/reference/check-in-models) - Entrance flow your front desk should follow.

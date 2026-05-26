@@ -1,264 +1,121 @@
 ---
 title: Troubleshooting
-description: Common issues and solutions for the 1Club admin system.
+description: Common issues you might hit using the 1Club admin, and what to check.
 ---
 
-This guide helps you resolve common issues you might encounter while using the 1Club admin system.
+This page collects the issues we see most often in practice. For anything that isn't on this list, contact support via the admin's help menu.
 
-## Common Issues
+## Sign-in and account
 
-### Login Problems
+### You can't sign in
 
-#### Can't Access Admin Panel
+Check, in order:
 
-**Symptoms:** Unable to log in or access the admin interface
+1. **The org URL is right**. Each organization has its own subdomain on the admin. If you're at the wrong subdomain, your credentials won't be recognized even when they're correct.
+2. **The email is the one your invite went to**. If you've been invited under a different email than you usually use, sign in with that one.
+3. **Your account is still active**. Ask an Admin in your org to open **Settings > Users** and confirm your row exists with status **Active**. If it shows **Invited** or **Expired**, the invitation never completed - have them resend it.
+4. **You're not signed into a different org**. The top-right org switcher might have you in another organization where this user doesn't exist.
 
-**Solutions:**
+### Password reset email never arrives
 
-1. **Check URL** - Ensure you're using the correct admin URL
-2. **Verify Credentials** - Double-check username and password
-3. **Clear Browser Cache** - Clear cookies and cached data
-4. **Try Different Browser** - Test with Chrome, Firefox, or Safari
-5. **Check Internet Connection** - Ensure stable internet connection
-6. **Contact Administrator** - Ask admin to verify your account status
+- Check spam/junk.
+- Confirm the email is the one on file (have an Admin verify under **Settings > Users**).
+- Try once more after 15 minutes - some mail providers delay first-time messages.
+- If you signed up with a Google, Apple, or Facebook OAuth provider and never set a local password, password reset won't apply. Ask an Admin to use **Set password** from **Settings > Users** instead.
 
-#### Password Reset Issues
+### Two-factor or session keeps logging you out
 
-**Symptoms:** Password reset email not received or reset not working
+JWT tokens have a 7-day expiry. After they expire you'll be asked to sign in again - this is normal. If you're being signed out far more often than that, check whether you're using private/incognito mode (cookies don't persist) or whether your browser is clearing cookies on close.
 
-**Solutions:**
+## Permissions and access
 
-1. **Check Spam Folder** - Look in spam/junk email folder
-2. **Wait for Email** - Allow up to 15 minutes for email delivery
-3. **Try Again** - Request another password reset
-4. **Check Email Address** - Verify correct email address is on file
-5. **Contact Support** - Get help from technical support
+### "Permission denied" or pages are missing from the menu
 
-### Dashboard Issues
+Each module is gated by your role. Roles are fixed - **Admin**, **Manager**, **Front desk**, **Instructor**, **Member**. Pages you don't have access to are hidden from the navigation, not just disabled. See [Roles and permissions](/reference/roles-permissions) for the full module-by-module matrix.
 
-#### Widgets Not Loading
+If you should have access and don't:
 
-**Symptoms:** Dashboard widgets show loading spinner or error messages
+1. Ask an Admin to verify your role under **Settings > Users**.
+2. Sign out and back in to refresh your role claims.
+3. Check that you're in the right organization (top-right org switcher).
 
-**Solutions:**
+### Custom roles don't exist
 
-1. **Refresh Page** - Reload the dashboard page
-2. **Check Internet Connection** - Ensure stable connection
-3. **Clear Browser Cache** - Clear cached data and cookies
-4. **Disable Browser Extensions** - Turn off ad blockers or extensions
-5. **Try Incognito Mode** - Test in private/incognito browsing
-6. **Contact Support** - Report persistent issues
+1Club doesn't support custom roles. The five canonical roles cover the common admin shapes; there's no role builder, no per-permission toggle, and no way to scope an Admin to a subset of modules. If the existing roles don't fit, the usual answer is to use Manager (which is full operational access minus settings) or to give Admin temporarily and remove it later.
 
-#### Data Not Updating
+## Dashboard and analytics
 
-**Symptoms:** Dashboard shows outdated information
+### Widget or chart shows zero where you expect activity
 
-**Solutions:**
+Three usual culprits:
 
-1. **Refresh Data** - Click refresh button on widgets
-2. **Check Date Range** - Verify date range settings
-3. **Wait for Sync** - Allow time for data synchronization
-4. **Log Out and Back In** - Refresh your session
-5. **Clear Cache** - Clear browser cache and cookies
+1. **Time zone**. Analytics use your organization's time zone (set under **Settings > Organization**). A booking that's "today" in your local time may be yesterday in the org's time zone.
+2. **Club filter**. Some dashboards have a club selector. If it's set to one gym, members and bookings from other gyms are excluded.
+3. **Permissions**. Front desk and Instructor have own-scope analytics. The page renders but the numbers are limited to data you're allowed to see.
 
-### Member Management Issues
+### Engagement dashboard is empty
 
-#### Member Not Appearing in List
+Engagement scoring is disabled by default. Enable it under [Smart Tagging](/settings/smart-tagging) and let the background job run at least once before checking again.
 
-**Symptoms:** New member doesn't show up in member list
+### Billing dashboard says "no data"
 
-**Solutions:**
+The billing dashboard requires both start and end dates in the filter bar. Without them the query doesn't run. Pick a range and the dashboard loads.
 
-1. **Check Filters** - Verify no filters are hiding the member
-2. **Refresh Page** - Reload the member list
-3. **Check Member Status** - Verify member is active
-4. **Search for Member** - Use search function to find member
-5. **Check Permissions** - Ensure you have access to view members
-6. **Contact Support** - Report missing member data
+## Bookings and check-ins
 
-#### Can't Edit Member Information
+### Walk-in won't check in
 
-**Symptoms:** Unable to modify member details
+If the booking policy at this club has **Enforce payment** set to **At check-in** but Check-in Mode is **Strict**, you can't check in a person who doesn't have a contact, even if you're willing to take payment. Either create a lightweight contact for them, or switch the club's [Access control](/settings/access-control) to **Flexible** and let payment satisfy the requirement.
 
-**Solutions:**
+### Booking doesn't appear in the calendar
 
-1. **Check Permissions** - Verify you have edit permissions
-2. **Refresh Page** - Reload the member profile page
-3. **Clear Browser Cache** - Clear cached data
-4. **Try Different Browser** - Test with different browser
-5. **Contact Administrator** - Ask admin to check permissions
+- The calendar filter has a date and (sometimes) an area/class filter. Confirm the booking falls inside both.
+- Confirm the booking didn't fail to create. The Bookings list under **Operations > Bookings** is the source of truth.
+- Verify your role permits viewing other people's bookings. Instructors with own-scope can only see their own.
 
-### Booking Issues
+## Payments
 
-#### Booking Not Showing in Calendar
+### Stripe charge declines
 
-**Symptoms:** New booking doesn't appear in calendar view
+This is almost always a card issue (insufficient funds, blocked by issuer, wrong CVV). The error message from Stripe is shown verbatim - read it carefully. If you're testing in **test mode**, the org uses 1Club's platform Stripe account directly; in **live mode**, it uses the connected merchant account. Make sure you're in the mode you intended (visible under **Settings > Integrations > Stripe**).
 
-**Solutions:**
+### Refund button is greyed out
 
-1. **Refresh Calendar** - Reload the calendar page
-2. **Check Date Range** - Verify correct date is selected
-3. **Check Area Filter** - Ensure correct area is selected
-4. **Verify Booking Status** - Confirm booking was created successfully
-5. **Check Permissions** - Verify you can view the booking
-6. **Contact Support** - Report calendar display issues
+You can only refund a payment that's in the **Succeeded** state. Pending payments need to settle first; failed payments can't be refunded because nothing was captured.
 
-#### Can't Create Booking
+## Exports
 
-**Symptoms:** Unable to create new bookings
+### Export rejected with "exceeds 500,000 row limit"
 
-**Solutions:**
+This is a hard cap. Narrow the date range (a single quarter is usually enough) and try again. For yearly accounting handoffs, run four quarterly exports.
 
-1. **Check Required Fields** - Ensure all required information is filled
-2. **Verify Area Availability** - Confirm area is available at selected time
-3. **Check Member Status** - Ensure member has active membership
-4. **Clear Form** - Clear form and try again
-5. **Refresh Page** - Reload the booking page
-6. **Contact Support** - Get help with booking creation
+### QuickBooks export creates duplicate customers
 
-### Payment Issues
+The `Display Name` in `invoices.csv` didn't match the customer name in QBO. Open `customers.csv` first, reconcile the names against existing QBO customers, then import invoices. See [Settings > Export](/settings/export) for the recommended QBO workflow.
 
-#### Payment Not Processing
+## Performance
 
-**Symptoms:** Payment fails or doesn't complete
+### Pages load slowly
 
-**Solutions:**
+- Close other tabs and browser windows that might be running heavy work.
+- Clear your browser cache.
+- Try a different browser - Chrome and Safari are the most-tested.
+- For analytics, reduce the date range. A 12-month window with a heavy bucket count is slow by design.
 
-1. **Check Payment Method** - Verify card details are correct
-2. **Try Different Card** - Test with different payment method
-3. **Check Card Limits** - Ensure sufficient funds available
-4. **Contact Bank** - Verify card isn't blocked
-5. **Try Again Later** - Payment systems may be temporarily down
-6. **Contact Support** - Get help with payment processing
+If a single page is consistently slow across browsers and machines, report it to support with the page URL and roughly how long it takes.
 
-#### Invoice Not Generating
+## Getting help
 
-**Symptoms:** Unable to create or generate invoices
+The admin's help menu (top-right) has direct links to support and the AI assistant. When you contact support, include:
 
-**Solutions:**
+- The page URL where the issue happens.
+- A screenshot or copy-paste of any error message.
+- The browser and version.
+- Your org slug.
+- Steps to reproduce, if you can.
 
-1. **Check Member Information** - Verify member details are complete
-2. **Check Billing Settings** - Verify billing configuration
-3. **Refresh Page** - Reload the invoice page
-4. **Clear Browser Cache** - Clear cached data
-5. **Try Different Browser** - Test with different browser
-6. **Contact Support** - Report invoice generation issues
+## Related
 
-### System Performance Issues
-
-#### Slow Loading
-
-**Symptoms:** Pages load slowly or timeout
-
-**Solutions:**
-
-1. **Check Internet Connection** - Ensure stable, fast connection
-2. **Close Other Tabs** - Reduce browser resource usage
-3. **Clear Browser Cache** - Clear cached data and cookies
-4. **Disable Extensions** - Turn off browser extensions
-5. **Restart Browser** - Close and reopen browser
-6. **Contact Support** - Report performance issues
-
-#### System Errors
-
-**Symptoms:** Error messages or system crashes
-
-**Solutions:**
-
-1. **Refresh Page** - Reload the current page
-2. **Clear Browser Cache** - Clear cached data
-3. **Try Different Browser** - Test with different browser
-4. **Check System Status** - Verify system is operational
-5. **Contact Support** - Report system errors immediately
-
-## Browser-Specific Issues
-
-### Chrome Issues
-
-- **Clear Cache:** Settings > Privacy > Clear browsing data
-- **Disable Extensions:** Settings > Extensions > Turn off extensions
-- **Update Browser:** Help > About Google Chrome
-
-### Firefox Issues
-
-- **Clear Cache:** Settings > Privacy > Clear Data
-- **Disable Add-ons:** Add-ons Manager > Disable add-ons
-- **Update Browser:** Help > About Firefox
-
-### Safari Issues
-
-- **Clear Cache:** Develop > Empty Caches
-- **Disable Extensions:** Safari > Preferences > Extensions
-- **Update Browser:** Safari > About Safari
-
-## Mobile Issues
-
-### App Not Working
-
-**Symptoms:** Mobile app crashes or doesn't function properly
-
-**Solutions:**
-
-1. **Update App** - Install latest app version
-2. **Restart App** - Close and reopen the app
-3. **Check Internet** - Ensure stable mobile connection
-4. **Restart Device** - Restart your mobile device
-5. **Reinstall App** - Delete and reinstall the app
-6. **Contact Support** - Report mobile app issues
-
-### Mobile Website Issues
-
-**Symptoms:** Mobile website doesn't work properly
-
-**Solutions:**
-
-1. **Clear Browser Cache** - Clear mobile browser cache
-2. **Update Browser** - Install latest browser version
-3. **Check Internet** - Ensure stable mobile connection
-4. **Try Different Browser** - Test with different mobile browser
-5. **Contact Support** - Report mobile website issues
-
-## Getting Help
-
-### Self-Service Options
-
-1. **Check Documentation** - Review relevant documentation sections
-2. **Use AI Assistant** - Ask the AI Assistant for help
-3. **Search Knowledge Base** - Search for similar issues
-4. **Check System Status** - Verify system is operational
-
-### Contact Support
-
-1. **Email Support** - Send detailed description of issue
-2. **Phone Support** - Call during business hours
-3. **Live Chat** - Use live chat for immediate help
-4. **Submit Ticket** - Create support ticket for complex issues
-
-### When Contacting Support
-
-- **Describe the Problem** - Provide clear description of the issue
-- **Include Steps** - List steps you've already tried
-- **Provide Screenshots** - Include screenshots if helpful
-- **Include Error Messages** - Copy any error messages exactly
-- **Specify Browser** - Mention which browser you're using
-- **Include Account Info** - Provide your organization name
-
-## Prevention Tips
-
-### Regular Maintenance
-
-- **Keep Browser Updated** - Use latest browser version
-- **Clear Cache Regularly** - Clear browser cache weekly
-- **Use Strong Passwords** - Use secure, unique passwords
-- **Log Out Properly** - Always log out when finished
-- **Backup Data** - Regularly backup important data
-
-### Best Practices
-
-- **Use Supported Browsers** - Stick to recommended browsers
-- **Avoid Public Wi-Fi** - Use secure internet connections
-- **Keep System Updated** - Install system updates promptly
-- **Monitor Performance** - Watch for performance issues
-- **Report Issues Early** - Report problems as soon as they occur
-
-Remember: Most issues can be resolved with simple troubleshooting steps. If you continue to experience problems, don't hesitate to contact support for assistance.
+- [Roles and permissions](/reference/roles-permissions) - The full permission matrix.
+- [Check-in models](/reference/check-in-models) - How door check-ins relate to bookings and payments.
+- [Settings > Export](/settings/export) - Limits and behavior for CSV exports.

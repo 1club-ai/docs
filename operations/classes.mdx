@@ -1,188 +1,66 @@
 ---
-title: Class Management
+title: "Classes"
+description: "Create one-off or recurring classes, assign instructors, manage capacity, and run check-in and waitlists."
 ---
 
-In a nutshell, the class management system lets you create, schedule, and manage fitness classes, group activities, and training sessions with instructor assignments, capacity limits, and booking tracking.
+A class is a scheduled group activity with a capacity, optional price, one or more instructors, and an area. Members book against a class occurrence; if the class is full they go on the waitlist. The list page is at **Operations > Classes**; the detail page is where you run attendance, check-in, and waitlist conversion.
 
-## Overview
+## The list page
 
-The class management system provides comprehensive tools for organizing and managing all types of group activities at your club. You can create one-time or recurring classes, assign instructors, set capacity limits, track bookings, and manage waitlists.
+The classes list has four tabs with live counts: **All**, **Active**, **Cancelled**, and **Completed**. Active is the default. Each tab is paginated and sortable. Multi-select is enabled - pick rows and use the bulk delete action.
 
-Key capabilities:
+Click any row to open the class detail page, or **Add class** to create one.
 
-- **Class Creation**: Set up one-time or recurring classes with full details
-- **Instructor Assignment**: Assign instructors to classes and track their schedules
-- **Capacity Management**: Set maximum capacity and track current bookings
-- **Recurring Classes**: Create repeating classes with flexible scheduling
-- **Booking Integration**: Seamless integration with the booking system
-- **Waitlist Management**: Handle overflow when classes reach capacity
-- **Status Tracking**: Monitor class status (upcoming, past, cancelled)
+## Creating a class
 
-## Managing Classes
+The class dialog asks for:
 
-### Viewing All Classes
+- **Name**, **Description**, **Class type**, and **Sport**. Class types are managed under **Settings > Class types**; a class type can default the instructor type, max capacity, and price.
+- **Gym** and **Area** - where the class is held. The area selector is filtered to the chosen gym.
+- **Instructors** - one or more, picked from your bookable instructors.
+- **Date and time** - start and end. Multi-day classes are supported (the detail page formats the range accordingly).
+- **Max capacity** - leave blank for unlimited. The class is never "full" while capacity is unlimited.
+- **Price** or **Free** toggle - per booked seat.
+- **Visibility** - **Public**, **Member only**, or **Private**.
+- **Recurrence** - turn on to repeat. Pick the pattern (daily, weekly with specific weekdays, monthly) and an end date.
 
-1. Navigate to **Operations → Classes** in the admin panel
-2. Use the tabs to filter classes:
-   - **All**: All classes in your system
-   - **Upcoming**: Future classes only
-   - **Past**: Completed classes only
-3. Click on any class to view detailed information
+A recurring class is stored as a recurrence with N occurrences. Editing or deleting offers a scope choice: **This instance** or **All future**.
 
-### Understanding the Classes Grid
+## The class detail page
 
-The classes grid shows:
+The header carries the class name, status chips (active/cancelled/completed plus time status), the visibility chip, and the class type chip. The action row exposes **Notify participants** (when the class has bookings), **Edit**, **Cancel**, and **Delete**.
 
-- **Class Name**: Title of the class
-- **Date & Time**: When the class occurs
-- **Instructor**: Assigned instructor name
-- **Capacity**: Current bookings vs maximum capacity
-- **Price**: Class cost (or "Free")
-- **Status**: Current class status
-- **Actions**: View details, edit, or delete options
+The body is a two-column layout. The left card is **Information**: instructors (linked to their profiles), date and time with duration, gym, area, price, recurrence summary, review rating, sport, and description. If the class has images, a sortable gallery appears below the card.
 
-### Creating New Classes
+The right column starts with three capacity tiles: **Max capacity**, **Current attendance**, and **Remaining seats**. Below them is the **Attendance** card with three action buttons:
 
-1. Click **"Add Class"** in the top right
-2. Fill in the class details:
-   - **Class Name**: Descriptive title
-   - **Description**: Detailed class information
-   - **Sport**: Type of activity
-   - **Instructor**: Select from available instructors
-   - **Club**: Choose the location
-   - **Date & Time**: Start and end times
-   - **Duration**: Class length (auto-calculated)
-   - **Max Capacity**: Maximum number of participants
-   - **Price**: Cost per person (or set as free)
-   - **Recurrence**: Set up repeating classes if needed
-3. Click **"Save"** to create the class
+- **Add check-in** - opens the check-in dialog. Disabled outside the check-in window for roles that can't bypass it (see [Check-in models](/reference/check-in-models)).
+- **Add to waitlist** - only enabled when the class is full (capacity set and current bookings >= max).
+- **Add booking** - disabled when the class is full.
 
-### Class Types
+The attendance grid shows three groups: bookings (non-cancelled), anonymous check-ins (check-ins without a booking), and waitlist entries. The capacity is refetched every minute to keep counts current.
 
-#### One-Time Classes
+## Cancelling vs deleting
 
-- Single occurrence classes
-- Perfect for special events or workshops
-- Easy to create and manage
+**Cancel** changes the class status to cancelled, leaves the row visible on the Cancelled tab, and notifies booked members. Cancellation refunds follow the cancellation rules on the matching [booking policy](/operations/booking-policies).
 
-#### Recurring Classes
+**Delete** removes the class. For a recurring class, you choose whether to delete just this instance or all future instances. Deleting fails if the class has bookings - cancel or move them first.
 
-- Repeat on a schedule (daily, weekly, monthly)
-- Set start and end dates
-- Automatically creates multiple class instances
-- Great for regular fitness classes
+The right-click menu on a class block in the [Schedule](/operations/schedule) page exposes the same cancel and delete actions.
 
-## Class Details
+## Waitlist
 
-### Viewing Class Information
+When a class is full, members can join the waitlist (from the portal) or admins can add them via **Add to waitlist** on the detail page. When a seat opens 2-12 hours before the class, the first person on the waitlist gets a notification with a claim window. The default claim window is 15 minutes and is configurable on the [booking policy](/operations/booking-policies).
 
-1. Click on any class in the grid
-2. View comprehensive class details:
-   - **Class Information**: Name, description, sport, instructor
-   - **Schedule**: Date, time, duration, recurrence
-   - **Capacity**: Current bookings vs maximum capacity
-   - **Statistics**: Total bookings, confirmed, pending counts
+Past the claim window, the offer rolls to the next person. Admins can manually move a waitlist entry to a booking from the attendance grid.
 
-### Class Statistics
+## Notify participants
 
-The class details page shows:
+The **Notify participants** action collects the contact IDs of all confirmed bookings and opens the [Compose](/messaging/compose) page pre-populated with the recipients. Use this for last-minute class changes, location swaps, or substitute instructors.
 
-- **Total Bookings**: All bookings for this class
-- **Confirmed**: Bookings that are confirmed
-- **Pending**: Bookings awaiting confirmation
-- **Current Bookings**: Real-time booking count
-- **Remaining Seats**: Available capacity
+## Related
 
-### Managing Class Bookings
-
-1. In the class details page, scroll to **"Class Bookings"**
-2. View all bookings for this class
-3. Add new bookings by clicking **"Add Booking"**
-4. See member details, booking status, and payment information
-
-### Waitlist Management
-
-1. When a class reaches capacity, members can join the waitlist
-2. View waitlist entries in the **"Waitlist"** section
-3. Add members to waitlist manually if needed
-4. Move waitlist members to bookings when spots open
-
-## Recurring Classes
-
-### Setting Up Recurring Classes
-
-1. When creating a class, enable **"Recurring"**
-2. Choose recurrence pattern:
-   - **Daily**: Every day
-   - **Weekly**: Specific days of the week
-   - **Monthly**: Same date each month
-3. Set start and end dates for the series
-4. The system creates individual class instances
-
-### Managing Recurring Series
-
-- Edit the parent class to update all instances
-- Individual instances can be modified separately
-- Cancel specific instances without affecting the series
-- View all instances in the classes list
-
-## Common Tasks
-
-### Setting Up Weekly Fitness Classes
-
-1. Create a new class with your preferred name
-2. Set the first occurrence date and time
-3. Enable weekly recurrence
-4. Choose the days of the week
-5. Set an end date for the series
-6. Assign an instructor and set capacity
-
-### Managing Class Capacity
-
-1. Set appropriate maximum capacity for each class
-2. Monitor current bookings in real-time
-3. Use waitlist when classes are full
-4. Adjust capacity if needed for popular classes
-
-### Instructor Scheduling
-
-1. Assign instructors when creating classes
-2. View instructor availability and conflicts
-3. Track instructor workload across multiple classes
-4. Ensure proper coverage for all classes
-
-### Handling Cancellations
-
-1. Cancel individual class instances
-2. Cancel entire recurring series
-3. Notify booked members automatically
-4. Move waitlist members to available spots
-
-## Tips & Best Practices
-
-- **Consistent Naming**: Use clear, descriptive class names
-- **Capacity Planning**: Set realistic capacity limits based on space and instructor ability
-- **Recurring Setup**: Use recurring classes for regular activities to save time
-- **Instructor Assignment**: Always assign instructors to classes
-- **Price Setting**: Consider different pricing for different class types
-- **Waitlist Management**: Monitor waitlists and move members when spots open
-
-## Troubleshooting
-
-**Issue**: Cannot create recurring class
-**Solution**: Ensure you have set both start and end dates for the recurrence
-
-**Issue**: Class not showing in upcoming tab
-**Solution**: Check the class date and time - past classes appear in the "Past" tab
-
-**Issue**: Cannot assign instructor
-**Solution**: Verify the instructor exists and is active in your system
-
-**Issue**: Capacity not updating
-**Solution**: Refresh the page - capacity updates in real-time but may need a refresh
-
-**Issue**: Recurring class instances not created
-**Solution**: Check the recurrence settings and ensure dates are valid
-
-**Issue**: Cannot delete class with bookings
-**Solution**: Cancel or move all bookings before deleting the class
+- [Bookings](/operations/bookings) - Class bookings show up here too.
+- [Booking policies](/operations/booking-policies) - Payment timing and refund tiers per class type.
+- [Schedule](/operations/schedule) - Classes render as colored blocks on the calendar.
+- [Attendance](/members/attendance) - Cross-class attendance history per member.

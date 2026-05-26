@@ -1,144 +1,83 @@
 ---
 title: Access cards
-description: Manage physical access credentials (RFID cards, NFC tags, PINs) and assignments for members
+description: Manage the QR codes, access cards, and PINs that members use to check in at a reader or kiosk.
 ---
 
-In a nutshell, the access cards system lets you manage physical credentials for your members — RFID cards, NFC tags, PINs, and similar — track assignments, and monitor credential status across your organization.
+Access cards is the org-wide registry of credentials your members use to identify themselves: a QR code on their phone, a physical access card, or a PIN code. Each credential has a unique identifier, a status, and an optional contact assignment.
 
-## Overview
+This page is named **Access cards** in the UI, even though it covers more than physical cards. The same page is reachable from the **Members** overflow menu and from a member's profile.
 
-The access cards page is the central place to issue and manage physical entry credentials for your members. You can enroll new credentials, assign them to members, revoke or replace lost ones, and review assignment history.
+## Credential types
 
-Key capabilities:
+There are three credential types, matching the three identification methods configured under [Access control](/settings/access-control):
 
-- **Credential enrollment**: Issue cards, NFC tags, or PINs for members and staff
-- **Member assignment**: Link a credential to a specific member, with primary/secondary designation
-- **Status tracking**: Active, revoked, lost, or stolen — with audit history
-- **Multiple credential types**: RFID 125kHz, RFID 13.56MHz, NFC, PIN, and other types supported by your access-control configuration
-- **Revoke and replace**: Disable a lost credential and issue a replacement in one flow
+- **QR Code** - a code scannable at a reader or in the member portal.
+- **Access Card** - a physical card with a number printed or encoded on it.
+- **PIN Code** - a numeric code the member enters on a keypad.
 
-## Managing Access Cards
+The identifier value can be anything that uniquely identifies the credential within your org: a card serial, an NFC UID, a QR string, or a PIN. The hint on the enrollment form is "Enter the card number, NFC ID, or QR code value."
 
-### Viewing all credentials
+## Opening the page
 
-1. Navigate to **Members → Access cards** in the admin panel
-2. The grid displays every credential issued for your organization
-3. Use search and filters to narrow the list
+Go to **Members > Access cards**, or open the overflow menu next to **Add Member** on the member list and pick **Access Cards**. The page shows every credential ever enrolled in the org.
 
-### Understanding the grid
+The **Settings** button in the top right jumps to [Access control settings](/settings/access-control), where check-in mode and identification methods are configured.
 
-The grid shows:
+## Grid columns
 
-- **Identifier**: Card number, tag UID, or PIN reference
-- **Type**: Credential type (RFID 125kHz, RFID 13.56MHz, NFC, PIN, etc.)
-- **Status**: Active, revoked, lost, or stolen
-- **Assigned to**: Member name, or "Unassigned"
-- **Issued date**: When the credential was enrolled
-- **Notes**: Free-form notes about the credential
-- **Actions**: Assign, revoke, or delete (depending on state)
+- **Assigned to** - the contact the credential belongs to, with avatar. A `+N more` chip appears when a credential is assigned to more than one contact (rare; allowed for household-style sharing). Unassigned credentials show an **Unassigned** chip.
+- **Type** - QR Code, Access Card, or PIN Code.
+- **Number** - the credential's identifier.
+- **Status** - active, suspended, revoked, or expired.
+- **Issued date** - when the credential was enrolled.
+- **Expiry date** - optional expiry, or `-` if open-ended.
 
-### Enrolling a new credential
+Click a row to inspect or act on the credential.
 
-1. Click **"Add"** in the top right
-2. Choose the credential type
-3. Enter the identifier (scan or type the card/tag UID, or set the PIN)
-4. Optionally pre-assign it to a member
-5. Add notes if needed
-6. Save
+## Adding a credential
 
-<Note>
-Credential enrollment is gated by your access-control settings. If enrollment is disabled at the organization level, the **Add** button will be hidden. See [Access control](/settings/access-control).
-</Note>
+Click **Add Credential** in the top right:
 
-### Credential statuses
+1. Pick the type (QR Code, Access Card, PIN Code).
+2. Enter the identifier.
+3. Optionally pre-assign it to a contact and mark it primary.
 
-- **Active**: In use and accepted by access readers
-- **Revoked**: Permanently disabled (e.g., member left)
-- **Lost / Stolen**: Disabled and flagged in history for follow-up
+The credential is enrolled and appears in the grid immediately. You can also enroll a credential from a member's profile sidebar, which assigns it to that contact in one step.
 
-## Assigning credentials to members
+## Assigning to a member
 
-### Assigning
+Unassigned credentials show an **Assign** action in the row menu. Pick a contact and choose whether this is their **primary** credential. A contact can have at most one primary credential; assigning a new primary automatically demotes the previous one.
 
-1. Find an unassigned credential in the grid
-2. Click the **Assign** action
-3. Pick the member
-4. Choose whether this is their primary credential
-5. Save
+From a member's profile, the **Assign** button in the credentials block lets you pick from the pool of unassigned credentials. The **Add** button enrolls a brand-new credential and assigns it in one step.
 
-### Primary vs secondary
+## Revoking and deleting
 
-- **Primary**: The member's main credential; only one per member
-- **Secondary**: Additional credentials linked to the same member (e.g., a backup tag)
+The row menu adapts to the credential's current state:
 
-### From a member profile
+- **Unassigned and active** - can be assigned or **deleted** outright. Deletion is only allowed when there are no assignments on record.
+- **Assigned and active** - can be **revoked**. The credential is marked revoked and rejected at the reader from then on; the row stays in the grid for audit.
+- **Revoked** - can be **deleted** if you want to clear it from the grid. Otherwise it stays as a historical record.
 
-1. Open **Members → Member list** and click the member
-2. The credentials section lists every credential assigned to them, with assignment date and status
-3. You can revoke or unassign from there
+Revoking by default revokes every active assignment of the credential. If a member loses their card, revoke the old credential and enroll a new one for them.
 
-## Revoking and replacing
+## Statuses
 
-### Revoke
+- **Active** - in use, accepted by readers.
+- **Suspended** - temporarily disabled.
+- **Revoked** - permanently disabled. The record is kept for the audit trail.
+- **Expired** - past the optional `expiresAt` date.
 
-1. In the grid (or member profile), click **Revoke** on the credential
-2. Optionally choose to revoke all assignments at once
-3. The credential is marked revoked and rejected by readers immediately
+## How credentials interact with check-in
 
-### Replace a lost or stolen credential
+How strict the door is, and what happens when a credential is presented, depends on your check-in mode. See [Check-in models](/reference/check-in-models) for the full matrix. Quick summary:
 
-1. Mark the old credential as **Lost** or **Stolen**
-2. Enroll a new credential
-3. Assign the new credential to the member, marking it primary if needed
-
-### Deleting
-
-- Only **unassigned** credentials can be deleted
-- Once a credential has been assigned (even if later unassigned), keep it for audit history
-
-## Common tasks
-
-### Issuing a credential to a new member
-
-1. Enroll the credential under the chosen type
-2. Assign it to the member as primary
-3. Add notes if relevant (e.g., locker or gate scope)
-
-### Handling a lost card
-
-1. Mark the lost card as **Lost** so readers stop accepting it
-2. Enroll a replacement credential
-3. Assign the replacement to the member as primary
-
-### Guest or temporary access
-
-1. Enroll a credential intended for short-term use
-2. Assign it to the guest contact
-3. Revoke it as soon as access is no longer needed
-
-## Tips & best practices
-
-- **Unique identifiers**: Each credential's identifier must be unique within your organization
-- **Regular audits**: Periodically review active credentials and revoke ones that should no longer have access
-- **Status hygiene**: Always mark lost or stolen credentials immediately — don't just unassign
-- **Notes**: Capture context (which gate, which locker, why a secondary credential was issued)
-- **Primary designation**: Keep one primary per member so reports and member-facing surfaces show the right card
-
-## Troubleshooting
-
-**Issue**: Cannot enroll a new credential
-**Solution**: Check that credential enrollment is enabled in [Access control settings](/settings/access-control), and that your role has permission to manage credentials.
-
-**Issue**: Identifier already exists
-**Solution**: Each credential identifier must be unique. Check the existing record and revoke or delete it before reusing the value.
-
-**Issue**: Cannot delete a credential
-**Solution**: Credentials with assignment history can be revoked but not deleted. This preserves the audit trail.
-
-**Issue**: Member has multiple primary credentials
-**Solution**: Only one credential can be primary per member. Setting a new primary automatically demotes the old one.
+- **Strict** mode requires a credential to match an active booking or membership.
+- **Flexible** mode allows walk-ins and anonymous check-ins.
+- A scanned credential is matched to its primary contact, and the rest of the check-in flow proceeds as if you had selected that contact manually.
 
 ## Related
 
-- [Access control](/settings/access-control) — configure check-in mode and credential enrollment for the organization
-- [Check-in models](/reference/check-in-models) — understand how credentials interact with bookings and check-in flows
+- [Access control](/settings/access-control) - check-in mode, identification methods, organization-level credential settings
+- [Check-in models](/reference/check-in-models) - how credentials are honored at the reader
+- [Member profile](/members/member-profiles) - per-contact credentials block
+- [Attendance](/members/attendance) - the check-in log

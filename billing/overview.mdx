@@ -1,234 +1,67 @@
 ---
 title: Billing overview
-description: Plans, invoices, bill runs, transactions, payments, and payment methods
+description: How plans, transactions, invoices, bill runs, and payments fit together in 1Club.
 ---
 
-**In a nutshell:** The Billing section handles plans, invoices, bill runs, transactions, payments, and payment methods so you can run recurring billing and track revenue.
+Billing in 1Club is built on three distinct concepts that are deliberately kept separate. Once you have the model in your head, every screen in the **Billing** menu lines up.
 
-## Sections
+- A **transaction** is what someone owes you. One row per obligation (a booking fee, a membership charge, a signup fee). Has a `paymentStatus` of `pending`, `paid`, `overdue`, `void`, `partially_paid`, `refunded`, or `cancelled`.
+- A **payment** is how money was collected. One row per settlement event, linked to one or more transactions via a join table.
+- An **invoice** is a document that groups outstanding transactions for a contact, with a number and a due date. Invoices don't move money on their own.
 
-- **[Plans](/billing/plans)** — Create and manage membership plans (pricing, interval, access).
-- **[Transactions](/billing/transactions)** — View all financial transactions.
-- **[Invoices](/billing/invoices)** — Create, send, and track invoices.
-- **[Bill runs](/billing/bill-runs)** — Automated billing cycles and batch invoicing.
-- **[Payments](/billing/payments)** — View and manage payment records and status.
-- **[Payment methods](/settings/payment-methods)** — Configure which payment methods your organization accepts (Settings → Billing → Payment methods).
+This separation is why you can record a payment without ever issuing an invoice (e.g. taking cash at the front desk for a single booking), and why an invoice can contain transactions from several different bookings or memberships.
 
-## Key financial features
+## The Billing menu
 
-### Invoice Management
+| Page | What it lists | When to use it |
+|------|---------------|----------------|
+| [Plans](/billing/plans) | Membership and pass templates | Set up pricing tiers and recurrence rules. |
+| [Transactions](/billing/transactions) | Individual obligations | Audit what's owed, void mistakes, charge or record payment in bulk. |
+| [Invoices](/billing/invoices) | Receivable documents | Issue formal invoices, send payment links, download PDFs. |
+| [Bill runs](/billing/bill-runs) | Batch invoice generations | Roll up a month of pending transactions into invoices in one go. |
+| [Payments](/billing/payments) | Settlement records | See what's been collected, including who recorded it. |
 
-- **Invoice Creation** - Generate invoices for members and services
-- **Automated Billing** - Set up recurring billing cycles
-- **Payment Tracking** - Monitor payment status and history
-- **Invoice Templates** - Customize invoice appearance and content
-- **PDF Generation** - Create professional PDF invoices
+[Payment methods](/settings/payment-methods) is also part of billing, but lives under **Settings** because it's a one-time configuration: which methods (Stripe, cash, bank transfer, wallet) your organization accepts.
 
-### Payment Processing
+## How a charge usually flows
 
-- **Stripe Integration** - Secure payment processing
-- **Multiple Payment Methods** - Credit cards, bank transfers, etc.
-- **Payment Plans** - Flexible payment options for members
-- **Refund Processing** - Handle refunds and adjustments
-- **Payment Security** - PCI-compliant payment handling
+The typical flow for a paid activity is:
 
-### Membership Plans
+1. A booking, membership, or signup fee is created. 1Club writes a **transaction** with `paymentStatus = pending` (or `paid` if the amount is zero).
+2. Either the system or an admin collects payment. That can happen up front (Stripe Payment Element in the member portal, or an admin recording a manual payment), at check-in if the booking policy says so, or later from an invoice.
+3. When the payment succeeds, 1Club creates a **payment** row, links it to the transaction(s) via `payment_transactions`, and flips the transaction's status to `paid`. Pending bookings tied to that transaction are confirmed.
 
-- **Flexible Pricing** - Monthly, quarterly, annual options
-- **Plan Types** - Unlimited, limited, class-specific plans
-- **Signup Fees** - One-time charges for new members
-- **Auto-renewal** - Automatic membership renewals
-- **Plan Modifications** - Upgrade, downgrade, or pause plans
+Invoices are optional. They get created when:
 
-### Financial Reporting
+- You manually invoice a transaction from its details page.
+- You run a [bill run](/billing/bill-runs), which sweeps every pending non-void transaction for a period and groups them into invoices.
+- A scheduled bill run fires on a cron (configured under **Settings > Billing > Automated bill runs**).
 
-- **Revenue Reports** - Track income from all sources
-- **Payment Analytics** - Analyze payment patterns and trends
-- **Member Financials** - Individual member payment history
-- **Tax Reporting** - Generate reports for tax purposes
-- **Profitability Analysis** - Analyze revenue vs. costs
+## Recurring memberships
 
-## Billing Workflow
+For recurring plans, an hourly job (`recurring-transactions`) does three things:
 
-### Invoice Creation Process
+- Creates the next `membership_recurrence` transaction when a billing period rolls over.
+- For memberships flagged **payment required up front**, it attempts to charge the contact's default Stripe payment method when the recurrence becomes due. If no default method is on file or the charge fails, the transaction stays `pending`.
+- Marks any `pending` transaction whose due date is in the past as `overdue`.
 
-1. **Identify Billing Items** - Determine what to bill for
-2. **Create Invoice** - Generate invoice with appropriate details
-3. **Review Invoice** - Check accuracy and completeness
-4. **Send Invoice** - Deliver to member via email or mail
-5. **Track Payment** - Monitor payment status and follow up
+It does not send invoices and it does not retry failed charges. Retries are manual: open the transaction or invoice and use **Charge** or **Add payment**.
 
-### Payment Processing
+## What lives where
 
-1. **Payment Received** - Member submits payment
-2. **Payment Verification** - Confirm payment details
-3. **Payment Recording** - Record payment in system
-4. **Invoice Update** - Mark invoice as paid
-5. **Confirmation** - Send payment confirmation to member
+- Transaction obligations: **Billing > Transactions**.
+- Settlement events and the **Created by** column: **Billing > Payments**.
+- Invoice documents, PDFs, and payment links: **Billing > Invoices**.
+- Batch invoice generation: **Billing > Bill runs**.
+- Plan templates: **Billing > Plans**.
+- Stripe connection, manual payment methods, tax rates, revenue accounts: **Settings > Billing**.
 
-### Membership Billing
+## Related
 
-1. **Billing Cycle** - Determine billing frequency
-2. **Plan Calculation** - Calculate membership fees
-3. **Invoice Generation** - Create membership invoices
-4. **Payment Collection** - Process membership payments
-5. **Renewal Processing** - Handle membership renewals
-
-## Invoice Management
-
-### Creating Invoices
-
-- **Manual Creation** - Create invoices as needed
-- **Bulk Generation** - Generate multiple invoices at once
-- **Template Usage** - Use pre-built invoice templates
-- **Custom Fields** - Add organization-specific information
-- **Line Items** - Detail all charges and fees
-
-### Invoice Types
-
-- **Membership Invoices** - Monthly/annual membership fees
-- **Service Invoices** - One-time service charges
-- **Booking Invoices** - Charges for area bookings
-- **Class Invoices** - Fees for classes and training
-- **Penalty Invoices** - Late fees and penalties
-
-### Invoice Status Tracking
-
-- **Draft** - Invoice created but not sent
-- **Sent** - Invoice delivered to member
-- **Paid** - Payment received and processed
-- **Overdue** - Payment past due date
-- **Cancelled** - Invoice cancelled or voided
-
-## Payment Processing
-
-### Payment Methods
-
-- **Credit Cards** - Visa, MasterCard, American Express
-- **Debit Cards** - Bank debit card processing
-- **Bank Transfers** - Direct bank account transfers
-- **Cash Payments** - Manual cash payment recording
-- **Check Payments** - Check payment processing
-
-### Payment Security
-
-- **PCI Compliance** - Secure payment card handling
-- **Data Encryption** - Encrypted payment data storage
-- **Fraud Prevention** - Advanced fraud detection
-- **Secure Processing** - Secure payment gateway
-- **Audit Trail** - Complete payment audit trail
-
-### Payment Status
-
-- **Pending** - Payment submitted but not processed
-- **Processing** - Payment being processed
-- **Completed** - Payment successfully processed
-- **Failed** - Payment processing failed
-- **Refunded** - Payment refunded to member
-
-## Membership Plans
-
-### Plan Configuration
-
-- **Plan Name** - Descriptive name for the plan
-- **Plan Description** - Details about plan benefits
-- **Pricing** - Monthly, quarterly, or annual pricing
-- **Billing Frequency** - How often to bill members
-- **Signup Fee** - One-time fee for new members
-- **Usage Limits** - Restrictions on plan usage
-
-### Plan Types
-
-- **Unlimited Plans** - Access to all facilities
-- **Limited Plans** - Restricted access or usage
-- **Class-specific Plans** - Access to specific classes
-- **Area-specific Plans** - Access to specific areas
-- **Time-based Plans** - Access during specific hours
-
-### Plan Management
-
-- **Plan Creation** - Set up new membership plans
-- **Plan Modification** - Update existing plans
-- **Plan Activation** - Activate plans for new members
-- **Plan Suspension** - Temporarily suspend plans
-- **Plan Cancellation** - Cancel plans and handle termination
-
-## Financial Reporting
-
-### Revenue Reports
-
-- **Daily Revenue** - Daily income tracking
-- **Monthly Revenue** - Monthly income analysis
-- **Revenue by Source** - Income breakdown by category
-- **Member Revenue** - Revenue per member
-- **Trend Analysis** - Revenue trend over time
-
-### Payment Reports
-
-- **Payment History** - Complete payment records
-- **Outstanding Payments** - Unpaid invoices and amounts
-- **Payment Methods** - Breakdown by payment type
-- **Failed Payments** - Failed payment analysis
-- **Refund Reports** - Refund tracking and analysis
-
-### Member Financials
-
-- **Individual Statements** - Member-specific financial records
-- **Payment History** - Complete payment history per member
-- **Outstanding Balances** - Amounts owed by each member
-- **Payment Patterns** - Member payment behavior analysis
-- **Financial Health** - Member financial status assessment
-
-## Best Practices
-
-### Invoice Management
-
-- **Timely Invoicing** - Send invoices promptly
-- **Clear Descriptions** - Provide clear invoice details
-- **Professional Appearance** - Use branded invoice templates
-- **Follow-up Process** - Systematic follow-up on overdue payments
-- **Record Keeping** - Maintain complete invoice records
-
-### Payment Processing
-
-- **Secure Handling** - Follow security best practices
-- **Quick Processing** - Process payments promptly
-- **Confirmation** - Send payment confirmations
-- **Error Handling** - Handle payment errors gracefully
-- **Customer Service** - Provide payment support
-
-### Financial Reporting
-
-- **Regular Reviews** - Review financial reports regularly
-- **Trend Analysis** - Monitor financial trends
-- **Performance Metrics** - Track key financial metrics
-- **Budget Planning** - Use reports for budget planning
-- **Compliance** - Ensure regulatory compliance
-
-## Troubleshooting
-
-### Payment Issues
-
-1. **Check Payment Method** - Verify payment method validity
-2. **Contact Member** - Reach out to member for payment
-3. **Update Payment Info** - Help member update payment details
-4. **Process Manually** - Handle payment manually if needed
-5. **Escalate** - Escalate persistent payment issues
-
-### Invoice Problems
-
-1. **Verify Invoice Details** - Check invoice accuracy
-2. **Correct Errors** - Fix any invoice errors
-3. **Resend Invoice** - Send corrected invoice
-4. **Follow Up** - Follow up on invoice delivery
-5. **Contact Support** - Get help with complex issues
-
-### System Issues
-
-1. **Check System Status** - Verify system is operational
-2. **Refresh Data** - Refresh financial data
-3. **Clear Cache** - Clear browser cache
-4. **Try Different Browser** - Test with different browser
-5. **Contact Technical Support** - Get technical assistance
-
-The Billing & Invoicing system is designed to handle all financial aspects of your club while providing the flexibility and security needed for modern payment processing.
+- [Plans](/billing/plans)
+- [Transactions](/billing/transactions)
+- [Invoices](/billing/invoices)
+- [Bill runs](/billing/bill-runs)
+- [Payments](/billing/payments)
+- [Payment methods](/settings/payment-methods)
+- [Export](/settings/export) - CSV and QuickBooks bundle for accounting handoff.

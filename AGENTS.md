@@ -18,6 +18,8 @@
 <!-- Example: Use "workspace" not "project", "member" not "user" -->
 
 - When referring to sport clubs, use "gym" instead of "club". Exception: do not rename the "Club" / "Clubs" menu items in the UI - keep those as-is.
+- **Automations** is the current event-driven workflow feature (triggers, steps, runs). The previous **Campaigns** feature was decommissioned and removed from the product - do not document it. Reminders, review requests, and segment messaging are all built as automations now. See `marketing/automations.mdx`.
+- **Promotions** is the umbrella for both **vouchers** (wallet credit redeemed by code) and **discounts** (percentage or fixed at checkout). The two types share a single feature surface. See `marketing/promotions.mdx`.
 
 ## Style preferences
 
@@ -35,3 +37,13 @@
 
 <!-- Define what should and shouldn't be documented -->
 <!-- Example: Don't document internal admin features -->
+
+## Source repo and sync
+
+The product code lives in a sibling repo at `../1club` (GitHub: `1club-ai/1club`). When a PR in `1club` ships user-visible behavior - a new feature, renamed/removed menu item, changed setting, new permission, new field, new admin/user/cms route - the corresponding page in this repo must be created or updated.
+
+`../1club/.agents/docs-map.yml` is the authoritative mapping from source-tree paths to pages in this repo. Read it before deciding whether a code change has a docs counterpart, and which page to update. The map's `gaps:` section lists features that exist in code but are not documented here yet - that's where new pages typically go.
+
+When code introduces a new concept that doesn't fit any existing page, add the page, add the nav entry in `docs.json`, and add the new mapping to `../1club/.agents/docs-map.yml` so future changes route to it.
+
+Run `mint broken-links` after structural changes to catch dangling cross-links.

@@ -17,6 +17,8 @@ Promotions are always one of two types. Pick the type when you create the promot
 | **Where the code is entered** | Member portal → **Account → Add voucher** | Booking dialog or order checkout |
 | **Can be scoped to a class/area/instructor?** | No — wallet credit is universal | Yes (see **Scope** below) |
 | **Effect on the ledger** | Creates a wallet transaction | Reduces the booking/order total |
+| **Auto-apply at checkout** | No | Yes - see [Auto-apply](#auto-apply-trials-and-intro-offers) |
+| **Can target a specific plan?** | No | Yes - via **Plan** in the Valid for section |
 
 ## Creating a promotion
 
@@ -66,15 +68,65 @@ Restrict who can redeem by:
 
 Within a list the match is **OR** (any tag matches). Between lists it's **AND** (the member must match both the type filter and the tag filter when both are set). Leave both empty to allow everyone in the audience defined by **Visibility**.
 
-## Scope (valid for) — discounts only
+## Scope (valid for) - discounts only
 
-For discounts you can require that the booking or order matches a specific kind of thing:
+A discount can target two independent surfaces. List entries on either surface; the discount is valid when the purchase matches **any** declared surface.
 
-- **Class types** — applies only when the booking is for one of these class types.
-- **Area types** — applies only when the booking targets one of these area types.
-- **Instructor types** — applies only when the assigned instructor is one of these types.
+**Plan surface - what plan is being purchased:**
 
-Vouchers are wallet credit, so they aren't scoped — once a voucher is redeemed the credit can be spent on anything the wallet can pay for.
+- **Plan** - the discount applies only when the buyer is purchasing one of the selected plans. Used for first-purchase intro pricing, trials, and plan-specific promo codes. Required for [auto-apply](#auto-apply-trials-and-intro-offers).
+
+**Booking surface - what is being booked:**
+
+- **Class types** - applies only when the booking is for one of these class types.
+- **Area types** - applies only when the booking targets one of these area types.
+- **Instructor types** - applies only when the assigned instructor is one of these types.
+
+A promotion with both surfaces (e.g. "Plan: Annual + Class types: Yoga") applies to purchases of the listed plans **and** to bookings of the listed class types. Leaving every surface empty makes the discount valid for any booking or order (but never for a plan purchase, since plan eligibility is opt-in).
+
+Vouchers are wallet credit, so they aren't scoped - once a voucher is redeemed the credit can be spent on anything the wallet can pay for.
+
+## Auto-apply (trials and intro offers)
+
+A discount can be set to **Auto-apply**, meaning it lands silently at checkout for any first-time buyer of the targeted plan. No code needed. This is how you build trials, free days, and first-month-off offers.
+
+### How it works
+
+1. Create a **Discount** promotion.
+2. Pick one or more plans in **Valid for → Plan**. Auto-apply requires at least one plan.
+3. Set **Value** to the discount you want (100% for a free trial, e.g. 50 for "50% off the first period").
+4. Toggle **Auto-apply** on.
+5. Save.
+
+From then on, anyone buying one of those plans **for the first time** automatically gets the discount applied to the membership creation transaction. No code entry, no admin step.
+
+### First-time buyer rule
+
+Auto-apply only fires for a contact who has **no prior membership** on any of the targeted plans - active, expired, or cancelled. Once they've ever held a membership on one of those plans, they no longer qualify. This prevents the same person re-triggering an intro offer by signing up again.
+
+When more than one auto-apply promotion could fire for the same plan and contact, the one with the **largest computed savings** wins. Only one applies.
+
+### How it shows up on plan cards
+
+The public plan API computes a `firstTimeOffer` for each plan and contact, which the member-facing apps use to render badges like **"Try free"** or **"Save 20%"** on plan cards. The card shows both the original price and the effective price after the discount.
+
+### Effect on recurring plans
+
+For recurring plans the discount is baked into the membership's stored price at creation, so it **carries through every renewal** for as long as that membership runs. If you want the discount to lapse after the first period, use a one-time plan or a recurring plan paired with a manual price change at the renewal you choose.
+
+### Voucher promotions can't auto-apply
+
+Vouchers credit the wallet; they have no checkout-time line to silently discount. The Auto-apply toggle is hidden when **Type** is **Voucher**.
+
+## Attaching promotions to a plan
+
+The **Billing → Plans → \<Plan\>** detail page has a **Promotions** section listing every promotion whose **Valid for → Plan** includes this plan. From there you can:
+
+- **Add promotion** - opens the promotion editor pre-scoped to this plan. Pick the shape you want: 100% auto-apply (trial), code-driven percentage off, fixed-amount intro, etc.
+- **Edit** any attached promotion in place.
+- **Delete** an attached promotion if it has no redemptions yet.
+
+This is the most common entry point when you're building a trial for a specific plan rather than running a cross-product campaign.
 
 ## Stacking
 
@@ -130,6 +182,10 @@ When validating a code in the admin (for example, on a booking dialog) you may s
 - **class_type_not_eligible** — discount is scoped to class types and this booking isn't one of them.
 - **area_type_not_eligible** — discount is scoped to area types and this area isn't one of them.
 - **instructor_type_not_eligible** — discount is scoped to instructor types and this instructor isn't one of them.
+- **plan_not_eligible** - discount is scoped to specific plans and this plan isn't one of them. Also fires when the buyer is purchasing a plan and the promotion has no plan rule set (plan eligibility is opt-in).
+- **booking_not_eligible** - the booking-surface scope is set but the booking doesn't satisfy it (catch-all when the granular reason can't be narrowed).
+- **scope_not_eligible** - the promotion declares both plan and booking surfaces, and neither matches.
+- **not_first_time_buyer** - an auto-apply discount was evaluated for a contact who already holds (or held) a membership on one of the targeted plans.
 - **wrong_type** — a voucher code was entered at checkout (vouchers credit the wallet; they aren't applied as a discount).
 
 ## Best practices
@@ -138,6 +194,8 @@ When validating a code in the admin (for example, on a booking dialog) you may s
 - **Prefer Ends at over deletion.** Setting an end date is reversible and keeps the redemption history intact.
 - **Use segment filters for re-engagement campaigns.** Combine a "lapsed" tag with a generous voucher to bring members back.
 - **Scope discounts to fill specific inventory.** A 30% discount valid only for low-demand class types is a more efficient lever than a blanket discount.
+- **Build trials with auto-apply, not free plans.** A 100% auto-apply discount on a paid plan converts to a real subscription at the next renewal without any admin intervention. A separate "free trial plan" requires a manual migration step to start charging.
+- **For one-time intro pricing on a recurring plan, prefer a coded discount over auto-apply.** Auto-apply embeds the discount in the membership and carries it through every renewal; a one-shot intro is cleaner as a code that only applies to the creation transaction.
 - **Don't confuse promotions with deals.** [Deals](/marketing/deals) are sales opportunities tracked in your pipeline — a completely separate feature from promotions.
 
 ## Related

@@ -1,38 +1,53 @@
 ---
 title: Google Tag Manager
-description: Inject Google Tag Manager and GA4 tracking into your 1Club public surfaces
+description: Load a Google Tag Manager container on your member portal and CMS website
 ---
 
-This integration adds Google Tag Manager (GTM) and Google Analytics 4 (GA4) tracking to your 1Club public-facing surfaces - the CMS website and the member portal - without code changes. Configure your container or measurement ID once and 1Club injects the tags on every page load.
+This integration loads a Google Tag Manager (GTM) container on your 1Club public-facing surfaces - the member portal and the CMS website - without any code changes. Paste your container ID once and 1Club injects the GTM snippet on every page load. From there, your GTM workspace controls what fires (GA4, Meta Pixel, conversion pixels, custom tags, and so on).
 
 ## Before you start
 
-- A GTM container ID (format `GTM-XXXXXXX`) or a GA4 measurement ID (format `G-XXXXXXXXXX`), or both. You can find these in [tagmanager.google.com](https://tagmanager.google.com) and [analytics.google.com](https://analytics.google.com).
-- Either field is optional, so you can use just GTM, just GA4, or both side by side.
+You need a GTM container ID in the format `GTM-XXXXXXX`. Find it on the workspace overview screen in [tagmanager.google.com](https://tagmanager.google.com), next to your container name.
+
+If you want to use Google Analytics 4, configure the GA4 Configuration tag inside your GTM container. 1Club does not accept a standalone GA4 measurement ID - everything goes through GTM.
 
 ## Connect Google Tag Manager
 
-1. Go to **Settings → Integrations** and click **Activate** on the Google Tag Manager card.
-2. On the integration page, paste your **GTM Container ID** and/or **GA4 Measurement ID**.
+1. In the admin, go to **Settings → Integrations** and click **Activate** on the Google Tag Manager card.
+2. Paste your **GTM Container ID** into the form. It is normalized to uppercase on save and must match `GTM-` followed by letters or digits.
 3. Click **Save**.
 
-The IDs are stored on your organization and used the next time a public page is rendered. No deployment or cache flush is required.
+The container ID is stored on your organization. The next page load on your member portal and CMS website includes the GTM snippet. No redeploy or cache flush is required.
+
+## Where the tag loads
+
+1Club injects two things on every public page render:
+
+- The standard GTM script (`https://www.googletagmanager.com/gtm.js?id=GTM-XXXXXXX`), loaded with Next.js `afterInteractive` strategy so it does not block first paint.
+- The noscript iframe fallback for visitors with JavaScript disabled.
+
+Both the member portal (`{org}.portal.1club.ai` or your custom portal domain) and the CMS website (your branded site) read the container ID from your organization settings and load the same container.
 
 ## What gets tracked
 
-1Club only injects the tag - what it tracks is entirely up to your GTM workspace and GA4 property. Typical setups include:
+1Club only loads the container. What it tracks is entirely up to your GTM workspace. Typical setups include:
 
 - Page views on the marketing site and member portal.
 - Conversion events for sign-up, booking confirmation, or purchase.
 - Custom dataLayer events you trigger from GTM tags.
 
-If you only configure the GA4 measurement ID, 1Club emits a basic `gtag.js` snippet. If you configure GTM, the container loads and any GA4 tag inside the container runs as you configured it there.
+1Club's member portal also pushes a small set of standard events to `window.dataLayer` (for example `page_view`, `sign_up`, `login`, `booking_created`, `purchase`) that you can pick up with GTM triggers if you want to track member behavior in GA4 or other tools.
+
+## Cookie consent
+
+The GTM snippet runs on every page load. If you operate under GDPR, ePrivacy, or similar regulations, configure consent in your GTM container using Google's Consent Mode and gate marketing or analytics tags on the appropriate consent state. 1Club's cookie banner records the visitor's preferences but does not configure GTM tags for you.
 
 ## Disconnect
 
-Clear both fields and save. The tags stop being injected on subsequent page loads.
+Clear the **GTM Container ID** field and save. The GTM snippet stops being injected on subsequent page loads. Existing visitors with the script already loaded keep it until they navigate away or refresh.
 
 ## Troubleshooting
 
-- **Tag not firing** - confirm the ID format (`GTM-` or `G-` prefix, all uppercase) and that you saved the form. Then use the [Tag Assistant](https://tagassistant.google.com) on the public site to confirm the container loaded.
-- **Events missing in GA4** - check that the GA4 tag inside your GTM container is firing on the right triggers. GTM publishes are independent of 1Club - changes you make in GTM go live on the next publish there.
+- **Tag not firing** - confirm the ID format (must start with `GTM-`, uppercase, letters and digits only) and that you saved the form. Then open your public site and use [Tag Assistant](https://tagassistant.google.com) to confirm the container loaded.
+- **Events missing in GA4** - GTM publishes are independent of 1Club. Confirm the GA4 tag inside your container is firing on the right triggers and that you published the latest workspace version in GTM.
+- **Tag loads on portal but not website (or vice versa)** - both surfaces read from the same organization setting, so a missing tag usually means the ID was not saved, the site is on an older cached HTML response, or the public org payload was not refreshed. Reload the page once to pick up the latest container ID.

@@ -1,82 +1,76 @@
 ---
-title: Admin users
-description: Invite organization users, assign roles, and manage their access to the admin panel
+title: Users
+description: Invite admin staff, assign one of five fixed roles, and manage invitations from Settings > Users.
 ---
 
-Admin user management controls who can access your organization's admin panel and what they can do there. You invite a user, assign them one of the built-in roles, and the role decides which areas they see and which actions they can take.
+**Settings > Users** is where you control who can sign into the admin and what they can do once they're in. Every organization user holds exactly one of five fixed roles. There is no custom-role builder - the role list is the same across every org.
 
-## Where to find it
+## The roles
 
-Go to **Settings → Users**. The page lists every organization user in a grid, with tabs to filter by role: **All**, **Admin**, **Manager**, **Front Desk**, **Instructor**, and **Member**. Each tab shows a count.
+1Club ships with five canonical roles. Pick the one closest to what the person actually does day-to-day.
 
-The grid columns are:
+| Role | Typical use | What it can do |
+|------|-------------|----------------|
+| **Admin** | Owner or main administrator | Full access to every module (members, marketing, website, operations, billing, analytics, settings). |
+| **Manager** | Club or department manager | Members and operations full management, marketing manage, analytics manage, inventory manage, billing read and create. No settings. |
+| **Front desk** | Receptionist or front-of-house staff | Members create and read, messaging full, operations create and read, billing read and create. No settings, no analytics beyond their own. |
+| **Instructor** | Coach or teacher | Manages only their own classes, bookings, and check-ins. Reads their own analytics and messages. |
+| **Member** | End member | No admin portal access. Uses the member portal and public apps. |
 
-- **Contact** - name, email, and avatar
-- **Role** - the assigned role, plus an **Owner** chip if the user is an owner
-- **Status** - the user's account or invitation status
-- **Joined** - the date the user joined (or was invited)
+The full permission matrix lives in [Roles and permissions](/reference/roles-permissions).
 
-## Roles
+### Owner flag
 
-1Club has five built-in roles. Every user has exactly one. Roles and their permissions are fixed - you assign a role, but you cannot create custom roles or change a role's permissions.
+Owner is a separate flag on the user, not a sixth role. An Admin can be marked as **owner**, and only owners can delete the organization. Setting **Account owner** in the invite dialog forces the role to Admin.
 
-| Role | Access summary |
-|------|----------------|
-| **Admin** | Full access to every module, including settings and user management. |
-| **Manager** | Full management of members, messaging, operations, staff, marketing, analytics, and inventory; read and create billing. No settings access. |
-| **Front Desk** | Members, messaging, operations (bookings, check-ins), point of sale, and read access to analytics and inventory. No settings access. |
-| **Instructor** | Their own classes, bookings, and check-ins, plus messaging and their own profile. |
-| **Member** | No admin access; uses the member portal and public apps. |
+## The Users page
 
-For the full permission matrix, role types, and what each action means, see [Roles and permissions](/reference/roles-permissions). In Settings → Users you can also open the **Role permissions** info icon to view the same grid in-app.
+Open **Settings > Users**. The page is a single table of every organization user with these tabs at the top:
 
-### Owner
+- **All** - everyone in the organization.
+- **Admin**, **Manager**, **Front desk**, **Instructor**, **Member** - filtered by role.
 
-One or more Admin users can be marked as an **owner**. Owners bypass permission gates and only owners can delete the organization. Owner is a flag on the user, shown as an **Owner** chip in the grid - not a separate role.
+Each tab shows a badge with the count. The search box filters by name or email and resets pagination.
+
+Each row shows the user's name, role chip (with an **Owner** chip if applicable), status (Active, Invited, Pending invite, Expired), and join date.
 
 ## Inviting a user
 
-1. Go to **Settings → Users**.
-2. Click **Invite**.
-3. Enter the user's details and pick their **role**.
-4. Send the invitation.
+Click **Invite user** in the top right. The dialog has two modes:
 
-The user receives an email invitation. Until they accept, they appear in the grid with an invitation status.
+- **From a contact** - pick someone who already exists in your contact list.
+- **New person** - enter first name, last name, and email.
 
-<Note>
-Inviting someone as an **Instructor** creates (or links) an instructor profile. If the user doesn't have one yet, you'll be prompted to fill in the instructor details before the role is saved.
-</Note>
+Then choose a role from the five listed above. Tick **Account owner** if this person should be allowed to delete the organization (forces Admin). Submit, and 1Club sends an invitation email. The user appears in the table with status **Invited** until they accept.
 
-## User and invitation status
+If you pick **Instructor** for someone who doesn't yet have an instructor profile, the dialog walks you through creating one before the role is saved. This is so an instructor always has a profile to attach classes, bookings, and schedule slots to.
 
-- **Active** - the user has accepted and can log in.
-- **Invited** / **Pending invite** - an invitation has been created or sent but not yet accepted.
-- **Expired** - the invitation link expired before it was accepted.
+## Editing, resending, and removing
 
-## Managing existing users
+Click any active user row to open the edit dialog. You can change their role, toggle the owner flag, or (if they have an instructor profile) edit instructor-specific details. You can't edit your own role from this page.
 
-Click a user (or use the row actions menu) to manage them:
+From the row's actions menu:
 
-- **Edit** - change the user's role. For a user who is also an instructor, this opens the full instructor editor with the role picker.
-- **Resend invitation** / **Send invitation** - re-send an invitation that hasn't been accepted yet.
-- **Set password** (Admins only) - set a password for another user directly.
-- **Remove** / **Delete invitation** - remove an active user from the organization, or delete a pending invitation. This cannot be undone.
+- **Resend invitation** - available for users still in **Invited** or **Pending invite** state. Sends a fresh email.
+- **Set password** - admins can set a password directly for any other user instead of waiting for them to use the reset flow.
+- **Delete invitation** - cancels an unaccepted invite.
+- **Remove user** - removes an active user from the organization. The contact record (if any) stays; only the organization-user link is deleted.
 
-You cannot edit, remove, or set a password for your own account from this page.
+## Statuses
 
-## Granting an instructor admin-portal access
+- **Active** - signed up and using the admin.
+- **Invited** - invitation sent, waiting for the user to accept.
+- **Pending invite** - the invitation hasn't been sent yet (e.g. created from a contact without an email yet).
+- **Expired** - the invitation link expired. Use **Resend invitation** to send a new one.
 
-An instructor can be given access to the admin portal so they can manage their own classes and bookings. This toggle is controlled from the instructor's record and is available to Admins and Managers only. See [Instructor management](/operations/instructors).
+## What changing a role does
 
-## Best practices
+Roles replace each other - there's no permission delta or stacking. When you move someone from Front desk to Manager, their old permissions are dropped and the Manager set is applied wholesale. The owner flag is preserved across role changes (but the system still requires Admin if the owner flag is on).
 
-- **Assign the least-privileged role** that lets someone do their job. Front Desk covers most front-of-house work without exposing billing settings or analytics.
-- **Reserve Admin for the people who run the organization.** Only Admins can change settings and manage other users.
-- **Clean up invitations.** Delete invitations that were never accepted so the user list stays accurate.
-- **Review access periodically** and remove users who no longer need it.
+Existing sessions pick up the new role on their next request. There's no "force sign-out" button - if you need someone out immediately, **Remove user**.
 
 ## Related
 
-- [Roles and permissions](/reference/roles-permissions) - the full permission matrix and role types.
-- [Instructor management](/operations/instructors) - instructor profiles and admin-portal access.
-- [Organization and clubs](/reference/organization-clubs) - how organizations and clubs relate.
+- [Roles and permissions](/reference/roles-permissions) - The full module-by-module permission matrix.
+- [Access control](/settings/access-control) - Door check-in modes, separate from admin roles.
+- [API tokens](/settings/api-tokens) - Service tokens for programmatic access; not the same as user invites.

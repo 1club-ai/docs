@@ -1,0 +1,145 @@
+---
+title: Export
+description: Download your organization data as CSV, or prep your books for QuickBooks Online.
+---
+
+Settings > Export lets you download your organization's data as CSV files: contacts, bookings, memberships, invoices, and payments. There's also a QuickBooks bundle that packages customers, invoices, and payments into one ZIP for handing off to your accountant.
+
+## Overview
+
+Navigate to **Settings > Export** to open the export wizard. The wizard walks you through four steps:
+
+1. **Select data** - pick what you want to export.
+2. **Filters** - narrow by date range.
+3. **Preview** - see the row count and a 10-row sample before committing to the download.
+4. **Download** - get the file.
+
+Each export is scoped to your current organization and to the role of the person running it. Only admins can run exports.
+
+## What you can export
+
+<CardGroup cols={2}>
+  <Card title="Contacts" icon="address-book">
+    Everyone in your contact list: members, leads, staff, and one-off check-ins. Includes name, contact details, address, type, tags, date of birth, and audit timestamps.
+  </Card>
+  <Card title="Bookings" icon="calendar-check">
+    Class and area bookings. Date filter is by **class start time**. Useful for attendance analysis or reconciling with third-party reporting.
+  </Card>
+  <Card title="Memberships" icon="id-card">
+    Active and historical memberships, with plan, billing frequency, start/end dates, and status. Date filter is by **membership start date**.
+  </Card>
+  <Card title="Invoices" icon="file-invoice">
+    Invoices in a QuickBooks-friendly column layout (one row per invoice line item). Date filter is by **invoice date**.
+  </Card>
+  <Card title="Payments" icon="credit-card">
+    Customer payments with payment method, amount, and linked invoice number where available. Date filter is by **payment date**.
+  </Card>
+  <Card title="Accounting export (QuickBooks-friendly)" icon="file-zipper">
+    A ZIP containing `customers.csv`, `invoices.csv`, `payments-reference.csv`, and a `README.txt` explaining how to bring the data into QuickBooks Online.
+  </Card>
+</CardGroup>
+
+## Running an export
+
+1. Open **Settings > Export**.
+2. Choose what you want to export (one entity per run).
+3. Click **Next** and set a **From** and **To** date if you want to narrow the range. Leave both blank to export everything.
+4. Click **Next** to generate the preview. You'll see the total row count, the list of columns, and the first 10 rows.
+5. Click **Download**. The file is sent straight to your browser; nothing is stored on the server afterwards.
+
+The preview is the same query as the download (just capped at 10 rows), so the row count you see is exactly what you'll get in the file.
+
+## Date range behavior
+
+Each entity uses a different date column for filtering. The table below shows what the **From / To** filter actually checks:
+
+| Export | Date filter is applied to |
+|--------|---------------------------|
+| Contacts | Contact creation date |
+| Bookings | Class start time |
+| Memberships | Membership start date |
+| Invoices | Invoice date |
+| Payments | Payment date |
+| Accounting export | Invoice date for `invoices.csv`, payment date for `payments-reference.csv`, and "any invoice or payment in range" for `customers.csv` |
+
+For the accounting export, an existing member whose contact record was created years ago will still show up in `customers.csv` if they had an invoice or payment in the selected window. That's deliberate: your accountant needs to see every customer who transacted in the period, not just those who joined in it.
+
+## File format
+
+All exports are UTF-8 CSV with a byte-order mark (BOM), so Excel and Numbers will open them with the correct encoding automatically.
+
+- **Dates** are formatted as `YYYY-MM-DD` (UTC).
+- **Timestamps** are full ISO 8601 in UTC.
+- **Money values** have two decimal places, no currency symbol or thousands separator.
+- **Cells that would trigger Excel formulas** (those starting with `=`, `+`, `-`, or `@`) are prefixed with a single quote so they import as text. This is a security measure to prevent malicious values in your data from running formulas in your spreadsheet.
+
+## The accounting export (QuickBooks)
+
+The QuickBooks option produces `quickbooks-export.zip`, intended as **preparation** for QuickBooks Online, not a one-click import.
+
+### What's in the ZIP
+
+- **`README.txt`** - Step-by-step instructions for using the bundle with QBO, plus caveats about file-size limits and sales tax.
+- **`customers.csv`** - Your contacts who had at least one invoice or payment in the selected date range. The **Display Name** column is the canonical join key (see below).
+- **`invoices.csv`** - One row per invoice line item, in QBO's invoice import format: `InvoiceNo`, `Customer`, `InvoiceDate`, `DueDate`, `ItemProductService`, `ItemDescription`, `ItemQuantity`, `ItemRate`, `ItemAmount`, `ItemTaxCode`, `ItemTaxAmount`, `Currency`.
+- **`payments-reference.csv`** - Customer payments for the period. **Reference and audit only** - QuickBooks Online does not natively CSV-import customer payments applied to invoices.
+
+### Recommended workflow
+
+1. Open `customers.csv` and reconcile the **Display Name** values against existing customers in QBO. Create or update customers as needed so the names match exactly.
+2. Open `invoices.csv` and confirm every `Customer` value matches a Display Name in QBO. If not, QBO will create duplicate customers on import.
+3. In QBO, go to **Settings > Import data > Invoices** and import `invoices.csv`. If you have more than 100 invoices, you'll need to split the file (see "QBO limits" below).
+4. Use `payments-reference.csv` to verify the paid/open status of each invoice after import, or feed it into a bridge tool that supports payment imports.
+
+### QBO limits to know
+
+- **100 invoices per file / 1,000 rows per file** - QuickBooks Online's native invoice CSV import enforces this. If your `invoices.csv` exceeds either, either split the file before importing, or use a bridge tool such as SaasAnt Transactions that doesn't enforce the per-file limit.
+- **Sales tax** - The `ItemTaxCode` column is filled from your 1Club tax rate name. QBO's CSV tax import has limitations and varies by region. Test in a QBO sandbox before importing to your production books.
+- **Payments are reference-only** - As above, payments don't import natively. The file is there for audit, reconciliation, or feeding a bridge tool.
+
+### The Display Name join key
+
+`customers.csv`, `invoices.csv`, and `payments-reference.csv` all use the same `Display Name` / `Customer` value for the same contact - that's what lets QBO match invoice rows to customers after import. If you change the Display Name in QBO but not in the CSV (or vice versa) before importing invoices, QBO will create duplicate customers.
+
+## Limits
+
+- **500,000 rows per export.** If your filtered result exceeds this, the download is rejected with a message showing the actual count. Narrow the date range and try again. For the accounting export, the limit is applied to customers + invoices + payments combined.
+- **One entity per run.** To export both contacts and bookings, run the wizard twice.
+- **No saved exports.** Each run is independent; there's no history of past exports on the server.
+
+## Access and permissions
+
+Running exports requires the **admin** role. Managers, instructors, staff, and members cannot access the Export page or the underlying download endpoints.
+
+If you need to give someone outside the admin role access to a recurring export, the current workaround is to run the export yourself and share the file via your usual channel (email, shared drive). Programmatic access via the public API for non-admin exports is not currently supported.
+
+## Tips & best practices
+
+- **Always preview first.** The row count tells you whether your filters are right before you commit to a download you may not need.
+- **Use the same date range across multiple exports** when you're reconciling. For example, exporting bookings and payments for the same month makes them easy to cross-check.
+- **Open CSVs in Numbers or Google Sheets** if Excel mangles dates. The UTF-8 BOM should prevent encoding issues, but date parsing varies by locale.
+- **For accounting exports, run in a QBO sandbox first.** Especially the first time, to confirm Display Names and tax codes behave as expected.
+
+## Troubleshooting
+
+**Issue**: The download is rejected with "Export exceeds the 500,000 row limit."
+**Solution**: Narrow the **From** and **To** date range. The cap is per-export, so splitting a year into quarters (or smaller) is the normal workaround for large tenants.
+
+**Issue**: The preview shows zero rows.
+**Solution**: Check your date range. The filter is applied to the entity's natural date column (see [Date range behavior](#date-range-behavior)) - exporting Bookings with a date range that's before any class started will return nothing.
+
+**Issue**: QuickBooks imports created duplicate customers.
+**Solution**: The Display Name in `invoices.csv` did not match the customer name in QBO. Open `customers.csv`, reconcile the Display Name values against QBO first, then re-import.
+
+**Issue**: Tax amounts look wrong in QBO after importing invoices.
+**Solution**: QBO's CSV tax import has region-specific behavior. The export fills `ItemTaxCode` from your 1Club tax rate name; QBO needs a matching tax code on its side. Verify in a QBO sandbox before doing this on your production books.
+
+**Issue**: Excel shows a cell starting with a single quote, like `'=SUM(...)`.
+**Solution**: That's intentional. The export prefixes cells that look like spreadsheet formulas with a single quote to prevent formula injection. The quote is displayed in the formula bar but won't appear when the cell is printed or copied as a value.
+
+## Related
+
+- [Import](/settings/overview) - The mirror flow for bringing data into 1Club.
+- [Billing overview](/billing/overview) - How invoices and payments work in 1Club, useful context when reading the exported files.
+- [Invoices](/billing/invoices) - Invoice fields and statuses you'll see in `invoices-export.csv`.
+- [Payments](/billing/payments) - Payment records and how they link to invoices.

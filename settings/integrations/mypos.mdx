@@ -1,0 +1,128 @@
+---
+title: myPOS
+description: Accept card payments through myPOS hosted checkout, with sandbox and live modes
+---
+
+myPOS is a card payment provider you can use alongside or instead of Stripe. Customers are redirected to myPOS's hosted checkout page to enter their card details, then bounced back to 1Club once the payment completes. Card data never touches 1Club servers - all processing happens on myPOS's PCI-certified infrastructure.
+
+You can try myPOS end-to-end in **Test** mode against a shared sandbox without any credentials, then switch to **Live** mode with your own myPOS Checkout Store when you are ready to take real money.
+
+## Before you start
+
+- **Test mode** needs nothing. 1Club ships shared sandbox credentials, so you can run the full checkout flow with myPOS test cards before signing up for anything.
+- **Live mode** needs a myPOS merchant account with an **Online (Checkout) Store** set up. You configure 1Club with credentials from that store - see [Where to get your myPOS credentials](#where-to-get-your-mypos-credentials) below.
+
+<Note>
+  Configuring myPOS requires the **settings.manage.organization** permission. Admins and users with full settings management can reach this page; managers and other roles cannot.
+</Note>
+
+## Where to get your myPOS credentials
+
+Live credentials come from your **myPOS account**, not from 1Club. In the myPOS dashboard you create an **Online Store** (also called a **Checkout Store**), and that store is where every value below originates. If you do not have a store yet, follow myPOS's [Create a Checkout Store](https://developers.mypos.com/online-payments/initial-setup-and-testing/create-checkout-store) guide first.
+
+There are two ways to supply the credentials to 1Club. Use the Configuration Pack if your myPOS store offers it - it is faster and avoids copy-paste mistakes.
+
+### Option A - Configuration Pack (recommended)
+
+myPOS **Easy Setup** generates a single Base64 string called a **Configuration Pack** that bundles all five credentials together. In your myPOS Checkout Store, open the integration / **Easy Setup** screen, generate the pack, and copy the whole string. You paste it into one field in 1Club and it fills in everything else - you do not need the individual values below.
+
+### Option B - manual credentials
+
+If you prefer (or your store predates Easy Setup), enter the five values by hand. All of them come from your Checkout Store in the myPOS dashboard:
+
+| Field | What it is | Where to find it in myPOS |
+| --- | --- | --- |
+| **Store ID (SID)** | The numeric identifier of your Checkout Store. | General information for your Checkout Store. |
+| **Client number (Wallet number)** | The myPOS wallet that receives the funds. | Your myPOS account / wallet details. |
+| **Key index** | The index of the signing key pair (a positive number, usually `1`). | Shown next to the key pair when you generate it. |
+| **RSA private key (PEM)** | The private half of your signing key pair, used to sign requests to myPOS. | Generated in myPOS and **shown only once** - store it securely. |
+| **myPOS public certificate (PEM)** | The certificate 1Club uses to verify notifications coming back from myPOS. It is unique to this Checkout Store. | Download it from your **Checkout Store's Integration tab**. |
+
+<Note>
+  The private key is displayed only once when you generate the key pair in myPOS. If you lose it, generate a new key pair (which produces a new key index and certificate) and update all three values here.
+</Note>
+
+For full details on stores, keys, and certificates, see the [myPOS Developers portal](https://developers.mypos.com/).
+
+## Connect myPOS
+
+1. Go to **Settings → Integrations** and click **Activate** on the myPOS card.
+2. On the myPOS page, choose a **Mode**:
+   - **Test** - uses the shared myPOS sandbox. No credentials needed.
+   - **Live** - reveals the credential fields described below.
+3. In live mode, supply your credentials one of two ways:
+   - Paste your **Configuration Pack** into the **Configuration Pack** field. This fills in all five values and disables the manual fields.
+   - Or, under **Or enter credentials manually**, fill in **Store ID (SID)**, **Client number (Wallet number)**, **Key index**, **RSA private key**, and **myPOS public certificate**.
+4. Set your **Capabilities** (see [Capabilities](#capabilities)).
+5. Click **Validate configuration** to check that the stored values are well-formed.
+6. Click **Save**.
+
+<Note>
+  The private key and public certificate are stored encrypted and shown back to you as masked fields. When you edit the configuration later, leave them blank to keep the existing values - only paste a value if you are replacing it.
+</Note>
+
+## Configuration fields
+
+| Field | Mode | Notes |
+| --- | --- | --- |
+| **Mode** | Both | **Test** or **Live**. |
+| **Capabilities** | Both | Toggles which payment surfaces myPOS handles. |
+| **Configuration Pack** | Live | Base64 string from myPOS Easy Setup. Supplies all credentials and replaces the manual fields. |
+| **Store ID (SID)** | Live | Your Checkout Store identifier. |
+| **Client number (Wallet number)** | Live | The wallet that receives funds. |
+| **Key index** | Live | Positive integer; the index of your signing key pair. |
+| **RSA private key (PEM)** | Live | Stored encrypted. Leave blank when editing to keep the current key. |
+| **myPOS public certificate (PEM)** | Live | Downloaded from your Checkout Store's Integration tab. Leave blank when editing to keep the current certificate. |
+
+## Test mode vs. live mode
+
+- **Test** uses shared myPOS sandbox credentials. No real money moves and no Configuration Pack is needed - use myPOS [test cards](https://developers.mypos.com/online-payments/initial-setup-and-testing/testing-in-sandbox/test-data) to simulate payments.
+- **Live** uses your own myPOS Checkout Store. Real payments are processed and settled to your wallet.
+
+Switching from **Live** back to **Test** does not delete your saved live credentials - they stay on file so you can switch back without re-entering them.
+
+## Validate configuration
+
+The **Validate configuration** button checks that your saved credentials are well-formed (the private key and certificate are valid PEM, the key index is present, and the required server settings exist). It records the time of the last successful validation.
+
+<Note>
+  Validation runs locally and does **not** contact myPOS or move any money. It catches a malformed key or a missing field, but it cannot confirm that myPOS recognizes your SID or wallet. The first real proof that live credentials are correct is a successful test payment through hosted checkout.
+</Note>
+
+## Capabilities
+
+The **Capabilities** section controls which payment surfaces the integration serves:
+
+- **Online** - hosted checkout for members on the web (portal, kiosk, and admin-initiated charges). Enabled by default.
+- **Terminal** - in-person card readers at your gyms. Marked **Coming soon** and currently disabled.
+
+## Send a myPOS payment link
+
+For an outstanding transaction, you can send the member a link to pay through myPOS instead of charging a saved card.
+
+1. Open the transaction from **Billing → Transactions**.
+2. Choose **Send myPOS payment link**. This is available only while the transaction is still payable (pending, overdue, or partially paid).
+3. Review the amount and recipient, add an optional message, and send.
+
+The member receives an email with a link that opens myPOS hosted checkout for the exact amount due. Each link is valid for **7 days**. Sending payment links requires the **billing.manage** permission.
+
+## What syncs
+
+- Payments created in 1Club open a myPOS hosted checkout URL that the customer is redirected to.
+- After payment, myPOS notifies 1Club through a signed webhook (IPN). The payment status, myPOS transaction reference, and order ID are recorded on the 1Club payment, and any linked transactions and bookings are settled automatically.
+- If the IPN is redelivered, 1Club matches it to the same payment, so duplicate notifications do not double-charge or double-settle.
+
+## Refunds
+
+1Club does not push refunds to myPOS. Refund a myPOS payment from your **myPOS account**, then reconcile the transaction in 1Club. (Automated refunds through 1Club are planned alongside the Terminal capability.)
+
+## Disconnect
+
+Click **Deactivate** on the myPOS page and confirm. This removes the integration. Pending hosted-checkout sessions already open on myPOS keep working until they expire; only new charges are stopped. Your saved credentials are cleared.
+
+## Troubleshooting
+
+- **Validation fails** - confirm the **Store ID (SID)**, **Client number**, and **Key index** match your myPOS Checkout Store, and that the **RSA private key** is the one paired with the certificate for that key index. If you used a Configuration Pack, regenerate it in myPOS and paste the fresh pack.
+- **Customers see a signature error on the checkout page** - the public certificate registered with myPOS does not match the private key on file. Regenerate the key pair in myPOS, download the new public certificate from the Integration tab, and paste the new private key and certificate here.
+- **Payment succeeded on myPOS but the transaction stays unpaid in 1Club** - the IPN webhook did not reach 1Club. Confirm the notification URL is allowed in your myPOS store settings, then re-trigger the notification from myPOS.
+- **Live payments fail but test mode works** - double-check you are in **Live** mode and that you entered live credentials (a Configuration Pack from your real store, not the sandbox).

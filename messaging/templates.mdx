@@ -1,275 +1,80 @@
 ---
-title: "Message Templates"
-description: "Learn how to create and manage email and SMS templates for consistent messaging."
+title: Templates
+description: Reusable subject and body for manual message sends. Variables resolve per recipient at send time.
 ---
 
-**In a nutshell:** Create reusable email and SMS templates to save time and ensure consistent messaging across your communications.
+Message templates are the saved subjects and bodies that show up in the **Template** picker when you compose a manual message. They live alongside system templates (booking confirmations, receipts, password resets) at **Settings > Communication > Templates**, but the compose picker only surfaces templates with `type = message`.
 
-## What are Message Templates?
+Use them when you find yourself retyping the same welcome note, class reminder, or promotional blurb every week.
 
-Message templates are pre-written messages that you can use as starting points for your communications. They help you maintain consistency, save time, and ensure important information is always included in your messages.
+## What a template stores
 
-## Key Features
+Each template carries four fields:
 
-### **Template Management**
+- **Name** - shown in the picker and the list.
+- **Subject** - used when the template is applied to an email send.
+- **Content type** - `html` (rich text) or `text` (plain).
+- **Content** - the body, either HTML or plain text.
 
-- **Create custom templates** for your specific needs
-- **Edit existing templates** to keep them current
-- **Copy templates** to create variations
-- **Delete unused templates** to keep your list clean
+The list also shows an **Active / Inactive** chip and the created date. Inactive templates stay in the database but disappear from the compose picker.
 
-### **Template Categories**
+Templates carry a `type` of `message` (manual sends), `transactional` (system emails like password resets), or `receipt` (invoice receipts). The compose picker only shows `message` templates; the others are picked up by the server when those flows fire.
 
-- **Welcome messages** for new members
-- **Class reminders** for upcoming sessions
-- **Promotional content** for special offers
-- **General announcements** for club updates
+## Creating a template
 
-### **Content Types**
+From **Settings > Communication > Templates**, click **Add template**. A dialog asks for name, subject, content type, and content. Save and the template becomes available in the compose picker immediately.
 
-- **HTML templates** with rich formatting
-- **Plain text templates** for simple messages
-- **SMS templates** for mobile communications
-- **Email templates** for detailed content
+To duplicate a template for a variation, hit the **Copy** action on the row. A copy opens in the dialog with `(Copy)` appended to the name; tweak it and save.
 
-## Creating Templates
+## Variables
 
-### **Basic Template Setup**
+Write variables as `{{variableName}}`. They are substituted at send time using the recipient's contact record and your organization's settings.
 
-1. Go to **Messaging** → **Templates**
-2. Click **Add Template**
-3. **Enter template name** and description
-4. **Choose content type** (HTML or text)
-5. **Write your template content**
-6. **Save the template**
-
-### **Template Content**
-
-- **Subject line** for email templates
-- **Message body** with your content
-- **Placeholder variables** for personalization
-- **Rich formatting** for HTML templates
-
-### **Template Variables**
-
-Variables are written as `{{variableName}}` and substituted at send time. Use the **Insert variable** picker in the editor toolbar to browse and insert variables without typing them by hand. The picker groups variables by category (Contact, Organization, Booking, Membership) and shows a short description for each.
-
-For automations, the available variables depend on the **trigger**. Booking-triggered messages get the booking variables; membership-triggered messages get the membership variables. Variables that aren't available for the current trigger ship as literal `{{variableName}}` text, so always insert from the picker rather than typing.
-
-#### Available everywhere
-
-Available on every trigger and in any manual message.
+For `message` templates, the server validates that every `{{...}}` token in your subject and body is in the allow-list below. Saving a template with an unknown variable returns an "invalid variable" error. The complete allow-list:
 
 | Variable | Description |
 | --- | --- |
-| `{{contactFirstName}}` | Recipient's first name (use for greetings) |
 | `{{contactName}}` | Recipient's full name |
-| `{{contactLastName}}` | Recipient's last name |
-| `{{contactEmail}}` | Recipient's email address |
+| `{{contactFirstName}}` | Recipient's first name (for greetings) |
+| `{{contactEmail}}` | Recipient's email |
 | `{{organizationName}}` | Your organization's name |
-| `{{organizationEmail}}` | Your organization's email |
+| `{{organizationEmail}}` | Your organization's contact email |
 | `{{organizationPhone}}` | Your organization's phone number |
-| `{{clubName}}` | Club name |
-| `{{orgBaseUrl}}` | Your organization's base URL |
-| `{{orgLogoUrl}}` | Your organization's logo URL |
+| `{{senderName}}` | The staff member sending the message |
+| `{{subject}}` | The message subject (handy in body copy) |
+| `{{messageDate}}` | The send date |
 
-#### Booking triggers
+That's the complete list for manual sends. Booking-specific tokens (`{{entityName}}`, `{{bookingDate}}`, `{{accessPin}}`) and membership-specific tokens (`{{planName}}`, `{{renewalPrice}}`) are only valid on **transactional** templates, where a booking or membership record is bound to the send. For trigger-based messages that use those tokens, see [Automations](/marketing/automations).
 
-Available on booking-related triggers: booking created, cancelled, no-show, checked-in, and upcoming reminders.
-
-| Variable | Description |
-| --- | --- |
-| `{{entityName}}` | The booked class, area or instructor (no club name) |
-| `{{bookingResource}}` | Joined display of class, area, instructor and club on the booking |
-| `{{bookingDate}}` | Booking date, e.g. "Mar 12, 2026" |
-| `{{bookingTime}}` | Booking time range, e.g. "10:00 - 11:00" |
-| `{{bookingStartTime}}` | Booking start time |
-| `{{bookingEndTime}}` | Booking end time |
-| `{{bookingDuration}}` | Booking length, e.g. "1h" or "1h 30min" |
-| `{{accessPin}}` | The member's access PIN, or empty if they don't have one |
-
-#### Membership triggers
-
-Available on membership-related triggers: created, cancelled, and expiring.
-
-| Variable | Description |
-| --- | --- |
-| `{{planName}}` | Membership plan name |
-| `{{renewalPrice}}` | Renewal amount with currency |
-| `{{membershipExpiresAt}}` | Membership expiration date |
-| `{{daysUntilExpiration}}` | Days until membership expires |
-
-#### Membership expiring only
-
-| Variable | Description |
-| --- | --- |
-| `{{renewUrl}}` | Deep link to the member portal renewal page |
-
-<Note>
-  `{{accessPin}}` returns only the raw PIN (or empty). Write any surrounding label as plain text, for example: `Door code: {{accessPin}}`. The older `{{accessPinLine}}` token that rendered a full English sentence has been removed.
-</Note>
-
-## Template Categories
-
-### **Welcome Messages**
-
-- **New member onboarding** templates
-- **First class welcome** messages
-- **Membership confirmation** emails
-- **Getting started** guides
-
-### **Class Reminders**
-
-- **Upcoming class** notifications
-- **Class cancellation** alerts
-- **Waitlist notifications** when spots open
-- **Class change** announcements
-
-### **Promotional Content**
-
-- **Special offers** and discounts
-- **New class announcements**
-- **Event invitations**
-- **Membership upgrades**
-
-### **General Announcements**
-
-- **Club updates** and news
-- **Policy changes** notifications
-- **Holiday hours** announcements
-- **Maintenance alerts**
-
-## Using Templates
-
-### **In Message Composition**
-
-1. **Start composing** a new message
-2. **Select a template** from the dropdown
-3. **Template content** automatically fills in
-4. **Customize the content** as needed
-5. **Send or schedule** your message
-
-### **Template Customization**
-
-- **Edit subject lines** for specific campaigns
-- **Modify content** to match your needs
-- **Add personal touches** to make it unique
-- **Keep the template structure** for consistency
-
-## Template Management
-
-### **Editing Templates**
-
-1. **Click Edit** on any template
-2. **Modify the content** as needed
-3. **Update the name** or description
-4. **Save changes** to update the template
-
-### **Copying Templates**
-
-1. **Click Copy** on any template
-2. **Template opens** with "(Copy)" in the name
-3. **Modify the content** for your new template
-4. **Save as a new template**
-
-### **Deleting Templates**
-
-1. **Click Delete** on any template
-2. **Confirm deletion** in the dialog
-3. **Template is permanently removed**
-4. **Cannot be undone**
-
-## Template Best Practices
-
-### **Content Guidelines**
-
-- **Keep templates concise** and to the point
-- **Use clear, friendly language** that matches your brand
-- **Include all necessary information** in the template
-- **Test templates** before using them widely
-
-### **Organization Tips**
-
-- **Use descriptive names** for easy identification
-- **Group similar templates** by category
-- **Update templates regularly** to keep them current
-- **Remove unused templates** to avoid confusion
-
-### **Personalization**
-
-- **Use template variables** for personalization
-- **Test with real data** to ensure variables work
-- **Keep personalization natural** and not forced
-- **Balance personalization** with template efficiency
-
-## Template Examples
-
-### **Welcome Email Template**
+## Welcome email example
 
 ```text
 Subject: Welcome to {{organizationName}}!
 
 Hi {{contactFirstName}},
 
-Welcome to {{organizationName}}! We're excited to have you as a new member.
+Welcome to {{organizationName}}! We're glad to have you.
 
-If you have any questions, don't hesitate to reach out at {{organizationEmail}}.
+If anything comes up, reply here or reach us at {{organizationEmail}}.
 
-Best regards,
-The {{organizationName}} Team
+Thanks,
+The {{organizationName}} team
 ```
 
-### **Booking Reminder Template**
+## Using a template
 
-Use on a booking trigger so that `{{entityName}}`, `{{bookingDate}}`, `{{bookingTime}}` and `{{bookingDuration}}` are available.
+In [compose](/messaging/compose), open the **Template** picker above the subject. Selecting a template fills in both subject and body. You can edit either freely after applying; the saved template is not touched.
 
-```text
-Subject: Reminder: {{entityName}} at {{clubName}}
+The picker only appears for admin and manager roles. Instructor-only inboxes hide it.
 
-Hi {{contactFirstName}},
+## System vs manual templates
 
-This is a friendly reminder for your upcoming session:
+If you want to customize the email a member receives when their booking is confirmed, when their membership is about to expire, or when a payment receipt is generated, you are looking for **system templates** (type `transactional` or `receipt`) on the same Templates page. Those expose the booking and membership variable sets, plus a customize-vs-override workflow keyed to a stable `systemTemplateKey`.
 
-- What: {{entityName}}
-- When: {{bookingDate}}, {{bookingTime}} ({{bookingDuration}})
-- Where: {{clubName}}
-- Door code: {{accessPin}}
+The manual `message` templates described above are for the ad-hoc sends you fire from the messaging inbox.
 
-Please arrive a few minutes early to check in.
+## Related
 
-See you there!
-The {{organizationName}} Team
-```
-
-## Advanced Features
-
-### **Template Status**
-
-- **Active templates** are available for use
-- **Inactive templates** are hidden from selection
-- **Toggle status** to enable/disable templates
-- **Manage template availability** easily
-
-### **Template Search**
-
-- **Search by name** to find specific templates
-- **Filter by category** to narrow results
-- **Sort by date** to see recent templates
-- **Quick access** to frequently used templates
-
-### **Template Analytics**
-
-- **Track template usage** across messages
-- **See which templates** are most popular
-- **Monitor template performance** over time
-- **Optimize templates** based on usage data
-
-## Getting Started
-
-1. **Create your first template** with basic content
-2. **Test the template** with a small group
-3. **Refine the content** based on feedback
-4. **Use the template** in your regular communications
-5. **Build a library** of templates for different needs
-
-Templates save you time and ensure consistency in your communications. Start with a few basic templates and gradually build a comprehensive library that covers all your messaging needs.
+- [Compose](/messaging/compose) - Where templates are applied to outbound messages.
+- [Settings overview](/settings/overview) - System templates for transactional emails live under Settings > Communication.
+- [Automations](/marketing/automations) - Automated trigger-based sends with booking and membership variables.

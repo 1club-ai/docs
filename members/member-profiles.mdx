@@ -1,98 +1,105 @@
 ---
-title: Member Profiles
-description: Complete guide to managing member profiles and personal information.
+title: Member profile
+description: Everything attached to a single contact - notes, memberships, bookings, check-ins, transactions, messages, documents, credentials, and account links.
 ---
 
-Member profiles contain all the personal information, contact details, and activity history for each club member.
+The member profile is the per-contact page you land on after clicking a row in the [Member list](/members/member-list). It pulls together the contact's identity, balances, memberships, history, and integration links into one view. The URL is `/members/list/{contactId}`.
 
-## Profile Information
+## Page layout
 
-### Personal Details
+The page has two columns:
 
-- **Full Name** - First and last name
-- **Email Address** - Primary contact email
-- **Phone Number** - Contact phone number
-- **Date of Birth** - Member's birth date
-- **Profile Image** - Member photo
+- **Left sidebar** - the contact card: avatar, name, email, phone, status chip, accounts, custom fields, user-account section, credentials (when access control is on), payment methods, integration links (Stripe, WebLock), and a notes panel.
+- **Main column** - an info strip across the top, then seven or eight tabs underneath.
 
-### Contact Information
+## Info strip
 
-- **Address** - Home address details
-- **Emergency Contact** - Emergency contact information
-- **Communication Preferences** - How member wants to be contacted
+Four to five tiles at the top of the main column summarize the contact's current state:
 
-### Membership Information
+- **Balance** - account balance plus wallet credit. Negative means the member owes you; positive means you owe them or they have credit. Hover the icons to redeem a voucher or add wallet credit.
+- **Total paid** - lifetime amount paid versus billed.
+- **Weekly attendance** - sparkline of recent check-ins. The dot lights up when the member has already checked in today.
+- **Level** - current progression level, when progression tracks are enabled. Plus icon assigns a new level.
 
-- **Current Plan** - Active membership plan
-- **Join Date** - When member joined
-- **Renewal Date** - When membership expires
-- **Payment Status** - Current payment status
+## Header actions
 
-## Managing Profiles
+The page header has an **Add** menu, an **Edit** action, an **Archive** action, and a **Message** shortcut. The **Add** menu creates:
 
-### Viewing Profiles
+- **Booking** - opens the schedule pre-filtered to this contact.
+- **Membership** - opens the membership dialog with the contact pre-selected.
+- **Check-in** - records a visit (existing booking, existing membership, or new booking/membership in one step).
+- **Voucher** - redeems a voucher against this contact's account.
+- **Household** or **Company** account - creates the account with this contact as primary.
 
-1. Navigate to **Members** → **Member List**
-2. Click on any member's name
-3. View complete profile information
-4. Review activity history and notes
+If the contact is archived, the header switches to a single **Unarchive** action.
 
-### Editing Profiles
+## Tabs
 
-1. Open member profile
-2. Click **Edit** button
-3. Update information as needed
-4. Save changes
+| Tab | What it shows |
+|------|---------------|
+| **Overview** | Engagement gauge and activity timeline (recent bookings, payments, messages, check-ins, notes) |
+| **Bookings** | All bookings, including cancelled. Click through to the booking detail |
+| **Memberships** | Every membership ever assigned. Edit, pause, resume, renew, or cancel from here |
+| **Check-ins** | Visit history |
+| **Transactions** | Invoices and payments tied to this contact |
+| **Messages** | Email and SMS sent to or received from the contact |
+| **Signatures** | Signed documents (waivers, contracts) |
+| **Matches** | Match history, when ratings are enabled |
 
-### Profile Customization
+Each tab loads its own data on demand, so opening the profile is fast even for contacts with long histories.
 
-- Add custom fields for organization-specific information
-- Set member preferences and interests
-- Add internal notes and observations
-- Track member communication history
+## Editing the contact
 
-## Profile Features
+Click **Edit** in the header. The form covers name, contact details, date of birth, type (member, lead, drop-in, lapsed, contact, staff), profile image, address, and any custom fields configured under **Settings > Custom fields**.
 
-### Activity History
+Changing the contact's **type** is logged. Click the type chip in the page header to see the type-change history.
 
-- Complete record of member interactions
-- Booking history and preferences
-- Payment and transaction records
-- Communication log
+## Notes
 
-### Custom Fields
+The notes panel at the bottom of the sidebar is a free-form running log. Each note is timestamped and edits update the timestamp. Notes are internal: members do not see them.
 
-- Organization-specific information
-- Health and medical information
-- Member preferences and interests
-- Internal notes and observations
+## User account
 
-### Communication
+The **User Account** block in the sidebar shows whether the contact has a member-portal login. Possible states:
 
-- Send messages directly to member
-- Track communication history
-- Set communication preferences
-- Manage notification settings
+- **Unregistered** - no portal account exists. If the contact has an email, an **Invite** button appears.
+- **Invited** - invitation sent but not accepted. The block shows the expiration date. The overflow menu offers **Resend invitation** or **Delete invitation**.
+- **Active** / **Inactive** / **Suspended** / **Incomplete** - the account exists. Admins can use the overflow menu to set a password (for any user except themselves) or delete the org-user link.
 
-## Best Practices
+## Credentials
 
-### Data Accuracy
+When [access control](/settings/access-control) is enabled, a credentials block lists every QR code, access card, or PIN assigned to this contact. From here you can:
 
-- Keep member information current
-- Verify contact details regularly
-- Update preferences as needed
-- Maintain complete records
+- **Assign** an existing unassigned credential to the contact.
+- **Add** a new credential (manual enrollment, type plus identifier).
+- Mark a credential **primary**, revoke it, or unassign it.
 
-### Privacy and Security
+See [Access cards](/members/member-cards) for credential types and lifecycle.
 
-- Protect member personal information
-- Follow data protection regulations
-- Limit access to sensitive information
-- Secure member data storage
+## Accounts panel
 
-### Member Service
+The Accounts block in the sidebar shows every household and company the contact belongs to, with the contact's role on each. Click an account name to jump to the [account detail page](/members/accounts). The plus button creates a new household with this contact as owner.
 
-- Use profile information to personalize service
-- Track member preferences and needs
-- Provide proactive member support
-- Build strong member relationships
+When a contact is on a household account, the **Add** button on each account row lets you pull in another household member, and the trash icon detaches a member without deleting their contact record.
+
+## Integrations
+
+When the contact has been pushed to external systems, the sidebar shows:
+
+- **Stripe customer** - customer ID, email, and creation date. **Sync** re-pulls Stripe's record.
+- **WebLock** - the WebLock user ID, or a prompt to sync. **Sync** re-pushes every active access grant for this contact to WebLock.
+
+These blocks only appear when the corresponding integration is installed and connected for your org.
+
+## Payment methods
+
+Saved cards and bank accounts on file appear in the sidebar. They're the same payment methods available to use when adding payments to invoices or membership transactions.
+
+## Related
+
+- [Member list](/members/member-list) - the grid this page opens from
+- [Memberships](/members/memberships) - the org-wide membership grid
+- [Accounts](/members/accounts) - households and companies
+- [Attendance](/members/attendance) - check-in workflows
+- [Access cards](/members/member-cards) - credential management
+- [Engagement analytics](/analytics/engagement) - how the gauge is computed

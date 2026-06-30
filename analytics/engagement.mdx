@@ -1,239 +1,82 @@
 ---
-title: Engagement Analytics
+title: Engagement analytics
+description: Member engagement scores (0-100) - distribution, recent changes, and progression over time.
 ---
 
-In a nutshell, the engagement analytics system tracks member activity levels, calculates engagement scores, and identifies members at risk of churning to help you maintain high member retention and satisfaction.
+The **Engagement dashboard** shows how engaged your members are right now and how their scores have moved over time. Scores are a 0-100 number per contact, calculated by a background job from booking frequency, spending, recent activity, and tenure.
 
 <Note>
-  Engagement *analytics* (this page) is the engagement-scoring dashboard - a 0-100 risk score per member. The smart-tag category that groups members by recent check-ins is called **Attendance** (previously **Engagement**); see [Smart Tagging](/settings/smart-tagging) for the rule-based tags.
+Engagement *analytics* (this page) is the 0-100 scoring dashboard. The smart-tag category that groups members by recent check-ins is called **Attendance** and lives under [Smart Tagging](/settings/smart-tagging). They are different systems.
 </Note>
 
-## Overview
+## Score levels
 
-The engagement analytics system provides comprehensive insights into member engagement levels and activity patterns. It calculates individual engagement scores, identifies high-performing members, and alerts you to members who may need attention to prevent churn.
+The score maps to one of four levels (thresholds are fixed):
 
-Key capabilities:
+- **Rockstar** - 75 to 100. Highly engaged, frequent users.
+- **High** - 50 to 74. Well-engaged regulars.
+- **Medium** - 25 to 49. Moderate activity.
+- **Low** - 0 to 24. At-risk, infrequent.
 
-- **Engagement Scoring**: Calculate individual member engagement scores
-- **Risk Assessment**: Identify members at different risk levels
-- **Performance Tracking**: Monitor top-performing members
-- **Churn Prevention**: Alert on low-engagement members
-- **Trend Analysis**: Track engagement changes over time
-- **Actionable Insights**: Get specific recommendations for member retention
+The same thresholds are used for the score chip on member pages and any tag-based automations driven by engagement.
 
-## Engagement Scoring System
+## How scoring is calculated
 
-### Score Calculation
+The scoring service combines four equally-weighted categories by default:
 
-The engagement score is calculated based on multiple factors:
+- **Financial activity** (25%) - Recent transactions and payment activity.
+- **Active services** (25%) - Active memberships and service usage.
+- **Physical activity** (25%) - Check-ins, bookings, visit frequency.
+- **Member engagement** (25%) - Activity consistency and tenure.
 
-- **Booking Frequency**: How often members book facilities
-- **Spending Amount**: Total and average spending
-- **Activity Recency**: Days since last booking
-- **Area Diversity**: Variety of facilities used
-- **Consistency**: Regular booking patterns
+Weights and time windows are configurable per organization under [Smart Tagging](/settings/smart-tagging) - if scoring is disabled there, this dashboard shows no data. The "recent activity" window is derived from your engagement tag period; the "very recent" window is fixed at seven days.
 
-### Score Ranges
+Scores are written by a background job, not computed live. The dashboard reads from the stored scores, so newly created activity won't reflect until the next aggregation runs.
 
-#### 🔥 Rockstar (75-100 points)
+## What's on the page
 
-- **Characteristics**: Highly engaged, frequent users
-- **Behavior**: Regular bookings, high spending, diverse usage
-- **Focus**: Retention and premium services
-- **Action**: Reward and recognize these members
+### Filters
 
-#### ⭐ High (50-74 points)
+- **Date range** - Defaults to the last 90 days for the progression chart.
+- **Contact type** - Restrict the progression chart to specific contact types (member, lead, drop-in, etc.).
+- **Member** - Select a single contact to switch the chart from organization-wide averages to that member's own progression.
 
-- **Characteristics**: Consistently engaged members
-- **Behavior**: Regular bookings, good spending
-- **Focus**: Maintain engagement, upsell services
-- **Action**: Encourage continued participation
+### KPI cards
 
-#### 📈 Medium (25-49 points)
+Four cards across the top:
 
-- **Characteristics**: Moderately engaged members
-- **Behavior**: Occasional bookings, moderate spending
-- **Focus**: Increase frequency and engagement
-- **Action**: Targeted outreach and promotions
+- **Total members** - All contacts considered for scoring in your org.
+- **Average score** - Mean across members who have a score, plus the count of scored members as a subtitle.
+- **Recent tag changes** - Engagement-related tag changes in the last seven days.
+- **Recent score changes** - Score updates in the last seven days.
 
-#### ⚠️ Low (0-24 points)
+### Score distribution
 
-- **Characteristics**: At-risk members
-- **Behavior**: Infrequent bookings, low spending
-- **Focus**: Re-engagement and retention
-- **Action**: Immediate intervention needed
+A row showing how many members sit in each level: **Rockstar**, **High**, **Medium**, **Low**. Each is a count, color-coded.
 
-## Key Metrics Dashboard
+### Progression chart
 
-### Overall Engagement Score
+A line chart of average engagement score over time. The Y-axis is fixed at 0 to 100. The time bucket adapts to the date range.
 
-- **Gauge Display**: Visual representation of average engagement
-- **Color Coding**: Green (high), yellow (medium), red (low)
-- **Trend Indicator**: Shows if engagement is improving or declining
-- **Last Updated**: When the score was last calculated
+When you select a single member, the chart switches to that member's individual score history (rendered green instead of blue). The legend label changes from **Average score** to **Engagement score**.
 
-### Total Members
+If a member doesn't have a score yet, you'll see **No score** in the panel above the chart and the chart will be empty.
 
-- **Count**: Total number of members in the system
-- **Active Members**: Members with recent activity
-- **Engagement Rate**: Percentage of engaged members
-- **Growth Tracking**: Monitor member base growth
+## How to use this
 
-### Average Score
+- **Spot at-risk members early**. If the Low count grows week over week, members are slipping. Cross-check against recent tag changes for context.
+- **Reward Rockstars**. Use the count of Rockstar-level members as the audience size for a loyalty campaign.
+- **Track a specific member's journey**. Pick a member in the dropdown to see how their score moved - useful when investigating a churn case or qualifying a referral candidate.
+- **Tune scoring before you trust it**. Calibrate weights and time windows under Smart Tagging until the levels match your gut feel about who's engaged, then use the dashboard for tracking.
 
-- **Calculation**: Mean engagement score across all members
-- **Benchmark**: Compare against industry standards
-- **Target Setting**: Set goals for improvement
-- **Progress Tracking**: Monitor score improvements
+## Limitations
 
-## Risk Distribution Analysis
+- The dashboard is read-only. To change thresholds or weights, edit Smart Tagging settings.
+- There's no "no-engagement-yet" filter - members without a score are silently excluded from the average and chart.
+- Scores need data. Brand-new members and members in their first few weeks may not have a stable score until the next aggregation pass.
 
-### Risk Level Breakdown
+## Related
 
-- **Low Risk**: High engagement, low churn probability
-- **Medium Risk**: Moderate engagement, some concern
-- **High Risk**: Low engagement, high churn probability
-- **Critical Risk**: Very low engagement, immediate action needed
-
-### Risk Percentages
-
-- **Visual Display**: Color-coded risk distribution
-- **Percentage Breakdown**: Shows proportion in each risk category
-- **Trend Analysis**: Track risk level changes over time
-- **Action Planning**: Prioritize intervention efforts
-
-### Risk Management
-
-- **Automated Alerts**: System notifications for high-risk members
-- **Intervention Strategies**: Specific actions for each risk level
-- **Success Tracking**: Monitor intervention effectiveness
-- **Continuous Improvement**: Refine risk assessment criteria
-
-## Top Performers
-
-### High-Engagement Members
-
-- **Identification**: Members with highest engagement scores
-- **Recognition**: Highlight top performers
-- **Analysis**: Understand what makes them successful
-- **Replication**: Apply successful patterns to other members
-
-### Performance Metrics
-
-- **Engagement Score**: Individual member scores
-- **Progress Bars**: Visual representation of scores
-- **Ranking**: Top 5 performers displayed
-- **Trends**: Track performance over time
-
-### Recognition Programs
-
-- **Rewards**: Acknowledge high-performing members
-- **Loyalty Programs**: Incentivize continued engagement
-- **Referral Programs**: Encourage member referrals
-- **Community Building**: Create member communities
-
-## Low Engagement Alerts
-
-### At-Risk Members
-
-- **Identification**: Members with low engagement scores
-- **Alert System**: Immediate notifications for intervention
-- **Risk Assessment**: Detailed analysis of engagement factors
-- **Action Items**: Specific steps to improve engagement
-
-### Alert Details
-
-- **Member Name**: Identified at-risk member
-- **Engagement Level**: Current risk category
-- **Last Activity**: Days since last booking
-- **Engagement Score**: Current score and trend
-- **Recommended Actions**: Specific intervention strategies
-
-### Intervention Strategies
-
-- **Personal Outreach**: Direct contact with members
-- **Special Offers**: Targeted promotions and discounts
-- **Service Improvements**: Address specific concerns
-- **Feedback Collection**: Understand member needs
-
-## Filtering and Analysis
-
-### Time Range Filters
-
-- **Last 7 Days**: Recent engagement patterns
-- **Last 30 Days**: Monthly engagement trends
-- **Last 90 Days**: Quarterly engagement analysis
-
-### Engagement Level Filters
-
-- **All Levels**: View all members together
-- **Rockstar**: Focus on high-engagement members
-- **High**: Analyze consistently engaged members
-- **Medium**: Target moderate engagement members
-- **Low**: Address at-risk members
-
-### Analysis Tools
-
-- **Interactive Charts**: Hover for detailed information
-- **Export Capabilities**: Download data for external analysis
-- **Comparative Analysis**: Compare different time periods
-- **Trend Analysis**: Identify patterns and changes
-
-## Common Use Cases
-
-### Daily Engagement Review
-
-1. Check overall engagement score
-2. Review low engagement alerts
-3. Identify members needing attention
-4. Plan intervention activities
-
-### Weekly Engagement Analysis
-
-1. Analyze engagement trends
-2. Review top performers
-3. Assess risk distribution
-4. Plan retention strategies
-
-### Monthly Engagement Strategy
-
-1. Review engagement metrics
-2. Identify improvement opportunities
-3. Plan member outreach campaigns
-4. Evaluate intervention effectiveness
-
-### Quarterly Engagement Planning
-
-1. Compare engagement across quarters
-2. Identify long-term trends
-3. Plan strategic improvements
-4. Set engagement goals
-
-## Tips & Best Practices
-
-- **Regular Monitoring**: Check engagement scores daily
-- **Proactive Intervention**: Act on low engagement alerts quickly
-- **Data-Driven Decisions**: Use scores to guide retention efforts
-- **Personalized Outreach**: Tailor interventions to member needs
-- **Continuous Improvement**: Regularly refine engagement criteria
-- **Member Feedback**: Collect input to improve engagement
-
-## Troubleshooting
-
-**Issue**: Engagement scores not updating
-**Solution**: Check that member activity data is being recorded properly
-
-**Issue**: Low engagement alerts not showing
-**Solution**: Ensure engagement criteria are set correctly
-
-**Issue**: Scores seem inaccurate
-**Solution**: Verify that all member activities are being tracked
-
-**Issue**: Charts not loading
-**Solution**: Refresh the page and check your internet connection
-
-**Issue**: Filters not working
-**Solution**: Clear all filters and reapply them one at a time
-
-**Issue**: Performance is slow
-**Solution**: Reduce the time range or limit the number of members being analyzed
+- [Smart tagging](/settings/smart-tagging) - Where engagement scoring is enabled and tuned.
+- [Members analytics](/analytics/members) - Member-level metrics not tied to scoring.
+- [Analytics overview](/analytics/overview) - Other dashboards.

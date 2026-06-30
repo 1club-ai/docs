@@ -1,271 +1,99 @@
 ---
-title: Dashboard Widgets
-description: Learn about all available dashboard widgets and how to configure them for your needs
+title: Dashboard widgets
+description: The eight widgets on the admin Dashboard, what they show, and where they link.
 ---
 
-**In a nutshell:** Customizable information panels that display real-time data about your club's operations, allowing you to monitor key metrics and access important information at a glance.
+The Dashboard ships with eight widgets, all enabled by default. They appear in this order out of the box, though you can [reorder](/dashboard/overview#reordering-widgets) them to your taste. Two of the eight are configurable; the others draw their parameters from sensible fixed windows (today, this week, last 7 days).
 
-## What are Dashboard Widgets?
+Every widget header links to the full report it's a slice of, so when a number catches your eye you're one click from the underlying view.
 
-Dashboard widgets are information panels that display specific data about your club's operations. Each widget shows different types of information - from member counts to booking trends - and can be customized to show exactly what you need to see.
+## Revenue Overview
 
-## Available Widgets
+Monthly revenue trend across the last N months, broken down by revenue account. The default is 6 months; you can show anywhere from 1 to 24.
 
-### **Members Overview Widget**
+The chart shows both invoiced amount and what was actually paid, so you can spot months where invoicing looked healthy but collections lagged. Each revenue account appears as its own bar series, and the total appears in the header.
 
-- **Total active members** count
-- **New members** this month
-- **Member growth** trend chart
-- **Quick link** to member management
+**Configuration**: Click the cog icon in the widget header to open the **Configure Revenue Widget** dialog and set **Number of months**. The setting is per-user and is saved with the rest of your widget configuration.
 
-### **Bookings Overview Widget**
+**Linked report**: Analytics > Billing > Revenue.
 
-- **Today's bookings** and reservations
-- **Upcoming bookings** this week
-- **Booking revenue** and trends
-- **Booking status** breakdown
+## Today's Performance
 
-### **Classes Overview Widget**
+Hourly trends for the current day, plotted as a combined chart: bookings created, revenue (net), and check-ins, hour-by-hour. The header shows running totals for the day.
 
-- **Upcoming classes** schedule
-- **Class capacity** utilization
-- **Instructor schedules** and availability
-- **Class performance** metrics
+This is the widget to watch during business hours. Spikes line up with class start times; gaps are when nothing is moving. If you run multiple clubs, you can filter the widget to a single club.
 
-### **Tasks Overview Widget**
+**Configuration**: Click the cog icon to set a **Club filter** (leave empty for all clubs).
 
-- **Pending tasks** and assignments
-- **Overdue items** requiring attention
-- **Task completion** rates
-- **Team productivity** metrics
+**Linked report**: Analytics > Billing.
 
-### **Revenue Overview Widget**
+## Payments (last 7 days)
 
-- **Daily revenue** and income
-- **Monthly trends** and patterns
-- **Payment status** and collections
-- **Financial performance** indicators
+A rolling 7-day bar chart comparing **Paid** versus **Unpaid** amounts per day. Each bar pairs the two so you can see at a glance whether yesterday's invoices have been collected or are still outstanding.
 
-### **Recent Activity Widget**
+The widget is most useful as an early-warning signal: if "Unpaid" is climbing while "Paid" is flat, your collection process needs attention before the gap compounds.
 
-- **Latest member** signups
-- **Recent bookings** and cancellations
-- **System notifications** and alerts
-- **Staff actions** and updates
+**Linked report**: Analytics > Billing.
 
-## Widget Configuration
+## Today's Bookings
 
-### **Adding Widgets**
+A list of every booking scheduled for today, sorted by start time. Each row shows the class or area, the member, the start time, and a status chip (Booked, Cancelled, Attended, No-show, etc.). The header shows the total count.
 
-1. Click **"Customize Dashboard"** button
-2. **Browse available widgets** in the sidebar
-3. **Click "Add Widget"** next to desired widget
-4. **Configure widget settings** as needed
-5. **Click "Save"** to add to dashboard
+The widget is collapsible: by default it shows the first few rows; click to expand and see the full day. From the expanded list you can open any booking in its detail dialog. A **+** button in the header opens the create-booking flow without leaving the Dashboard.
 
-### **Removing Widgets**
+If there are no bookings today, the widget displays an empty state instead of an empty list.
 
-1. Click **"Customize Dashboard"** button
-2. **Click "Remove"** on unwanted widgets
-3. **Confirm removal** in the dialog
-4. **Click "Save"** to update dashboard
+**Linked report**: Operations > Bookings.
 
-### **Reordering Widgets**
+## This Week's Classes
 
-1. Click **"Customize Dashboard"** button
-2. **Drag widgets** to desired positions
-3. **Release to drop** in new location
-4. **Click "Save"** to apply changes
+The classes scheduled for the current week, where "week" follows your locale's first day of week (Monday in most regions, Sunday in the US). Each row shows the class, the instructor, the start time, and capacity utilization.
 
-## Widget Settings
+Like the Bookings widget, the list is collapsible and the header has a **+** button for adding a class straight from the Dashboard.
 
-### **General Settings**
+**Linked report**: Operations > Classes.
 
-- **Title** - Custom widget title
-- **Size** - Small, medium, or large
-- **Refresh Rate** - Auto-refresh interval
-- **Visibility** - Show or hide widget
+## Member engagement
 
-### **Data Settings**
+Overall engagement scoring for your member base - how many members have engagement scores, the distribution, and trends.
 
-- **Date Range** - Time period for data
-- **Filters** - Specific data filtering
-- **Grouping** - How data is organized
-- **Sorting** - Data display order
+The widget is only visible if **engagement scoring is enabled** for your organization. If scoring is off, the widget hides itself entirely (it doesn't render an empty state). To turn scoring on, see the engagement settings under Members.
 
-### **Display Settings**
+**Linked report**: Analytics > Engagement.
 
-- **Chart Type** - Visualization style
-- **Colors** - Widget color scheme
-- **Labels** - Show or hide data labels
-- **Legends** - Display chart legends
+## Member Statistics
 
-## Widget Types and Features
+A snapshot of your member base: **Total Members**, new members **This Month**, and a **Growth Rate** figure that compares the last 30 days to the prior 30 days.
 
-### **Members Overview Widget**
+The header also shows the most recently joined members, each linking to their contact profile.
 
-**What it shows:**
+**Linked report**: Members > Member list.
 
-- Total number of active members
-- New members added this month
-- Member growth trend over time
-- Quick access to member management
+## Sales Pipeline
 
-**Configuration options:**
+A roll-up of your CRM pipeline: **Total Pipeline Value**, **Open Deals**, **Won Deals**, **Win Rate**, plus a breakdown of deals by stage and the most recent deal activity.
 
-- Time period (7 days, 30 days, 90 days)
-- Chart type (line, bar, area)
-- Show or hide specific metrics
-- Refresh interval settings
+The stats are currently calculated client-side from the full deal list, so if you have many thousands of deals expect a brief loading delay when the widget first renders.
 
-### **Bookings Overview Widget**
+A **+** button in the header opens the new-deal flow.
 
-**What it shows:**
+**Linked report**: Marketing > Pipeline.
 
-- Today's total bookings
-- Upcoming reservations
-- Booking revenue and trends
-- Booking status breakdown
+## Widget mechanics
 
-**Configuration options:**
+A few things are true for every widget:
 
-- Date range selection
-- Area filtering
-- Status filtering
-- Chart visualization
+**Data is fetched per-widget on page load.** Each widget owns its own query and renders independently. One slow widget doesn't block the others.
 
-### **Classes Overview Widget**
+**There's no auto-refresh.** Numbers reflect the moment the page loaded. To get fresh data, reload the page or navigate away and back.
 
-**What it shows:**
+**Configuration is per-user, per-browser.** The Revenue and Today's Performance widget settings are stored in your local browser storage, alongside your widget order. They don't sync across devices and they don't apply to teammates.
 
-- Upcoming classes schedule
-- Class capacity utilization
-- Instructor schedules
-- Class performance metrics
+**Empty states are explicit.** If a widget has no data to show (no bookings today, no classes this week, scoring not enabled), it says so rather than showing a blank chart.
 
-**Configuration options:**
+**Currencies follow the organization.** Money is formatted using your organization's currency setting, not your browser locale.
 
-- Class type filtering
-- Instructor filtering
-- Time period selection
-- Display format options
+## Related
 
-### **Tasks Overview Widget**
-
-**What it shows:**
-
-- Pending tasks count
-- Overdue tasks alert
-- Task completion rates
-- Team productivity metrics
-
-**Configuration options:**
-
-- Task status filtering
-- Assignee filtering
-- Priority level display
-- Due date range
-
-### **Revenue Overview Widget**
-
-**What it shows:**
-
-- Daily revenue and income
-- Monthly trends and patterns
-- Payment status and collections
-- Financial performance indicators
-
-**Configuration options:**
-
-- Revenue period selection
-- Payment method filtering
-- Chart type selection
-- Currency display options
-
-### **Recent Activity Widget**
-
-**What it shows:**
-
-- Latest member signups
-- Recent bookings and cancellations
-- System notifications and alerts
-- Staff actions and updates
-
-**Configuration options:**
-
-- Activity type filtering
-- Time period selection
-- User filtering
-- Display format options
-
-## Widget Best Practices
-
-### **Performance Optimization**
-
-- **Limit widget count** - Too many widgets can slow loading
-- **Optimize refresh rates** - Balance real-time updates with performance
-- **Use appropriate sizes** - Match widget size to content importance
-- **Filter data** - Only show relevant information
-
-### **Layout Organization**
-
-- **Group related widgets** - Place similar widgets together
-- **Prioritize important metrics** - Put key widgets at the top
-- **Use consistent sizing** - Maintain visual balance
-- **Leave space for growth** - Plan for additional widgets
-
-### **Data Accuracy**
-
-- **Verify data sources** - Ensure widgets pull correct information
-- **Check refresh timing** - Confirm data updates appropriately
-- **Monitor for errors** - Watch for data inconsistencies
-- **Update filters** - Adjust filters as needs change
-
-## Advanced Widget Features
-
-### **Real-time Updates**
-
-- **Automatic refresh** based on configured intervals
-- **Critical data updates** immediately
-- **Background refresh** doesn't interrupt user interaction
-- **Manual refresh** available for all widgets
-
-### **Export Functionality**
-
-- **Export widget data** to CSV or Excel
-- **Save widget configurations** for reuse
-- **Share widget layouts** with team members
-- **Print widget reports** for offline use
-
-### **Mobile Responsiveness**
-
-- **Adapt to mobile** screen sizes
-- **Touch-friendly** interactions
-- **Optimized performance** for mobile devices
-- **Consistent experience** across devices
-
-## Troubleshooting
-
-### **Common Issues**
-
-- **Widget not displaying data** - Check data permissions and refresh settings
-- **Slow loading widgets** - Reduce number of widgets or increase refresh intervals
-- **Incorrect data display** - Verify data source connections and filter settings
-- **Widget customization issues** - Check browser compatibility and clear cache
-
-### **Widget Problems**
-
-- **Data not updating** - Check refresh settings and internet connection
-- **Missing information** - Verify data permissions and filter configurations
-- **Layout not saving** - Ensure you click "Save" after making changes
-- **Performance issues** - Reduce widget count or simplify data filters
-
-## Getting Started
-
-1. **Start with default widgets** to see what information is available
-2. **Add widgets** that show data you need most often
-3. **Configure settings** to match your preferences
-4. **Arrange layout** to prioritize important information
-5. **Monitor performance** and adjust as needed
-
-Dashboard widgets help you stay informed about your club's operations at a glance. Choose the widgets that show the information most important to your daily work and customize them to match your needs.
+- [Dashboard overview](/dashboard/overview) - The page itself: layout, edit mode, role-specific views.
+- [Analytics overview](/analytics/overview) - The full reports the widgets link to.

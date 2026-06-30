@@ -1,98 +1,77 @@
 ---
-title: Membership Plans
+title: Plans
+description: Membership and pass templates - pricing, billing frequency, usage limits, and what they get access to.
 ---
 
-The membership plans system lets you create and manage different pricing tiers for your club members, from one-time passes to recurring monthly subscriptions with flexible billing options.
+A plan is the template you sell to members. It defines the price, the billing cadence, the usage allowance, the sports it covers, and a few visibility and accounting fields. When someone is enrolled in a plan they get a **membership** record; the plan itself just describes the offer.
 
-## Overview
+Plans live under **Billing > Plans**. The page opens on the **Active** tab; switch to **Inactive** to see archived offers.
 
-The membership plans system is the foundation of your club's revenue model. You can create various types of memberships, set pricing structures, define usage limits, and track which members are subscribed to which plans.
+## What a plan defines
 
-Key capabilities:
+The fields you'll fill in when creating or editing a plan:
 
-- **Plan Creation**: Set up different membership types and pricing
-- **Billing Frequencies**: One-time, weekly, monthly, quarterly, or annual billing
-- **Usage Limits**: Set maximum uses for passes and memberships
-- **Sports Integration**: Associate plans with specific sports or activities
-- **Revenue Tracking**: Monitor plan performance and revenue
-- **Member Management**: See which members are subscribed to each plan
+- **Name** and **description**. Public-facing.
+- **Price** per billing period.
+- **Signup fee**. A one-off charge added to the first transaction when someone joins. Optional.
+- **Billing frequency**: `one_time`, `weekly`, `monthly`, `quarterly`, `annually`, or `custom`. Custom plans pair with a **Custom period** number and a unit of `days`, `weeks`, or `months`.
+- **Max uses**. Optional usage cap. For recurring plans this means uses per period; for one-time plans it's the lifetime total.
+- **Session unit**: `booking` or `hour`. Decides whether each use is counted as one booking or as the duration of the booking in hours.
+- **Valid for**. The list of class types, areas, or instructors the plan grants access to. Empty means broad access; otherwise the membership only counts against the entries you select.
+- **Validity period** (one-time plans only). How many days after issue the plan remains usable.
+- **Sports**. Tags the plan with one or more sports so it surfaces under sport-specific filtering.
+- **Household allowance**. Optional. The number of additional household members the plan covers, used in account-level billing.
+- **Auto renewal default**. Whether new memberships on this plan are flagged to auto-renew at the end of each period. Members can flip this on their own membership later.
+- **Visibility**: `Public`, `Member_only`, or `Private`. Controls which sales surfaces the plan appears on.
+- **Revenue account**. The accounting code transactions for this plan are tagged with. Optional; falls back to the organization default.
+- **Images**. Drag-to-reorder gallery shown in the member-facing sales pages.
+- **Features**. Free-text bullet list shown on the plan detail card.
 
-## Managing Plans
+The plan's **Active** flag controls whether it can be sold. Toggling a plan inactive does not affect existing memberships on it - they keep running until they expire or are cancelled.
 
-### Viewing All Plans
+## The plans grid
 
-1. Navigate to **Billing → Plans** in the admin panel
-2. The plans grid shows all your membership plans
-3. Use the **Type Filter** to view specific plan types
-4. Click on any plan to view detailed information
+Each row in **Billing > Plans** shows:
 
-### Understanding the Plans Grid
+- **Name**
+- **Price** (with the signup fee underneath when one is set)
+- **Sessions** (max uses, or `-` when unlimited)
+- **Frequency** (decoded for `custom` plans into "N days/weeks/months")
+- **Auto renewal** default
+- **Visibility**
 
-The plans grid displays:
+A frequency filter at the top of the page narrows the grid to a specific billing cadence. Above the grid, four cards summarize **Total plans**, **Active plans**, **Average price**, and **Recurring plans** (anything with a billing frequency other than `one_time`).
 
-- **Name**: Plan title and description
-- **Frequency**: Billing frequency (Monthly, Annually, One-time)
-- **Type**: Plan category or type
-- **Price**: Cost per billing period
-- **Signup Fee**: One-time fee when joining
-- **Sessions**: Usage limits (if applicable)
-- **Validity**: How long the plan is valid
-- **Sports**: Associated sports or activities
-- **Status**: Active or inactive
-- **Actions**: Edit or delete options
+Click a row to open the details page. The kebab menu on each row has **Edit** and **Delete**.
 
-### Plan Statistics
+## Plan details
 
-The top of the page shows:
+The details page shows the same fields, plus two stats: **Active memberships** (a count of memberships on the plan currently in `active` status) and **Total revenue** (sum of the prices of those active memberships).
 
-- **Total Plans**: Number of plans created
-- **Active Plans**: Currently active plans
-- **Average Price**: Mean price across all plans
-- **Recurring Plans**: Plans with recurring billing
+If the plan has images, they appear at the top in a sortable gallery; drag to reorder and the change is saved as you drop.
 
-## Creating Plans
+The right column shows the assigned **Revenue account**, or a "uses organization default" hint when none is set.
 
-### Adding New Plans
+## Trials, free days, and intro offers
 
-1. Click **"Add Plan"** in the top right
-2. Fill in the plan details:
-   - **Plan Name**: Descriptive title
-   - **Description**: Detailed plan information
-   - **Club**: Select the club location
-   - **Price**: Cost per billing period
-   - **Signup Fee**: Optional one-time fee
-   - **Billing Frequency**: How often to charge
-   - **Type**: Plan category (General, Class, Court, etc.)
-   - **Max Uses**: Usage limits (optional)
-   - **Validity Period**: Days the plan is valid
-   - **Sports**: Associated activities
-   - **Notes**: Additional information
-3. Click **"Save"** to create the plan
+Plans don't have a built-in "trial days" field. Instead, trials and intro pricing are modelled as [promotions](/marketing/promotions) attached to the plan. This keeps the same offer machinery (eligibility, caps, audience, analytics) behind every kind of incentive.
 
-### Plan Types
+The plan-details page has a **Promotions** section listing everything currently targeting this plan. **Add promotion** opens the editor pre-scoped to this plan; from there you pick the shape:
 
-#### Recurring Plans
+- **Free trial** - a discount with **Auto-apply** on and **Value** of 100%. New customers buying this plan get it free the first time, no code. The first-time-buyer rule prevents repeat redemptions.
+- **First-month intro** - same idea with a partial discount (e.g. 50% or a fixed amount off the first period). For recurring plans this rides through every renewal once applied, so prefer a one-shot code if you only want it on the creation transaction.
+- **Coded promotion** - leave **Auto-apply** off and give the discount a code to share via email or partners. Members or staff enter the code at checkout.
 
-- **Monthly**: Charged every month
-- **Quarterly**: Charged every 3 months
-- **Annually**: Charged once per year
-- **Weekly**: Charged every week
-- Perfect for ongoing memberships
+See the [Promotions](/marketing/promotions) page for the full set of controls (schedule, redemption caps, audience targeting, analytics).
 
-#### One-Time Plans
+## How plans turn into transactions
 
-- **Single Payment**: Paid once upfront
-- **Usage-Based**: Limited number of uses
-- **Time-Limited**: Valid for specific period
-- Great for passes and packages
+When a contact buys a plan you get a membership and, immediately, a transaction:
 
-### Billing Frequencies
+- **One-time plans**: one transaction at the plan's price, plus a separate `membership_signup_fee` transaction when the signup fee is set.
+- **Recurring plans**: a `membership_creation` transaction for the current period, with the next period scheduled. An hourly job creates a fresh `membership_recurrence` transaction when each period rolls over.
 
-- **One-time**: Single payment, no renewal
-- **Weekly**: Charged every 7 days
-- **Monthly**: Charged every 30 days
-- **Quarterly**: Charged every 90 days
-- **Annually**: Charged every 365 days
+For plans that have a stored Stripe payment method on file and require payment up front, the recurrence job also attempts to charge immediately. If the charge fails or no default method is on file, the transaction is left `pending` and you collect through the [Invoices](/billing/invoices) or [Transactions](/billing/transactions) flow.
 
 ## Plan order
 
@@ -110,128 +89,13 @@ You can group plans into categories (for example, "Adults", "Juniors", "Day pass
 - **Assign a category** - Set a plan's **Category** in the plan dialog. You can pick an existing category or type a new name to create one inline.
 - **On your website** - Categories show as a small tag on plan cards and on the plan details page. When a Plans section has more than one category, members get a pill filter (with an **All** option) to narrow the list, and you can scope which categories a section shows from the website editor's **Categories** field.
 
-## Plan Configuration
+## Deleting a plan
 
-### Usage Limits
+Delete is permanent and clears the plan record. If active memberships still reference it you'll need to migrate or cancel them first. Inactive plans you've stopped selling but want to keep for historical reporting should stay on the **Inactive** tab rather than being deleted.
 
-#### Unlimited Plans
+## Related
 
-- No usage restrictions
-- Members can use facilities freely
-- Best for premium memberships
-
-#### Limited Plans
-
-- Set maximum number of uses
-- Track remaining uses
-- Perfect for class passes or court time
-
-#### Validity Periods
-
-- Set how long the plan remains valid
-- Useful for time-limited offers
-- Automatically expires after period
-
-### Sports Integration
-
-1. Select which sports the plan applies to
-2. Members can only use the plan for selected activities
-3. Helps organize different membership tiers
-4. Useful for sport-specific pricing
-
-### Revenue Accounts
-
-1. Assign plans to specific revenue accounts
-2. Track income by plan type
-3. Organize financial reporting
-4. Monitor plan profitability
-
-## Plan Details
-
-### Viewing Plan Information
-
-1. Click on any plan in the grid
-2. View comprehensive plan details:
-   - **Plan Information**: Name, description, pricing
-   - **Configuration**: Billing frequency, usage limits
-   - **Sports**: Associated activities
-   - **Statistics**: Member count and revenue
-
-### Plan Statistics
-
-The plan details page shows:
-
-- **Active Memberships**: Current subscribers
-- **Total Revenue**: Income from this plan
-- **Average Revenue**: Revenue per member
-- **Usage Statistics**: How the plan is being used
-
-### Managing Plan Memberships
-
-1. View all members subscribed to the plan
-2. See membership status and usage
-3. Track payment history
-4. Monitor plan performance
-
-## Common Tasks
-
-### Setting Up Basic Memberships
-
-1. Create a **Monthly** plan for regular members
-2. Set appropriate pricing for your market
-3. Choose **Unlimited** usage for full access
-4. Associate with all relevant sports
-5. Set as **Active** to make it available
-
-### Creating Class Passes
-
-1. Create a **One-time** plan
-2. Set the number of classes included
-3. Choose **Class** as the type
-4. Set validity period (e.g., 30 days)
-5. Associate with specific sports
-
-### Setting Up Court Time
-
-1. Create **One-time** or **Monthly** plans
-2. Set usage limits based on hours
-3. Choose **Court** as the type
-4. Set appropriate pricing per hour
-5. Associate with court sports
-
-### Creating Premium Tiers
-
-1. Create multiple plans with different features
-2. Use higher pricing for premium plans
-3. Include additional benefits or services
-4. Set different usage limits
-5. Market to different member segments
-
-## Tips & Best Practices
-
-- **Clear Naming**: Use descriptive names that members understand
-- **Pricing Strategy**: Research local market rates for competitive pricing
-- **Usage Limits**: Set realistic limits based on facility capacity
-- **Validity Periods**: Don't make plans too restrictive
-- **Sports Association**: Only include relevant sports for each plan
-- **Regular Review**: Monitor plan performance and adjust as needed
-
-## Troubleshooting
-
-**Issue**: Cannot create plan
-**Solution**: Ensure all required fields are filled and the club is selected
-
-**Issue**: Plan not showing in member signup
-**Solution**: Check that the plan is set to **Active** status
-
-**Issue**: Usage limits not working
-**Solution**: Verify that **Max Uses** is set and members are using the correct plan
-
-**Issue**: Billing frequency not updating
-**Solution**: Check that the plan doesn't have active memberships before changing frequency
-
-**Issue**: Revenue not tracking correctly
-**Solution**: Verify that the **Revenue Account** is properly assigned
-
-**Issue**: Plan not appearing in reports
-**Solution**: Ensure the plan is active and has been used by members
+- [Transactions](/billing/transactions) - the records created when someone is billed for a plan.
+- [Memberships](/members/memberships) - the per-contact record produced when someone buys a plan.
+- [Invoices](/billing/invoices)
+- [Promotions](/marketing/promotions) - vouchers, discount codes, and auto-apply trials that attach to a plan.

@@ -1,0 +1,180 @@
+---
+title: Automations
+description: Build event-driven workflows that message members, manage tags, and notify staff automatically
+---
+
+Automations are event-driven workflows that run in the background. A trigger fires (a booking is created, a membership expires, a payment fails), the contact is checked against the automation's entry conditions, and a sequence of steps then runs for that contact: send a message, wait, branch on a condition, add a tag, notify staff.
+
+## Overview
+
+Use **Marketing → Automations** to view, edit, and create automations. The list is split into two sections:
+
+- **Built-in automations** - Seeded by 1club (for example, the booking reminder). You can adjust timing, channels, and entry conditions, but the step structure is fixed.
+- **Your automations** - Custom workflows you build from scratch. Available on the Grow plan.
+
+Each row shows the trigger, step count, total runs, failed runs, and the last time it fired.
+
+## How an automation runs
+
+1. A **trigger** event happens in the system (for example, a booking is created).
+2. The contact is matched against the automation's **entry conditions** (membership type, tags). If they don't match, nothing happens.
+3. A **run** is created and the first step is scheduled.
+4. The background worker picks up scheduled steps and executes them in order.
+5. Each step records its outcome. Failed steps are retried up to three times before being marked failed.
+
+You can see every run and step in the automation's history view, including timestamps and error messages for failed steps.
+
+## Triggers
+
+Choose one trigger per automation. Triggers are grouped by domain:
+
+### Bookings
+
+- **Booking created** - A member books a class or area.
+- **Booking cancelled** - A booking is cancelled (by the member or staff).
+- **Booking checked in** - A member checks in for their booking.
+- **Booking no-show** - A booking is marked as no-show.
+- **Upcoming booking** - Fires before the booking starts. Configure how far in advance (minutes, hours, or days). Used for reminders.
+
+### Memberships
+
+- **Membership created** - A new membership is activated for a contact.
+- **Membership cancelled** - A membership is cancelled.
+- **Membership expiring** - Fires before a membership expires. Configure the advance window.
+
+### Payments
+
+- **Payment succeeded** - A transaction is successfully captured.
+- **Payment failed** - A transaction fails (card declined, insufficient funds, etc.).
+
+### Messaging and reviews
+
+- **Message received** - A contact sends an inbound message.
+- **Review submitted** - A member submits a review.
+
+### Contact lifecycle
+
+- **Contact created** - A new contact is added.
+- **Contact birthday** - Fires on the contact's birthday.
+- **Tag added** - A tag is added to a contact. Optionally restrict to a specific tag.
+- **Tag removed** - A tag is removed from a contact. Optionally restrict to a specific tag.
+
+## Entry conditions
+
+Entry conditions filter who the automation runs for after the trigger fires. Both conditions are optional and combined with AND.
+
+- **Membership types** - Only run for contacts whose active membership matches one of the selected plan types.
+- **Tags** - Only run for contacts who have at least one of the selected tags.
+
+If neither is set, the automation runs for every contact the trigger applies to.
+
+## Steps
+
+Drag steps from the palette onto the canvas to build the workflow. Steps run in order, top to bottom, except where a **Condition** step branches the flow.
+
+### Send message
+
+Send an email, SMS, push notification, or in-app notification to the contact.
+
+- **Channels** - Pick one or more delivery channels. Email and SMS require the corresponding integration to be configured (see [Integrations](/settings/integrations)).
+- **Content** - Either write content inline (subject + body) or bind to a [message template](/messaging/templates). Bound content is snapshotted when you save the automation, so later edits to the template do not change what the automation sends.
+
+### Send AI message
+
+Generate the message content with AI at send time, using a rule and tone you provide.
+
+- **Mode** - **Auto** sends the AI-generated content directly. **Draft** saves it for staff review in the [Messaging](/messaging/overview) inbox before sending.
+- **Tone** - Set the voice of the generated message.
+
+### Send review request
+
+Send a post-booking review request with a one-tap link.
+
+- **Instructor chat bubble** - Optionally include a personal message from the instructor in a casual, professional, or motivational tone.
+- **Frequency limit** - Cap how often a single contact receives review requests (for example, at most once every 30 days).
+- **External review CTA** - After a positive in-app rating, optionally surface a Google review link.
+
+### Wait
+
+Pause the run for a fixed duration.
+
+- **Duration** - Minutes, hours, or days.
+- **Anchor** - Measure from the trigger event, the booking start, or the booking end (where applicable).
+
+### Wait until
+
+Pause until a condition becomes true, with a timeout.
+
+- **Condition** - The check that, when true, lets the run continue.
+- **Timeout** - Maximum wait before the run gives up and ends.
+
+### Condition
+
+Branch the workflow. The condition is evaluated and the run follows the **Yes** path or the **No** path.
+
+Supported checks:
+
+- **Has tag** / **Does not have tag**
+- **Has active membership**
+- **Engagement above** / **Engagement below** - Compare the contact's email open or click rate to a threshold.
+- **Booked in period** - Did the contact book a class in the last N days, hours, or minutes?
+
+### Modify contact
+
+Update the contact in place.
+
+- **Add tag** or **Remove tag**
+- **Update field** - Set a contact field to a new value.
+
+### Notify staff
+
+Send an in-app, email, SMS, or push notification to staff.
+
+- **Recipients** - By role (admin, manager, instructor, staff) or to the booking's assigned instructor.
+- **Content** - Subject and body, with variables for the contact and trigger event.
+
+## Built-in automations
+
+Built-in automations cover common needs without setup. One example ship by default:
+
+- **24 hours before booking** - Reminder via email, push, and in-app.
+
+For built-in automations you can change:
+
+- The advance window (for time-based triggers).
+- The channels used by message steps.
+- The entry conditions (membership types, tags).
+- Per-club restrictions (apply to all gyms, or only specific ones).
+
+The step structure itself is fixed and cannot be edited or deleted. To extend behavior, create a custom automation alongside.
+
+## Building a custom automation
+
+1. Go to **Marketing → Automations**.
+2. Click **Add Automation**.
+3. Give it a name and description.
+4. Select a **trigger** and configure its options.
+5. Set **entry conditions** if you want to limit who the automation runs for.
+6. Add steps from the palette and configure each one in the right sidebar.
+7. For each **Send message** step, choose channels and either write content inline or select a template.
+8. Click **Save**.
+
+The automation is active immediately. You can pause it from the list at any time.
+
+## Testing
+
+Use the **Test run** action on an automation to dispatch a single run against a contact you choose. The run executes the real steps (real emails, real SMS) so test against yourself or a designated test contact.
+
+## Limits and behavior
+
+- Steps are executed by a background worker that polls every minute. Expect up to a minute of delay between when a step is scheduled and when it runs.
+- A step that errors is retried up to three times before being marked failed. Failed steps stop that branch of the run, but other branches continue.
+- Completed runs and processed events are archived after roughly 90 days. Failed runs are kept indefinitely so you can investigate.
+- One trigger event creates at most one run per contact per automation.
+
+## Related
+
+- [Messaging templates](/messaging/templates) - Reusable content you can bind to Send message steps.
+- [Messaging overview](/messaging/overview) - Inbox, AI drafts, and one-off sends.
+- [Member list](/members/member-list) - Tags and segments used in entry conditions and Modify contact steps.
+- [Integrations](/settings/integrations) - Configure email and SMS providers before using those channels.

@@ -1,316 +1,91 @@
 ---
 title: Transactions
+description: The per-obligation records behind every booking, membership, signup fee, and product sale - the source of truth for what's owed.
 ---
 
-**In a nutshell:** Track all financial transactions in your club, from payments and refunds to adjustments and fees, with complete audit trails and financial reporting.
+A transaction is a single line of "X owes Y for Z." Every chargeable event in 1Club - a booking, a membership creation, a recurring membership period, a signup fee, a product sale, an external program entry - writes exactly one transaction. Settlement happens separately through [payments](/billing/payments) linked over a join table.
 
-## What are Transactions?
+Open the page at **Billing > Transactions**. The grid pages on the server and is tab-filtered into **All**, **Pending**, **Overdue**, **Paid**.
 
-Transactions are all the financial activities that happen in your club - payments from members, refunds you issue, billing adjustments, and other monetary movements. This system gives you a complete picture of your club's financial activity and helps you manage cash flow effectively.
+## Anatomy of a transaction
 
-## Key Features
+Each row carries:
 
-### **Payment Tracking**
+- **Date** of the obligation.
+- **Type** (`booking_creation`, `booking_cancellation`, `membership_creation`, `membership_recurrence`, `membership_signup_fee`, `membership_cancellation`, `product_sale`, `external_program_entry`, `checkin_creation`).
+- **Description** describing what was billed.
+- **Contact** the transaction is against.
+- **Amount**, **Tax amount**, **Total amount**, and **Currency** (the organization currency at the time of creation).
+- **Payment status**: `pending`, `paid`, `void`, `failed`, `settled`, `overdue`, `partially_paid`, `refunded`, or `cancelled`.
+- **Invoiced** flag. Once a transaction has been wrapped into an invoice (manually or by a bill run), this is `true` and the obligation will not be picked up by future bill runs.
+- Optional foreign keys to a **booking**, **membership**, **product**, **external program**, **tax rate**, and **revenue account**.
+- Optional **parent / child** links, used to chain related entries together (for example a `booking_cancellation` referencing the original `booking_creation`).
 
-- **Monitor all incoming** payments from members
-- **Track payment methods** and success rates
-- **View payment history** for each member
-- **Process payments** manually when needed
+Zero-amount transactions are auto-marked `paid` at creation, so a free booking still produces a transaction but it never blocks anything.
 
-### **Refund Management**
+## How transactions get created
 
-- **Process refunds** for cancelled services
-- **Handle billing adjustments** and corrections
-- **Manage payment disputes** and chargebacks
-- **Track refund reasons** and patterns
+Most of the time you won't create transactions by hand. They arrive when:
 
-### **Financial Reporting**
+- Someone is **booked** into a class, an area, or with an instructor. The booking flow writes the transaction at the price implied by the membership or the override.
+- Someone **buys a plan**. You get `membership_creation` plus, when applicable, `membership_signup_fee`.
+- A **recurring membership period rolls over**. The hourly `recurring-transactions` job writes the next `membership_recurrence` transaction.
+- A booking is **cancelled** with a refund or charge policy. You get `booking_cancellation` linked to the original.
+- A **product** is sold through the POS.
 
-- **Generate transaction reports** by date, member, or type
-- **Analyze revenue trends** and patterns
-- **Track financial performance** metrics
-- **Export data** for accounting systems
+You can also create one by hand from the page header **Add** button - for example to record an ad-hoc charge that doesn't correspond to a booking or membership.
 
-## Viewing Transactions
+## Transaction actions
 
-### **Transaction List**
+From a row or from the details page:
 
-1. Go to **Billing** → **Transactions**
-2. **View all transactions** with key details
-3. **Use filters** to find specific transactions
-4. **Click on any transaction** to see full details
+- **Add payment.** Available when the status isn't `paid` or `void`. Opens the payment dialog, where you pick a payment method (manual or Stripe) and record the settlement.
+- **Add invoice.** Available when the transaction hasn't been invoiced yet, has a contact, and isn't `void`. Wraps the single transaction into a new one-line invoice and navigates to the invoice page.
+- **Void.** Available for any transaction not already `void`. Marks the transaction `void` so it stops showing as owed and stops being picked up by bill runs. Voiding is a soft delete - the row remains for audit.
+- **View** opens the details page.
 
-### **Transaction Details**
+## Batch actions
 
-- **Transaction ID** - Unique identifier for each transaction
-- **Date and Time** - When the transaction occurred
-- **Member** - Which member the transaction is for
-- **Type** - Payment, refund, adjustment, etc.
-- **Amount** - Transaction amount and currency
-- **Status** - Completed, pending, failed, etc.
-- **Payment Method** - How the payment was made
+Multi-select in the grid unlocks two batch operations:
 
-### **Filtering and Search**
+- **Charge.** Calls Stripe for every selected transaction's contact, charging their default payment method. The results dialog summarises which transactions succeeded, which failed, and the reason for each failure (no default method, charge declined, etc.). It uses idempotency keys built from the transaction ID and current date so reruns on the same day won't double-charge.
+- **Record manual payment.** Opens a dialog where you choose a configured manual payment method (cash, bank transfer, etc.) and a payment date, then writes a payment row against each selected transaction. Transactions already `paid` or `void`, or with zero remaining balance, are skipped and counted in the summary so you can see exactly what landed.
 
-- **Date range** - Filter by specific time periods
-- **Member name** - Find transactions for specific members
-- **Transaction type** - Filter by payment, refund, etc.
-- **Status** - Show only completed, pending, or failed
-- **Amount range** - Filter by transaction amounts
-- **Payment method** - Filter by credit card, bank transfer, etc.
+## Transaction details
 
-## Transaction Types
+Beyond the same fields shown in the grid, the details page exposes:
 
-### **Payments**
+- The **payment method** column lists each payment row linked to this transaction with amount and date, each linking to the payment.
+- The full tax breakdown when a tax rate applied (rate name, percentage, description).
+- **Recurrence info** for `membership_recurrence` transactions: auto-renew flag, billing frequency, and the period start/end dates.
+- The linked **booking** or **membership** as a clickable card.
+- A **Transaction relationships** card showing the parent and any children, so you can trace a cancellation back to the original booking or follow a chain of recurring periods.
+- All linked **Payments** in a grid at the bottom, including partial and refunded payments.
 
-- **Membership fees** - Monthly or annual membership payments
-- **Class fees** - Payment for fitness classes and sessions
-- **Personal training** - PT session payments
-- **Equipment rental** - Equipment usage fees
-- **Guest passes** - Guest access payments
-- **Late fees** - Late payment charges
+## How payment status flows
 
-### **Refunds**
-
-- **Membership refunds** - Refund membership payments
-- **Class refunds** - Refund class fees
-- **Service refunds** - Refund service charges
-- **Overpayment refunds** - Refund overpayments
-- **Cancellation refunds** - Refund for cancellations
-- **Dispute refunds** - Refund for disputes
+When a payment is recorded, its outcome determines the transaction's new status:
 
-### **Adjustments**
-
-- **Billing corrections** - Fix billing errors
-- **Discount applications** - Apply discounts
-- **Credit applications** - Apply account credits
-- **Fee waivers** - Waive certain fees
-- **Price adjustments** - Adjust pricing
-- **Tax adjustments** - Correct tax calculations
-
-### **Other Transactions**
-
-- **Deposits** - Security deposits
-- **Fines** - Penalty charges
-- **Interest** - Interest charges
-- **Bank fees** - Bank processing fees
-- **System fees** - Platform fees
-- **Miscellaneous** - Other charges
+| Payment outcome | Transaction status |
+|-----------------|--------------------|
+| `succeeded` | `paid` |
+| `failed` | `pending` |
+| `cancelled` | `pending` |
+| `refunded` | `refunded` |
+| `partially_refunded` | `partially_paid` |
 
-## Processing Transactions
+A successful payment also flips any pending booking on that transaction to `confirmed`.
 
-### **Manual Transactions**
-
-1. Go to **Billing** → **Transactions**
-2. **Click "Add Transaction"**
-3. **Select transaction type** (payment, refund, adjustment)
-4. **Enter transaction details:**
-   - **Member** - Choose the member
-   - **Amount** - Enter the amount
-   - **Description** - Add description
-   - **Payment Method** - How payment was made
-   - **Date** - Transaction date
-5. **Save the transaction**
-
-### **Bulk Transactions**
-
-- **CSV import** - Import transactions from CSV files
-- **Batch processing** - Process multiple transactions at once
-- **Template import** - Use pre-defined templates
-- **Data validation** - Validate imported data
-- **Error handling** - Handle import errors
-- **Confirmation** - Confirm bulk operations
-
-### **Transaction Approval**
-
-- **Approval workflow** - Multi-level approval process
-- **Approval limits** - Set approval limits by amount
-- **Approver assignment** - Assign specific approvers
-- **Approval notifications** - Notify approvers
-- **Approval history** - Track approval process
-- **Override capabilities** - Override when needed
-
-## Payment Processing
-
-### Payment Methods
-
-- **Credit Cards**: Visa, MasterCard, American Express
-- **Debit Cards**: Bank debit cards
-- **Bank Transfers**: ACH and wire transfers
-- **Digital Wallets**: PayPal, Apple Pay, Google Pay
-- **Check Payments**: Physical check payments
-- **Cash Payments**: Cash transactions
-
-### Payment Status
-
-- **Pending**: Payment is being processed
-- **Completed**: Payment was successful
-- **Failed**: Payment failed
-- **Cancelled**: Payment was cancelled
-- **Refunded**: Payment was refunded
-- **Disputed**: Payment is under dispute
-
-### Payment Reconciliation
-
-- **Bank Matching**: Match with bank statements
-- **Gateway Reconciliation**: Match with payment gateway
-- **Daily Reconciliation**: Daily reconciliation process
-- **Monthly Reconciliation**: Monthly reconciliation
-- **Discrepancy Resolution**: Resolve discrepancies
-- **Audit Trail**: Complete audit trail
-
-## Refund Processing
-
-### Processing Refunds
-
-1. Find the original transaction
-2. Click **"Refund"**
-3. Enter refund details:
-   - **Refund Amount**: How much to refund
-   - **Refund Reason**: Why refunding
-   - **Refund Method**: How to refund
-   - **Notes**: Additional notes
-4. Process the refund
-
-### Refund Types
-
-- **Full Refund**: Refund entire amount
-- **Partial Refund**: Refund part of amount
-- **Credit Refund**: Apply credit to account
-- **Exchange**: Exchange for other services
-- **Void**: Cancel before processing
-- **Chargeback**: Handle chargebacks
-
-### Refund Policies
-
-- **Refund Timeframes**: How long refunds take
-- **Refund Limits**: Maximum refund amounts
-- **Approval Requirements**: Who can approve refunds
-- **Documentation**: Required documentation
-- **Processing Fees**: Fees for refunds
-- **Communication**: Notify members of refunds
-
-## Financial Reporting
-
-### Transaction Reports
-
-- **Daily Summary**: Daily transaction summary
-- **Weekly Report**: Weekly transaction report
-- **Monthly Report**: Monthly transaction summary
-- **Custom Reports**: Custom date ranges
-- **Member Reports**: Transactions by member
-- **Payment Method Reports**: By payment method
-
-### Revenue Analysis
-
-- **Revenue by Period**: Revenue over time
-- **Revenue by Source**: Revenue by transaction type
-- **Revenue by Member**: Revenue per member
-- **Revenue Trends**: Revenue trend analysis
-- **Seasonal Analysis**: Seasonal revenue patterns
-- **Growth Analysis**: Revenue growth over time
-
-### Financial Metrics
-
-- **Total Revenue**: Total income
-- **Average Transaction**: Average transaction amount
-- **Transaction Volume**: Number of transactions
-- **Success Rate**: Payment success rate
-- **Refund Rate**: Refund percentage
-- **Collection Rate**: Collection efficiency
-
-## Integration Features
-
-### Accounting Systems
-
-- **QuickBooks Integration**: Export to QuickBooks
-- **Xero Integration**: Export to Xero
-- **Sage Integration**: Export to Sage
-- **Custom Export**: Custom accounting exports
-- **Real-time Sync**: Real-time synchronization
-- **Data Mapping**: Map transaction data
-
-### Banking Integration
-
-- **Bank Feeds**: Import bank transactions
-- **Reconciliation**: Match with bank statements
-- **Cash Flow**: Monitor cash flow
-- **Bank Reporting**: Generate bank reports
-- **Multi-bank Support**: Support multiple banks
-- **Currency Support**: Multiple currencies
-
-### Member Management
-
-- **Profile Integration**: Link to member profiles
-- **Payment History**: Track member payments
-- **Communication**: Send payment notifications
-- **Access Control**: Control based on payments
-
-## Security and Compliance
-
-### Data Security
-
-- **Encryption**: Encrypt sensitive data
-- **Access Control**: Control who can view transactions
-- **Audit Logs**: Track all access and changes
-- **Data Backup**: Regular data backups
-- **Secure Storage**: Secure data storage
-- **Compliance**: Meet regulatory requirements
-
-### PCI Compliance
-
-- **PCI DSS**: Payment card industry compliance
-- **Data Protection**: Protect cardholder data
-- **Secure Processing**: Secure payment processing
-- **Regular Audits**: Regular compliance audits
-- **Staff Training**: Train staff on compliance
-- **Documentation**: Maintain compliance documentation
-
-## Best Practices
-
-### **Transaction Management**
-
-- **Reconcile regularly** to ensure accuracy
-- **Record transactions accurately** with proper documentation
-- **Process transactions promptly** to maintain cash flow
-- **Document all transactions** for audit purposes
-
-### **Financial Controls**
-
-- **Set appropriate approval limits** for different transaction types
-- **Separate transaction duties** among different staff members
-- **Review transactions regularly** for accuracy and compliance
-- **Handle exceptions properly** with clear procedures
-
-### **Member Service**
-
-- **Communicate clearly** with members about transactions
-- **Resolve issues quickly** to maintain member satisfaction
-- **Use fair refund policies** that are easy to understand
-- **Provide excellent customer service** for all transaction inquiries
-
-## Troubleshooting
-
-### **Common Issues**
-
-- **Failed payments** - Check payment methods and retry logic
-- **Reconciliation errors** - Verify data accuracy and matching
-- **System errors** - Check system status and contact support
-- **Member disputes** - Review transaction details and policies
-
-### **Resolution Procedures**
-
-- **Investigate errors thoroughly** before taking action
-- **Communicate with members** about any issues
-- **Fix underlying system issues** to prevent recurrence
-- **Improve processes** based on lessons learned
-
-## Getting Started
-
-1. **Review your current** transaction history and patterns
-2. **Set up transaction** approval workflows and limits
-3. **Configure payment** processing and refund policies
-4. **Train staff** on transaction management procedures
-5. **Monitor transactions** regularly for accuracy and compliance
-
-Transaction management is essential for maintaining accurate financial records and providing excellent member service. A well-organized system helps you track revenue, manage cash flow, and resolve any billing issues quickly.
+The hourly job that processes recurring memberships also runs a sweep that flips any `pending` transaction with a date in the past to `overdue` (start of UTC day). `overdue` is treated as a flavor of `pending` when invoice status is derived.
+
+## Caveats
+
+- The user-facing "outstanding transactions" query treats anything not `paid` as payable, so theoretically a `cancelled` transaction could surface there until it's explicitly excluded.
+- Voiding a transaction doesn't refund associated payments. If money was actually collected and now needs returning, refund the payment first, then decide whether to void the obligation.
+
+## Related
+
+- [Payments](/billing/payments) - the settlement events linked to transactions.
+- [Invoices](/billing/invoices) - how to wrap transactions in a sendable document.
+- [Bill runs](/billing/bill-runs) - sweeping pending transactions into invoices in bulk.
+- [Booking policies](/operations/booking-policies) - decides when a booking's transaction is created and when it must be paid.

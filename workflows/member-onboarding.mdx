@@ -96,6 +96,24 @@ The same **Settings → Contacts** page has a **Show family members on signup** 
 
 When **Date of birth** is set to **Required** under signup fields, the requirement applies to **every** family member as well - submitting a family member without a DOB fails the signup. The public website and member portal validate this client-side in all supported locales before the request is sent, so the user sees an inline message rather than a server error.
 
+### The signup wizard
+
+New members complete signup through a step-by-step wizard (plan selection, details, optional signature, review, and payment). The wizard guides them and validates as they go:
+
+- **Step intros** explain each step. For example, the details step shows "We'll use your email to create your account.", and the review step shows "Check that everything's correct before you submit."
+- **Inline validation on Next** - if a required field is missing, the wizard scrolls to and focuses the first invalid field instead of failing silently.
+- **Editable review** - each section on the review step has an **Edit** link that jumps back to that step.
+- **Already-registered email** - if the email is taken, the form shows "This email is already registered." with a "Sign in here" link, rather than a generic error.
+- **Guardian-only signups** - when the buyer is signing up family members but not themselves, the wizard shows "You'll manage this account but won't be a member yourself." The **I'm joining too** option appears only once at least one family member has been added.
+
+#### Combine plan and details into one step
+
+Each signup form has a **Combine plan & user details into one step** toggle (off by default). Its help reads: "Show plan selection and the sign-up details together as the first step, instead of two separate steps." Turn it on to shorten the wizard to a single first step that shows plan selection and account details together.
+
+#### Browser verification (Turnstile)
+
+Signup is protected by a browser check (Cloudflare Turnstile). If a privacy browser or ad blocker blocks the check, the member sees an actionable message instead of a silent failure: "We couldn't verify your browser. If you use a privacy browser (like Brave) or an ad blocker, turn off its protection for this page or try a different browser, then try again." This message also appears on the public sign-in email form and in the portal.
+
 ### **Account Verification**
 
 - **Email verification** to confirm valid address

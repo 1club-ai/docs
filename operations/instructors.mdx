@@ -2,7 +2,7 @@
 title: Instructor Management
 ---
 
-In a nutshell, the instructor management system lets you manage your coaching staff, track their schedules, set hourly rates, manage their availability, and monitor their classes and bookings.
+The instructor management system lets you manage your coaching staff, track their schedules, set hourly rates, manage their availability, and monitor their classes and bookings.
 
 ## Overview
 
@@ -79,6 +79,8 @@ The top of the page shows:
 - **Therapist**: Physical therapy and rehabilitation
 - **Instructor**: Group class instruction
 - **Specialist**: Specialized training or therapy
+
+You can also clear the instructor type. When no type is set, the instructor shows **None** rather than a blank value.
 
 ### Sports Specialization
 
@@ -194,6 +196,45 @@ The top of the page shows:
 3. Set booking policies
 4. Handle cancellations
 5. Track booking revenue
+
+## Shift scheduling
+
+Instead of fixed operating hours, you can drive instructor availability from **shifts**. Shift scheduling is an organization-level option; when it's on, an instructor's shift roster becomes the source of truth for when they can be booked. Instructors without a roster keep using their operating hours.
+
+Shifts are managed under the **Staff** section:
+
+- **Shifts** tab - build reusable **shift templates** (a named time window like "Morning 06:00-14:00", with standard breaks such as lunch) and **rotations** (a multi-week weekly pattern that picks a template for each day, with a configurable cycle length). You also assign instructors to a rotation here, with a cycle start date, a starting week, and effective-from/until dates.
+- **Roster** tab - the generated, editable roster of individual shifts over a rolling window. Editing a single shift marks it as a manual override so it won't be changed when the rotation regenerates.
+
+Standard breaks (for example, lunch) block bookings during their window, just like any other booking blocker.
+
+On the instructor's details page, a read-only **Working hours** block shows the hours derived from their shift roster, with a **Manage shifts** link to jump to the Staff shifts area.
+
+### Rescheduling on the calendar
+
+On the **Operations → Schedule** calendar you can drag a booking or class to a new time. The move keeps the same resource (area, instructor, or class type) and the same duration - only the start and end time shift. Every drop asks you to confirm the old and new time, and for recurring events you choose whether the change applies to just that occurrence or to all future ones.
+
+## Pay rates and paid-booking gating
+
+Beyond a flat hourly rate, you can define **pay rate policies** that determine how an instructor is compensated for the classes and bookings they deliver.
+
+### Only compensate for paid bookings
+
+A pay rate policy includes an **Only compensate for paid bookings** toggle. When it's on, the instructor is paid only for paid visits:
+
+- Memberships
+- Fully-paid bookings
+- External-program visits that were both checked in and paid
+
+Unpaid or no-show bookings earn nothing. The in-app help reads: "When on, the instructor is paid only for paid visits: memberships, fully-paid bookings, and external-program visits that were both checked in and paid. Unpaid or no-show bookings earn nothing."
+
+### How gating works in practice
+
+- An instructor's pay for a booking or check-in is only recorded once the underlying charge is settled. If a booking is still unpaid, it doesn't pay out.
+- For recurring bookings, each occurrence is gated on its own payment - future unpaid occurrences won't pay out until they're charged and paid.
+- If a class is deleted, the related instructor pay-ledger rows are cleared.
+
+Leave the toggle off to compensate the instructor for every booking regardless of payment status.
 
 ## Instructor Earnings Dashboard
 

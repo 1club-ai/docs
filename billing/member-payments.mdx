@@ -1,0 +1,63 @@
+---
+title: How members pay
+description: The member side of billing - paying at checkout, saved cards, wallet credit, invoices, refunds, and family billing in the portal and app.
+---
+
+The rest of the Billing section describes billing from your desk. This page describes what a **member** sees and does: how they pay for a booking or plan, how saved cards and wallet credit work, where they find invoices, and how refunds land. The concepts behind it all - transactions, payments, invoices - are the same ones in [Billing overview](/billing/overview); this is the member-facing view of them.
+
+## Paying at checkout
+
+When a member books something or buys a plan that needs payment, the [member portal](/member-experience/member-portal) or [app](/member-experience/mobile-app) shows a checkout with the amount due and the ways to pay. Whether payment is required up front, at check-in, or not at all is decided by the [booking policy](/operations/booking-policies) that applies - the member only sees a checkout when there is a balance to collect at that moment.
+
+Members can pay with:
+
+- **A card**, entered securely (and Apple Pay or Google Pay in the app where supported), if you have [Stripe connected](/settings/integrations/stripe).
+- **A saved card** on file (see below).
+- **Wallet credit**, when their balance covers the amount (see below).
+- **myPOS**, if your gym uses it as its card processor.
+
+Which options appear depends on the [payment methods](/settings/payment-methods) you have made visible to members. After a successful payment the booking is confirmed or the membership activates; if a member cancels out of the payment step, nothing is charged and they can try again.
+
+## Saved cards
+
+Members can save a card so they do not re-enter it every time, and mark one as their **default**. The default card is what recurring memberships attempt to charge on renewal. Members manage their saved cards - add, set default, or remove - from the billing area of **My account**.
+
+<Note>
+Saving and charging cards requires [Stripe](/settings/integrations/stripe). Card details are handled by Stripe, not stored by 1Club.
+</Note>
+
+## Wallet credit
+
+Each member has a **wallet** - a store-credit balance in your gym's currency, held per organization. At checkout, if a member has enough wallet credit, they can pay with it instead of a card.
+
+Credit gets into a wallet a few ways:
+
+- **Refunds** - a cancelled booking or membership refund is issued as wallet credit (see below).
+- **Promotions** - a [voucher](/marketing/promotions) can add wallet credit a member redeems.
+- **Staff adjustments** - you can credit a member's wallet from the admin.
+
+Wallet credit is spent on future bookings and purchases at your gym. It is store credit, so it is not withdrawn back to a card.
+
+## Invoices
+
+When you invoice a member - individually or through a [bill run](/billing/bill-runs) - they can see the invoice in the billing area of their account, download it as a PDF, and pay any outstanding balance from there. You can also send a member a **payment link** that opens a focused checkout for a specific invoice or amount; the link works without signing in, so it is easy to pay from an email.
+
+## Refunds
+
+When a booking is cancelled within a refundable window, or you refund a membership, the refund is issued as **wallet credit** the member can spend on their next booking or purchase. The refund amount follows the cancellation tiers on the applicable [booking policy](/operations/booking-policies) - if no tiers are configured, a cancellation refunds in full. Refunds show up in the member's wallet activity and, on your side, in [Transactions](/billing/transactions).
+
+## Family billing
+
+For a member on a [household or company account](/members/accounts), payments can roll up to the account. A household owner or adult can pay for a dependent's booking; a company admin can pay for an employee. The member doing the booking chooses who it is for, and the charge and any invoice are associated with the account. Company invoices are sent to the account's billing email.
+
+## Recurring memberships
+
+For a plan that renews, the system creates the next charge when the billing period rolls over. For memberships marked **payment required up front**, it attempts to charge the member's default saved card. If the charge cannot be taken - no card on file, or the payment fails - the member is notified and the balance stays outstanding for them (or you) to settle manually. See [Billing overview](/billing/overview#recurring-memberships) for the full lifecycle.
+
+## Related
+
+- [Billing overview](/billing/overview) - transactions, payments, and invoices explained
+- [Payment methods](/settings/payment-methods) - which methods members see at checkout
+- [Booking policies](/operations/booking-policies) - when payment is due and how cancellations refund
+- [Stripe](/settings/integrations/stripe) - the card processor behind portal and app payments
+- [Member portal](/member-experience/member-portal) and [Mobile app](/member-experience/mobile-app) - where members pay

@@ -42,10 +42,12 @@ Invoices are optional. They get created when:
 For recurring plans, an hourly job (`recurring-transactions`) does three things:
 
 - Creates the next `membership_recurrence` transaction when a billing period rolls over.
-- For memberships flagged **payment required up front**, it attempts to charge the contact's default Stripe payment method when the recurrence becomes due. If no default method is on file or the charge fails, the transaction stays `pending`.
+- For memberships flagged **payment required up front**, it attempts to charge the contact's default Stripe payment method when the recurrence becomes due. This requires Stripe to be connected; if it is not, no charge is attempted and the transaction stays `pending` for manual payment. If no default method is on file or the charge fails, the balance stays outstanding and a payment-failed notice is emitted so staff (and the member) can follow up.
 - Marks any `pending` transaction whose due date is in the past as `overdue`.
 
-It does not send invoices and it does not retry failed charges. Retries are manual: open the transaction or invoice and use **Charge** or **Add payment**.
+It does not send invoices and it does not automatically retry failed charges. Retries are manual: open the transaction or invoice and use **Charge** or **Add payment**.
+
+For the member's view of all this - checkout, saved cards, wallet credit, and refunds - see [How members pay](/billing/member-payments).
 
 ## What lives where
 
@@ -63,5 +65,6 @@ It does not send invoices and it does not retry failed charges. Retries are manu
 - [Invoices](/billing/invoices)
 - [Bill runs](/billing/bill-runs)
 - [Payments](/billing/payments)
+- [How members pay](/billing/member-payments) - the member-facing view of checkout, wallet, and refunds.
 - [Payment methods](/settings/payment-methods)
 - [Export](/settings/export) - CSV and QuickBooks bundle for accounting handoff.

@@ -1,0 +1,191 @@
+---
+title: Signup forms
+description: The form builder under Settings > CRM > Forms. Design self-service signup pages that take a new person from a shared link to a fully onboarded contact - with optional plan, package, class-type, document, and signature steps.
+---
+
+Signup forms are 1Club's form builder. Each form is a shareable public link that runs a configurable wizard, taking a brand new person from "never heard of you" to "fully onboarded contact in your system" in one flow. You build the form once under **Settings > CRM > Forms**, and the wizard adapts its steps to whatever you turn on.
+
+Publish as many forms as you want - one per gym, one per offer, one per audience. Each has its own public URL, its own set of plans and products, and its own copy.
+
+## When to use a signup form
+
+Reach for a signup form whenever you want to send someone a link that ends with them in your contact list, with the right contracts signed and the right plan or products attached. Common cases:
+
+- A landing-page CTA for prospects who clicked through from an ad or referral.
+- A QR code at the front desk so walk-ins can register before their first session.
+- A link in your link-in-bio that funnels followers into a free trial plan.
+- A parent-facing form that registers children under a guardian account (junior programs, kids' classes).
+- An **order form** where members pick packages and add-on products and pay at checkout.
+- A different form per gym or per audience (adults, juniors, corporate) so each cohort sees the right offerings and the right documents.
+
+<Note>
+If you only need to attach an **existing** person to a plan, create a [membership](/members/memberships) instead. Signup forms are for first-time onboarding of new contacts.
+</Note>
+
+## What members go through
+
+Every signup form is the same wizard. The steps that appear, and their order, are decided by the form's configuration - steps a form doesn't need are skipped automatically.
+
+<Steps>
+<Step title="Details">
+Name, email, password, and any contact fields you require at signup. When the form registers children, this step also collects the participants (see [Registration audience](#who-the-form-is-for)).
+</Step>
+<Step title="Selection">
+Pick a plan, a class type, and/or add packages and products to a cart. This step only appears when the form has at least one of those attached. You can merge it into the Details step with **Combine plan & user details into one step**.
+</Step>
+<Step title="Documents">
+Read and accept any documents that apply to the new contact. The wizard automatically picks up the [document rules](/settings/external-programs) and [document signatures](/content/document-signatures) that target member contact types - you don't attach documents to the form directly.
+</Step>
+<Step title="Signature">
+Sign the accepted documents by drawing or typing. Skipped when the form's signature method is set to **No signature**.
+</Step>
+<Step title="Review">
+Confirm the summary and submit. If a selected plan needs upfront payment, the wizard moves straight into a payment step; if a cart has packages or products, the buyer is routed to checkout.
+</Step>
+</Steps>
+
+Drafts are saved in the member's browser as they go, so a half-finished signup survives a page refresh. Passwords and drawn signatures are never persisted in the draft.
+
+## Creating a form
+
+1. Go to **Settings > CRM > Forms**.
+2. Click **Add form**.
+3. Fill in the sections below.
+4. Save. The form's public URL appears in the **Preview URL** column.
+
+The builder is organized into three sections: **Basic information**, **What members can choose**, and **Settings**.
+
+### Basic information
+
+| Field | What it does |
+| --- | --- |
+| **Name** | Internal label, shown in the admin forms list only. Members never see it. Typing a name auto-fills the slug. |
+| **Slug** | The last segment of the public URL. Lowercase letters, numbers, and dashes only. Must be unique in your organization - if it collides, the system appends a number (`yoga-trial-2`). |
+| **Form title** | The heading shown at the top of the wizard. Leave blank to use 1Club's built-in default copy. |
+| **Form subtitle** | The sub-heading under the title. Same fallback behavior as the title. |
+| **Plan selection title** | The heading shown above the plan picker. |
+| **Class type selection title** | The heading shown above the class-type picker. |
+
+<Note>
+All four heading fields are optional. When left blank, the wizard falls back to sensible default copy rather than showing an empty heading.
+</Note>
+
+### What members can choose
+
+This section defines the offerings on the wizard's Selection step. Attach any combination; leave everything empty to create a plain "just capture the contact" form that skips selection entirely.
+
+- **Plans** - the plans a member can pick from. Only **active** plans appear in the wizard, so deactivating a plan removes it from every form on the next page load without editing the form. Each plan keeps its own pricing, signup fee, payment requirement, and renewal rules - selecting one behaves exactly like a standard [membership](/members/memberships) checkout.
+- **Class types** - attach one or more class types to add a class-type interest step. When set, members pick a single class type they're interested in. Useful for routing new leads to the right program.
+- **Packages** - attaching packages turns the form into an **order form** (see below), where members add or remove packages and check out.
+- **Add-on products** - optional products members can add to their order as extras. Products are only meaningful alongside packages or as part of the order-form cart.
+
+### Settings
+
+<AccordionGroup>
+<Accordion title="Who is this form for?">
+Controls who the form registers and whether the wizard collects participants.
+
+- **Individuals** - each person signs up for themselves. No participant list.
+- **Children (registered by a parent)** - a parent or guardian creates their own account and registers one or more children under it. The wizard adds a participants step for the children.
+- **Individuals & children** - the person can sign up for themselves, add family members, or both. The wizard shows a "who is this for?" toggle plus a participants list.
+</Accordion>
+<Accordion title="Signature method">
+How the member signs the documents shown on the Documents step.
+
+- **Draw signature** - the member draws their signature on a canvas.
+- **Type name** - the member types their legal name to bind the acceptance.
+- **No signature (documents only)** - there's no separate signature step. Members still accept documents via the checkboxes on the Documents step; this just removes the dedicated signing ceremony.
+</Accordion>
+<Accordion title="Display mode">
+How surfaces that link to the form should present it.
+
+- **Open as a page** - the link navigates to the full-page wizard at `/signup/<slug>`.
+- **Open as a dialog** - the wizard opens inline as a modal overlay on top of the current page. Use this when embedding the form on a gym page or marketing site so members never leave the page they're on.
+</Accordion>
+<Accordion title="Combine plan & user details into one step">
+When on, the Selection and Details steps are merged into a single first step, so members see plan selection and their sign-up details together instead of on two separate screens. Shorter forms feel faster this way. Off by default. This option only has an effect when the form has something to select (a plan, class type, or cart).
+</Accordion>
+</AccordionGroup>
+
+### Translations
+
+Use the **Translate** button in the Basic information header to provide per-locale overrides for the **Form title**, **Form subtitle**, **Plan selection title**, and **Class type selection title**. Members see the copy for their own language; anything you don't translate falls back to the values above.
+
+## Order forms (packages and products)
+
+Attaching **packages** switches the form into order-form mode. Instead of picking one plan, members build a cart:
+
+- Packages are the sellable bundles you've configured for your organization. In the wizard, members can add or remove them and adjust quantities.
+- **Add-on products** appear alongside the packages as optional extras.
+- On submit, 1Club creates a **draft order** attached to the new contact and routes the buyer to checkout to pay. Packages are broken down into their component memberships and products automatically - the order isn't charged during signup, so the buyer completes payment on the checkout page.
+
+Order-form mode and plan mode can coexist on the same form: if you attach both, a member can either select a plan or fill a cart. Either path is a valid submission.
+
+## Contact fields on the Details step
+
+The form itself does not define the account fields. What the Details step asks for - phone, date of birth, gender, and any custom fields - is driven by your contact-field configuration under **Settings > CRM > Contacts**. For each field you control:
+
+- **Signup visibility** - hidden, optional, or required on signup forms.
+- **Applies to** - whether the field is collected for the person signing up, for the children/dependents they add, or both.
+
+Because this is central configuration, adding or changing a required signup field updates every form at once - you don't edit forms one by one.
+
+## Sharing the form
+
+Each form has a public URL of the shape:
+
+```
+https://<your-portal>/signup/<slug>
+```
+
+The **Preview URL** column on the forms list links straight to it. Paste that link into emails, ads, signage, or your link-in-bio, or wire it to a button using the form's **Display mode**.
+
+<Note>
+The portal subdomain is set under **Settings > Member portal** (see the [member portal](/member-experience/member-portal)). Until that's configured, the **Preview URL** column is empty because there's no public host to build the link against.
+</Note>
+
+The wizard is served first-party from your member portal, so the account it creates is signed in against the portal the moment signup completes - there's no cross-site login hop.
+
+## Documents and signature
+
+The Documents and Signature steps are driven by your [document rules](/settings/external-programs) and [document signatures](/content/document-signatures), not by the form. A new contact created through any signup form is matched against every active rule that targets member contact types. If a rule matches, the wizard shows the document and the contact must accept it before continuing.
+
+Two consequences:
+
+- You don't attach documents to a signup form directly. Adding a new document rule automatically applies to every form that creates matching contacts.
+- The Signature step appears only when the form's signature method is **Draw** or **Type**. Setting it to **No signature** removes the step; documents are still accepted via their checkboxes.
+
+## Editing and deleting
+
+- **Editing** a form changes the wizard for everyone who opens the link from that point on, including people mid-draft. Drafts are held in the browser but re-fetch the form's config on every step, so changes take effect immediately.
+- **Changing the slug** breaks any previously shared links - the old URL returns a "form not found" page. Prefer leaving the slug alone once you've published it.
+- **Deleting** a form makes its public URL return "form not found" immediately. It does not delete or modify the contacts, memberships, or orders already created through it.
+
+## What gets created
+
+Every successful submission creates:
+
+- A new **contact** of type "member", with the account and contact fields filled in from the Details step.
+- Any **children or family members** added on the participants step, linked to the primary contact.
+- Document **acceptances** (and a signature, unless the form uses **No signature**) for each presented document, tied to the new contact.
+- A **membership** if a plan was selected, plus its first payment if the plan requires upfront payment.
+- A **draft order** if the form is an order form and the cart has packages or products, ready for the buyer to check out.
+
+From there the contact behaves like any other member. They appear in the [member list](/members/member-list), their plan shows up under [memberships](/members/memberships), and any [smart tagging](/settings/smart-tagging) rules they match apply on the next sync.
+
+## Related
+
+<CardGroup cols={2}>
+<Card title="Memberships" icon="id-card" href="/members/memberships">
+The catalog and checkout behavior behind the Selection step's plans.
+</Card>
+<Card title="Plans" icon="tags" href="/billing/plans">
+Pricing, signup fees, and renewal rules the form inherits per plan.
+</Card>
+<Card title="Document signatures" icon="file-signature" href="/content/document-signatures">
+Control which documents appear on which forms.
+</Card>
+<Card title="Member portal" icon="globe" href="/member-experience/member-portal">
+The portal that serves the form, on the subdomain set under Settings > Member portal.
+</Card>
+</CardGroup>

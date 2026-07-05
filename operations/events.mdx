@@ -1,0 +1,157 @@
+---
+title: "Events"
+description: "Create one-off ticketed events, draft them with AI, sell tickets online or at the front desk, take pay-on-arrival reservations, and promote events to members in one click."
+---
+
+An event is a one-off happening your members can discover and book - a workshop, seminar, tournament, open day, or party. Each event gets its own public page, ticket types with individual prices and capacities, an attendee list with check-in, and a one-click promotion flow that emails your members.
+
+The list page is at **Schedule > Events** (also reachable from the [Schedule](/operations/schedule) page menu). The detail page is where you publish, promote, watch ticket sales, and run check-in on the day.
+
+## Events vs classes
+
+Use a [class](/operations/classes) for recurring group activities with a single per-seat price and a waitlist. Use an event for one-off occasions that need their own page, multiple ticket tiers, or promotion:
+
+|                | Event                                         | Class                                         |
+| -------------- | --------------------------------------------- | --------------------------------------------- |
+| Recurrence     | One-off                                       | One-off or recurring                          |
+| Pricing        | Per ticket type (e.g. General admission, VIP) | Single price per seat                         |
+| Capacity       | Per ticket type                               | Per class                                     |
+| Group purchase | Buyer + guest seats, mixed ticket types       | Party booking, capped by max party size       |
+| Waitlist       | Not available                                 | Available when full                           |
+| Promotion      | One-click **Promote** to a prefilled message  | **Notify participants** (booked members only) |
+
+## The list page
+
+The events list has five tabs with live counts: **All**, **Draft**, **Live**, **Past**, and **Cancelled**. Search filters by title or location. Each row shows the cover thumbnail, date and time, booked count, and status.
+
+Row actions depend on status: **Publish** (draft), **Unpublish** (live, only while nothing is booked), **Promote** (live), **View attendees**, **Copy link** (the event's public page URL), **Edit**, **Cancel event**, and **Delete**.
+
+## Creating an event
+
+Click **Add Event** on the list page, or use the add menu on the [Schedule](/operations/schedule) page. The dialog has four sections:
+
+- **Details** - **Title**, **Summary** (a short teaser shown on event cards and in notifications), **Description** (rich text shown on the event page - what to expect, who it's for, what to bring), and **Cover image**.
+- **When & where** - start and end time (entered in the gym's timezone; multi-day events are supported), a free-text **Location** line, and the gym. Leave the gym empty for an organization-wide or off-site event.
+- **People & sports** - **Instructors**, **Areas**, and **Sports**. These are labels for the event page and the schedule, not reservations: assigning an area does not block that area from being booked separately at the same time, and instructors are not marked busy.
+- **Booking** - the **Members can book a spot** toggle, [tickets](#tickets), [payment collection](#payment-collection-pay-online-or-reserve), and the **Featured** toggle.
+
+Events also have a visibility setting: **Public** (anyone can see it), **Member only** (only signed-in members), or **Private** (admins only).
+
+New events start as drafts. Members never see a draft - publish when you're ready.
+
+## Drafting events with AI
+
+The admin AI assistant can plan and draft an event for you - ask it something like "plan a Saturday morning yoga workshop". The draft is grounded in your real data, not invented: your gyms, sports, instructors, areas, recent event titles (to avoid near-duplicates), and a suggested slot on the next free weekend morning.
+
+The cover image comes from one of three sources, in order of preference:
+
+1. **Your media library** - real photos of your gym are always preferred.
+2. **Stock photo search** - the assistant searches a stock photo catalog (powered by Pexels) for a concept-matched cover. The photo you approve is imported into your own media storage, so the event never depends on a third-party link.
+3. **A curated stock catalog** - a built-in fallback set covering common concepts (yoga, HIIT, running, dance, community events, and more).
+
+AI drafts are deliberately conservative: they are created as private drafts with a free ticket, they always target a future date, and the assistant keeps at most one AI draft at a time - if one exists, it offers to refine it instead of creating another. You review, edit, and publish; the assistant never publishes for you.
+
+When your organization has no upcoming events, the admin home and schedule pages show a suggestion card that starts this flow.
+
+## Tickets
+
+Tickets set the booking price - members pick one when they book. A bookable event needs at least one active ticket. Each ticket has:
+
+- **Ticket name** - for example "General admission", "Session + brunch", "VIP".
+- **Price** - in your organization's currency. Set `0` for a free ticket; free tickets skip payment entirely.
+- **Capacity** - how many of this ticket can be sold. Leave empty for unlimited spots.
+- **Description** - optional, shown in the ticket picker.
+- **Active** - deactivate a ticket to stop new sales without touching existing bookings.
+
+Add several tickets to offer price tiers. Members see each ticket with its price and remaining spots; a ticket at capacity shows **Sold out** and can't be selected. Cards and listings show the price as "from X" (the cheapest active ticket).
+
+A few rules to know:
+
+- The price a member pays is captured at purchase - editing a ticket's price later does not change existing orders.
+- A ticket that has bookings can't be deleted; deactivate it instead.
+- Each ticket can book revenue to its own revenue account for tax and reporting.
+- Ticket names and descriptions (and the event title and summary) can be translated per locale.
+
+### Group orders and guest seats
+
+A member can buy several tickets in one order - including a mix of types, like two General admission and one VIP - with up to 10 seats per ticket type. The buyer gets one named seat; every additional seat becomes an anonymous guest registration tied to the buyer's order. Guests appear on the [attendee list](#attendees-and-check-in) as "Anonymous (buyer name)" so you always know who brought them. A member can hold only one named seat per event.
+
+## Payment collection: pay online or reserve
+
+For paid tickets, the **How is payment collected?** setting controls when money changes hands:
+
+- **Pay online** - members pay by card when they book.
+- **Pay on arrival** - members reserve their spot and pay in person at the event. The booking is created with an outstanding balance that staff collect at check-in.
+- **Let members choose** - members pick between paying online now or paying on arrival at checkout.
+
+Pay-on-arrival balances are settled with the **Check in & collect** action on the attendee list, which records the payment and checks the attendee in at the same time.
+
+## Publishing, unpublishing, and cancelling
+
+- **Publish** moves a draft to **Live**. Live events appear on member surfaces and become bookable. The detail page of a draft event has a **Publish** button in the header.
+- **Unpublish** moves a live event back to draft, but only while it has no active bookings. Once seats are booked, cancel instead.
+- **Cancel event** cancels the event and all of its active bookings through the standard booking cancellation flow. Cancelled events move to the **Cancelled** tab and disappear from member surfaces.
+- **Delete** is only available for events that never had bookings.
+
+## Promoting an event
+
+On a live event, click **Promote**. This opens [Compose](/messaging/compose) with a ready-to-send message: the cover image, the event title, a formatted when-and-where line in the gym's timezone, the summary, and a **View event** button that links to the event's public page.
+
+You choose the audience (all members, a filtered segment, or individual contacts) and press **Send** yourself - nothing goes out automatically. In the mobile app, the **View event** button opens the event screen directly in the app.
+
+## Featured events
+
+Turn on **Featured** to spotlight an event across member surfaces:
+
+- The mobile app home screen shows a **Featured events** row; tapping **See all** opens the full events list.
+- The member portal highlights featured events at the top of the events page.
+- The website's **Events** section defaults to a featured-events rail (see [Website](/content/website)).
+
+Featured placements are self-hiding: when no live, upcoming, featured events exist, the rails don't render. Feature your next big event, and unfeature it after it happens.
+
+## Selling tickets at the front desk (POS)
+
+The **Events** tab in Point of Sale lists your live, bookable events sorted by start time, each card showing the cover, date, and number of ticket tiers. Tap an event to pick a ticket tier, set the quantity, and add it to the order alongside any products. The selected contact gets the named seat; additional seats become guest registrations, exactly like online orders.
+
+Complete the order with any POS payment method - card, cash, or terminal. Collecting an existing pay-on-arrival reservation is done with **Check in & collect** on the event's attendee list, not by ringing up a new POS sale.
+
+## Attendees and check-in
+
+The event detail page shows per-ticket sales ("N sold") next to each ticket and a booked-versus-capacity summary, above the **Attendees** grid. Attendees are sorted newest-first, and clicking a row opens the underlying [booking](/operations/bookings).
+
+Each row shows the attendee, the ticket they hold, booking date, payment status, and check-in status. Guest seats read **Anonymous (buyer name)** with the buyer's email underneath, and the buyer's own row carries a **+N guests** chip so a party reads as one order.
+
+Row actions:
+
+- **Check in** - marks a paid (or free) attendee as present.
+- **Check in & collect** - for unpaid pay-on-arrival attendees: opens the payment method picker, settles the balance, and checks them in, in one step.
+- **Assign** - attaches a real contact to an anonymous guest seat, turning it into a named attendee. Useful when a guest walks up and you want their visit on their profile. A contact who already has a seat on the event can't be assigned a second one.
+
+## Events on the schedule
+
+Live events appear on the [Schedule](/operations/schedule) calendar as read-only cards. A single-day event placed at a gym renders in its areas' lanes in day view (or under its instructors when it has no areas). Multi-day and organization-wide events render as chips in a banner above the grid. Click a card to open the event detail page.
+
+Remember that area and instructor assignments are visual placement only - an event "in Court 1" does not reserve Court 1. If you need the space held, keep an eye on bookings for that area during the event window.
+
+## Where members see events
+
+- **Member portal** - the events page lists upcoming live events with cover, date, location, and price; each event has its own detail page with the description, instructors, ticket picker, and booking flow. The event's **Copy link** URL points here.
+- **Mobile app** - the home screen shows the featured events row, the events list shows everything upcoming, and an upcoming event booking appears on the Today card with the event cover, title, and ticket count. Event links in messages open in the app.
+- **Website** - the **Events** section (a featured rail or a full list) can be added to any page of your site, and new template sites include it on the home page. See [Website](/content/website).
+- **Visibility** - **Member only** events require a signed-in member; **Private** events never appear on member surfaces.
+
+## Current limits
+
+- Events don't recur - create each occurrence separately, or ask the AI assistant to draft the next one.
+- There is no event waitlist. When every ticket is sold out, booking closes.
+- Event tickets are always paid directly - membership plans and external programs don't cover them.
+- The kiosk doesn't sell event tickets; use the [POS](#selling-tickets-at-the-front-desk-pos) for on-site sales.
+- The event description is single-language; only the title, summary, and ticket names/descriptions are translatable.
+
+## Related
+
+- [Schedule](/operations/schedule) - Where live events render on the calendar.
+- [Bookings](/operations/bookings) - Every ticket is a booking row; the detail page shows the event and ticket.
+- [Classes](/operations/classes) - For recurring group activities with waitlists.
+- [Compose](/messaging/compose) - The messaging page the **Promote** button prefills.
+- [Website](/content/website) - The Events section on your public site.

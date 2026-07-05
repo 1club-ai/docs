@@ -20,6 +20,7 @@
 - When referring to sport clubs, use "gym" instead of "club". Exception: do not rename the "Club" / "Clubs" menu items in the UI - keep those as-is.
 - **Automations** is the current event-driven workflow feature (triggers, steps, runs). The previous **Campaigns** feature was decommissioned and removed from the product - do not document it. Reminders, review requests, and segment messaging are all built as automations now. See `marketing/automations.mdx`.
 - **Promotions** is the umbrella for both **vouchers** (wallet credit redeemed by code) and **discounts** (percentage or fixed at checkout). The two types share a single feature surface. See `marketing/promotions.mdx`.
+- **Events** are one-off ticketed happenings members book (workshops, tournaments, parties) - see `operations/events.mdx`. Not to be confused with the trigger "events" that start Automations; in prose, reserve the word "event" for the bookable feature and say "trigger" for automations.
 
 ## Style preferences
 

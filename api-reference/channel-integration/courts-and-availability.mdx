@@ -1,0 +1,84 @@
+---
+title: "Courts and availability"
+description: "Discover bookable courts and read their availability before booking."
+---
+
+Before creating bookings, discover the courts you can sell and read their availability. Store the mapping between your courts and 1Club court ids on your side.
+
+## List courts
+
+Returns the organization's bookable courts (areas). Filter by club or sport to get just the padel courts.
+
+```bash
+curl "https://api.1club.ai/v1/platform/courts?sport=padel" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Query parameters:
+
+- `clubId` (optional) - only return courts belonging to this club
+- `sport` (optional) - only return courts whose area type lists this sport, for example `padel`
+
+Response:
+
+```json
+[
+  {
+    "id": 51,
+    "name": "Court 1",
+    "clubId": 8,
+    "sports": ["padel"],
+    "pricePerHour": 24,
+    "maxConcurrentBookings": 1,
+    "operatingHours": {
+      "monday": [{ "open": "08:00", "close": "22:00" }],
+      "tuesday": [{ "open": "08:00", "close": "22:00" }]
+    }
+  }
+]
+```
+
+Use each court's `id` as the `areaId` when creating a booking.
+
+## Read availability
+
+Returns the court's operating hours and the intervals already taken by non-cancelled bookings within a window, so you can compute open slots.
+
+```bash
+curl "https://api.1club.ai/v1/platform/courts/51/availability?from=2026-07-20T00:00:00Z&to=2026-07-21T00:00:00Z" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Query parameters:
+
+- `from` (required) - window start, ISO date-time
+- `to` (required) - window end, ISO date-time, at most 31 days after `from`
+
+Response:
+
+```json
+{
+  "areaId": 51,
+  "from": "2026-07-20T00:00:00.000Z",
+  "to": "2026-07-21T00:00:00.000Z",
+  "maxConcurrentBookings": 1,
+  "operatingHours": {
+    "monday": [{ "open": "08:00", "close": "22:00" }]
+  },
+  "busy": [
+    {
+      "startTime": "2026-07-20T17:00:00.000Z",
+      "endTime": "2026-07-20T18:00:00.000Z"
+    }
+  ]
+}
+```
+
+Compute open slots as the operating hours for the window minus the `busy` intervals. A court with `maxConcurrentBookings` greater than 1 can hold that many overlapping bookings before a slot is full.
+
+<Note>
+  Availability is a snapshot. 1Club remains the source of truth: booking
+  creation re-checks availability atomically, so a slot that was open a moment
+  ago may be rejected if it was taken in between. Always handle a booking
+  rejection gracefully.
+</Note>

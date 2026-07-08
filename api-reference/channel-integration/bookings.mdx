@@ -1,0 +1,107 @@
+---
+title: "Bookings"
+description: "Create, cancel, and reconcile court bookings from your channel."
+---
+
+Create a booking when a player books a court in your app, and cancel it when they cancel on your side. Each booking carries your own booking id (`externalId`), which makes every call idempotent and lets you cancel or look up the booking later without storing the 1Club id.
+
+## Create a booking
+
+Requires the `bookings:write` scope.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/bookings" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "areaId": 51,
+    "startTime": "2026-07-20T17:00:00Z",
+    "endTime": "2026-07-20T18:00:00Z",
+    "externalId": "padel-app-bk-9931",
+    "player": {
+      "email": "alex@example.com",
+      "firstName": "Alex",
+      "lastName": "Rivera",
+      "phone": "+34600111222",
+      "externalId": "padel-app-user-42"
+    },
+    "notes": "Booked via Padel Community"
+  }'
+```
+
+Body fields:
+
+- `areaId` (required) - the court id from [List courts](/api-reference/channel-integration/courts-and-availability#list-courts)
+- `startTime`, `endTime` (required) - ISO date-times, `endTime` after `startTime`
+- `externalId` (required) - your booking id, used as the idempotency key
+- `player.email` (required) - matches an existing contact or creates a new one
+- `player.firstName`, `player.lastName`, `player.phone` (optional) - used when creating a new contact
+- `player.externalId` (optional) - your player id, stored so you can reconcile players later
+- `notes` (optional)
+
+Response (`201 Created`):
+
+```json
+{
+  "bookingId": 48213,
+  "externalId": "padel-app-bk-9931",
+  "status": "confirmed",
+  "areaId": 51,
+  "startTime": "2026-07-20T17:00:00.000Z",
+  "endTime": "2026-07-20T18:00:00.000Z",
+  "idempotentReplay": false
+}
+```
+
+### Idempotency
+
+Re-sending a request with an `externalId` that already exists returns the existing booking with HTTP `200` and `idempotentReplay: true`, instead of creating a duplicate. Safe to retry after a network error.
+
+### Common errors
+
+- `400` - the court is not available for the selected time, the time is outside operating hours, the booking breaks a club booking policy, or the channel integration is not enabled for the organization.
+- `403` - the API key is missing the `bookings:write` scope.
+
+The player is recorded as a contact in the gym's CRM, and the booking is a zero-priced inventory hold. Your platform owns the payment.
+
+## Cancel a booking
+
+Requires the `bookings:write` scope. Cancels the booking created with this `externalId`. No refund is issued by 1Club.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/bookings/by-external/padel-app-bk-9931/cancel" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Response:
+
+```json
+{ "bookingId": 48213, "status": "cancelled" }
+```
+
+Cancelling is idempotent: cancelling an already-cancelled booking succeeds and returns the same response.
+
+## Look up a booking
+
+Requires the `bookings:read` scope. Returns the current state of a booking for reconciliation.
+
+```bash
+curl "https://api.1club.ai/v1/platform/bookings/by-external/padel-app-bk-9931" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Response:
+
+```json
+{
+  "bookingId": 48213,
+  "externalId": "padel-app-bk-9931",
+  "status": "confirmed",
+  "areaId": 51,
+  "startTime": "2026-07-20T17:00:00.000Z",
+  "endTime": "2026-07-20T18:00:00.000Z",
+  "idempotentReplay": false
+}
+```
+
+A `404` means no booking exists for that `externalId` in your organization.

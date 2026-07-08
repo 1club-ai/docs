@@ -16,10 +16,28 @@
     }
   ],
   "tags": [
-    { "name": "Classes", "description": "Browse class schedules, pricing, and availability." },
-    { "name": "Content", "description": "Read published content (FAQs, posts, documents, blocks)." },
-    { "name": "Clubs", "description": "Look up club details by slug." },
-    { "name": "Transactions", "description": "List and inspect billing transactions." }
+    {
+      "name": "Classes",
+      "description": "Browse class schedules, pricing, and availability."
+    },
+    {
+      "name": "Content",
+      "description": "Read published content (FAQs, posts, documents, blocks)."
+    },
+    {
+      "name": "Clubs",
+      "description": "Look up club details by slug."
+    },
+    {
+      "name": "Transactions",
+      "description": "List and inspect billing transactions."
+    },
+    {
+      "name": "Courts"
+    },
+    {
+      "name": "Bookings"
+    }
   ],
   "security": [
     {
@@ -38,30 +56,52 @@
       "PlatformError": {
         "type": "object",
         "properties": {
-          "error": { "type": "string" }
+          "error": {
+            "type": "string"
+          }
         }
       },
       "PlatformInstructor": {
         "type": "object",
         "description": "Public instructor shape returned alongside classes.",
         "properties": {
-          "id": { "type": "integer" },
-          "contactId": { "type": "integer" },
+          "id": {
+            "type": "integer"
+          },
+          "contactId": {
+            "type": "integer"
+          },
           "sports": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
-          "typeId": { "type": "integer", "nullable": true },
+          "typeId": {
+            "type": "integer",
+            "nullable": true
+          },
           "type": {
             "type": "object",
             "nullable": true,
             "properties": {
-              "id": { "type": "integer" },
-              "name": { "type": "string" }
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
             }
           },
-          "experience": { "type": "string", "nullable": true },
-          "hourlyRate": { "type": "number", "format": "float", "nullable": true },
+          "experience": {
+            "type": "string",
+            "nullable": true
+          },
+          "hourlyRate": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
           "bio": {
             "type": "object",
             "nullable": true,
@@ -70,16 +110,28 @@
           },
           "certifications": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
-          "isActive": { "type": "boolean" },
-          "isBookable": { "type": "boolean" },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isBookable": {
+            "type": "boolean"
+          },
           "contact": {
             "type": "object",
             "nullable": true,
             "properties": {
-              "name": { "type": "string", "nullable": true },
-              "profileImage": { "type": "string", "nullable": true }
+              "name": {
+                "type": "string",
+                "nullable": true
+              },
+              "profileImage": {
+                "type": "string",
+                "nullable": true
+              }
             }
           }
         }
@@ -88,78 +140,151 @@
         "type": "object",
         "description": "A class returned by the platform API, including scheduling, capacity, pricing (with tax), club/area context, instructors, and computed status fields.",
         "properties": {
-          "id": { "type": "integer" },
-          "name": { "type": "string" },
-          "slug": { "type": "string", "nullable": true },
-          "description": { "type": "string", "nullable": true },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "images": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
           "classType": {
             "type": "object",
             "nullable": true,
             "properties": {
-              "id": { "type": "integer" },
-              "name": { "type": "string", "nullable": true },
-              "slug": { "type": "string", "nullable": true }
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string",
+                "nullable": true
+              },
+              "slug": {
+                "type": "string",
+                "nullable": true
+              }
             }
           },
-          "isMultiDay": { "type": "boolean" },
-          "startTime": { "type": "string", "format": "date-time" },
-          "endTime": { "type": "string", "format": "date-time" },
+          "isMultiDay": {
+            "type": "boolean"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
           "duration": {
             "type": "number",
             "format": "float",
             "nullable": true,
             "description": "Duration in hours when present."
           },
-          "maxCapacity": { "type": "integer", "nullable": true },
+          "maxCapacity": {
+            "type": "integer",
+            "nullable": true
+          },
           "price": {
             "type": "number",
             "format": "float",
             "nullable": true,
             "description": "Price including any applicable default tax."
           },
-          "isFree": { "type": "boolean" },
+          "isFree": {
+            "type": "boolean"
+          },
           "visibility": {
             "type": "string",
-            "enum": ["Public", "Member_only", "Private"]
+            "enum": [
+              "Public",
+              "Member_only",
+              "Private"
+            ]
           },
-          "status": { "type": "string" },
+          "status": {
+            "type": "string"
+          },
           "recurrence": {
             "type": "object",
             "nullable": true,
             "additionalProperties": true
           },
-          "sport": { "type": "string", "nullable": true },
-          "color": { "type": "string", "nullable": true },
+          "sport": {
+            "type": "string",
+            "nullable": true
+          },
+          "color": {
+            "type": "string",
+            "nullable": true
+          },
           "club": {
             "type": "object",
             "nullable": true,
             "properties": {
-              "id": { "type": "integer" },
-              "name": { "type": "string" },
-              "slug": { "type": "string", "nullable": true }
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string",
+                "nullable": true
+              }
             }
           },
           "area": {
             "type": "object",
             "nullable": true,
             "properties": {
-              "id": { "type": "integer" },
-              "name": { "type": "string" }
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
             }
           },
           "instructors": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/PlatformInstructor" }
+            "items": {
+              "$ref": "#/components/schemas/PlatformInstructor"
+            }
           },
-          "timeStatus": { "type": "string", "nullable": true },
-          "availabilityStatus": { "type": "string", "nullable": true },
-          "userStatus": { "type": "string", "nullable": true },
-          "waitlistPosition": { "type": "integer", "nullable": true },
-          "currentBookings": { "type": "integer", "nullable": true },
+          "timeStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "availabilityStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "userStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "waitlistPosition": {
+            "type": "integer",
+            "nullable": true
+          },
+          "currentBookings": {
+            "type": "integer",
+            "nullable": true
+          },
           "translations": {
             "type": "object",
             "nullable": true,
@@ -172,26 +297,64 @@
         "type": "object",
         "description": "A club with its address, contact info, amenities, sports, aggregated images, and average rating.",
         "properties": {
-          "id": { "type": "integer" },
-          "name": { "type": "string" },
-          "slug": { "type": "string", "nullable": true },
-          "address": { "type": "string", "nullable": true },
-          "city": { "type": "string", "nullable": true },
-          "state": { "type": "string", "nullable": true },
-          "country": { "type": "string", "nullable": true },
-          "postalCode": { "type": "string", "nullable": true },
-          "phone": { "type": "string", "nullable": true },
-          "email": { "type": "string", "nullable": true },
-          "website": { "type": "string", "nullable": true },
-          "logo": { "type": "string", "nullable": true },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "postalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "nullable": true
+          },
+          "logo": {
+            "type": "string",
+            "nullable": true
+          },
           "images": {
             "type": "array",
-            "items": { "type": "string" },
+            "items": {
+              "type": "string"
+            },
             "description": "All images aggregated from the club and its active areas."
           },
           "amenities": {
             "type": "array",
-            "items": { "type": "string" },
+            "items": {
+              "type": "string"
+            },
             "description": "Raw amenity IDs stored on the club."
           },
           "amenitiesResolved": {
@@ -200,29 +363,48 @@
             "items": {
               "type": "object",
               "properties": {
-                "id": { "type": "string" },
-                "name": { "type": "string" },
-                "icon": { "type": "string", "nullable": true },
-                "category": { "type": "string", "nullable": true }
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "icon": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "category": {
+                  "type": "string",
+                  "nullable": true
+                }
               }
             }
           },
           "sports": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
           "rating": {
             "type": "object",
             "nullable": true,
             "description": "Average and total of public reviews. Omitted when there are no public reviews.",
             "properties": {
-              "average": { "type": "number", "format": "float" },
-              "total": { "type": "integer" }
+              "average": {
+                "type": "number",
+                "format": "float"
+              },
+              "total": {
+                "type": "integer"
+              }
             }
           },
           "socialProfiles": {
             "type": "object",
-            "additionalProperties": { "type": "string" },
+            "additionalProperties": {
+              "type": "string"
+            },
             "description": "Map of social network keys (e.g. 'instagram') to profile URLs."
           }
         }
@@ -231,44 +413,92 @@
         "type": "object",
         "description": "A published content item (FAQ, post, document, or block) for the organization.",
         "properties": {
-          "id": { "type": "integer" },
-          "organizationId": { "type": "integer" },
-          "title": { "type": "string" },
-          "slug": { "type": "string" },
+          "id": {
+            "type": "integer"
+          },
+          "organizationId": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
           "type": {
             "type": "string",
-            "enum": ["faq", "post", "document", "block"]
+            "enum": [
+              "faq",
+              "post",
+              "document",
+              "block"
+            ]
           },
-          "status": { "type": "string" },
+          "status": {
+            "type": "string"
+          },
           "visibility": {
             "type": "string",
-            "enum": ["Public", "Member_only", "Private"]
+            "enum": [
+              "Public",
+              "Member_only",
+              "Private"
+            ]
           },
           "content": {
             "type": "object",
             "description": "Body of the content item. May contain HTML, EditorJS blocks, a summary, and keywords.",
             "properties": {
-              "html": { "type": "string", "nullable": true },
+              "html": {
+                "type": "string",
+                "nullable": true
+              },
               "blocks": {
                 "type": "object",
                 "nullable": true,
                 "additionalProperties": true,
                 "description": "EditorJS document."
               },
-              "summary": { "type": "string", "nullable": true },
+              "summary": {
+                "type": "string",
+                "nullable": true
+              },
               "keywords": {
                 "type": "array",
-                "items": { "type": "string" }
+                "items": {
+                  "type": "string"
+                }
               }
             }
           },
-          "excerpt": { "type": "string", "nullable": true },
-          "metaTitle": { "type": "string", "nullable": true },
-          "metaDescription": { "type": "string", "nullable": true },
-          "metaKeywords": { "type": "string", "nullable": true },
-          "canonicalUrl": { "type": "string", "nullable": true },
-          "template": { "type": "string", "nullable": true },
-          "layout": { "type": "string", "nullable": true },
+          "excerpt": {
+            "type": "string",
+            "nullable": true
+          },
+          "metaTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "metaDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "metaKeywords": {
+            "type": "string",
+            "nullable": true
+          },
+          "canonicalUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "template": {
+            "type": "string",
+            "nullable": true
+          },
+          "layout": {
+            "type": "string",
+            "nullable": true
+          },
           "customFields": {
             "type": "object",
             "nullable": true,
@@ -276,27 +506,51 @@
           },
           "tags": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
-          "summary": { "type": "string", "nullable": true },
+          "summary": {
+            "type": "string",
+            "nullable": true
+          },
           "keywords": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
           "images": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
-          "featured": { "type": "boolean", "nullable": true },
-          "authorId": { "type": "integer", "nullable": true },
+          "featured": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "authorId": {
+            "type": "integer",
+            "nullable": true
+          },
           "author": {
             "type": "object",
             "nullable": true,
             "properties": {
-              "id": { "type": "integer" },
-              "name": { "type": "string" },
-              "email": { "type": "string" },
-              "profileImage": { "type": "string", "nullable": true }
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "profileImage": {
+                "type": "string",
+                "nullable": true
+              }
             }
           },
           "publishedAt": {
@@ -304,26 +558,52 @@
             "format": "date-time",
             "nullable": true
           },
-          "language": { "type": "string", "nullable": true },
-          "createdAt": { "type": "string", "format": "date-time" },
-          "updatedAt": { "type": "string", "format": "date-time" }
+          "language": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "PlatformTransaction": {
         "type": "object",
         "description": "A billing transaction with amounts, payment status, and links to the originating booking or membership.",
         "properties": {
-          "id": { "type": "integer" },
-          "description": { "type": "string", "nullable": true },
+          "id": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "transactionType": {
             "type": "string",
             "nullable": true,
             "description": "TransactionType enum value (e.g. booking_creation, membership_creation, product_sale, membership_recurrence, etc.)."
           },
-          "bookingId": { "type": "integer", "nullable": true },
-          "membershipId": { "type": "integer", "nullable": true },
-          "createdAt": { "type": "string", "format": "date-time" },
-          "date": { "type": "string", "format": "date-time" },
+          "bookingId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "membershipId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
           "paymentStatus": {
             "type": "string",
             "enum": [
@@ -354,6 +634,41 @@
             "description": "Total billed amount (amount + taxAmount). Serialized as a decimal string on the wire to preserve precision."
           }
         }
+      },
+      "PlatformBooking": {
+        "type": "object",
+        "description": "A court booking created through a channel integration. Recorded as a confirmed inventory hold — 1Club blocks the court but records no payment or revenue; the partner owns pricing, payment, and refunds.",
+        "properties": {
+          "bookingId": {
+            "type": "integer",
+            "description": "1Club booking id"
+          },
+          "externalId": {
+            "type": "string",
+            "description": "Your booking id (the idempotency key)"
+          },
+          "status": {
+            "type": "string",
+            "description": "Booking status (e.g. confirmed, cancelled)"
+          },
+          "areaId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Court (area) id"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "idempotentReplay": {
+            "type": "boolean",
+            "description": "True when an existing booking was returned instead of creating a new one."
+          }
+        }
       }
     }
   },
@@ -362,25 +677,39 @@
       "get": {
         "summary": "List classes for the organization",
         "description": "Returns all classes for the organization associated with the API token. Requires the `classes:read` scope.\n",
-        "tags": ["Classes"],
-        "security": [{ "customerApiAuth": [] }],
+        "tags": [
+          "Classes"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "query",
             "name": "startDate",
-            "schema": { "type": "string", "format": "date-time" },
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
             "description": "Filter classes starting from this date"
           },
           {
             "in": "query",
             "name": "endDate",
-            "schema": { "type": "string", "format": "date-time" },
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
             "description": "Filter classes ending before this date"
           },
           {
             "in": "query",
             "name": "locale",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Locale for translations (e.g. \"en\", \"es\")"
           }
         ],
@@ -391,26 +720,52 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/PlatformClass" }
+                  "items": {
+                    "$ref": "#/components/schemas/PlatformClass"
+                  }
                 }
               }
             }
           },
           "400": {
             "description": "Invalid query parameters",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Invalid or missing API key",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "403": {
             "description": "API key is missing the required `classes:read` scope",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "429": {
             "description": "Rate limit exceeded",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           }
         }
       }
@@ -419,20 +774,30 @@
       "get": {
         "summary": "Get a class by ID",
         "description": "Returns a single class. The class must belong to the organization associated with the API token. Requires the `classes:read` scope.\n",
-        "tags": ["Classes"],
-        "security": [{ "customerApiAuth": [] }],
+        "tags": [
+          "Classes"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "id",
             "required": true,
-            "schema": { "type": "integer" },
+            "schema": {
+              "type": "integer"
+            },
             "description": "Class ID"
           },
           {
             "in": "query",
             "name": "locale",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Locale for translations"
           }
         ],
@@ -441,29 +806,61 @@
             "description": "Class details",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PlatformClass" }
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformClass"
+                }
               }
             }
           },
           "400": {
             "description": "Invalid class ID",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Invalid or missing API key",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "403": {
             "description": "API key is missing the required `classes:read` scope",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "404": {
             "description": "Class not found",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "429": {
             "description": "Rate limit exceeded",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           }
         }
       }
@@ -472,20 +869,30 @@
       "get": {
         "summary": "Get club details by slug",
         "description": "Returns club details including amenities, rating, and images. The club must belong to the organization associated with the API token. Requires the `clubs:read` scope.\n",
-        "tags": ["Clubs"],
-        "security": [{ "customerApiAuth": [] }],
+        "tags": [
+          "Clubs"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "slug",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Club slug"
           },
           {
             "in": "query",
             "name": "locale",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Locale for amenity translations"
           }
         ],
@@ -494,25 +901,51 @@
             "description": "Club details",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PlatformClub" }
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformClub"
+                }
               }
             }
           },
           "401": {
             "description": "Invalid or missing API key",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "403": {
             "description": "API key is missing the required `clubs:read` scope",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "404": {
             "description": "Club not found",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "429": {
             "description": "Rate limit exceeded",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           }
         }
       }
@@ -521,22 +954,35 @@
       "get": {
         "summary": "List published content",
         "description": "Returns published content for the organization. Optionally filter by type. Requires the `content:read` scope.\n",
-        "tags": ["Content"],
-        "security": [{ "customerApiAuth": [] }],
+        "tags": [
+          "Content"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "query",
             "name": "type",
             "schema": {
               "type": "string",
-              "enum": ["faq", "post", "document", "block"]
+              "enum": [
+                "faq",
+                "post",
+                "document",
+                "block"
+              ]
             },
             "description": "Filter by content type"
           },
           {
             "in": "query",
             "name": "locale",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Locale for content resolution"
           }
         ],
@@ -547,26 +993,52 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/PlatformContent" }
+                  "items": {
+                    "$ref": "#/components/schemas/PlatformContent"
+                  }
                 }
               }
             }
           },
           "400": {
             "description": "Invalid query parameters",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Invalid or missing API key",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "403": {
             "description": "API key is missing the required `content:read` scope",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "429": {
             "description": "Rate limit exceeded",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           }
         }
       }
@@ -575,20 +1047,30 @@
       "get": {
         "summary": "Get content by slug",
         "description": "Returns a single published content item by slug. Requires the `content:read` scope.\n",
-        "tags": ["Content"],
-        "security": [{ "customerApiAuth": [] }],
+        "tags": [
+          "Content"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "slug",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Content slug"
           },
           {
             "in": "query",
             "name": "locale",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Locale for content resolution"
           }
         ],
@@ -597,25 +1079,51 @@
             "description": "Content item",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PlatformContent" }
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformContent"
+                }
               }
             }
           },
           "401": {
             "description": "Invalid or missing API key",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "403": {
             "description": "API key is missing the required `content:read` scope",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "404": {
             "description": "Content not found",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "429": {
             "description": "Rate limit exceeded",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           }
         }
       }
@@ -624,19 +1132,31 @@
       "get": {
         "summary": "List transactions for the organization",
         "description": "Returns transactions for the organization associated with the API token, filtered by transaction creation time to a window of at most 24 hours and ordered by `createdAt` descending. When `startDate` and `endDate` are omitted, the window defaults to the last 24 hours (`endDate = now`, `startDate = now - 24h`). When only one of the two is provided, the other is derived from the 24-hour window. Transactions with `amount = 0` are excluded. Requires the `transactions:read` scope.\n",
-        "tags": ["Transactions"],
-        "security": [{ "customerApiAuth": [] }],
+        "tags": [
+          "Transactions"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "query",
             "name": "startDate",
-            "schema": { "type": "string", "format": "date-time" },
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
             "description": "Inclusive lower bound on transaction `createdAt`. Defaults to `endDate - 24h`."
           },
           {
             "in": "query",
             "name": "endDate",
-            "schema": { "type": "string", "format": "date-time" },
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
             "description": "Inclusive upper bound on transaction `createdAt`. Defaults to `now`."
           },
           {
@@ -687,26 +1207,52 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/PlatformTransaction" }
+                  "items": {
+                    "$ref": "#/components/schemas/PlatformTransaction"
+                  }
                 }
               }
             }
           },
           "400": {
             "description": "Invalid query parameters (e.g. malformed date, window > 24h)",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Invalid or missing API key",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "403": {
             "description": "API key is missing the required `transactions:read` scope",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "429": {
             "description": "Rate limit exceeded",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           }
         }
       }
@@ -715,14 +1261,22 @@
       "get": {
         "summary": "Get a transaction by ID",
         "description": "Returns a single transaction. The transaction must belong to the organization associated with the API token. Requires the `transactions:read` scope.\n",
-        "tags": ["Transactions"],
-        "security": [{ "customerApiAuth": [] }],
+        "tags": [
+          "Transactions"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "id",
             "required": true,
-            "schema": { "type": "integer" },
+            "schema": {
+              "type": "integer"
+            },
             "description": "Transaction ID"
           }
         ],
@@ -731,29 +1285,641 @@
             "description": "Transaction details",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PlatformTransaction" }
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformTransaction"
+                }
               }
             }
           },
           "400": {
             "description": "Invalid transaction ID",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Invalid or missing API key",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "403": {
             "description": "API key is missing the required `transactions:read` scope",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "404": {
             "description": "Transaction not found",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "429": {
             "description": "Rate limit exceeded",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/courts": {
+      "get": {
+        "summary": "List bookable courts",
+        "description": "Returns the organization's bookable courts (areas). Optionally filter by club or sport (e.g. `padel`). Use the returned court `id` as `areaId` when creating a booking.",
+        "tags": [
+          "Courts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "clubId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only return courts belonging to this club"
+          },
+          {
+            "in": "query",
+            "name": "sport",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only return courts whose area type lists this sport (e.g. \"padel\")"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of bookable courts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "clubId": {
+                        "type": "integer"
+                      },
+                      "sports": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "pricePerHour": {
+                        "type": "number",
+                        "nullable": true
+                      },
+                      "maxConcurrentBookings": {
+                        "type": "integer"
+                      },
+                      "operatingHours": {
+                        "type": "object",
+                        "description": "Per-day-of-week opening schedule"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `courts:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/courts/{areaId}/availability": {
+      "get": {
+        "summary": "Get court availability",
+        "description": "Returns the court's operating hours and the intervals already taken by non-cancelled bookings within the window, so you can compute open slots. 1Club remains the source of truth: booking creation re-checks availability atomically and rejects conflicts.",
+        "tags": [
+          "Courts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "areaId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Court (area) id"
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Window start (ISO date-time)"
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Window end (ISO date-time). At most 31 days after `from`."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Court availability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "areaId": {
+                      "type": "integer"
+                    },
+                    "from": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "to": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "maxConcurrentBookings": {
+                      "type": "integer"
+                    },
+                    "operatingHours": {
+                      "type": "object",
+                      "description": "Per-day-of-week opening schedule"
+                    },
+                    "busy": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "startTime": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "endTime": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `courts:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Court not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/bookings": {
+      "post": {
+        "summary": "Create a court booking",
+        "description": "Creates a booking on a court on behalf of a player from your channel. The player is matched to a contact by email (created if new). The booking is recorded as a confirmed inventory hold — 1Club blocks the court but records no payment or revenue; your platform owns pricing, payment, and refunds. Idempotent on `externalId`: re-sending the same id returns the existing booking (HTTP 200) instead of creating a duplicate.",
+        "tags": [
+          "Bookings"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "areaId",
+                  "startTime",
+                  "endTime",
+                  "externalId",
+                  "player"
+                ],
+                "properties": {
+                  "areaId": {
+                    "type": "integer",
+                    "description": "Court id (from GET /v1/platform/courts)"
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "endTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "externalId": {
+                    "type": "string",
+                    "description": "Your booking id — the idempotency key"
+                  },
+                  "player": {
+                    "type": "object",
+                    "required": [
+                      "email"
+                    ],
+                    "properties": {
+                      "email": {
+                        "type": "string",
+                        "format": "email"
+                      },
+                      "firstName": {
+                        "type": "string"
+                      },
+                      "lastName": {
+                        "type": "string"
+                      },
+                      "phone": {
+                        "type": "string"
+                      },
+                      "externalId": {
+                        "type": "string",
+                        "description": "Your player id (mapped for reverse lookup)"
+                      }
+                    }
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Existing booking returned (idempotent replay of `externalId`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformBooking"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Booking created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformBooking"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request, court unavailable, or integration not enabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `bookings:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/bookings/by-external/{externalId}/cancel": {
+      "post": {
+        "summary": "Cancel a court booking",
+        "description": "Cancels the booking previously created with this `externalId`. No refund is issued by 1Club — your platform owns refunds. Idempotent: cancelling an already-cancelled booking succeeds.",
+        "tags": [
+          "Bookings"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "externalId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Your booking id used when creating the booking"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "bookingId": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "cancelled"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Integration not enabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `bookings:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No booking found for that external id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/bookings/by-external/{externalId}": {
+      "get": {
+        "summary": "Get a booking by external id",
+        "description": "Returns the current state of the booking previously created with this `externalId`. Useful for reconciliation.",
+        "tags": [
+          "Bookings"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "externalId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Your booking id used when creating the booking"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformBooking"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Integration not enabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `bookings:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No booking found for that external id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           }
         }
       }

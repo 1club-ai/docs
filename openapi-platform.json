@@ -33,10 +33,10 @@
       "description": "List and inspect billing transactions."
     },
     {
-      "name": "Courts"
+      "name": "Bookings"
     },
     {
-      "name": "Bookings"
+      "name": "Areas"
     }
   ],
   "security": [
@@ -637,7 +637,7 @@
       },
       "PlatformBooking": {
         "type": "object",
-        "description": "A court booking created through a channel integration. Recorded as a confirmed inventory hold — 1Club blocks the court but records no payment or revenue; the partner owns pricing, payment, and refunds.",
+        "description": "A booking created through a channel integration. Recorded as a confirmed inventory hold — 1Club blocks the area but records no payment or revenue; the partner owns pricing, payment, and refunds.",
         "properties": {
           "bookingId": {
             "type": "integer",
@@ -654,7 +654,7 @@
           "areaId": {
             "type": "integer",
             "nullable": true,
-            "description": "Court (area) id"
+            "description": "Area id"
           },
           "startTime": {
             "type": "string",
@@ -1344,268 +1344,10 @@
         }
       }
     },
-    "/v1/platform/courts": {
-      "get": {
-        "summary": "List bookable courts",
-        "description": "Returns the organization's bookable courts (areas). Optionally filter by club or sport (e.g. `padel`). Use the returned court `id` as `areaId` when creating a booking.",
-        "tags": [
-          "Courts"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "clubId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Only return courts belonging to this club"
-          },
-          {
-            "in": "query",
-            "name": "sport",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Only return courts whose area type lists this sport (e.g. \"padel\")"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of bookable courts",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "clubId": {
-                        "type": "integer"
-                      },
-                      "sports": {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
-                      },
-                      "pricePerHour": {
-                        "type": "number",
-                        "nullable": true
-                      },
-                      "maxConcurrentBookings": {
-                        "type": "integer"
-                      },
-                      "operatingHours": {
-                        "type": "object",
-                        "description": "Per-day-of-week opening schedule"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid query parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid or missing API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "API key is missing the required `courts:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/platform/courts/{areaId}/availability": {
-      "get": {
-        "summary": "Get court availability",
-        "description": "Returns the court's operating hours and the intervals already taken by non-cancelled bookings within the window, so you can compute open slots. 1Club remains the source of truth: booking creation re-checks availability atomically and rejects conflicts.",
-        "tags": [
-          "Courts"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "areaId",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Court (area) id"
-          },
-          {
-            "in": "query",
-            "name": "from",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "description": "Window start (ISO date-time)"
-          },
-          {
-            "in": "query",
-            "name": "to",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "description": "Window end (ISO date-time). At most 31 days after `from`."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Court availability",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "areaId": {
-                      "type": "integer"
-                    },
-                    "from": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "to": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "maxConcurrentBookings": {
-                      "type": "integer"
-                    },
-                    "operatingHours": {
-                      "type": "object",
-                      "description": "Per-day-of-week opening schedule"
-                    },
-                    "busy": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "startTime": {
-                            "type": "string",
-                            "format": "date-time"
-                          },
-                          "endTime": {
-                            "type": "string",
-                            "format": "date-time"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid or missing API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "API key is missing the required `courts:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Court not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v1/platform/bookings": {
       "post": {
-        "summary": "Create a court booking",
-        "description": "Creates a booking on a court on behalf of a player from your channel. The player is matched to a contact by email (created if new). The booking is recorded as a confirmed inventory hold — 1Club blocks the court but records no payment or revenue; your platform owns pricing, payment, and refunds. Idempotent on `externalId`: re-sending the same id returns the existing booking (HTTP 200) instead of creating a duplicate.",
+        "summary": "Create a booking",
+        "description": "Creates a booking on an area (e.g. a padel court) on behalf of a player from your channel. The player is matched to a contact by email (created if new). The booking is recorded as a confirmed inventory hold — 1Club blocks the area but records no payment or revenue; your platform owns pricing, payment, and refunds. Idempotent on `externalId`: re-sending the same id returns the existing booking (HTTP 200) instead of creating a duplicate.",
         "tags": [
           "Bookings"
         ],
@@ -1630,7 +1372,7 @@
                 "properties": {
                   "areaId": {
                     "type": "integer",
-                    "description": "Court id (from GET /v1/platform/courts)"
+                    "description": "Area id (from GET /v1/platform/areas)"
                   },
                   "startTime": {
                     "type": "string",
@@ -1699,7 +1441,7 @@
             }
           },
           "400": {
-            "description": "Invalid request, court unavailable, or integration not enabled",
+            "description": "Invalid request (outside operating hours, policy violation, area not bookable, or integration not enabled)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1728,6 +1470,16 @@
               }
             }
           },
+          "409": {
+            "description": "Area unavailable for the selected time, or externalId reused for a different booking",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
           "429": {
             "description": "Rate limit exceeded",
             "content": {
@@ -1743,7 +1495,7 @@
     },
     "/v1/platform/bookings/by-external/{externalId}/cancel": {
       "post": {
-        "summary": "Cancel a court booking",
+        "summary": "Cancel a booking",
         "description": "Cancels the booking previously created with this `externalId`. No refund is issued by 1Club — your platform owns refunds. Idempotent: cancelling an already-cancelled booking succeeds.",
         "tags": [
           "Bookings"
@@ -1903,6 +1655,264 @@
           },
           "404": {
             "description": "No booking found for that external id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/areas": {
+      "get": {
+        "summary": "List bookable areas",
+        "description": "Returns the organization's bookable areas (e.g. padel courts). Optionally filter by club or sport (e.g. `padel`). Use the returned area `id` as `areaId` when creating a booking.",
+        "tags": [
+          "Areas"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "clubId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only return areas belonging to this club"
+          },
+          {
+            "in": "query",
+            "name": "sport",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only return areas whose area type lists this sport (e.g. \"padel\")"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of bookable areas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "clubId": {
+                        "type": "integer"
+                      },
+                      "sports": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "pricePerHour": {
+                        "type": "number",
+                        "nullable": true
+                      },
+                      "maxConcurrentBookings": {
+                        "type": "integer"
+                      },
+                      "operatingHours": {
+                        "type": "object",
+                        "description": "Per-day-of-week opening schedule"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `areas:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/areas/{areaId}/availability": {
+      "get": {
+        "summary": "Get area availability",
+        "description": "Returns the area's operating hours and the intervals already taken by non-cancelled bookings within the window, so you can compute open slots. 1Club remains the source of truth: booking creation re-checks availability atomically and rejects conflicts.",
+        "tags": [
+          "Areas"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "areaId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Area id"
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Window start (ISO date-time)"
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Window end (ISO date-time). At most 31 days after `from`."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Area availability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "areaId": {
+                      "type": "integer"
+                    },
+                    "from": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "to": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "maxConcurrentBookings": {
+                      "type": "integer"
+                    },
+                    "operatingHours": {
+                      "type": "object",
+                      "description": "Per-day-of-week opening schedule"
+                    },
+                    "busy": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "startTime": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "endTime": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `areas:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Area not found",
             "content": {
               "application/json": {
                 "schema": {

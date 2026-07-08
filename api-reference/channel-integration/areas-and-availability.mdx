@@ -1,23 +1,23 @@
 ---
-title: "Courts and availability"
-description: "Discover bookable courts and read their availability before booking."
+title: "Areas and availability"
+description: "Discover bookable areas (your courts) and read their availability before booking."
 ---
 
-Before creating bookings, discover the courts you can sell and read their availability. Store the mapping between your courts and 1Club court ids on your side.
+Before creating bookings, discover the areas you can sell and read their availability. In 1Club a bookable padel court is an **area**; store the mapping between your courts and 1Club area ids on your side.
 
-## List courts
+## List areas
 
-Returns the organization's bookable courts (areas). Filter by club or sport to get just the padel courts.
+Returns the organization's bookable areas. Filter by club or sport to get just the padel courts.
 
 ```bash
-curl "https://api.1club.ai/v1/platform/courts?sport=padel" \
+curl "https://api.1club.ai/v1/platform/areas?sport=padel" \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
 Query parameters:
 
-- `clubId` (optional) - only return courts belonging to this club
-- `sport` (optional) - only return courts whose area type lists this sport, for example `padel`
+- `clubId` (optional) - only return areas belonging to this club
+- `sport` (optional) - only return areas whose type lists this sport, for example `padel`
 
 Response:
 
@@ -38,14 +38,14 @@ Response:
 ]
 ```
 
-Use each court's `id` as the `areaId` when creating a booking.
+Use each area's `id` as the `areaId` when creating a booking.
 
-## Read availability
+## Area availability
 
-Returns the court's operating hours and the intervals already taken by non-cancelled bookings within a window, so you can compute open slots.
+Returns the area's operating hours and the intervals already taken by non-cancelled bookings within a window, so you can compute open slots.
 
 ```bash
-curl "https://api.1club.ai/v1/platform/courts/51/availability?from=2026-07-20T00:00:00Z&to=2026-07-21T00:00:00Z" \
+curl "https://api.1club.ai/v1/platform/areas/51/availability?from=2026-07-20T00:00:00Z&to=2026-07-21T00:00:00Z" \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
@@ -74,7 +74,7 @@ Response:
 }
 ```
 
-Compute open slots as the operating hours for the window minus the `busy` intervals. A court with `maxConcurrentBookings` greater than 1 can hold that many overlapping bookings before a slot is full.
+Compute open slots as the operating hours for the window minus the `busy` intervals. An area with `maxConcurrentBookings` greater than 1 can hold that many overlapping bookings before a slot is full.
 
 <Note>
   Availability is a snapshot. 1Club remains the source of truth: booking

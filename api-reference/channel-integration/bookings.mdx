@@ -1,6 +1,6 @@
 ---
 title: "Bookings"
-description: "Create, cancel, and reconcile court bookings from your channel."
+description: "Create, cancel, and reconcile bookings from your channel."
 ---
 
 Create a booking when a player books a court in your app, and cancel it when they cancel on your side. Each booking carries your own booking id (`externalId`), which makes every call idempotent and lets you cancel or look up the booking later without storing the 1Club id.
@@ -31,7 +31,7 @@ curl -X POST "https://api.1club.ai/v1/platform/bookings" \
 
 Body fields:
 
-- `areaId` (required) - the court id from [List courts](/api-reference/channel-integration/courts-and-availability#list-courts)
+- `areaId` (required) - the area id from [List areas](/api-reference/channel-integration/areas-and-availability#list-areas)
 - `startTime`, `endTime` (required) - ISO date-times, `endTime` after `startTime`
 - `externalId` (required) - your booking id, used as the idempotency key
 - `player.email` (required) - matches an existing contact or creates a new one
@@ -55,11 +55,12 @@ Response (`201 Created`):
 
 ### Idempotency
 
-Re-sending a request with an `externalId` that already exists returns the existing booking with HTTP `200` and `idempotentReplay: true`, instead of creating a duplicate. Safe to retry after a network error.
+Re-sending a request with an `externalId` that already exists returns the existing booking with HTTP `200` and `idempotentReplay: true`, instead of creating a duplicate. Safe to retry after a network error. Reusing an `externalId` for a different area or time returns `409 Conflict`.
 
 ### Common errors
 
-- `400` - the court is not available for the selected time, the time is outside operating hours, the booking breaks a club booking policy, or the channel integration is not enabled for the organization.
+- `409` - the area is not available for the selected time.
+- `400` - the time is outside operating hours, the booking breaks a club booking policy, the area is not bookable through this channel, or the integration is not enabled for the organization.
 - `403` - the API key is missing the `bookings:write` scope.
 
 The player is recorded as a contact in the gym's CRM, and the booking is a zero-priced inventory hold. Your platform owns the payment.

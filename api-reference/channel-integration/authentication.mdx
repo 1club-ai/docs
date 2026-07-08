@@ -1,24 +1,18 @@
 ---
-title: "Authentication and setup"
-description: "Enable the channel integration and create a scoped API key to sync bookings."
+title: "Authentication"
+description: "Create a scoped API key to sync bookings through the channel integration."
 ---
 
-The channel integration uses the same API key mechanism as the rest of the [Platform API](/api-reference/introduction). Two things must be in place before you can push bookings.
+The channel integration uses the same API key mechanism as the rest of the [Platform API](/api-reference/introduction) — no separate enablement step is needed.
 
-## 1. Enable the integration
-
-The channel integration must be enabled for the organization whose areas (courts) you are selling. Enabling it creates the record that links bookings to your channel and sets the channel name used for attribution.
-
-Ask your 1Club contact to enable the padel community integration for the organization, or enable it under **Settings - Integrations** in the admin dashboard.
-
-## 2. Create an API key
+## Create an API key
 
 API keys are created in the admin dashboard under **Settings - API Tokens**. See [Creating an API token](/api-reference/introduction#creating-an-api-token) for the full flow.
 
 Grant only the scopes the integration needs:
 
 - `areas:read` - list areas and read their availability
-- `bookings:read` - read a booking by its external id
+- `bookings:read` - read a booking
 - `bookings:write` - create and cancel bookings
 
 <Note>
@@ -34,6 +28,10 @@ Authorization: Bearer 1club_sk_live_...
 ```
 
 The key is tied to one organization, so all areas and bookings are scoped to that organization automatically.
+
+## Idempotency
+
+Booking creation accepts an optional **`Idempotency-Key`** header. Send a unique key per booking attempt (for example your own booking id); if the request is retried with the same key, 1Club returns the original booking instead of creating a duplicate. Reusing a key for a genuinely different booking returns `409 Conflict`.
 
 ## Rate limits and errors
 

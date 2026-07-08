@@ -1,30 +1,31 @@
 ---
 title: "Bookings"
-description: "Create, cancel, and reconcile bookings from your channel."
+description: "Create, cancel, and look up bookings through the platform API."
 ---
 
-Create a booking when a player books a court in your app, and cancel it when they cancel on your side. Each booking carries your own booking id (`externalId`), which makes every call idempotent and lets you cancel or look up the booking later without storing the 1Club id.
+Create a booking when a customer books a court in your app, and cancel it when they cancel on your side. 1Club returns a `bookingId` you use to cancel or look the booking up later.
 
 ## Create a booking
 
-Requires the `bookings:write` scope.
+Requires the `bookings:write` scope. Send an optional `Idempotency-Key` header so retries don't create duplicates.
 
 ```bash
 curl -X POST "https://api.1club.ai/v1/platform/bookings" \
   -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Idempotency-Key: padel-app-bk-9931" \
   -H "Content-Type: application/json" \
   -d '{
     "areaId": 51,
     "startTime": "2026-07-20T17:00:00Z",
     "endTime": "2026-07-20T18:00:00Z",
-    "externalId": "padel-app-bk-9931",
-    "player": {
+    "customer": {
       "email": "alex@example.com",
       "firstName": "Alex",
       "lastName": "Rivera",
-      "phone": "+34600111222",
-      "externalId": "padel-app-user-42"
+      "phone": "+34600111222"
     },
+    "payment": { "status": "paid", "amount": 24 },
+    "channel": "Padel Community",
     "notes": "Booked via Padel Community"
   }'
 ```
@@ -33,10 +34,11 @@ Body fields:
 
 - `areaId` (required) - the area id from [List areas](/api-reference/channel-integration/areas-and-availability#list-areas)
 - `startTime`, `endTime` (required) - ISO date-times, `endTime` after `startTime`
-- `externalId` (required) - your booking id, used as the idempotency key
-- `player.email` (required) - matches an existing contact or creates a new one
-- `player.firstName`, `player.lastName`, `player.phone` (optional) - used when creating a new contact
-- `player.externalId` (optional) - your player id, stored so you can reconcile players later
+- `customer.email` (required) - matches an existing contact or creates a new one
+- `customer.firstName`, `customer.lastName`, `customer.phone` (optional) - used when creating a new contact
+- `payment.status` (required) - `paid` (you collected the money) or `unpaid` (outstanding)
+- `payment.amount` (optional) - amount collected; defaults to the area's price for the slot
+- `channel` (optional) - a label stored for attribution
 - `notes` (optional)
 
 Response (`201 Created`):
@@ -44,33 +46,38 @@ Response (`201 Created`):
 ```json
 {
   "bookingId": 48213,
-  "externalId": "padel-app-bk-9931",
   "status": "confirmed",
   "areaId": 51,
   "startTime": "2026-07-20T17:00:00.000Z",
   "endTime": "2026-07-20T18:00:00.000Z",
+  "payment": { "status": "paid", "amount": 24 },
   "idempotentReplay": false
 }
 ```
 
+### How payment is recorded
+
+- `paid` → 1Club records a paid booking transaction, settled against a dedicated **External / API** payment method (manual channel, no card charged). Counts as revenue and paid.
+- `unpaid` → 1Club records the transaction as outstanding. Counts as accrued revenue with nothing paid.
+
+You keep ownership of collection and refunds. 1Club never charges a card for these bookings.
+
 ### Idempotency
 
-Re-sending a request with an `externalId` that already exists returns the existing booking with HTTP `200` and `idempotentReplay: true`, instead of creating a duplicate. Safe to retry after a network error. Reusing an `externalId` for a different area or time returns `409 Conflict`.
+If you send an `Idempotency-Key` and retry the request with the same key, 1Club returns the original booking with HTTP `200` and `idempotentReplay: true` instead of creating a duplicate. Reusing a key for a different area or time returns `409 Conflict`.
 
 ### Common errors
 
-- `409` - the area is not available for the selected time.
-- `400` - the time is outside operating hours, the booking breaks a club booking policy, the area is not bookable through this channel, or the integration is not enabled for the organization.
+- `409` - the area is not available for the selected time, or the Idempotency-Key was reused for a different booking.
+- `400` - the time is outside operating hours, the booking breaks a club booking policy, or the area is not bookable through this API.
 - `403` - the API key is missing the `bookings:write` scope.
-
-The player is recorded as a contact in the gym's CRM, and the booking is a zero-priced inventory hold. Your platform owns the payment.
 
 ## Cancel a booking
 
-Requires the `bookings:write` scope. Cancels the booking created with this `externalId`. No refund is issued by 1Club.
+Requires the `bookings:write` scope. Cancels the booking by its 1Club id. No refund is issued by 1Club.
 
 ```bash
-curl -X POST "https://api.1club.ai/v1/platform/bookings/by-external/padel-app-bk-9931/cancel" \
+curl -X POST "https://api.1club.ai/v1/platform/bookings/48213/cancel" \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
@@ -84,25 +91,23 @@ Cancelling is idempotent: cancelling an already-cancelled booking succeeds and r
 
 ## Look up a booking
 
-Requires the `bookings:read` scope. Returns the current state of a booking for reconciliation.
+Requires the `bookings:read` scope. Returns the current state of a booking, including its payment status.
 
 ```bash
-curl "https://api.1club.ai/v1/platform/bookings/by-external/padel-app-bk-9931" \
+curl "https://api.1club.ai/v1/platform/bookings/48213" \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
-
-Response:
 
 ```json
 {
   "bookingId": 48213,
-  "externalId": "padel-app-bk-9931",
   "status": "confirmed",
   "areaId": 51,
   "startTime": "2026-07-20T17:00:00.000Z",
   "endTime": "2026-07-20T18:00:00.000Z",
+  "payment": { "status": "paid", "amount": 24 },
   "idempotentReplay": false
 }
 ```
 
-A `404` means no booking exists for that `externalId` in your organization.
+A `404` means no booking with that id exists in your organization.

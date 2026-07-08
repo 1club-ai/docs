@@ -637,15 +637,11 @@
       },
       "PlatformBooking": {
         "type": "object",
-        "description": "A booking created through a channel integration. Recorded as a confirmed inventory hold — 1Club blocks the area but records no payment or revenue; the partner owns pricing, payment, and refunds.",
+        "description": "A booking created through the platform API. Recorded with a booking transaction so it counts for revenue, marked paid (settled against the External / API payment method) or unpaid (outstanding) per the caller. Refunds and collection stay with the caller.",
         "properties": {
           "bookingId": {
             "type": "integer",
             "description": "1Club booking id"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "Your booking id (the idempotency key)"
           },
           "status": {
             "type": "string",
@@ -663,6 +659,23 @@
           "endTime": {
             "type": "string",
             "format": "date-time"
+          },
+          "payment": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "paid",
+                  "unpaid"
+                ]
+              },
+              "amount": {
+                "type": "number",
+                "nullable": true,
+                "description": "Recorded amount in the organization's currency"
+              }
+            }
           },
           "idempotentReplay": {
             "type": "boolean",
@@ -1347,13 +1360,24 @@
     "/v1/platform/bookings": {
       "post": {
         "summary": "Create a booking",
-        "description": "Creates a booking on an area (e.g. a padel court) on behalf of a player from your channel. The player is matched to a contact by email (created if new). The booking is recorded as a confirmed inventory hold — 1Club blocks the area but records no payment or revenue; your platform owns pricing, payment, and refunds. Idempotent on `externalId`: re-sending the same id returns the existing booking (HTTP 200) instead of creating a duplicate.",
+        "description": "Creates a booking on an area (e.g. a padel court) for a customer. The customer is matched to a contact by email (created if new). A booking transaction is recorded so it counts for revenue: `paid` marks it settled against the External / API payment method (no gateway call), `unpaid` leaves it outstanding. `amount` defaults to the area's price for the slot. Send an `Idempotency-Key` header to make retries safe — the same key returns the original booking (HTTP 200).",
         "tags": [
           "Bookings"
         ],
         "security": [
           {
             "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional key; a retried request with the same key returns the original booking"
           }
         ],
         "requestBody": {
@@ -1366,8 +1390,8 @@
                   "areaId",
                   "startTime",
                   "endTime",
-                  "externalId",
-                  "player"
+                  "customer",
+                  "payment"
                 ],
                 "properties": {
                   "areaId": {
@@ -1382,11 +1406,7 @@
                     "type": "string",
                     "format": "date-time"
                   },
-                  "externalId": {
-                    "type": "string",
-                    "description": "Your booking id — the idempotency key"
-                  },
-                  "player": {
+                  "customer": {
                     "type": "object",
                     "required": [
                       "email"
@@ -1404,12 +1424,31 @@
                       },
                       "phone": {
                         "type": "string"
-                      },
-                      "externalId": {
-                        "type": "string",
-                        "description": "Your player id (mapped for reverse lookup)"
                       }
                     }
+                  },
+                  "payment": {
+                    "type": "object",
+                    "required": [
+                      "status"
+                    ],
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "paid",
+                          "unpaid"
+                        ]
+                      },
+                      "amount": {
+                        "type": "number",
+                        "description": "Amount collected; defaults to the area's price for the slot"
+                      }
+                    }
+                  },
+                  "channel": {
+                    "type": "string",
+                    "description": "Optional channel label, stored for attribution"
                   },
                   "notes": {
                     "type": "string"
@@ -1421,7 +1460,7 @@
         },
         "responses": {
           "200": {
-            "description": "Existing booking returned (idempotent replay of `externalId`)",
+            "description": "Existing booking returned (idempotent replay of the Idempotency-Key)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1441,7 +1480,7 @@
             }
           },
           "400": {
-            "description": "Invalid request (outside operating hours, policy violation, area not bookable, or integration not enabled)",
+            "description": "Invalid request (outside operating hours, policy violation, or area not bookable)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1471,190 +1510,7 @@
             }
           },
           "409": {
-            "description": "Area unavailable for the selected time, or externalId reused for a different booking",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/platform/bookings/by-external/{externalId}/cancel": {
-      "post": {
-        "summary": "Cancel a booking",
-        "description": "Cancels the booking previously created with this `externalId`. No refund is issued by 1Club — your platform owns refunds. Idempotent: cancelling an already-cancelled booking succeeds.",
-        "tags": [
-          "Bookings"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "externalId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Your booking id used when creating the booking"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Booking cancelled",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "bookingId": {
-                      "type": "integer"
-                    },
-                    "status": {
-                      "type": "string",
-                      "example": "cancelled"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Integration not enabled",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid or missing API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "API key is missing the required `bookings:write` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No booking found for that external id",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/platform/bookings/by-external/{externalId}": {
-      "get": {
-        "summary": "Get a booking by external id",
-        "description": "Returns the current state of the booking previously created with this `externalId`. Useful for reconciliation.",
-        "tags": [
-          "Bookings"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "externalId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Your booking id used when creating the booking"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Booking state",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformBooking"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Integration not enabled",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid or missing API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "API key is missing the required `bookings:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No booking found for that external id",
+            "description": "Area unavailable for the selected time, or the Idempotency-Key was reused for a different booking",
             "content": {
               "application/json": {
                 "schema": {
@@ -1913,6 +1769,189 @@
           },
           "404": {
             "description": "Area not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/bookings/{id}/cancel": {
+      "post": {
+        "summary": "Cancel a booking",
+        "description": "Cancels the booking by its 1Club id. No refund is issued by 1Club — the caller owns refunds. Idempotent: cancelling an already-cancelled booking succeeds.",
+        "tags": [
+          "Bookings"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "1Club booking id (returned by create)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "bookingId": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "cancelled"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid booking id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `bookings:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/bookings/{id}": {
+      "get": {
+        "summary": "Get a booking",
+        "description": "Returns the current state of a booking (including payment status) by its 1Club id.",
+        "tags": [
+          "Bookings"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "1Club booking id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformBooking"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid booking id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `bookings:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking not found",
             "content": {
               "application/json": {
                 "schema": {

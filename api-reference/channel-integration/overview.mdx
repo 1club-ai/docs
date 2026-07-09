@@ -1,0 +1,41 @@
+---
+title: "Channel integration overview"
+description: "Sync bookings and contacts from a partner booking platform into 1Club as a channel."
+---
+
+The channel integration lets a partner booking platform (for example a padel community app with court booking, player ratings, and matchmaking) sell your courts and push the resulting bookings into 1Club. 1Club stays the single source of truth for court inventory, so the same court can be booked from your own tools and the partner channel without double-booking.
+
+This is a channel-manager model: the partner is one sales channel, and 1Club is the hub that owns the inventory and the booking record. The API is generic — any integration with an API key can use it.
+
+<Note>
+  In 1Club a bookable court is an **area** (areas are typed by sport, e.g.
+  padel). The API uses the term **areas** throughout, so the padel courts you
+  sell are areas of a padel type.
+</Note>
+
+## What syncs
+
+- **Bookings** - the partner creates and cancels bookings through the API.
+- **Contacts** - each customer is matched to a contact in your gym's CRM by email, and created if new. Contact sync happens automatically as a by-product of booking sync.
+
+## How money is recorded
+
+You collect payment on your side; 1Club records the booking so it counts for revenue. On each booking you tell us the payment status:
+
+- **`paid`** - 1Club records a paid booking transaction, settled against a dedicated **External / API** payment method (on the `manual` channel, so no card is charged). It shows in revenue as paid.
+- **`unpaid`** - 1Club records the transaction as outstanding. It shows in revenue as accrued, with nothing paid yet.
+
+`amount` is optional and defaults to the area's price for the slot. Refund handling and collection stay on your side — cancelling a booking releases the area and issues no refund from 1Club.
+
+## How it works
+
+1. **Create an API key** under **Settings - API Tokens** with the `areas:read`, `bookings:read`, and `bookings:write` scopes. See [Authentication](/api-reference/channel-integration/authentication).
+2. **Discover areas** (your courts) and read their availability. See [Areas and availability](/api-reference/channel-integration/areas-and-availability).
+3. **Create bookings** with a payment status and optional amount. See [Bookings](/api-reference/channel-integration/bookings).
+4. **Cancel or look up** a booking by the 1Club booking id returned on create.
+
+## Not in v1
+
+- **Live availability push (1Club to partner).** The partner reads availability before booking, and 1Club rejects conflicts atomically at create time. There is no outbound webhook that notifies the partner when an area is booked elsewhere.
+- **Per-partner payment methods.** All API-collected payments are recorded against a single per-org External / API method; they are not split per partner.
+- **Player ratings and matchmaking.** These stay on the partner's side and are never mirrored into 1Club.

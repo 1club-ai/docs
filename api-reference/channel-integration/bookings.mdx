@@ -1,0 +1,107 @@
+---
+title: "Bookings"
+description: "Create, cancel, and look up bookings through the platform API."
+---
+
+Create a booking when a customer books a court in your app, and cancel it when they cancel on your side. 1Club returns a `bookingId` you use to cancel or look the booking up later.
+
+## Create a booking
+
+Requires the `bookings:write` scope.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/bookings" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "areaId": 51,
+    "startTime": "2026-07-20T17:00:00Z",
+    "endTime": "2026-07-20T18:00:00Z",
+    "customer": {
+      "email": "alex@example.com",
+      "firstName": "Alex",
+      "lastName": "Rivera",
+      "phone": "+34600111222"
+    },
+    "payment": { "status": "paid", "amount": 24 },
+    "channel": "Padel Community",
+    "notes": "Booked via Padel Community"
+  }'
+```
+
+Body fields:
+
+- `areaId` (required) - the area id from [List areas](/api-reference/channel-integration/areas-and-availability#list-areas)
+- `startTime`, `endTime` (required) - ISO date-times, `endTime` after `startTime`
+- `customer.email` (required) - matches an existing contact or creates a new one
+- `customer.firstName`, `customer.lastName`, `customer.phone` (optional) - used when creating a new contact
+- `payment.status` (required) - `paid` (you collected the money) or `unpaid` (outstanding)
+- `payment.amount` (optional) - amount collected; defaults to the area's price for the slot (max 1,000,000)
+- `channel` (optional) - a label stored for attribution
+- `notes` (optional)
+
+Response (`201 Created`):
+
+```json
+{
+  "bookingId": 48213,
+  "status": "confirmed",
+  "areaId": 51,
+  "startTime": "2026-07-20T17:00:00.000Z",
+  "endTime": "2026-07-20T18:00:00.000Z",
+  "payment": { "status": "paid", "amount": 24 }
+}
+```
+
+### How payment is recorded
+
+- `paid` → 1Club records a paid booking transaction, settled against a dedicated **External / API** payment method (manual channel, no card charged). Counts as revenue and paid.
+- `unpaid` → 1Club records the transaction as outstanding. Counts as accrued revenue with nothing paid.
+
+You keep ownership of collection and refunds. 1Club never charges a card for these bookings.
+
+### Common errors
+
+- `409` - the area is not available for the selected time.
+- `400` - the time is outside operating hours, the booking breaks a club booking policy, or the area is not bookable through this API.
+- `403` - the API key is missing the `bookings:write` scope.
+- `429` - rate limit exceeded (booking writes are throttled in addition to the standard per-org limit).
+
+## Cancel a booking
+
+Requires the `bookings:write` scope. Cancels the booking by its 1Club id. No refund is issued by 1Club.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/bookings/48213/cancel" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Response:
+
+```json
+{ "bookingId": 48213, "status": "cancelled" }
+```
+
+Cancelling is idempotent: cancelling an already-cancelled booking succeeds and returns the same response.
+
+## Look up a booking
+
+Requires the `bookings:read` scope. Returns the current state of a booking, including its payment status.
+
+```bash
+curl "https://api.1club.ai/v1/platform/bookings/48213" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+```json
+{
+  "bookingId": 48213,
+  "status": "confirmed",
+  "areaId": 51,
+  "startTime": "2026-07-20T17:00:00.000Z",
+  "endTime": "2026-07-20T18:00:00.000Z",
+  "payment": { "status": "paid", "amount": 24 }
+}
+```
+
+A `404` means no booking with that id exists in your organization.

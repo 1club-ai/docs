@@ -1,0 +1,45 @@
+---
+title: "Authentication"
+description: "Create a scoped API key to sync bookings through the channel integration."
+---
+
+The channel integration uses the same API key mechanism as the rest of the [Platform API](/api-reference/introduction) — no separate enablement step is needed.
+
+## Create an API key
+
+API keys are created in the admin dashboard under **Settings - APIs and MCP**. See [Creating an API token](/api-reference/introduction#creating-an-api-token) for the full flow.
+
+<Note>
+  API access is a paid feature. Organizations on the free plan or in trial can't
+  create API keys, and existing keys stop working if an organization downgrades
+  (requests return `403` with `code: "PLAN_FEATURE_LOCKED"`).
+</Note>
+
+Grant only the scopes the integration needs:
+
+- `areas:read` - list areas and read their availability
+- `bookings:read` - read a booking
+- `bookings:write` - create and cancel bookings
+
+<Note>
+  `bookings:write` is required to create or cancel bookings. A read-only key
+  cannot write bookings, and the legacy broad read grant does not satisfy write
+  scopes.
+</Note>
+
+Pass the key as a Bearer token on every request:
+
+```
+Authorization: Bearer 1club_sk_live_...
+```
+
+The key is tied to one organization, so all areas and bookings are scoped to that organization automatically.
+
+## Rate limits and errors
+
+The channel endpoints share the Platform API's limits and error model:
+
+- **100 requests per minute** per organization. A `429` response includes a `Retry-After` header.
+- Errors return a JSON body of the shape `{ "error": "...", "message": "...", "code": "..." }`.
+
+See [Rate limiting](/api-reference/introduction#rate-limiting) and [Errors](/api-reference/introduction#errors) for the full reference.

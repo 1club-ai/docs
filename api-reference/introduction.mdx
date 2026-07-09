@@ -46,7 +46,9 @@ API tokens are created from the admin dashboard at [admin.1club.ai](https://admi
 6. **Copy the token immediately** — it is shown only once and cannot be retrieved later
 
 <Note>
-  Creating and revoking API tokens requires the **settings.manage.organization** permission. Admins and users with full settings management can access this page; managers and other roles cannot.
+  Creating and revoking API tokens requires the **settings.manage.organization**
+  permission. Admins and users with full settings management can access this
+  page; managers and other roles cannot.
 </Note>
 
 For the full guide — including scope selection, expiry options, revocation, and security best practices — see the [API Tokens](/settings/api-tokens) page.
@@ -58,12 +60,17 @@ Each token is granted access to specific resources with either **Read** or **Wri
 - **Read** — allows fetching data (GET requests)
 - **Write** — allows creating and updating data (POST/PUT/PATCH requests)
 
-Grant only the scopes the integration actually needs. The Platform API currently supports these read scopes:
+Grant only the scopes the integration actually needs. The Platform API currently supports these scopes:
 
 - `classes:read` - list and read classes
 - `content:read` - list and read published content
 - `clubs:read` - look up clubs by slug
 - `transactions:read` - list and read billing transactions
+- `areas:read` - list areas and read their availability
+- `bookings:read` - read a booking by external id
+- `bookings:write` - create and cancel bookings
+
+To sync bookings from a partner booking platform, see [Channel integration](/api-reference/channel-integration/overview).
 
 ### Revoking a token
 
@@ -103,14 +110,14 @@ curl "https://api.1club.ai/v1/platform/classes?startDate=2026-05-01" \
 
 ## Errors
 
-| Status | Meaning |
-|--------|---------|
-| `400` | Invalid request parameters |
-| `401` | Missing or invalid API key |
-| `403` | Token is missing the required scope for this endpoint |
-| `404` | Resource not found (or doesn't belong to your organization) |
-| `429` | Rate limit exceeded |
-| `500` | Internal server error |
+| Status | Meaning                                                     |
+| ------ | ----------------------------------------------------------- |
+| `400`  | Invalid request parameters                                  |
+| `401`  | Missing or invalid API key                                  |
+| `403`  | Token is missing the required scope for this endpoint       |
+| `404`  | Resource not found (or doesn't belong to your organization) |
+| `429`  | Rate limit exceeded                                         |
+| `500`  | Internal server error                                       |
 
 ## Security best practices
 

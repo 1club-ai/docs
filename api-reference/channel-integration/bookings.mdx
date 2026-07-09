@@ -36,7 +36,7 @@ Body fields:
 - `customer.email` (required) - matches an existing contact or creates a new one
 - `customer.firstName`, `customer.lastName`, `customer.phone` (optional) - used when creating a new contact
 - `payment.status` (required) - `paid` (you collected the money) or `unpaid` (outstanding)
-- `payment.amount` (optional) - amount collected; defaults to the area's price for the slot
+- `payment.amount` (optional) - amount collected; defaults to the area's price for the slot (max 1,000,000)
 - `channel` (optional) - a label stored for attribution
 - `notes` (optional)
 
@@ -65,6 +65,7 @@ You keep ownership of collection and refunds. 1Club never charges a card for the
 - `409` - the area is not available for the selected time.
 - `400` - the time is outside operating hours, the booking breaks a club booking policy, or the area is not bookable through this API.
 - `403` - the API key is missing the `bookings:write` scope.
+- `429` - rate limit exceeded (booking writes are throttled in addition to the standard per-org limit).
 
 ## Cancel a booking
 

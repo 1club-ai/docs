@@ -7,12 +7,11 @@ Create a booking when a customer books a court in your app, and cancel it when t
 
 ## Create a booking
 
-Requires the `bookings:write` scope. Send an optional `Idempotency-Key` header so retries don't create duplicates.
+Requires the `bookings:write` scope.
 
 ```bash
 curl -X POST "https://api.1club.ai/v1/platform/bookings" \
   -H "Authorization: Bearer 1club_sk_live_..." \
-  -H "Idempotency-Key: padel-app-bk-9931" \
   -H "Content-Type: application/json" \
   -d '{
     "areaId": 51,
@@ -50,8 +49,7 @@ Response (`201 Created`):
   "areaId": 51,
   "startTime": "2026-07-20T17:00:00.000Z",
   "endTime": "2026-07-20T18:00:00.000Z",
-  "payment": { "status": "paid", "amount": 24 },
-  "idempotentReplay": false
+  "payment": { "status": "paid", "amount": 24 }
 }
 ```
 
@@ -62,13 +60,9 @@ Response (`201 Created`):
 
 You keep ownership of collection and refunds. 1Club never charges a card for these bookings.
 
-### Idempotency
-
-If you send an `Idempotency-Key` and retry the request with the same key, 1Club returns the original booking with HTTP `200` and `idempotentReplay: true` instead of creating a duplicate. Reusing a key for a different area or time returns `409 Conflict`.
-
 ### Common errors
 
-- `409` - the area is not available for the selected time, or the Idempotency-Key was reused for a different booking.
+- `409` - the area is not available for the selected time.
 - `400` - the time is outside operating hours, the booking breaks a club booking policy, or the area is not bookable through this API.
 - `403` - the API key is missing the `bookings:write` scope.
 
@@ -105,8 +99,7 @@ curl "https://api.1club.ai/v1/platform/bookings/48213" \
   "areaId": 51,
   "startTime": "2026-07-20T17:00:00.000Z",
   "endTime": "2026-07-20T18:00:00.000Z",
-  "payment": { "status": "paid", "amount": 24 },
-  "idempotentReplay": false
+  "payment": { "status": "paid", "amount": 24 }
 }
 ```
 

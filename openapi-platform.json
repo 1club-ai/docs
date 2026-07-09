@@ -676,10 +676,6 @@
                 "description": "Recorded amount in the organization's currency"
               }
             }
-          },
-          "idempotentReplay": {
-            "type": "boolean",
-            "description": "True when an existing booking was returned instead of creating a new one."
           }
         }
       }
@@ -1369,17 +1365,6 @@
             "customerApiAuth": []
           }
         ],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "Idempotency-Key",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Optional key; a retried request with the same key returns the original booking"
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1459,16 +1444,6 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Existing booking returned (idempotent replay of the Idempotency-Key)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformBooking"
-                }
-              }
-            }
-          },
           "201": {
             "description": "Booking created",
             "content": {
@@ -1510,7 +1485,7 @@
             }
           },
           "409": {
-            "description": "Area unavailable for the selected time, or the Idempotency-Key was reused for a different booking",
+            "description": "Area unavailable for the selected time",
             "content": {
               "application/json": {
                 "schema": {

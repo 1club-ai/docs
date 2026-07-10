@@ -1,0 +1,105 @@
+---
+title: "Webhooks"
+description: "Receive real-time availability changes so your calendar stays live."
+---
+
+Webhooks push availability changes to your app in near real time, so you can show
+a live calendar instead of discovering conflicts only when a booking is rejected.
+1Club sends a signed HTTP `POST` to your endpoint within seconds whenever a court's
+bookable availability changes on **any** channel — your app, the club's own tools,
+another partner, a class, or an event.
+
+Webhooks are the low-latency signal; the [change feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed)
+is the correctness backstop. Build for both (see [Staying in sync](/api-reference/channel-integration/overview#staying-in-sync)).
+
+## Register an endpoint
+
+In the admin dashboard under **Settings - APIs and MCP**, add a webhook endpoint:
+an HTTPS URL to receive events. On creation you get a **signing secret**
+(`whsec_...`) shown **once** — store it securely; you'll use it to verify every
+delivery. You can rotate the secret or disable the endpoint at any time.
+
+<Note>
+  Webhooks are part of the paid API feature. Endpoints must use `https`.
+</Note>
+
+## The `availability.changed` event
+
+The only event today. Its payload is a **thin invalidation**: it names the area and
+window that changed and why — not the new availability itself. On receipt, re-pull
+[`GET /availability`](/api-reference/channel-integration/areas-and-availability) for
+that area/window to get the authoritative state. This keeps 1Club the source of truth
+and makes events safe to process out of order.
+
+```json
+{
+  "id": "evt_9f2c4a1b8d7e4c2fa0b1c2d3e4f5a6b7",
+  "type": "availability.changed",
+  "occurredAt": "2026-07-20T16:32:04.115Z",
+  "sequence": "48213",
+  "organizationId": 8,
+  "data": {
+    "clubId": 8,
+    "areaId": 51,
+    "window": { "from": "2026-07-20T17:00:00.000Z", "to": "2026-07-20T18:00:00.000Z" },
+    "reason": "booking.created"
+  }
+}
+```
+
+- **`id`** - unique per event. Deduplicate on it (delivery is at-least-once).
+- **`sequence`** - the change's position in your org's change feed. Compare it to the `version` on an availability read to know whether your last read already reflects this change; use it as the `since` cursor for the [change feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed).
+- **`data.reason`** - a coarse cause label, e.g. `booking.created`, `booking.cancelled`, `booking.updated`, `booking.released`, `class.reserved`, `class.reservation_removed`, `event.published`, `event.unpublished`, `event.cancelled`, `event.updated`, `area.updated`. Treat it as a hint; always re-pull for truth.
+
+## Verify the signature
+
+Every delivery includes a timestamped HMAC-SHA256 signature over the raw request
+body, so you can confirm it came from 1Club and reject replays.
+
+Headers:
+
+| Header | Description |
+| --- | --- |
+| `1Club-Signature` | `t=<unix-seconds>,v1=<hex>` |
+| `1Club-Event-Id` | The event `id` (also in the body) |
+| `1Club-Event-Type` | `availability.changed` |
+| `1Club-Delivery-Attempt` | Attempt number, starting at 1 |
+
+The signed string is `"<t>.<raw-body>"`. Verify with a constant-time compare and
+reject timestamps outside a tolerance (e.g. 5 minutes):
+
+```ts
+import crypto from "node:crypto";
+
+function verify(rawBody: string, header: string, secret: string, toleranceSec = 300): boolean {
+  const parts = Object.fromEntries(header.split(",").map(kv => kv.split("=")));
+  const t = Number.parseInt(parts.t, 10);
+  if (!Number.isFinite(t) || Math.abs(Date.now() / 1000 - t) > toleranceSec) return false;
+
+  const expected = crypto.createHmac("sha256", secret).update(`${t}.${rawBody}`).digest("hex");
+  const a = Buffer.from(parts.v1, "hex");
+  const b = Buffer.from(expected, "hex");
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+```
+
+<Note>
+  Verify against the **raw** request body, before any JSON parsing/re-serialization
+  — a re-encoded body will not match the signature.
+</Note>
+
+## Delivery, retries, and idempotency
+
+- **Respond `2xx` quickly.** Any `2xx` status marks the delivery successful. Do the minimum synchronously (verify, enqueue, ack) and re-pull availability asynchronously.
+- **At-least-once.** You may receive the same `id` more than once. Deduplicate on `id` and make handling idempotent (re-pulling availability already is).
+- **Retries with backoff.** A non-`2xx`, timeout, or connection error is retried with exponential backoff (roughly 1m, 5m, 30m, 2h, 6h, 24h).
+- **Auto-disable.** After the retries are exhausted the endpoint is disabled and the reason is shown in the dashboard. Re-enable it (and rotate the secret if needed) once your endpoint is healthy, then reconcile with the change feed.
+- **Ordering is not guaranteed.** Use `sequence` if you need to order or detect gaps; because events are invalidations you re-pull for, exact order rarely matters.
+
+## Reconcile after downtime
+
+If your endpoint was down (or auto-disabled), don't try to replay individual
+webhooks — pull the [change feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed)
+from your last stored `cursor`, apply the changes, and store the new cursor. Polling
+the feed on a slow timer (e.g. every few minutes) in addition to webhooks means your
+calendar self-heals from any missed delivery.

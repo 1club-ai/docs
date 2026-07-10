@@ -170,6 +170,17 @@ To reconcile: pass your last stored `cursor`, apply each change by re-pulling
 Keep paging while `hasMore` is `true`.
 
 <Note>
+  On **first sync** you have no cursor — do a full grid pull and start from the
+  `cursor` it returns (starting from `0` for a live club replays its whole
+  history). The feed serves a **rolling history**; if your cursor predates it
+  after a long outage, re-baseline with a full grid pull. Some changes (e.g.
+  `area.updated`) carry a **coarse, wide** `from`/`to` window rather than a single
+  slot — re-pull the whole window. See the
+  [webhooks guide](/api-reference/channel-integration/webhooks#reconcile-after-downtime)
+  for the full reconciliation flow.
+</Note>
+
+<Note>
   Availability is a snapshot. 1Club remains the source of truth: booking
   creation re-checks availability atomically, so a slot that was open a moment
   ago may be rejected if it was taken in between. Always handle a booking

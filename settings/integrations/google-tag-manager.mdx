@@ -33,10 +33,32 @@ Both the member portal (`{org}.portal.1club.ai` or your custom portal domain) an
 1Club only loads the container. What it tracks is entirely up to your GTM workspace. Typical setups include:
 
 - Page views on the marketing site and member portal.
-- Conversion events for sign-up, booking confirmation, or purchase.
+- Conversion events for sign-up, booking confirmation, purchase, or contact-form lead.
 - Custom dataLayer events you trigger from GTM tags.
 
-1Club's member portal also pushes a small set of standard events to `window.dataLayer` (for example `page_view`, `sign_up`, `login`, `booking_created`, `purchase`) that you can pick up with GTM triggers if you want to track member behavior in GA4 or other tools.
+### Events pushed by 1Club
+
+The member portal and CMS website push a small set of standard events to `window.dataLayer` automatically. Create a **Custom Event** trigger in GTM with the matching name and forward to GA4 (or any other tag).
+
+| Event name | Fires when | Parameters |
+| --- | --- | --- |
+| `page_view` | Every client-side route change in portal and website | `page_path`, `page_title` |
+| `login` | A member signs in | `event_source` (`portal` or `website`) |
+| `sign_up` | A new member account is created | `event_source` |
+| `sign_out` | A member logs out of the portal | `event_source` |
+| `booking_created` | A booking is confirmed | `booking_id`, `event_source` |
+| `payment_success` | Stripe checkout returns to the success page | `booking_id` (if any), `invoice_id` (if any), `event_source` |
+| `form_submitted` | The contact form on a CMS site submits successfully | `form_type` (always `contact` for the contact form), `form_category` (the category the visitor picked, if any), `form_location` (the page path the form was on), `event_source` |
+
+All non-`page_view` events also carry `event_source` so you can split GA4 reports by surface.
+
+### Suggested GA4 mapping
+
+For drop-in GA4 coverage, map the events above to GA4's recommended names where they line up, and pass them through as-is otherwise:
+
+- `sign_up` and `login` already match GA4's recommended events - forward with **Event Name** `{{Event}}` and GA4 surfaces them in the standard user-engagement reports.
+- `payment_success` maps to GA4's `purchase` if you also pass `transaction_id`, `value`, and `currency`. If you don't have those yet, forward as `payment_success` and report on it as a custom event.
+- `form_submitted` is a good fit for GA4's recommended `generate_lead` event. Either forward as `form_submitted` or remap to `generate_lead` in your GA4 Event tag - whichever you prefer for reporting.
 
 ## Cookie consent
 

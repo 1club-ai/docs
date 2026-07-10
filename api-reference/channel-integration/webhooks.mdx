@@ -1,0 +1,158 @@
+---
+title: "Webhooks"
+description: "Receive real-time availability changes so your calendar stays live."
+---
+
+Webhooks push availability changes to your app in near real time, so you can show
+a live calendar instead of discovering conflicts only when a booking is rejected.
+1Club sends a signed HTTP `POST` to your endpoint within seconds whenever a court's
+bookable availability changes on **any** channel — your app, the club's own tools,
+another partner, a class, or an event.
+
+Webhooks are the low-latency signal; the [change feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed)
+is the correctness backstop. Build for both (see [Staying in sync](/api-reference/channel-integration/overview#staying-in-sync)).
+
+## Quickstart
+
+Build a live calendar in five steps:
+
+1. **Baseline.** Pull the club grid once to render the calendar and store the returned `cursor`:
+   `GET /v1/platform/availability?clubId=8&from=…&to=…`.
+2. **Register** an HTTPS endpoint (below) and store the `whsec_…` signing secret.
+3. **Receive & verify.** On each `POST`, check the `1Club-Signature` header against the raw body ([verify the signature](#verify-the-signature)) and respond `2xx` within 10 seconds.
+4. **Re-pull.** Fetch the affected window named in the event's `data` and update those slots:
+   `GET /v1/platform/areas/{areaId}/availability?from=…&to=…`. Keep the highest `version`/`sequence` you've applied.
+5. **Reconcile.** On a slow timer — and after any downtime — call `GET /v1/platform/availability/changes?since=<cursor>`, apply the deltas, and store the new `cursor`.
+
+Steps 3–4 keep the calendar fresh in seconds; steps 1 and 5 keep it correct even if a webhook is never delivered.
+
+## Register an endpoint
+
+In the admin dashboard under **Settings - APIs and MCP**, add a webhook endpoint:
+an HTTPS URL to receive events. On creation you get a **signing secret**
+(`whsec_...`) shown **once** — store it securely; you'll use it to verify every
+delivery. You can rotate the secret or disable the endpoint at any time.
+
+<Note>
+  Webhooks are part of the paid API feature. Endpoints must use `https`.
+</Note>
+
+## The `availability.changed` event
+
+The only event today. Its payload is a **thin invalidation**: it names the area and
+window that changed and why — not the new availability itself. On receipt, re-pull
+[`GET /availability`](/api-reference/channel-integration/areas-and-availability) for
+that area/window to get the authoritative state. This keeps 1Club the source of truth
+and makes events safe to process out of order.
+
+```json
+{
+  "id": "evt_9f2c4a1b8d7e4c2fa0b1c2d3e4f5a6b7",
+  "type": "availability.changed",
+  "occurredAt": "2026-07-20T16:32:04.115Z",
+  "sequence": "48213",
+  "organizationId": 8,
+  "data": {
+    "clubId": 8,
+    "areaId": 51,
+    "window": { "from": "2026-07-20T17:00:00.000Z", "to": "2026-07-20T18:00:00.000Z" },
+    "reason": "booking.created"
+  }
+}
+```
+
+- **`id`** - unique per event. Deduplicate on it (delivery is at-least-once).
+- **`sequence`** - the change's position in your org's change feed. Compare it to the `version` on an availability read to know whether your last read already reflects this change; use it as the `since` cursor for the [change feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed).
+- **`data.reason`** - a coarse cause label, e.g. `booking.created`, `booking.cancelled`, `booking.updated`, `booking.released`, `class.reserved`, `class.reservation_removed`, `event.published`, `event.unpublished`, `event.cancelled`, `event.updated`, `area.updated`. Treat it as a hint; always re-pull for truth.
+
+<Note>
+  `data.window` is the affected time range, but for configuration changes (such
+  as `area.updated`, when operating hours or capacity change) it is a **coarse,
+  forward-looking window** of up to ~60 days — not a single slot. Always re-pull
+  `/availability` for the window rather than assuming exactly one slot changed.
+</Note>
+
+### `sequence`, `version`, and `cursor`
+
+Three related tokens tie reads, webhooks, and the change feed together. All are
+monotonically increasing integers **sent as strings** (they can exceed `2^53`, so
+don't parse them into a JS `number` — compare as strings of equal length, or as
+`BigInt`).
+
+| Token | Scope | Where you see it | Use it to |
+| --- | --- | --- | --- |
+| `sequence` | one change | webhook `sequence`, change-feed `sequence` | order changes / detect gaps; pass as the `since` cursor |
+| `version` | one area | availability read (`version`, and the `ETag`) | tell whether a read already reflects a given `sequence` |
+| `cursor` | whole org | grid `cursor`, change-feed `cursor` | your reconciliation checkpoint |
+
+## Verify the signature
+
+Every delivery includes a timestamped HMAC-SHA256 signature over the raw request
+body, so you can confirm it came from 1Club and reject replays.
+
+Headers:
+
+| Header | Description |
+| --- | --- |
+| `1Club-Signature` | `t=<unix-seconds>,v1=<hex>` |
+| `1Club-Event-Id` | The event `id` (also in the body) |
+| `1Club-Event-Type` | `availability.changed` |
+| `1Club-Delivery-Attempt` | Attempt number, starting at 1 |
+
+The `v1=` element is the signature-scheme version. If a future scheme is added it
+will be sent as an extra element (e.g. `v2=`) alongside `v1=`, so parse by name and
+verify the scheme you support rather than assuming a fixed layout.
+
+The signed string is `"<t>.<raw-body>"`. Verify with a constant-time compare and
+reject timestamps outside a tolerance (e.g. 5 minutes):
+
+```ts
+import crypto from "node:crypto";
+
+function verify(rawBody: string, header: string, secret: string, toleranceSec = 300): boolean {
+  const parts = Object.fromEntries(header.split(",").map(kv => kv.split("=")));
+  const t = Number.parseInt(parts.t, 10);
+  if (!Number.isFinite(t) || Math.abs(Date.now() / 1000 - t) > toleranceSec) return false;
+
+  const expected = crypto.createHmac("sha256", secret).update(`${t}.${rawBody}`).digest("hex");
+  const a = Buffer.from(parts.v1, "hex");
+  const b = Buffer.from(expected, "hex");
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+```
+
+<Note>
+  Verify against the **raw** request body, before any JSON parsing/re-serialization
+  — a re-encoded body will not match the signature.
+</Note>
+
+## Delivery, retries, and idempotency
+
+- **Respond within 10 seconds.** Any `2xx` marks the delivery successful. A non-`2xx`, a connection error, or a response slower than the **10-second** timeout counts as a failure. Do the minimum synchronously (verify, enqueue, ack) and re-pull availability asynchronously.
+- **At-least-once.** You may receive the same `id` more than once. Deduplicate on `id` and make handling idempotent (re-pulling availability already is).
+- **Retries with backoff.** A failed delivery is retried up to **7 attempts total** — the first immediately, then after roughly 1m, 5m, 30m, 2h, 6h, and 24h (about **33 hours** end to end). Timing has a few seconds of jitter.
+- **Auto-disable.** After the 7th attempt fails, the endpoint is **disabled automatically** and the reason is shown under **Settings → APIs and MCP**. Re-enable it (and rotate the secret if needed) once healthy, then reconcile with the change feed to catch up on everything sent while it was down.
+- **Ordering is not guaranteed.** Use `sequence` if you need to order or detect gaps; because events are invalidations you re-pull for, exact order rarely matters.
+
+## Reconcile after downtime
+
+If your endpoint was down (or auto-disabled), don't try to replay individual
+webhooks — pull the [change feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed)
+from your last stored `cursor`, apply the changes, and store the new cursor. Polling
+the feed on a slow timer (e.g. every few minutes) in addition to webhooks means your
+calendar self-heals from any missed delivery.
+
+**First sync (no cursor yet):** do the baseline grid pull ([Quickstart](#quickstart)
+step 1) and start from the `cursor` it returns — don't start from `0` for a live
+club, or you'll replay the entire history.
+
+**Very long outages:** the feed serves a rolling history. If your stored `cursor`
+is older than the retained history, the feed can't close the whole gap — discard
+the cursor and re-baseline with a full grid pull, exactly like first sync. When in
+doubt, a full grid re-pull is always a safe way to resynchronise.
+
+## Troubleshooting
+
+- **Deliveries stopped arriving.** The endpoint was likely auto-disabled after repeated failures — check **Settings → APIs and MCP** for the disable reason, fix your endpoint, re-enable it, then reconcile from your last `cursor`.
+- **Signature always fails.** You're almost certainly hashing a re-serialized body — verify against the exact bytes received (see the note above), and confirm you're using the current secret (rotating it invalidates the old one immediately).
+- **Correlate and dedupe on your side.** Log the `1Club-Event-Id` and `1Club-Delivery-Attempt` headers: the event id lets you dedupe, and the attempt number tells first deliveries apart from retries.

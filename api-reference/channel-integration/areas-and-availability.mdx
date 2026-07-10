@@ -42,10 +42,12 @@ Use each area's `id` as the `areaId` when creating a booking.
 
 ## Area availability
 
-Returns the area's operating hours and the intervals already taken by non-cancelled bookings within a window, so you can compute open slots.
+Returns everything you need to render a court's calendar for a window: the club
+timezone, operating hours, the intervals already taken (`busy`), and ready-made
+open `slots` with remaining capacity.
 
 ```bash
-curl "https://api.1club.ai/v1/platform/areas/51/availability?from=2026-07-20T00:00:00Z&to=2026-07-21T00:00:00Z" \
+curl "https://api.1club.ai/v1/platform/areas/51/availability?from=2026-07-20T00:00:00Z&to=2026-07-21T00:00:00Z&slotMinutes=60" \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
@@ -53,6 +55,7 @@ Query parameters:
 
 - `from` (required) - window start, ISO date-time
 - `to` (required) - window end, ISO date-time, at most 31 days after `from`
+- `slotMinutes` (optional) - slot granularity: `15`, `30`, `60` (default), `90`, or `120`
 
 Response:
 
@@ -61,24 +64,126 @@ Response:
   "areaId": 51,
   "from": "2026-07-20T00:00:00.000Z",
   "to": "2026-07-21T00:00:00.000Z",
+  "timezone": "Europe/Madrid",
   "maxConcurrentBookings": 1,
+  "version": "48213",
   "operatingHours": {
-    "monday": [{ "open": "08:00", "close": "22:00" }]
+    "monday": { "enabled": true, "openTime": "08:00", "closeTime": "22:00" }
   },
   "busy": [
+    { "startTime": "2026-07-20T17:00:00.000Z", "endTime": "2026-07-20T18:00:00.000Z" }
+  ],
+  "slots": [
+    { "start": "2026-07-20T06:00:00.000Z", "end": "2026-07-20T07:00:00.000Z", "capacity": 1, "remaining": 1, "bookable": true },
+    { "start": "2026-07-20T15:00:00.000Z", "end": "2026-07-20T16:00:00.000Z", "capacity": 1, "remaining": 0, "bookable": false }
+  ]
+}
+```
+
+- **`timezone`** - the IANA timezone the `operatingHours` are expressed in. Operating hours are per-weekday **local** times; slots are already resolved to absolute UTC instants for you (DST included), so prefer `slots` over re-deriving from `operatingHours`.
+- **`slots`** - open slots computed from effective bookable hours (club ∩ area) minus `busy`, honouring `maxConcurrentBookings`. `remaining` is how many of `capacity` are still free; `bookable` is `remaining > 0` and no hard block.
+- **`busy`** and **`operatingHours`** are still returned raw if you'd rather compute slots yourself. An area with `maxConcurrentBookings` greater than 1 can hold that many overlapping bookings before a slot is full.
+- **`version`** - a consistency token (the highest change sequence for this area). Compare it to the `sequence` on an [availability webhook](/api-reference/channel-integration/webhooks) to know whether this read already reflects that change.
+
+### Conditional requests
+
+The response sends an `ETag` built from `version`. Send it back as `If-None-Match`
+to get a cheap `304 Not Modified` when nothing has changed — useful as a polling
+fallback where you don't run webhooks.
+
+```bash
+curl "https://api.1club.ai/v1/platform/areas/51/availability?from=...&to=..." \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H 'If-None-Match: "48213-60"'
+```
+
+## Club availability grid
+
+Render a whole club's calendar in one request instead of one call per court.
+
+```bash
+curl "https://api.1club.ai/v1/platform/availability?clubId=8&sport=padel&from=2026-07-20T00:00:00Z&to=2026-07-21T00:00:00Z&slotMinutes=60" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Query parameters: `clubId` (optional), `sport` (optional), `from`/`to` (required, ≤ 31 days), `slotMinutes` (optional).
+
+```json
+{
+  "clubId": 8,
+  "timezone": "Europe/Madrid",
+  "from": "2026-07-20T00:00:00.000Z",
+  "to": "2026-07-21T00:00:00.000Z",
+  "cursor": "48213",
+  "areas": [
     {
-      "startTime": "2026-07-20T17:00:00.000Z",
-      "endTime": "2026-07-20T18:00:00.000Z"
+      "areaId": 51,
+      "name": "Court 1",
+      "sports": ["padel"],
+      "pricePerHour": 24,
+      "maxConcurrentBookings": 1,
+      "version": "48213",
+      "operatingHours": { "monday": { "enabled": true, "openTime": "08:00", "closeTime": "22:00" } },
+      "busy": [{ "startTime": "2026-07-20T17:00:00.000Z", "endTime": "2026-07-20T18:00:00.000Z" }],
+      "slots": [{ "start": "2026-07-20T06:00:00.000Z", "end": "2026-07-20T07:00:00.000Z", "capacity": 1, "remaining": 1, "bookable": true }]
     }
   ]
 }
 ```
 
-Compute open slots as the operating hours for the window minus the `busy` intervals. An area with `maxConcurrentBookings` greater than 1 can hold that many overlapping bookings before a slot is full.
+The top-level `cursor` is the reconciliation cursor at read time — store it and pass it to the [change feed](#availability-change-feed) to catch up later.
+
+## Availability change feed
+
+Returns every availability change for your organization after a cursor, in order.
+Pair it with [webhooks](/api-reference/channel-integration/webhooks): webhooks push
+changes in near real time; this feed lets you catch up exactly after any missed
+delivery, so your calendar never drifts.
+
+```bash
+curl "https://api.1club.ai/v1/platform/availability/changes?since=48000&limit=100" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Query parameters: `since` (required cursor; `0` for the start of retention), `limit` (optional, default 100, max 500).
+
+```json
+{
+  "changes": [
+    {
+      "sequence": "48213",
+      "clubId": 8,
+      "areaId": 51,
+      "from": "2026-07-20T17:00:00.000Z",
+      "to": "2026-07-20T18:00:00.000Z",
+      "reason": "booking.created",
+      "occurredAt": "2026-07-20T16:32:04.115Z"
+    }
+  ],
+  "cursor": "48213",
+  "hasMore": false
+}
+```
+
+To reconcile: pass your last stored `cursor`, apply each change by re-pulling
+`/availability` for the affected area and window, then store the new `cursor`.
+Keep paging while `hasMore` is `true`.
+
+<Note>
+  On **first sync** you have no cursor — do a full grid pull and start from the
+  `cursor` it returns (starting from `0` for a live club replays its whole
+  history). The feed serves a **rolling history**; if your cursor predates it
+  after a long outage, re-baseline with a full grid pull. Some changes (e.g.
+  `area.updated`) carry a **coarse, wide** `from`/`to` window rather than a single
+  slot — re-pull the whole window. See the
+  [webhooks guide](/api-reference/channel-integration/webhooks#reconcile-after-downtime)
+  for the full reconciliation flow.
+</Note>
 
 <Note>
   Availability is a snapshot. 1Club remains the source of truth: booking
   creation re-checks availability atomically, so a slot that was open a moment
   ago may be rejected if it was taken in between. Always handle a booking
-  rejection gracefully.
+  rejection gracefully — and use [webhooks](/api-reference/channel-integration/webhooks)
+  plus this feed to keep the snapshot fresh.
 </Note>

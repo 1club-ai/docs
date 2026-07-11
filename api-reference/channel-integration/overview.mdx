@@ -13,6 +13,40 @@ This is a channel-manager model: the partner is one sales channel, and 1Club is 
   sell are areas of a padel type.
 </Note>
 
+## How it fits together
+
+1Club is the hub that owns court inventory; your platform is one sales channel
+alongside the club's own tools, classes, and events. You read availability, create
+bookings (each resolved to a CRM contact by email), and stay in sync as the shared
+inventory changes on any channel.
+
+```mermaid
+flowchart LR
+  subgraph Partner["Your platform (a sales channel)"]
+    UI["App / calendar"]
+  end
+
+  subgraph OneClub["1Club — hub and source of truth"]
+    AV["Areas and availability"]
+    BK["Bookings + revenue"]
+    CT["Contacts (CRM)"]
+  end
+
+  Other["Other channels<br/>club tools · classes · events"]
+
+  UI -->|"① read slots — per court or club grid"| AV
+  UI -->|"② create booking (customer + slot)"| BK
+  BK -->|"match / create by email"| CT
+  BK -.->|"occupies the court"| AV
+  Other -.->|"book / block"| AV
+  AV -->|"③ availability.changed (webhook)"| UI
+  UI -->|"re-pull affected window · reconcile via change feed"| AV
+```
+
+- **① Read** availability as computed slots — one court or a whole-club grid.
+- **② Book** — the `customer` on each booking is matched to (or creates) a **contact** in the CRM by email; 1Club records the booking and its revenue. Details: [How contacts sync](/api-reference/channel-integration/bookings#how-contacts-sync).
+- **③ Stay in sync** — any change on any channel emits a signed `availability.changed` webhook; you re-pull the affected window and reconcile against the [change feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed) so nothing drifts.
+
 ## What syncs
 
 - **Bookings** - the partner creates and cancels bookings through the API.

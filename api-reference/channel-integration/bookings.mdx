@@ -60,6 +60,59 @@ Response (`201 Created`):
 
 You keep ownership of collection and refunds. 1Club never charges a card for these bookings.
 
+## How contacts sync
+
+Every booking belongs to a **contact** in the club's 1Club CRM. You never create or
+manage contacts directly — there is no contacts endpoint. Instead, the `customer`
+object you send with each booking is resolved to a contact automatically, as a
+by-product of booking sync. This is deliberately one-way: **partner → 1Club**. 1Club
+never pushes contact changes back to you.
+
+### Matching and creation
+
+1Club resolves the contact from `customer.email`:
+
+- **Email is the identity key.** It's normalized (trimmed and lower-cased) and matched within the club's organization. Matching is **case-insensitive** — `Alex@Example.com` and `alex@example.com` are the same contact.
+- **Scoped per organization.** Contacts belong to one organization. The same email booking at two different clubs (organizations) is two separate contacts — there is no global customer identity across clubs.
+- **Match wins over create.** If a contact with that email already exists, the booking links to it. If not, a new contact is created from the `customer` fields (`firstName`, `lastName`, `phone`; `name` is derived from first + last, falling back to the email when no name is given).
+- **The booking stores the resolved `contactId`.** From then on the booking, its revenue, and its history all roll up to that one contact in the CRM.
+
+<Warning>
+  For an **existing** contact, 1Club matches by email and does **not** overwrite the
+  stored name or phone with what you send. Treat contact profile fields as
+  create-time only — sending a new phone on a later booking for the same email will
+  not change the contact. (To correct contact details, edit the contact in 1Club.)
+</Warning>
+
+### Guarantees
+
+- **No duplicates.** A unique constraint on `(organization, lower(email))` plus a create-race retry means two bookings racing with the same new email still produce exactly one contact.
+- **Consistent identity.** Because matching is by normalized email, repeat customers always land on the same contact — their bookings accumulate rather than fragmenting.
+- **Searchable immediately.** A newly created contact is available in the CRM (searchable by name and email) as soon as the booking succeeds.
+
+### The full create flow
+
+```mermaid
+flowchart TD
+  A["Partner<br/>POST /v1/platform/bookings<br/>{ customer.email, areaId, time, payment }"] --> B{Area bookable<br/>through this API?}
+  B -- no --> E1["400 · not bookable"]
+  B -- yes --> C["Normalize email<br/>(trim + lower-case)"]
+  C --> D{"Contact with this email<br/>in this organization?"}
+  D -- "yes" --> F["Reuse existing contact<br/>(name/phone not overwritten)"]
+  D -- "no" --> G["Create contact<br/>email, first/last name, phone"]
+  F --> H["Create booking → link contactId<br/>atomic availability re-check"]
+  G --> H
+  H -- "slot taken" --> E2["409 · not available"]
+  H -- "ok" --> I["Record transaction<br/>paid → settled · unpaid → outstanding"]
+  I --> J["201 · { bookingId, status, payment }"]
+```
+
+Contact resolution runs **before** the booking write. So if the slot turns out to be
+taken (`409`) or the request is otherwise rejected, a contact that was just created
+for a first-time customer is **kept** — it isn't rolled back. That's harmless: it
+carries no booking, stays matched by email, and is reused when you retry. The booking
+write itself is what re-checks availability atomically and rejects conflicts.
+
 ### Common errors
 
 - `409` - the area is not available for the selected time.

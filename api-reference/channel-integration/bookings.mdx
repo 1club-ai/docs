@@ -92,26 +92,33 @@ never pushes contact changes back to you.
 
 ### The full create flow
 
-```mermaid
-flowchart TD
-  A["Partner<br/>POST /v1/platform/bookings<br/>{ customer.email, areaId, time, payment }"] --> B{Area bookable<br/>through this API?}
-  B -- no --> E1["400 · not bookable"]
-  B -- yes --> C["Normalize email<br/>(trim + lower-case)"]
-  C --> D{"Contact with this email<br/>in this organization?"}
-  D -- "yes" --> F["Reuse existing contact<br/>(name/phone not overwritten)"]
-  D -- "no" --> G["Create contact<br/>email, first/last name, phone"]
-  F --> H["Create booking → link contactId<br/>atomic availability re-check"]
-  G --> H
-  H -- "slot taken" --> E2["409 · not available"]
-  H -- "ok" --> I["Record transaction<br/>paid → settled · unpaid → outstanding"]
-  I --> J["201 · { bookingId, status, payment }"]
-```
+<Steps>
+  <Step title="Validate the area">
+    The `areaId` must be bookable through this API (active, public, bookable type).
+    If not → `400`.
+  </Step>
+  <Step title="Resolve the contact">
+    Normalize `customer.email` (trim + lower-case), then **match** an existing
+    contact in the organization or **create** one from the `customer` fields. An
+    existing contact is reused as-is (name/phone not overwritten).
+  </Step>
+  <Step title="Create the booking">
+    Link the resolved `contactId` and write the booking, re-checking availability
+    **atomically**. If the slot was taken in the meantime → `409`.
+  </Step>
+  <Step title="Record revenue & respond">
+    Record the transaction (`paid` → settled, `unpaid` → outstanding) and return
+    `201` with `{ bookingId, status, payment }`.
+  </Step>
+</Steps>
 
-Contact resolution runs **before** the booking write. So if the slot turns out to be
-taken (`409`) or the request is otherwise rejected, a contact that was just created
-for a first-time customer is **kept** — it isn't rolled back. That's harmless: it
-carries no booking, stays matched by email, and is reused when you retry. The booking
-write itself is what re-checks availability atomically and rejects conflicts.
+<Note>
+  Contact resolution runs **before** the booking write. So if the slot turns out to
+  be taken (`409`) or the request is otherwise rejected, a contact just created for a
+  first-time customer is **kept** — it isn't rolled back. That's harmless: it carries
+  no booking, stays matched by email, and is reused on retry. Only the booking write
+  re-checks availability atomically and rejects conflicts.
+</Note>
 
 ### Common errors
 

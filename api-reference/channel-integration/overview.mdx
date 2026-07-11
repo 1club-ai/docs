@@ -16,36 +16,39 @@ This is a channel-manager model: the partner is one sales channel, and 1Club is 
 ## How it fits together
 
 1Club is the hub that owns court inventory; your platform is one sales channel
-alongside the club's own tools, classes, and events. You read availability, create
-bookings (each resolved to a CRM contact by email), and stay in sync as the shared
-inventory changes on any channel.
+alongside the club's own tools, classes, and events. Everything a partner does maps
+to three things it holds in 1Club:
 
-```mermaid
-flowchart LR
-  subgraph Partner["Your platform (a sales channel)"]
-    UI["App / calendar"]
-  end
+<CardGroup cols={3}>
+  <Card title="Areas & availability" icon="calendar">
+    Your bookable courts and their computed open slots — the shared inventory,
+    changed by every channel.
+  </Card>
+  <Card title="Bookings & revenue" icon="calendar-check">
+    Each booking you create, recorded against revenue on your chosen payment status.
+  </Card>
+  <Card title="Contacts (CRM)" icon="user">
+    The customer on each booking, matched to (or created as) a CRM contact by email.
+  </Card>
+</CardGroup>
 
-  subgraph OneClub["1Club — hub and source of truth"]
-    AV["Areas and availability"]
-    BK["Bookings + revenue"]
-    CT["Contacts (CRM)"]
-  end
-
-  Other["Other channels<br/>club tools · classes · events"]
-
-  UI -->|"① read slots — per court or club grid"| AV
-  UI -->|"② create booking (customer + slot)"| BK
-  BK -->|"match / create by email"| CT
-  BK -.->|"occupies the court"| AV
-  Other -.->|"book / block"| AV
-  AV -->|"③ availability.changed (webhook)"| UI
-  UI -->|"re-pull affected window · reconcile via change feed"| AV
-```
-
-- **① Read** availability as computed slots — one court or a whole-club grid.
-- **② Book** — the `customer` on each booking is matched to (or creates) a **contact** in the CRM by email; 1Club records the booking and its revenue. Details: [How contacts sync](/api-reference/channel-integration/bookings#how-contacts-sync).
-- **③ Stay in sync** — any change on any channel emits a signed `availability.changed` webhook; you re-pull the affected window and reconcile against the [change feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed) so nothing drifts.
+<Steps>
+  <Step title="Read availability">
+    Fetch computed slots for one court or a whole-club grid.
+    See [Areas and availability](/api-reference/channel-integration/areas-and-availability).
+  </Step>
+  <Step title="Create a booking">
+    Send the slot and the `customer`. 1Club matches (or creates) a **contact** by
+    email and records the booking and its revenue.
+    See [How contacts sync](/api-reference/channel-integration/bookings#how-contacts-sync).
+  </Step>
+  <Step title="Stay in sync">
+    Any change on **any** channel emits a signed `availability.changed` webhook;
+    you re-pull the affected window and reconcile against the
+    [change feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed)
+    so your calendar never drifts. See [Webhooks](/api-reference/channel-integration/webhooks).
+  </Step>
+</Steps>
 
 ## What syncs
 

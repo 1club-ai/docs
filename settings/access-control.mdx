@@ -1,51 +1,54 @@
 ---
-title: Access Control
-description: Per-club check-in mode, member enrollment, and identification methods.
+title: Access control
+description: How members identify themselves at your door (QR, access card, PIN) per club, and how the check-in modes that decide who staff can check in are configured through booking policies.
+keywords: [access control, check-in mode, identification methods, QR code, access card, PIN, enrollment, anonymous check-in, walk-in check-in, credential enrollment]
 ---
 
-In a nutshell, Access Control settings decide how members identify themselves at your door and whether the front desk can check in walk-ins who don't have an account.
+Access control settings cover two things: how members identify themselves at the door (QR code, access card, or PIN), and how strict your check-in flow is - whether staff can check in walk-ins or anonymous visitors, and whether payment is required. Identification and enrollment are set per club on the **Check-in & access control** page. The strictness of check-in is governed by your **booking policy**, not by a single toggle on this page.
 
 ## Overview
 
-Access Control lives in **Settings → Access Control Settings** and is configured **per club**. Each club has its own check-in mode, enrollment options, and accepted identification methods so that a multi-club organization can run a strict members-only flagship and a kiosk-style satellite at the same time.
+- **Identification methods (per club)** - choose which of QR code, access card, and PIN members can use, and let them enroll a method themselves.
+- **Check-in modes (via booking policy)** - decide whether staff can check in a contact without a booking, check in an anonymous visitor with no contact, and whether payment is enforced at booking or at check-in.
+- **Physical door hardware** - access grants and WebLock door sync are part of the native access control feature, documented separately.
 
-Key capabilities:
+If you're choosing how members get into your club, start with [Check-in models](/reference/check-in-models).
 
-- **Check-in Mode** — Strict (account required) or Flexible (allow anonymous walk-ins).
-- **Member enrollment** — Let members enroll an identification method (QR, card, PIN) themselves from the portal.
-- **Identification methods** — Choose which combinations are accepted at the door.
+<Note>
+There is no longer a single "Check-in mode" (Strict/Flexible) switch on the access control page. That legacy toggle was replaced by the booking-policy settings described below - **Allow walk-ins** and **Allow anonymous check-ins**.
+</Note>
 
-If you're picking how strict your check-in flow should be, read [Check-in Models](/reference/check-in-models) first.
+## Check-in modes (booking policy)
 
-## Per-club configuration
+How strict your door is comes from your [booking policy](/operations/booking-policies) (**Settings → Operations → Booking policies**). The relevant toggles:
 
-Open **Settings → Access Control Settings**. Each club appears as its own block. Changes for any club are batched and saved together via the floating **Save** alert at the bottom of the page.
+- **Allow walk-ins** - staff can check in an existing contact who has no booking. Off by default.
+- **Allow anonymous check-ins** - staff can check in a visitor with no contact at all. Independent of walk-in check-ins. Off by default.
+- **Allow anonymous bookings** - a booking can be created without selecting a contact. Off by default.
+- **Check-in required** - a booking is marked no-show if the member isn't checked in by end of day.
+- **Enforce payment** - **None**, **At booking**, or **At check-in**. This decides whether payment is collected before a check-in is recorded.
 
-## Check-in Mode
+A "strict" club leaves the anonymous and walk-in toggles off and requires bookings. A "flexible" club turns on walk-ins and, if it accepts true guests, anonymous check-ins.
 
-The **Check-in Mode** toggle has two states:
+### How anonymous check-ins interact with Enforce payment
 
-- **Strict** — A contact with a booking is required. Walk-ins without an account cannot be checked in.
-- **Flexible (Anonymous) Check-in** — Staff can check in walk-ins without a member account.
+**Allow anonymous check-ins** and **Enforce payment** work together:
 
-The in-app description reads: "When enabled, staff can check in walk-ins without a member account. When disabled, a contact with a booking is required."
+- **Anonymous off** - staff must pick a contact (with or without a booking, depending on the walk-in setting).
+- **Anonymous on + Enforce payment: None** - anyone can be checked in, including a visitor with no account. The check-in is recorded with no contact link.
+- **Anonymous on + Enforce payment: At check-in** - anonymous check-ins are still allowed, but only when the front desk also collects payment via an entrance method (external program or direct payment). A "no contact and no payment" check-in is rejected.
 
-### How Check-in Mode interacts with booking policies
-
-Check-in Mode and the **Enforce payment** setting (in your [Booking Policy](/operations/booking-policies)) work together:
-
-- **Strict + Enforce payment: None** - Members must have a contact and an active booking. Front desk records the check-in against the booking.
-- **Strict + Enforce payment: At check-in (or At booking with a balance)** - Same as above, plus the front desk must confirm an active membership, an external program, or collect direct payment before the check-in is recorded.
-- **Flexible + Enforce payment: None** - Anyone can be checked in, including guests without an account. The check-in is recorded with no contact link.
-- **Flexible + Enforce payment: At check-in** - Anonymous check-ins are still allowed, but only when the front desk also collects payment (membership, external program, or direct payment). A "no contact and no payment" check-in is rejected.
+<Note>
+Anonymous check-ins support only the **direct payment** and **external program** entrance methods. **Membership** entries are contact-scoped, so they can't back an anonymous check-in. Entrance methods are covered in [Check-in models](/reference/check-in-models).
+</Note>
 
 ## Anonymous check-ins in practice
 
-When **Check-in Mode = Flexible**, the front desk can record a check-in without picking a contact:
+When anonymous check-ins are allowed, the front desk can record a check-in without picking a contact:
 
-1. From the check-in flow, choose to record an anonymous check-in.
-2. Optionally select what they're entering for (class, area, instructor).
-3. If your booking policy enforces payment at check-in, collect a direct payment now.
+1. From the check-in flow, choose to record an anonymous check-in (a club must be selected).
+2. Optionally note what they're entering for (class, area, instructor).
+3. If your booking policy enforces payment at check-in, collect a direct payment or apply an external program now.
 4. Save.
 
 What gets recorded:
@@ -57,59 +60,73 @@ What gets recorded:
 What does **not** happen:
 
 - No membership usage is decremented (there's no member to attribute it to).
-- The check-in won't show up in any single member's history.
+- The check-in won't appear in any single member's history.
 
-Anonymous check-ins are best for guests, trial visitors, and one-off drop-ins. For repeat members, create a contact even if it's lightweight — that way you can track usage and follow up.
+Anonymous check-ins are best for guests, trial visitors, and one-off drop-ins. For repeat members, create a contact even if it's lightweight, so you can track usage and follow up.
 
-## Member enrollment
+## Member identification methods (per club)
 
-Turn on **enrollment** to let members register an identification method themselves from the member portal (instead of staff doing it manually).
+Open **Settings → Check-in & access control**. Each club appears as its own block, and changes across clubs are saved together with the floating save alert at the bottom.
 
-When enrollment is enabled, pick which methods you accept:
+Turn on **Access control** for a club to enable **credential enrollment** - letting members register an access card, NFC device, or PIN themselves for physical entry, instead of staff registering one for them. When it's on, choose the **Enabled identification methods**:
 
-- **QR Code** — Members enroll a QR code in the portal and scan it at the door.
-- **Access Card** — Members enroll a physical access card (NFC/RFID).
-- **PIN Code** — Members enroll a numeric PIN to type at the door.
+- **QR Code** - members enroll a QR code and scan it at the door.
+- **Access Card** - members enroll a physical access card (NFC/RFID).
+- **PIN Code** - members enroll a numeric PIN to type at the door.
 
-You can enable any combination. If a method is off, members can't enroll it from the portal — you (as staff) can still register one for them manually.
+All three are enabled by default; you can turn off any you don't accept. When a method is off, members can't enroll it themselves, though staff can still register one manually.
+
+At the door, 1Club identifies the member in this order: **PIN**, then **access card**, then **QR code**. A PIN is matched on the full 6-digit code, and a kiosk can accept just the last 4 digits as a shortcut.
+
+<Note>
+The **Check-in & access control** page also manages **access grants** and WebLock door-hardware sync - the native access control feature that drives physical locks. That side is documented separately; see [Access control settings](/settings/access-control-settings).
+</Note>
 
 ## Worked examples
 
-### Kiosk-style walk-in club
+### Kiosk-style walk-in studio
 
-You run a small studio with lots of trial visitors and want minimal friction at the door.
+A small studio with lots of trial visitors that wants minimal friction at the door.
 
-- **Check-in Mode** — Flexible
-- **Enrollment** — On, with QR Code enabled
-- Pair this with a [Booking Policy](/operations/booking-policies) that has **Enforce payment** set to **At check-in**, so the system still collects payment from anonymous walk-ins.
+- **Booking policy** - **Allow walk-ins** on, **Allow anonymous check-ins** on, **Enforce payment** set to **At check-in** so the system still collects from anonymous visitors.
+- **Identification** - **Access control** on with **QR Code** enabled, so returning members self-serve.
 
-### Strict members-only club
+### Strict members-only class gym
 
-You run a class-based gym where every member has an account and bookings are mandatory.
+A class-based gym where every member has an account and bookings are mandatory.
 
-- **Check-in Mode** — Strict
-- **Enrollment** — On, with all three identification methods enabled
-- Pair this with a [Booking Policy](/operations/booking-policies) that has **Enforce payment** set to **At booking** and **Check-in required** on.
+- **Booking policy** - **Allow walk-ins** and **Allow anonymous check-ins** off, **Check-in required** on, **Enforce payment** set to **At booking**.
+- **Identification** - **Access control** on with all three methods enabled.
+
+### Multi-club organization
+
+A flagship club can run a strict booking-based policy while a community-run satellite allows walk-ins. Scope different booking policies per club (see [Booking policies](/operations/booking-policies)), and set identification methods independently for each club on the access control page.
 
 ## Tips & best practices
 
-- **Match Check-in Mode to your front-desk culture** — If staff are used to handling walk-ins, Flexible saves them friction. If your model depends on bookings, Strict prevents accidental "free entries."
-- **Don't rely on anonymous check-ins for revenue tracking** — Anonymous rows aren't attributable. If you want to know which members visit most, get them to create a contact.
-- **Multi-club orgs: use different settings per club** — A flagship club might run Strict while a community-run satellite runs Flexible. Both are fine.
+- **Match your booking policy to your front-desk culture.** If staff routinely handle walk-ins, turn on **Allow walk-ins**. If your model depends on bookings, leave it off to prevent accidental free entries.
+- **Only allow anonymous check-ins if you truly accept accountless visitors.** They aren't attributable to any member, so revenue and attendance reporting won't tie back to a person.
+- **Collect payment on anonymous entries.** Pair **Allow anonymous check-ins** with **Enforce payment: At check-in** so drop-ins still pay.
+- **Set identification methods per club.** A flagship with turnstiles might use access cards, while a studio uses QR only.
 
 ## Troubleshooting
 
-**Issue**: I turned on Flexible but staff still can't check in walk-ins
-**Solution**: Confirm the booking policy that applies at this club doesn't have a check-in payment requirement that no entrance method satisfies. Anonymous + no payment is rejected when **Enforce payment** is set to **At check-in**.
+**Issue**: I turned on walk-ins but staff still can't check someone in without payment.
+**Cause / fix**: The booking policy that applies at this club has **Enforce payment** set to **At check-in**, so an entrance method (external program or direct payment) is required. Collect payment, or set Enforce payment to **None**.
 
-**Issue**: Members can't enroll their QR code from the portal
-**Solution**: Check that **Enrollment** is on and **QR Code** is in the list of identification methods for that club.
+**Issue**: Members can't enroll their QR code themselves.
+**Cause / fix**: Confirm **Access control** is on for that club and **QR Code** is in the enabled identification methods.
 
-**Issue**: A check-in shows up without a member
-**Solution**: That's an anonymous check-in. They only appear when **Check-in Mode = Flexible**. If you didn't expect them, switch the club back to Strict.
+**Issue**: A check-in shows up with no member attached.
+**Cause / fix**: That's an anonymous check-in. They only appear when **Allow anonymous check-ins** is on for the applicable booking policy. Turn it off if you didn't intend to accept them.
+
+**Issue**: I can't find the old "Check-in mode" toggle.
+**Cause / fix**: It was removed. Use the booking-policy toggles **Allow walk-ins** and **Allow anonymous check-ins** instead.
 
 ## Related
 
-- [Check-in Models](/reference/check-in-models) — Pick how strict your check-in flow should be.
-- [Booking Policies](/operations/booking-policies) — Payment and check-in enforcement at booking time and door time.
-- [Attendance](/members/attendance) — Review and manage check-in records.
+- [Check-in models](/reference/check-in-models) - pick how members get into your club, and how entrance methods work.
+- [Booking policies](/operations/booking-policies) - where check-in modes, walk-ins, anonymous check-ins, and payment enforcement are configured.
+- [External programs](/settings/external-programs) - partner offerings and corporate wellness benefits used as an entrance method.
+- [Access control settings](/settings/access-control-settings) - the native access control feature (access grants, WebLock door hardware).
+- [Attendance](/members/attendance) - review and manage check-in records.

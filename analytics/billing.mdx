@@ -1,25 +1,37 @@
 ---
 title: Billing analytics
-description: Revenue, payments, and average transaction value, broken down by source over time.
+description: Revenue, payments, outstanding balances, and average transaction value, broken down by source, revenue account, and plan over time.
+keywords: [revenue analytics, revenue dashboard, payments report, invoices dashboard, revenue by plan, revenue account, collection rate, outstanding, CSV export]
 ---
 
-The **Billing dashboard** is the financial snapshot of your organization. It shows what you billed, what you collected, and what's still outstanding, broken down by what the revenue came from (bookings, memberships, or other).
+The **Revenue** category in the **Analytics** hub is the financial snapshot of your organization. It shows what you billed, what you collected, and what is still outstanding, broken down by where the revenue came from (bookings, memberships, or other), by revenue account, and by plan.
 
-For day-to-day invoice and payment work, use [Billing > Invoices](/billing/invoices) or [Billing > Payments](/billing/payments). This dashboard is for the higher-level "how are we doing this month?" view.
+For day-to-day invoice and payment work, use [Revenue > Invoices](/billing/invoices) or [Revenue > Payments](/billing/payments). This category is for the higher-level "how are we doing this month?" view. In the admin the category is labelled **Revenue** (the docs URL keeps `/analytics/billing`).
 
-## What you see
+## Overview
 
-### Filters
+Open **Analytics** and pick the **Revenue** category to reach four reports:
 
-- **Date range** - Defaults to the last 30 days. Required - the dashboard doesn't load until both start and end dates are set.
+- **Revenue dashboard** - KPI cards plus a stacked revenue-versus-paid trend by source.
+- **Revenue report** - A month-by-month matrix with **By source**, **By account**, and **By plan** tabs.
+- **Payments report** - Billed, paid, and unpaid amounts with a payments-by-day chart.
+- **Invoices dashboard** - Invoice counts and amounts by status, with collection rate and payment methods.
+
+Every report shares the same filter bar and exports to CSV where an **Export** button is shown.
+
+## Filters
+
+- **Date range** - Sets the reporting period. Defaults to the last 30 days and is required; the report does not load until both start and end dates are set.
 - **Club** - Scope the numbers to a single gym, or leave empty for the whole organization.
 
-### KPI cards
+## Revenue dashboard
 
-Three cards across the top:
+The **Revenue dashboard** (Analytics > Revenue > **Revenue**) is the headline view.
+
+KPI cards, three across the top:
 
 - **Total revenue** - Sum of all invoices issued in the date range (gross, before payment).
-- **Total payments** - Sum of all payments received in the date range. Compare with total revenue to see your collection rate.
+- **Total payments** - Sum of all payments received in the date range. Compare with total revenue to gauge your collection rate.
 - **Average transaction value** - Mean amount per transaction across the period.
 
 ### Revenue trends chart
@@ -28,11 +40,9 @@ A stacked bar chart of revenue versus paid amounts, split into three sources:
 
 - **Bookings** (blue) - Class bookings, area bookings, drop-ins.
 - **Memberships** (green) - Plan subscriptions and one-off membership purchases.
-- **Other** (yellow) - Everything that isn't a booking or membership (POS, retail, manual invoices, etc.).
+- **Other** (yellow) - Everything that is not a booking or membership (POS, retail, manual invoices, and so on).
 
-Within each source, the **paid** portion is rendered solid and the **unpaid** portion is rendered semi-transparent on top, so a tall semi-transparent bar means you billed but didn't collect.
-
-The time bucket adapts to your date range: daily for short ranges, weekly for medium ranges, monthly for long ones. The grouping is computed client-side via the shared time-series helper.
+Within each source, the **paid** portion is rendered solid and the **unpaid** portion is rendered semi-transparent on top, so a tall translucent bar means you billed but did not collect. The time bucket adapts to your date range: daily for short ranges, weekly for medium ranges, monthly for long ones.
 
 ## What "revenue" means here
 
@@ -40,33 +50,88 @@ The time bucket adapts to your date range: daily for short ranges, weekly for me
 - A line item appears in **paid** when a payment has been applied to it.
 - The difference is your **outstanding** balance for that period.
 
-If a booking was made in January but paid in March, it counts toward January's revenue (it's invoice-date based) and March's payments (it's payment-date based). For most dashboards this is what you want; if you need strict cash accounting, use the [Payments report](/billing/payments) instead.
+If a booking was made in January but paid in March, it counts toward January's revenue (it is invoice-date based) and March's payments (it is payment-date based). For most reporting this is what you want; if you need strict cash accounting, lean on the **Payments report** below, which is payment-date based.
 
-## Detail reports
+## Revenue report
 
-The Billing analytics category has five pages:
+The **Revenue report** (Analytics > Revenue > **Revenue Report**) is a month-by-month matrix with three tabs. Click any month cell to drill down into the transactions behind that figure.
 
-- **Dashboard** (this page).
-- **Revenue report** - Per-line-item revenue breakdown with filters for source and category.
-- **Transactions report** - Every transaction (charge, refund, adjustment) with status and gateway info.
-- **Payments report** - Payments grouped by method, with success rates and gateway fees.
-- **Invoices dashboard** - Invoice-level view: issued, paid, overdue, with collection timing.
+- **By source** - Revenue grouped by **Revenue Source** (bookings, memberships, other).
+- **By account** - Revenue grouped by **Revenue Account**, showing each account's name and code. Use this for bookkeeping and for mapping revenue to your chart of accounts.
+- **By plan** - Revenue grouped by **Plan**, with each plan's billing frequency shown. Use this to see which membership plans drive the most revenue.
 
-## Common questions
+The **Export** button downloads the tab you are viewing: the By source tab exports the revenue report, By account exports the transactions (revenue-account) report, and By plan exports the revenue-by-plan report.
 
-**Why is total payments lower than total revenue?** Either you have outstanding invoices in the period, or some invoices were issued in this period but paid before it. Look at the unpaid (translucent) portions of the bars to see where the gap is.
+## Payments report
 
-**Why is a number zero when I know we transacted?** Check the date range first - it defaults to 30 days, so anything before then is excluded. Then check the club filter.
+The **Payments report** (Analytics > Revenue > **Payments Report**) is payment-date based and focuses on collection.
 
-**Does this include refunds?** Refunds are netted into the payment totals but not into the revenue total. So a $100 invoice followed by a $50 refund counts as $100 revenue and $50 net payment.
+KPI cards:
+
+- **Total revenue** - Amount billed in the period.
+- **Paid** - Payments collected.
+- **Unpaid** - The gap between billed and paid.
+
+The **Payments by day** chart stacks paid (green) and unpaid (red) amounts per day, so you can see collection cadence and spot days where billing outran collection.
+
+## Invoices dashboard
+
+The **Invoices dashboard** (Analytics > Revenue > **Invoices Dashboard**) is the invoice-level view.
+
+Count cards: **Total invoices**, **Paid invoices**, **Pending invoices**, **Overdue invoices**.
+
+Amount cards: **Total invoice amount**, **Paid amount**, **Pending amount**, and **Collection rate** (paid as a percentage of billed).
+
+Charts:
+
+- **Invoice trends** - Invoice count and amount over time.
+- **Payment methods** - A pie of amount collected per payment method.
+- **Invoice status breakdown** - Paid, pending, overdue, and cancelled invoice counts.
+
+Use collection rate and the overdue count together to decide when to run reminders or a [bill run](/billing/bill-runs).
+
+## Exporting reports
+
+Reports with an **Export** button download a CSV of what is on screen, honoring your filters. The **Revenue report** exports per tab (source, revenue account, or plan). For outstanding balances per member, the **Balance report** (under the **Members** analytics category) exports each member's due and credit amounts. For bundled accounting exports such as the QuickBooks bundle, use [Settings > Export](/settings/export).
+
+## Worked examples
+
+**Racket sports - membership versus court revenue.** A tennis and padel club opens the **Revenue dashboard** and sees the Memberships (green) bars growing while Bookings (blue) stay flat. They switch to the **Revenue report** By plan tab to confirm which membership tier is driving the growth, then export it for the owner.
+
+**Martial arts - collecting on overdue invoices.** A muay-thai gym checks the **Invoices dashboard**, sees a rising **Overdue invoices** count and a collection rate under 90%, and kicks off a [bill run](/billing/bill-runs) to chase the overdue balances.
+
+**Pilates / Yoga - reconciling the month.** A reformer studio uses the **Revenue report** By account tab to map class and retail revenue to the right revenue accounts, drills into a month cell to verify a large figure, and exports the CSV for their bookkeeper.
+
+**Gym / Fitness - watching cash collection.** A large fitness club uses the **Payments report** to track paid versus unpaid by day across the month, catching a stretch where billed amounts spiked (annual renewals) but collection lagged, then follows up on the unpaid invoices.
+
+**Climbing - is the intro offer paying off?** A climbing gym compares the **Revenue dashboard** Other (yellow) source against the trend, confirming that day-pass and gear revenue rose alongside the promotion rather than cannibalizing memberships.
+
+## Tips & best practices
+
+- Set the **Date range** before reading any number. Reports default to 30 days, so a surprising "zero" usually means the period or club filter is excluding data.
+- Use the **Revenue dashboard** for the trend and the **Revenue report** for exact monthly figures; drill into a cell whenever a number looks off.
+- Reconcile the chart of accounts with the **By account** tab monthly, so exports to your accounting system are already mapped correctly.
+- When you need strict cash accounting, read the **Payments report** (payment-date based) rather than the revenue figures (invoice-date based).
+- Pair the **Invoices dashboard** collection rate with the **Balance report** to see both the aggregate and the per-member outstanding picture.
+
+## Troubleshooting
+
+- **Total payments is lower than total revenue.** You have outstanding invoices in the period, or some invoices were issued in this period but paid earlier. Look at the translucent (unpaid) portions of the revenue trend bars to find the gap.
+- **A number is zero when you know you transacted.** Check the date range first (it defaults to 30 days), then the club filter.
+- **Refunds seem to change the totals.** Refunds net into payment totals but not into the revenue total, so a $100 invoice followed by a $50 refund shows as $100 revenue and $50 net payment.
+- **Revenue by account has an "unassigned" or default row.** Line items without a mapped revenue account fall into the default account. Map them on the plan, product, or pricing rule so future revenue lands in the right account.
+- **The Export button is disabled.** There are no rows for the current filters. Widen the date range or clear a filter, then export.
 
 ## Who can see this
 
-Billing analytics is part of the analytics module, not the billing module. The Manager role has analytics manage at club scope; Admin sees everything. Front desk and Instructor have only own-scope analytics so they don't see the billing dashboard. See [Roles and permissions](/reference/roles-permissions).
+Revenue analytics is part of the analytics module, gated on the `analytics.read.club` permission (broader analytics permissions satisfy it through the permission hierarchy). Roles that lack club-scoped analytics see only their own-scope data and will not see these reports. See [Roles and permissions](/reference/roles-permissions).
 
 ## Related
 
-- [Billing > Invoices](/billing/invoices) - Day-to-day invoice management.
-- [Billing > Payments](/billing/payments) - Individual payments and their statuses.
+- [Operations analytics](/analytics/operations) - Bookings, classes, attendance, and instructor reports.
+- [Revenue > Invoices](/billing/invoices) - Day-to-day invoice management.
+- [Revenue > Payments](/billing/payments) - Individual payments and their statuses.
+- [Revenue > Plans](/billing/plans) - Membership plans and their revenue accounts.
+- [Revenue > Bill runs](/billing/bill-runs) - Batch billing and collection.
 - [Settings > Export](/settings/export) - Pull invoices, payments, or the QuickBooks bundle as CSV.
 - [Analytics overview](/analytics/overview) - Other reports.

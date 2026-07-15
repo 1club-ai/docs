@@ -1,54 +1,159 @@
 ---
 title: Reviews
-description: Moderate member-submitted reviews and Google reviews from one list, toggle public visibility, mark trusted ones verified.
+description: Moderate member and Google reviews in one list, toggle public visibility, mark trusted ones verified, and track review-request conversion to Google.
+keywords:
+  - reviews
+  - Google reviews
+  - review requests
+  - moderation
+  - verified reviews
+  - ratings
 ---
 
-The **Reviews** tab under **Content** (at `/content/reviews`) lists every review attached to your organization: those submitted by members through 1Club and any reviews synced from your Google Business Profile. You moderate them here and decide which ones appear in the website's **Reviews** section.
+**Reviews** lists every review attached to your organization: those submitted by members through 1Club and reviews synced from your clubs' Google listings. You moderate them here and decide which ones appear in the website's **Reviews** section. In the admin it lives under **Marketing > Reviews** (route `/marketing/reviews`).
+
+## Overview
+
+- **One list for both sources** - Member ("1club") reviews and Google reviews sit in the same grid.
+- **Moderation** - Toggle each review public or private, mark it verified or unverified, or delete it.
+- **Stats at a glance** - Total reviews, average rating, recent reviews, and verified count, plus review-request conversion stats when you run them.
+- **Filtering and search** - Narrow by club, instructor, rating, source, or contact, and search review content.
+- **Google sync** - Google reviews flow in automatically for any club that has a Google place linked.
+- **Website rendering** - Public reviews feed the **Reviews** section of your website.
 
 ## What the page shows
 
-The page leads with four stat cards: total reviews, average rating out of 5, recent reviews, and verified reviews. If your organization has been running external review prompts (asking happy members to post on Google), three extra cards appear: how many prompts went out, how many were clicked, and the conversion rate. A footnote next to that block reads "Tracks members who clicked through to Google. Whether they actually post depends on their Google account."
+The page opens with stat cards followed by a data grid.
 
-Below the stats is a data grid with one row per review. The columns are:
+### Stat cards
 
-- **Author** - the member's name and email for 1Club reviews, or the public reviewer's name and avatar for Google reviews.
-- **Club** - which gym the review is attached to. Some reviews also tag an area.
-- **Instructor** - if the review was about a specific instructor.
-- **Content** - the title and a two-line clamp of the comment body.
-- **Rating** - 1 to 5 stars.
-- **Source** - **1club** or **Google**.
-- **Verified** - whether you have manually marked the review as verified.
-- **Public** - whether the review is visible on the public site.
-- **Published at** - the publish or creation date.
+Four cards always show:
+
+- **Total Reviews** - Count of all reviews for the current filter.
+- **Average Rating** - Mean rating shown as `X/5`.
+- **Recent Reviews** - Reviews created in the last 30 days.
+- **Verified Reviews** - How many you have marked verified.
+
+If you have been running review-request automations that point happy members to Google, three more cards appear:
+
+- **Google CTA shown** - How many members were shown the "leave a Google review" prompt.
+- **Clicked Google CTA** - How many clicked through to Google.
+- **Google CTA conversion** - Click-through rate as a percentage.
+
+A footnote under these reads: "Tracks members who clicked through to Google. Whether they actually post depends on their Google account."
+
+### Review grid columns
+
+- **Author** - The member's name and email for 1club reviews, or the reviewer's public name and avatar for Google reviews.
+- **Club** - Which gym the review is attached to; some reviews also show an area underneath.
+- **Instructor** - The instructor the review is about, if any.
+- **Content** - The review title with a two-line clamp of the comment body.
+- **Rating** - 1 to 5 stars, with the numeric value alongside.
+- **Source** - A **1club** or **Google** chip.
+- **Verified** - A chip showing **Verified** or **Unverified**.
+- **Public** - A chip showing **Public** or **Private**.
+- **Published At** - The publish date, falling back to the creation date.
 
 ## Filtering and search
 
-The filter row above the grid lets you narrow by club, instructor, rating, source, and contact. The free-text search is keyed on review content. Filters and search persist in the URL so you can share a filtered view.
+Open the filters drawer above the grid to narrow the list by:
+
+- **Club** - A single club (defaults to all your accessible clubs).
+- **Instructor** - Reviews about a specific instructor.
+- **Rating** - Exactly 5, 4, 3, 2, or 1 stars.
+- **Source** - **1club** or **Google**.
+- **Contact** - Reviews tied to a specific member (via the contact picker).
+
+The grid's search box matches on review content. Filters and search are written to the URL, so a filtered view can be bookmarked or shared.
 
 ## Moderating a review
 
 Each row's action menu carries three options:
 
-- **Make public / Make private** toggles the review's visibility on the public website. Private reviews stay in the list but are excluded from the **Reviews** section.
-- **Verify / Unverify** toggles the verified flag. Verified reviews carry a badge on the public site so visitors can tell which reviews come from confirmed members.
-- **Delete** removes the review permanently after a confirmation dialog.
+- **Make Public / Make Private** - Toggles whether the review appears on your public website. Private reviews stay in the list but are excluded from the website's **Reviews** section.
+- **Verify / Unverify** - Toggles the verified flag. Verified reviews carry a badge on the public site so visitors can tell which come from confirmed members.
+- **Delete** - Removes the review after a confirmation dialog. This is a soft delete.
 
-Public, private, and verified states each show as a chip in the grid so you can scan the moderation status at a glance.
+Public, private, and verified states each show as a chip in the grid, so you can scan moderation status without opening anything.
 
 ## Where reviews come from
 
-**1club reviews** are submitted by members, typically through the member portal or post-booking prompts. They are tied to a user account, so the author column shows the member's profile.
+### 1club reviews
 
-**Google reviews** sync in from your Google Business Profile when the [Online health](/marketing/business-audit) integration is connected. They keep their original author name, image, and rating; you cannot edit the content, but you can toggle public/verified and delete.
+Members submit these through the member portal or post-booking prompts. They are tied to a user account, so the **Author** column shows the member's name and email. New member reviews are yours to moderate before they surface publicly.
 
-The website builder's **Reviews** section can render either source as cards or a carousel.
+### Google reviews
 
-## Permissions
+Google reviews sync in automatically for any club that has a Google place linked (the same place you pick when setting up your listing during onboarding or in the website builder). The sync pulls the most recent Google reviews for the club, keeps the aggregate Google rating and review count on the club, and imports each review with its original author name, avatar, rating, and text.
 
-Anyone with review read access can open the page. Moderating actions (toggle public, toggle verified, delete) require review manage permission.
+Google reviews arrive public and verified by default. You cannot edit their content, but you can toggle their public and verified state or delete them. Because the content comes from Google, the **Author** avatar is the reviewer's Google photo rather than a 1Club profile.
+
+<Note>
+  Google reviews are read-only in one direction: 1Club imports them, it does not post replies back to Google. Reviews sync when a club's Google place is set or refreshed, not on a manual button in this page. To connect a club to Google, see [Integrations](/settings/integrations/google-business).
+</Note>
+
+## Review requests (automation)
+
+The way you actively collect more reviews is through [Automations](/marketing/automations). A **review request** step sends a member a link to leave a review after a trigger - most commonly after they check in to a class (`booking.checked_in`). You configure:
+
+- **Channels** - Email, SMS, or both.
+- **Instructor voice** (optional) - Include an AI-personalized chat bubble written in a **casual**, **professional**, or **motivational** style, and optionally send it from the instructor's own verified email. The message adapts to how many classes the member has attended (first-timer, getting started, regular, or loyal veteran).
+- **Frequency limit** (optional) - Skip the step if the member has already had N requests in a rolling window, so you never over-ask.
+- **Google conversion** (optional) - After a member leaves a positive internal review, show them a call-to-action to post the same review on Google. This only fires when their rating meets a threshold you set (1, 3, 4, or 5 stars; default 4), so only your happiest members are nudged toward a public Google review.
+
+The Google conversion prompts are exactly what the **Google CTA shown / Clicked / conversion** stat cards on this page count.
+
+## Worked examples
+
+### Padel club funneling five-star players to Google
+
+A padel club adds a review-request automation triggered on check-in, email plus SMS, with Google conversion enabled at a threshold of 5. Only members who leave a 5-star internal review see the Google CTA. Over a month, the **Google CTA shown** and **Clicked Google CTA** cards show how many were nudged and how many followed through.
+
+### Jiu-jitsu gym with a personal coach voice
+
+A jiu-jitsu gym enables the instructor voice in **motivational** style and sends from the coach's email. A loyal veteran who just finished their 30th class gets a warm, personal ask that references their dedication, which lands better than a generic template.
+
+### Yoga studio moderating a mixed feed
+
+A yoga studio syncs Google reviews and collects 1club reviews. Staff filter **Source = Google** to spot-check imported reviews, mark the most representative ones **Verified**, and set a couple of off-topic ones to **Private** so they stay out of the website's **Reviews** section.
+
+### Climbing gym curating the website carousel
+
+A climbing gym wants only glowing, on-brand reviews on its site. They filter by **Rating = 5**, verify the best ones, and make anything lukewarm private. The website's **Reviews** section then renders just the curated, public set.
+
+## Tips & best practices
+
+- **Verify before you feature** - Mark the reviews you trust as verified so the public badge signals authenticity.
+- **Use the rating threshold** - Set the Google conversion threshold to 4 or 5 so you only send public-review nudges to satisfied members.
+- **Set a frequency limit** - Prevent review-request fatigue by capping how often a member can be asked.
+- **Curate, do not delete** - Prefer **Make Private** over **Delete** for reviews you simply do not want on the site; deletion is permanent.
+- **Watch the conversion cards** - A high "shown" count but low "clicked" count suggests the message or channel needs tuning.
+
+## Troubleshooting
+
+**Issue**: Google reviews are not appearing in the list.
+
+**Solution**: The club has no Google place linked, or it has not synced yet. Connect the club to its Google listing (during onboarding or in the website builder / club settings) so the sync can run. See [Integrations](/settings/integrations/google-business).
+
+**Issue**: A review is missing from the website but shows in the list.
+
+**Solution**: It is set to **Private**. Open its action menu and choose **Make Public**. Private reviews stay in the list but are excluded from the website's **Reviews** section.
+
+**Issue**: The Google conversion stat cards are not showing.
+
+**Solution**: They only appear once at least one review-request prompt has been shown. Set up a review-request automation with Google conversion enabled and let it run.
+
+**Issue**: The Google CTA shows a high "shown" count but few clicks.
+
+**Solution**: Try adding SMS as a channel, enabling the instructor voice, or adjusting timing in the automation. Whether a member actually posts after clicking depends on their Google account and is outside 1Club's control.
+
+**Issue**: I cannot moderate reviews, only view them.
+
+**Solution**: Moderation actions (make public, verify, delete) require the `marketing.manage.club` permission. Viewing the list and stats needs `marketing.read.club`. Ask an admin to grant the manage permission.
 
 ## Related
 
-- [Website builder](/content/website) - The **Reviews** section is what renders these on the public site.
-- [Online health](/marketing/business-audit) - Connect Google Business Profile so Google reviews sync into this list.
-- [Automations](/marketing/automations) - Trigger review-request prompts to members after a positive experience.
+- [Website builder](/content/website) - The **Reviews** section renders your public reviews on the site.
+- [Automations](/marketing/automations) - Build the review-request step that collects reviews and drives Google conversions.
+- [Business audit](/marketing/business-audit) - The AI visibility report analyzes your public review sentiment.
+- [Integrations](/settings/integrations/google-business) - Connect a club to its Google listing so Google reviews sync in.

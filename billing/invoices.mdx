@@ -1,52 +1,111 @@
 ---
 title: Invoices
-description: Create, send, charge, and track invoice documents that group a contact's outstanding transactions.
+description: Create, send, download, and settle invoice documents that group a contact's outstanding transactions under one number, due date, and PDF.
+keywords: [invoice, invoice number, due date, overdue, PDF, mark paid, payment link, charge, batch delete, receivable]
 ---
 
-An invoice in 1Club is a receivable document that groups one or more [transactions](/billing/transactions) under a single number, with a due date, line items, and an issue PDF. It's the artifact you send to a member or a corporate account when you want a formal record of what's owed.
+An invoice in 1Club is a receivable document that groups one or more [transactions](/billing/transactions) under a single number, with an issue date, a due date, line items, and a downloadable PDF. It is the artifact you send to a member or a corporate account when you want a formal record of what is owed.
 
-Invoices don't move money on their own. Money moves through [payments](/billing/payments), which the invoice flow can trigger but doesn't replace.
+Invoices do not move money on their own. Money moves through [payments](/billing/payments), which the invoice flow can trigger but does not replace. Deleting or editing an invoice never touches a settled payment.
+
+## Overview
+
+From **Revenue > Invoices** you can:
+
+- Create invoices manually, one line at a time, or in bulk with a [bill run](/billing/bill-runs).
+- Track every invoice across the **All**, **Pending**, **Paid**, and **Overdue** tabs, with server-side search and per-tab counts.
+- Collect on an invoice by recording a payment or emailing a hosted Stripe payment link.
+- Download a branded PDF for any invoice.
+- Edit invoice fields and line items, or delete an invoice and revert its transactions so they can be re-invoiced.
+- Multi-select rows for batch delete.
+
+Invoice numbers, currency, and the PDF layout all follow your organization's billing settings, so every document you send looks consistent.
 
 ## How invoices get created
 
 Three paths:
 
-1. **Manual single invoice.** Open a transaction (or a contact) and use **Add invoice**. The transaction is wrapped in a one-line invoice and marked `isInvoiced = true`.
-2. **Manual full-page create.** From **Billing > Invoices** click **Add**. Pick a contact and add line items.
-3. **Bill run.** A [bill run](/billing/bill-runs) sweeps every billable transaction in a period and groups them by contact. This is the right tool when you have many transactions to invoice at once.
+1. **Manual single invoice.** Open a [transaction](/billing/transactions) and use its invoice action. The transaction is wrapped in a one-line invoice and marked `isInvoiced = true` so a bill run won't sweep it again.
+2. **Manual full-page create.** From **Revenue > Invoices** click **Add**, pick a contact, optionally attach a billing account, and add line items.
+3. **Bill run.** A [bill run](/billing/bill-runs) sweeps every billable transaction in a period and groups it into invoices by contact. This is the right tool when you have many transactions to invoice at once.
 
-A new invoice gets a generated `invoiceNumber` from your invoice template, a `currency` inherited from the organization, and a 30-day due date when created by a bill run. Manual invoices use the date and due date you enter.
+A new invoice gets a generated `invoiceNumber` from your organization's numbering template, a `currency` inherited from the organization, and (for bill runs) a due date 30 days out. Manual invoices use the invoice date and due date you enter.
+
+### Creating a manual invoice
+
+1. Go to **Revenue > Invoices** and click **Add**.
+2. Choose the **Contact** the invoice is billed to.
+3. Optionally choose a billing **Account** (a household or company). The account must belong to your organization, and the contact you picked must be the account's primary contact or one of its members, otherwise the save is rejected.
+4. Set the **Invoice date** and **Due date**.
+5. Add **Line items**: each needs a description, quantity, and unit price. The total is the sum of the line items unless you enter an amount directly.
+6. Save. The invoice number is generated automatically.
+
+When a line item references a transaction, saving the invoice flips that transaction to `isInvoiced = true` and recalculates the invoice status from the linked transactions.
 
 ## The invoices grid
 
-**Billing > Invoices** shows every invoice for your organization with tabs **All**, **Pending**, **Paid**, **Overdue**. Each row carries the invoice number, contact, account (when invoices are billed to a household or company), invoice date, due date, total amount, the bill run ID if any, and status.
+**Revenue > Invoices** shows every invoice for your organization with tabs **All**, **Pending**, **Paid**, and **Overdue**. Each row carries the invoice number, contact, billing account (when the invoice is billed to a household or company), invoice date, due date, total amount, the bill run ID if any, and status. Search matches invoice number, contact name, and contact email.
 
 Row actions:
 
-- **View** the invoice details.
-- **Pay** opens the payment dialog (only for `pending` invoices).
+- **View** opens the invoice details.
+- **Pay** opens the payment dialog (shown only for `pending` invoices).
 - **Delete** removes the invoice, deletes its line items, and reverts every linked transaction back to `isInvoiced = false` so the obligation can be re-invoiced.
 
-Multi-select supports batch delete, which uses the same "revert linked transactions" behavior.
+Select multiple rows to reveal the **Delete** bulk action, which uses the same revert-linked-transactions behavior for every selected invoice.
 
 ## Invoice details
 
 The details page shows:
 
-- **Invoice details** card with invoice and due dates, total, status, and the bill run reference when present.
+- **Invoice details** card with the invoice date, due date, total, status, and the bill run reference when present.
 - **Account** and **Contact** cards on the right.
-- **Line items** with each item's description, quantity, unit price, total, and a link to the source transaction.
+- **Line items**, each with description, quantity, unit price, total, and a link to the source transaction.
 - **Billing information** listing related bookings and memberships, each linking to the underlying record.
 - **Amount breakdown** with subtotal, tax, and total.
-- **Payment information** when the invoice has been associated with a Stripe payment, including the payment ID and a **Refresh payment status** button that re-queries Stripe and updates the invoice if the state has changed.
+- **Payment information** when the invoice has been associated with a Stripe payment, including the payment ID, a **View in Stripe Connect** link, and a **Refresh payment status** button that re-queries Stripe and updates the invoice if the state has changed.
 
-The header has these actions, conditional on status:
+The header carries these actions, conditional on status:
 
 - **Add payment** (pending only): record a payment against the invoice. Uses the same dialog as the [Payments](/billing/payments) flow.
-- **Send**: open the **Send payment link** dialog, which emails the contact a hosted Stripe Payment Element scoped to this invoice.
-- **Download**: fetch a PDF.
+- **Send** (any status except paid or cancelled): open the **Send payment link** dialog, which emails the contact a hosted Stripe Payment Element scoped to this invoice.
+- **Download**: fetch the invoice PDF.
 - **Edit**: change invoice fields or line items.
-- **Delete**: same as the grid action.
+- **Delete**: same behavior as the grid action.
+
+## Invoice operations reference
+
+| Operation | Where | What it does |
+|-----------|-------|--------------|
+| **Add payment** | Invoice header / grid **Pay** | Records a payment (cash, transfer, terminal, or Stripe) against the invoice's transactions and recalculates status. |
+| **Send payment link** | Invoice header **Send** | Emails the contact a hosted Stripe Payment Element scoped to the invoice. |
+| **Download** | Invoice header **Download** | Streams a branded PDF named `invoice-<number>.pdf`. |
+| **Charge stored card** | API (`POST /v1/invoices/:id/charge`) | Charges a saved Stripe payment method for the invoice's outstanding balance. Not a button on the invoice page. |
+| **Mark paid** | API / data import | Flags the invoice and its transactions `paid` and confirms pending bookings, without recording a Stripe payment. |
+| **Delete / batch delete** | Grid and header | Removes the invoice(s) and reverts linked transactions to billable. |
+
+### Charging a stored payment method
+
+There is no "Charge stored card" button on the invoice details page. In the admin UI you collect manually with **Add payment** (record what you took outside Stripe) or **Send** (email a payment link). Charging a saved card directly is available programmatically through the charge endpoint and is what the automated membership renewal engine uses under the hood - see [Bill runs](/billing/bill-runs).
+
+When a stored card is charged, the amount is capped to the sum of the invoice's unpaid, non-void line items, not the raw invoice total. So if a future-period line was voided (for example after a membership pause), the charge collects only what is genuinely outstanding. On success, the linked transactions flip to `paid`, any pending bookings on them become `confirmed`, and the invoice's Stripe integration data is updated.
+
+### Marking an invoice paid
+
+**Mark paid** is a shortcut that sets the invoice to `paid`, flips all its linked transactions to `paid`, and promotes any `pending` bookings on those transactions to `confirmed`. It does not create a Stripe charge or a payment record, so use it only for invoices already settled outside 1Club (for example historical invoices brought in through data import). For day-to-day collection, prefer **Add payment**, which writes a payment row you can reconcile.
+
+### Downloading the PDF
+
+**Download** renders the invoice as a PDF on demand. The document includes your organization's logo and address, the bill-to party (the billing account's legal name and VAT number when an account is attached, otherwise the contact), the invoice number and status, the line items with a tax column, the subtotal/tax/total breakdown, any notes, and a payment link when one exists. Nothing is stored; the PDF is generated fresh each time from the current invoice data.
+
+### Invoice numbering
+
+Invoice numbers are generated from your organization's template, set at **Settings > Billing** in the **Invoice Numbering Template** field. The default template is `INV-[id]`.
+
+- `[id]` inserts the per-organization sequential invoice counter (1, 2, 3, ...). This is the placeholder the UI documents.
+- `[year]`, `[month]`, and `[orgId]` are also supported, so a template like `INV-[year]-[id]` produces `INV-2026-42`.
+
+The counter is per organization and assigned inside a locking transaction, with automatic retry if two invoices race for the same number, so numbers stay unique and gapless within your organization.
 
 ## Invoice statuses
 
@@ -56,26 +115,57 @@ Invoice status is normally derived from the linked transactions:
 |---------------------|----------------|
 | All `paid` | `paid` |
 | Some `paid` or `partially_paid` | `partially_paid` |
-| Otherwise, due date in the future | `pending` |
+| Otherwise, due date in the future (or none) | `pending` |
 | Otherwise, due date in the past | `overdue` |
 
-`cancelled` is sticky - once an invoice is cancelled it stays that way. Some webhook paths set `failed` directly when a Stripe charge fails, so you may see `failed` transiently before the next status recalculation.
+Transactions in the `overdue` state count as pending for this derivation. `cancelled` is sticky - once an invoice is cancelled it stays that way. Some Stripe webhook paths set `failed` directly when a charge fails, so you may briefly see `failed` before the next status recalculation.
+
+### Overdue and due-soon views
+
+Two dedicated lookups back reminders and dashboards:
+
+- **Overdue** returns invoices whose stored status is still `pending` and whose due date is in the past.
+- **Due soon** returns `pending` invoices whose due date falls within the next N days (7 by default).
+
+Both are stricter than the grid's **Overdue** tab, which simply filters on the stored `overdue` status. An invoice only lands in the grid's Overdue tab after status recalculation flips it; the overdue lookup catches pending invoices the moment their due date passes.
 
 ## Collecting on an invoice
 
 You have two options from the invoice detail page:
 
-- **Send a payment link** to the contact. They pay through a hosted Stripe Payment Element. On success, the linked transactions flip to `paid`, any pending bookings on those transactions become `confirmed`, and the invoice integrations JSON is updated with the Stripe payment ID.
+- **Send a payment link** to the contact. They pay through a hosted Stripe Payment Element. On success, the linked transactions flip to `paid`, any pending bookings on those transactions become `confirmed`, and the invoice's Stripe integration data is updated with the payment ID.
 - **Add payment** to record what you collected outside Stripe (cash, bank transfer, manual card terminal). This creates a payment row, links it to the invoice's transactions, and updates status.
 
-There's no "Charge stored card" action on the invoice details page. Charges against a saved payment method happen at the transaction level - go to [Transactions](/billing/transactions) and use **Batch charge** there, or use the per-transaction action from the Transactions tab on the booking.
+The invoice's totals are derived from its line items, which point at transaction IDs. Editing the underlying transaction prices after issuing the invoice will not retroactively change the invoice total.
 
-The invoice's totals are derived from its line items, which point at transaction IDs - editing the underlying transaction prices after issuing the invoice will not retroactively change the invoice total.
+## Worked examples
 
-## Known sharp edges
+**Padel club - corporate account, one document.** A local employer books a weekly padel court for its staff league. You attach every court transaction to the company's billing **Account**, then send one invoice per month. Because the invoice is billed to the account, the PDF shows the company's legal name and VAT number as the bill-to party, and the staff member's name appears as a subline.
 
-- Partial invoice payments through Stripe Payment Element accept an `amountOverride` that isn't capped to the unpaid balance. If you build a custom collection flow, validate the amount yourself.
-- The bill-run-specific invoice payment helper writes columns that don't exist on the `invoices` model; it appears to be unused, but if you discover it firing you'll see write failures in logs.
+**Jiu-jitsu gym - historical migration.** You are moving off a spreadsheet and importing last year's already-collected membership dues. Create the invoices, then **Mark paid** so they land in the **Paid** tab without generating phantom Stripe charges. New invoices going forward use **Add payment** or **Send** so each has a real payment record.
+
+**Pilates studio - reformer package sold on account.** A member buys a 10-class reformer package but wants to pay by bank transfer. Create a single manual invoice with one line item for the package, email it with **Send** or hand them the **Download** PDF, and when the transfer clears use **Add payment** to record it. The package transaction flips to `paid` and the invoice moves to the **Paid** tab.
+
+**Climbing gym - chasing late payers.** At month end you pull the due-soon list to nudge members whose dues are due this week, and the overdue list to follow up on ones that have already lapsed. Members who paid by link show up as `paid` automatically; the rest stay `pending` until you record a payment.
+
+## Tips & best practices
+
+- Prefer **Add payment** over **Mark paid** for live collection - it leaves an auditable payment row, where mark-paid only stamps the status.
+- Attach a billing **Account** whenever a company or household is the payer, so the PDF bills the right legal entity and VAT number.
+- Set your **Invoice Numbering Template** before you issue your first invoice. Including `[year]` keeps numbering readable across financial years.
+- To re-invoice an obligation, delete the invoice rather than editing it. Deletion reverts the linked transactions to billable; editing prices does not change what the transaction owes.
+- Use the **Refresh payment status** button on the invoice details page if a member says they paid a Stripe link but the invoice still reads `pending`.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Invoice save rejected with "Invoice contact must belong to the selected account" | The chosen contact is neither the account's primary contact nor a member. | Pick a contact tied to that account, or leave the account blank. |
+| A transaction won't appear in a new bill run | It is already on an invoice (`isInvoiced = true`). | Delete the invoice holding it to revert it to billable. |
+| Invoice still shows `pending` after the member paid a link | Status recalculation or the Stripe webhook hasn't landed yet. | Open the invoice and click **Refresh payment status**. |
+| Editing transaction prices didn't change the invoice total | Totals are frozen from the line items at issue time. | Delete and re-create the invoice, or edit the invoice line items directly. |
+| A pending invoice isn't in the **Overdue** tab yet, though its due date passed | The tab filters on the stored `overdue` status, which flips on recalculation. | Use the overdue lookup, which catches pending invoices with a past due date immediately. |
+| Two invoices almost got the same number | Concurrent creation. | No action needed - numbering retries on collision and stays unique per organization. |
 
 ## Related
 
@@ -83,3 +173,5 @@ The invoice's totals are derived from its line items, which point at transaction
 - [Payments](/billing/payments)
 - [Bill runs](/billing/bill-runs)
 - [Export](/settings/export) - bundle invoices for QuickBooks.
+</content>
+</invoke>

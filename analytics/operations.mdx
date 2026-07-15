@@ -1,44 +1,205 @@
 ---
 title: Operations analytics
-description: Bookings and classes dashboards and reports
+description: Bookings, classes, attendance, utilization, and instructor dashboards and reports for optimizing schedules, capacity, and pay.
+keywords: [bookings dashboard, booking audit, utilization, class attendance, instructor compensation, capacity, no-show rate, CSV export]
 ---
 
-Operations analytics show booking, class, and instructor performance so you can optimize schedules, capacity, and pay.
+Operations analytics show booking, class, attendance, and instructor performance so you can optimize schedules, capacity, and instructor pay. The reports live in the **Analytics** hub, grouped into the **Bookings**, **Classes**, and **Instructors** categories (attendance sits under the **Members** category).
 
 ## Overview
 
-Use the **Analytics** hub and open the **Bookings**, **Classes**, and **Instructors** categories to access:
+Open **Analytics** and pick a category to reach these dashboards and reports:
 
-- **Bookings dashboard** — Booking volume and utilization.
-- **Bookings monthly report** — Monthly breakdown of bookings.
-- **Booking audit** — Every booking with its status and payment (see below).
-- **Classes dashboard** — Class attendance and performance.
-- **Instructor reports** — Compensation and earnings per instructor (see below).
+- **Bookings dashboard** - Booking volume, revenue, cancellation rate, and peak times.
+- **Booking audit** - Row-level payment reconciliation for every booking.
+- **Bookings by source** - Where bookings come from, by channel and by UTM source.
+- **Utilization** - Booked hours versus capacity, for areas and instructors.
+- **Bookings monthly report** - A month-by-month matrix of bookings by type.
+- **Classes dashboard** - Class attendance, capacity utilization, and popular classes.
+- **Attendance dashboard** - Check-in volume, peak times, and no-show rate (under the **Members** category).
+- **Instructors dashboard** - Sessions and revenue per instructor per club.
+- **Instructor report** - Monthly instructor compensation, with per-month drill-down.
+- **Earnings statement** - An itemized breakdown of one instructor's compensation.
 
-Filter by club, area, or date range. Use these reports to adjust schedules and staffing.
+Every report exports to CSV. See [Exporting reports](#exporting-reports).
+
+## Filters
+
+All operations reports share the same filter bar at the top:
+
+- **Date range** - Sets the reporting period. The report only loads once both a start and end date are set. Dashboards default to the last 30 days; the monthly report, instructors dashboard, and instructor report default to the last 6 months; the earnings statement defaults to the last month.
+- **Club** - Scope the numbers to one gym, or leave it empty for the whole organization. The earnings statement has no club filter (it is scoped to the selected instructor).
+
+## Bookings dashboard
+
+The **Bookings dashboard** (Analytics > Bookings > **Bookings dashboard**) is the top-of-funnel view of demand and revenue.
+
+KPI cards:
+
+- **Total bookings**, **Confirmed bookings**, **Cancelled bookings**, and **Pending bookings** - Volume by status.
+- **Total revenue** - Amount billed by the bookings in range.
+- **Paid bookings amount** - How much of that has been collected.
+- **Average booking value** - Revenue divided by bookings.
+- **Cancellation rate** - Cancelled bookings as a percentage of the total.
+
+Charts:
+
+- **Booking trends** - Bookings (bars) and revenue (line) over time. The time bucket adapts to your date range (daily, weekly, or monthly).
+- **By area type** - Bookings per area type (for example, tennis court, reformer studio, climbing wall).
+- **By source** - Bookings per booking source.
+- **Peak hours** and **Peak days** - When bookings cluster, by hour of day and day of week.
+
+Use this dashboard to spot demand patterns and set your class and court schedule around peak hours and days.
+
+## Bookings by source
+
+**Bookings by source** (Analytics > Bookings > **By source**) splits booking volume two ways:
+
+- **By channel source** - The booking channel (for example, admin, member portal, kiosk).
+- **By UTM source** - The `utm_source` attached to the booking, so you can attribute bookings to specific marketing links or campaigns.
+
+This is the same source data summarized on the Bookings dashboard, broken out for attribution work.
+
+## Utilization
+
+The **Utilization** report (Analytics > Bookings > **Utilization**) compares booked hours against available capacity, so you can see how hard your rooms and instructors are working.
+
+KPI cards:
+
+- **Area utilization** and **Instructor utilization** - Booked hours as a percentage of capacity hours.
+- **Area capacity** and **Instructor capacity** - Booked hours over capacity hours (for example, `120 / 400 h`).
+
+Charts:
+
+- **Utilization over time** - Booked hours (bars) and utilization percentage (lines) for areas and instructors, over the period.
+- **Utilization by area type** and **Utilization by instructor type** - Where you have headroom or a bottleneck, broken down by type. Each bar is backed by a `booked / capacity h` breakdown underneath.
+
+Low utilization on a peak day means you can add classes or open more court slots; utilization near 100% is a signal to add capacity or staff.
 
 ## Booking audit
 
-The **Booking audit** report (Analytics → Bookings → **Audit**) is a row-level payment-reconciliation view. It lists every booking in the selected date range, with unpaid bookings highlighted on top, so you can see at a glance what's been paid, what's outstanding, and how each booking was entered.
+The **Booking audit** report (Analytics > Bookings > **Booking audit**) is a row-level payment-reconciliation view. It lists every booking in the selected date range, with unpaid bookings highlighted, so you can see at a glance what has been paid, what is outstanding, and how each booking was entered.
 
-Summary cards at the top show **Outstanding**, **Unpaid bookings**, **Total billed**, and **Total bookings**. The table can be filtered by **Payment**, **Type**, and **Status**, and searched by member, resource, or club. Columns include **Date & time**, **Member**, **Type**, **Resource**, **Club**, **Status**, **Entrance**, **Amount**, and **Payment**.
+Summary cards show **Outstanding**, **Unpaid bookings**, **Total billed**, and **Total bookings**.
 
-- **Payment** states: Unpaid, Paid, Refunded, Covered, No charge.
-- **Entrance** captures how the booking was paid for: Direct payment, Membership, or External program (external-program visits carry their own per-visit fee).
+Columns: **Date**, **Member**, **Type**, **Resource**, **Club**, **Source**, **Status**, **Entrance**, **Amount**, **Outstanding**, **Payment**, and **Method**.
 
-Rows link to the booking detail, and you can export the filtered list to CSV.
+You can refine the table with three filters, and the filters also apply to the CSV export so the two always match:
 
-## Instructor reports
+- **Payment** - The payment state of the booking.
+- **Type** - The resource, grouped by **Area**, **Class**, **Instructor**, and **Other**.
+- **Status** - Confirmed, Pending, Checked in, No show, or Cancelled.
 
-Under the **Instructors** analytics category:
+**Payment** states:
 
-- **Instructor pay report** — Monthly instructor compensation and club revenue per instructor.
-- **Earnings statement** — An itemized breakdown of every payment that contributed to a selected instructor's compensation. Pick an instructor and a date range to see a monthly breakdown and line-item details.
+- **Unpaid** - Nothing collected yet.
+- **Partial** - Some but not all of the amount is paid.
+- **Paid** - Fully collected.
+- **Refunded** - Payment was returned.
+- **Covered** - Settled without a direct charge (for example, by a membership).
+- **No charge** - No payment was required.
 
-When your organization has an active tax rate, instructor compensation is shown both **incl. tax** and **excl. tax**, and both figures are included in the CSV export. The instructor's own classes dashboard also shows a **My Compensation** card and trend line alongside class and attendance metrics.
+**Entrance** captures how the booking was paid for:
+
+- **Direct payment** - Paid at the time of booking.
+- **Membership** - Consumed from a membership allowance.
+- **External program** - Redeemed against an external program (these visits carry their own per-visit fee).
+
+Click a row to open the booking detail. Unpaid rows are tinted so you can chase them down.
+
+## Bookings monthly report
+
+The **Bookings monthly report** (Analytics > Bookings > **Bookings monthly report**) is a month-by-month matrix: one row per month, one column per booking type, plus **Total bookings** and **Total revenue** columns and a **Totals** row. A stacked bar chart above the table shows the same breakdown by type.
+
+Use it for period-over-period comparison (for example, "how did padel bookings trend across the last six months?") and export it for board or owner reporting.
+
+## Classes dashboard
+
+The **Classes dashboard** (Analytics > Classes > **Classes dashboard**) covers group class performance.
+
+KPI cards:
+
+- **Total classes**, **Total bookings**, and **Total attendance**.
+- **Average attendance** - Average attendees per class.
+- **Capacity utilization** - Attendance as a percentage of class capacity.
+
+Views:
+
+- **Classes and attendance trends** - Classes (bars) plus bookings and attendance (lines) over time.
+- **By instructor** - Attendance per instructor.
+- **Most popular classes** - The top classes by bookings, with their attendance and **attendance rate**.
+
+Watch the gap between bookings and attendance: a high booking count with low attendance points to a no-show problem you can address with [booking policies](/operations/booking-policies).
+
+## Attendance dashboard
+
+The **Attendance dashboard** (Analytics > Members > **Attendance dashboard**) reports on check-ins.
+
+KPI cards:
+
+- **Total check-ins** and **Unique members**.
+- **Average check-ins per member**.
+- **No-show rate** - The share of bookings that were not attended.
+
+Views: an attendance trend line, **Peak times** by hour, and check-ins **By area type**.
+
+Use no-show rate and peak times together to right-size class capacity and tighten cancellation windows where no-shows are high.
+
+## Instructor analytics
+
+The **Instructors** category has three reports.
+
+### Instructors dashboard
+
+The **Instructors dashboard** (Analytics > Instructors > **Instructors dashboard**) is a matrix of **sessions** and **revenue** per instructor per month, with **Total instructors**, **Total bookings**, and **Total revenue** cards and a per-month **Totals** row. Each instructor row also shows their club.
+
+### Instructor report
+
+The **Instructor report** (Analytics > Instructors > **Instructor report**) is a month-by-month matrix of **instructor compensation**, with a **Totals** row and an **Instructor Compensation** total column. Click any month cell to open a drill-down of what made up that month's figure for that instructor.
+
+### Earnings statement
+
+The **Earnings statement** (Analytics > Instructors > **Earnings statement**) is an itemized breakdown of every payment that contributed to a single instructor's compensation. Pick an instructor with the selector, choose a date range, and the statement lists each line item; click a line to jump to the underlying class or booking.
+
+## Exporting reports
+
+Reports with an **Export** button in the top-right download a CSV of exactly what is on screen, including any filters you applied. Exportable operations reports include the **Booking audit**, **Bookings monthly report**, **Classes dashboard** (by instructor), **Instructors dashboard**, **Instructor report**, and **Earnings statement**. Files are named with the report and date range, and the club id when a club filter is applied. For scheduled or bundled exports, see [Settings > Export](/settings/export).
+
+## Worked examples
+
+**Racket sports - fixing a court that pays for itself.** A padel club looks at **Utilization** and sees Court 3 at 42% while Courts 1 and 2 run near 95%. The **Bookings dashboard** peak-hours chart shows demand concentrated at 18:00-21:00. They move a coaching block off Court 3 into that window and re-run utilization a month later to confirm the lift.
+
+**Martial arts - chasing unpaid drop-ins.** A jiu-jitsu gym runs the **Booking audit** filtered to **Payment = Unpaid** and **Type = Class** for the last 30 days. The **Outstanding** card shows the total to collect; each unpaid row links straight to the booking so the front desk can take payment.
+
+**Pilates / Yoga - trimming a class that does not fill.** A reformer studio checks the **Classes dashboard**. A midday Pilates class shows high bookings but a low **attendance rate**, while capacity utilization on the 07:00 class is maxed out. They cut the midday slot and add an early class, then watch **Average attendance** and **Capacity utilization** the following month.
+
+**Gym / Fitness - paying instructors correctly.** A CrossFit box closes the month with the **Instructor report**, clicks each coach's month cell to verify the sessions behind the figure, then exports the CSV for payroll. For a single disputed coach, the **Earnings statement** shows every contributing line item.
+
+**Climbing - reading demand by source.** A climbing gym uses **Bookings by source** and sees a spike in **By UTM source** tied to an intro-offer link. They compare it against the **Bookings dashboard** revenue trend to confirm the promotion drove paid bookings, not just free trials.
+
+## Tips & best practices
+
+- Set the **Date range** first. Reports do not load until both start and end dates are set, and a "zero" often just means the range or club filter excludes the data.
+- Pair **Utilization** with the Bookings dashboard **peak hours / peak days** charts before changing the schedule - utilization tells you the "how full", peak times tell you the "when".
+- Reconcile with the **Booking audit** weekly using the **Payment = Unpaid** filter, so outstanding amounts do not pile up.
+- Use the **Instructor report** drill-down to answer pay questions before exporting, so the CSV you send to payroll is already reconciled.
+- Compare month-over-month with the **Bookings monthly report** rather than eyeballing the trend chart, when you need exact figures.
+
+## Troubleshooting
+
+- **A report is blank or shows zeros.** The date range is not set, or it excludes the data. Confirm both start and end dates, then check the **Club** filter is not scoped to the wrong gym.
+- **The Export button is disabled.** There are no rows for the current filters. Widen the date range or clear a filter, then export.
+- **Booking audit totals do not match another report.** The audit is invoice/booking based and honors the on-screen **Payment**, **Type**, and **Status** filters. Clear the filters to see the full period, and remember refunds and covered bookings affect the outstanding total.
+- **Attendance is lower than bookings.** That gap is your no-show rate. Check the **Attendance dashboard** no-show card and tighten [booking policies](/operations/booking-policies) if it is high.
+- **An instructor shows no compensation.** Confirm the instructor had sessions in the selected range and that pay rates are configured for them; the **Earnings statement** shows whether any line items exist for the period.
 
 ## Related
 
-- [Analytics overview](/analytics/overview) — All analytics categories.
-- [Bookings](/operations/bookings) — Manage bookings.
-- [Classes](/operations/classes) — Manage classes.
+- [Analytics overview](/analytics/overview) - All analytics categories.
+- [Billing analytics](/analytics/billing) - Revenue, payments, and invoices.
+- [Bookings](/operations/bookings) - Manage bookings.
+- [Classes](/operations/classes) - Manage classes.
+- [Instructors](/operations/instructors) - Manage instructors and pay.
+- [Attendance](/members/attendance) - Check-ins and attendance.
+- [Booking policies](/operations/booking-policies) - Cancellation windows and no-show handling.
+- [Settings > Export](/settings/export) - Scheduled and bundled CSV exports.

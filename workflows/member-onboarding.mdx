@@ -1,104 +1,22 @@
 ---
-title: Member Onboarding
-description: Learn how to guide new members through the signup and onboarding process
+title: Member onboarding
+description: How a new person becomes a member - the signup wizard, required fields, family members, verification, and passwordless guest signup.
+keywords: [onboarding, signup, registration, signup wizard, verification, guest booking, family members, contact fields]
 ---
 
-**In a nutshell:** Streamline new member registration and guide them through their first steps with your club, from initial signup to their first class or facility visit.
+Member onboarding is the path from a brand new person to a fully set-up member: they complete a signup form or book as a guest, verify their email, accept any required documents, and land in your member list with the right plan attached. You design the form itself under [Signup forms](/settings/signup-forms); this page explains the experience a new member goes through and the settings that shape it.
 
-## What is Member Onboarding?
+## Overview
 
-Member onboarding is the process of welcoming new members to your club and helping them get started. It includes everything from the initial signup process to their first visit, ensuring they feel comfortable and know how to use your facilities and services.
+- **Signup wizard** - a step-by-step flow (details, selection, documents, signature, review, payment) that adapts to the form's configuration.
+- **Configurable fields** - control which contact fields are required, optional, or hidden at signup.
+- **Family members** - let one person register children or partners in the same flow.
+- **Verification** - email verification and a browser check protect signups.
+- **Passwordless guest signup** - visitors can book without creating a password first, and get an account automatically.
 
-## Key Features
+## The signup wizard
 
-### **Registration Process**
-
-- **Online signup** forms for new members
-- **Account creation** with secure login credentials
-- **Profile setup** with personal information
-- **Membership selection** and payment processing
-
-### **Welcome Experience**
-
-- **Welcome emails** with important information
-- **Club tour** scheduling and management
-- **Orientation sessions** for new members
-- **First class** recommendations and booking
-
-### **Member Integration**
-
-- **Facility access** setup and training
-- **App download** and setup assistance
-- **Class booking** tutorials and guidance
-- **Staff introductions** and support contacts
-
-## Onboarding Workflow
-
-### **Step 1: Initial Registration**
-
-1. **Member visits** your website or app
-2. **Clicks "Sign Up"** or "Join Now" button
-3. **Fills out** registration form with personal details
-4. **Selects membership** plan and payment method
-5. **Completes payment** and receives confirmation
-
-### **Step 2: Account Setup**
-
-1. **Receives welcome email** with login instructions
-2. **Creates password** and logs into member portal
-3. **Completes profile** with additional information
-4. **Uploads photo** for member ID if required
-5. **Sets preferences** for notifications and communications
-
-### **Step 3: First Visit Preparation**
-
-1. **Schedules club tour** or orientation session
-2. **Downloads mobile app** and sets up account
-3. **Reviews club policies** and guidelines
-4. **Books first class** or facility time
-5. **Receives directions** and parking information
-
-### **Step 4: First Visit**
-
-1. **Arrives at club** and checks in at reception
-2. **Receives member ID** and facility access
-3. **Takes club tour** with staff member
-4. **Participates in** orientation or first class
-5. **Meets key staff** and learns about services
-
-## Registration Process
-
-### **Signup Form Fields**
-
-- **Personal Information** - Name, email, phone number
-- **Address Details** - Street address, city, postal code
-- **Emergency Contact** - Name and phone number
-- **Health Information** - Medical conditions, fitness level
-- **Membership Selection** - Plan type and duration
-- **Payment Information** - Credit card or bank details
-
-#### Configuring which fields appear
-
-The visibility of optional system fields on the public signup form is set per organization under **Settings → Contacts**. For each of **Phone**, **Date of birth**, and **Gender** you choose one of:
-
-- **Required** - the field is shown and must be filled in to submit.
-- **Optional** - the field is shown but can be left empty.
-- **Hidden** - the field is not shown at all.
-
-The server enforces these choices on submission - a hidden field cannot be back-filled by editing the request, and a required field that is empty rejects the signup.
-
-### Family members on signup
-
-The same **Settings → Contacts** page has a **Show family members on signup** toggle. Behavior:
-
-- **On** - the signup form shows a "Family members" section where the primary signer can add additional members (children, partner, etc.) in the same flow. Each family member submitted carries its own date of birth.
-- **Off** - the family-members section is hidden. The server rejects any request that includes family members with HTTP 400; this protects you against forged requests that try to enrol additional people while the feature is disabled.
-
-When **Date of birth** is set to **Required** under signup fields, the requirement applies to **every** family member as well - submitting a family member without a DOB fails the signup. The public website and member portal validate this client-side in all supported locales before the request is sent, so the user sees an inline message rather than a server error.
-
-### The signup wizard
-
-New members complete signup through a step-by-step wizard (plan selection, details, optional signature, review, and payment). The wizard guides them and validates as they go:
+New members complete signup through a step-by-step wizard (plan selection, details, optional documents and signature, review, and payment). The wizard guides them and validates as they go:
 
 - **Step intros** explain each step. For example, the details step shows "We'll use your email to create your account.", and the review step shows "Check that everything's correct before you submit."
 - **Inline validation on Next** - if a required field is missing, the wizard scrolls to and focuses the first invalid field instead of failing silently.
@@ -106,181 +24,56 @@ New members complete signup through a step-by-step wizard (plan selection, detai
 - **Already-registered email** - if the email is taken, the form shows "This email is already registered." with a "Sign in here" link, rather than a generic error.
 - **Guardian-only signups** - when the buyer is signing up family members but not themselves, the wizard shows "You'll manage this account but won't be a member yourself." The **I'm joining too** option appears only once at least one family member has been added.
 
-#### Combine plan and details into one step
+Drafts are saved in the member's browser as they go, so a half-finished signup survives a page refresh. Passwords and drawn signatures are never persisted in the draft.
+
+### Combine plan and details into one step
 
 Each signup form has a **Combine plan & user details into one step** toggle (off by default). Its help reads: "Show plan selection and the sign-up details together as the first step, instead of two separate steps." Turn it on to shorten the wizard to a single first step that shows plan selection and account details together.
 
-#### Browser verification (Turnstile)
+## Configuring which fields appear
 
-Signup is protected by a browser check (Cloudflare Turnstile). If a privacy browser or ad blocker blocks the check, the member sees an actionable message instead of a silent failure: "We couldn't verify your browser. If you use a privacy browser (like Brave) or an ad blocker, turn off its protection for this page or try a different browser, then try again." This message also appears on the public sign-in email form and in the portal.
+The visibility of optional system fields on the public signup form is set per organization under **Settings > CRM > Contacts**. For each of **Phone**, **Date of birth**, and **Gender** you choose one of:
 
-### **Account Verification**
+- **Required** - the field is shown and must be filled in to submit.
+- **Optional** - the field is shown but can be left empty.
+- **Hidden** - the field is not shown at all.
 
-- **Email verification** to confirm valid address
-- **Phone verification** for contact information
-- **Identity verification** for security purposes
-- **Payment verification** to ensure valid payment method
+The server enforces these choices on submission - a hidden field cannot be back-filled by editing the request, and a required field that is empty rejects the signup.
 
-### **Profile Completion**
+## Family members on signup
 
-- **Profile photo** upload for member ID
-- **Fitness goals** and interests selection
-- **Preferred communication** methods
-- **Emergency contact** information
-- **Medical information** and restrictions
+The same **Settings > CRM > Contacts** page has a **Show family members on signup** toggle:
 
-## Welcome Communications
+- **On** - the signup form shows a "Family members" section where the primary signer can add additional members (children, partner, etc.) in the same flow. Each family member submitted carries its own date of birth.
+- **Off** - the family-members section is hidden. The server rejects any request that includes family members with HTTP 400, which protects you against forged requests that try to enrol additional people while the feature is disabled.
 
-### **Welcome Email Series**
+When **Date of birth** is set to **Required**, the requirement applies to **every** family member as well - submitting a family member without a date of birth fails the signup. The public website and member portal validate this before the request is sent, so the user sees an inline message rather than a server error.
 
-1. **Immediate confirmation** after signup
-2. **Account setup** instructions and login details
-3. **Club information** and policies overview
-4. **First visit** preparation and what to expect
-5. **Follow-up** after first visit to ensure satisfaction
+## Verification
 
-### **SMS Notifications**
+- **Email verification** - a new member verifies their email with a one-time code to confirm the address and activate the account.
+- **Browser check (Turnstile)** - signup is protected by a Cloudflare Turnstile check. If a privacy browser or ad blocker blocks it, the member sees an actionable message rather than a silent failure: "We couldn't verify your browser. If you use a privacy browser (like Brave) or an ad blocker, turn off its protection for this page or try a different browser, then try again." The same message appears on the public sign-in email form and in the portal.
 
-- **Account confirmation** and login details
-- **First visit** reminders and directions
-- **Class booking** confirmations and reminders
-- **Club updates** and special announcements
+## Passwordless guest signup
 
-### **In-App Messages**
+When a [booking policy](/operations/booking-policies) has **Allow guest bookings** turned on, a logged-out visitor can book from your public portal, website, or network without creating a password first. They enter their email, verify it with a one-time code, and complete the booking. 1Club then creates a passwordless member account and signs them in, so they can see and manage the booking. If the email already belongs to an active member, the visitor is routed to sign in instead. This turns a first booking into a member account with no extra signup step.
 
-- **Welcome tour** of the mobile app
-- **Feature tutorials** for booking and check-in
-- **Club news** and updates
-- **Personalized recommendations** based on interests
+## Worked examples
 
-## First Visit Experience
+- **Ad landing page** - share a signup form link that offers a single trial plan, with Phone optional and documents required, so prospects convert in one short flow.
+- **Junior program** - use a form set to register children under a guardian account, with Date of birth required for every child, so each junior is enrolled with their own record.
+- **Walk-in trial** - turn on guest bookings so a first-time visitor can book and pay for a drop-in without creating a password, then finish their profile later.
 
-### **Club Tour**
+## Tips & best practices
 
-- **Facility overview** and key areas
-- **Equipment demonstration** and safety guidelines
-- **Class schedules** and booking process
-- **Staff introductions** and contact information
-- **Policies and procedures** explanation
+- **Keep required fields minimal.** Every required field is a drop-off point; mark only what you truly need at signup and collect the rest later.
+- **Attach documents through rules, not the form.** The wizard automatically shows any [document rules](/content/documents) that target new members, so a waiver added once applies to every form.
+- **Test each form end to end** from a real signup before sharing the link.
 
-### **Orientation Session**
+## Related
 
-- **Group orientation** for new members
-- **Individual consultation** with fitness staff
-- **Goal setting** and program recommendations
-- **Equipment training** and safety protocols
-- **Q&A session** for questions and concerns
-
-### **First Class Experience**
-
-- **Beginner-friendly** class recommendations
-- **Instructor introduction** and support
-- **Modification options** for different fitness levels
-- **Post-class follow-up** and feedback collection
-- **Next steps** and continued engagement
-
-## Member Integration
-
-### **Facility Access**
-
-- **Member ID card** or mobile app access
-- **Locker room** and changing area orientation
-- **Equipment usage** guidelines and safety
-- **Hours of operation** and peak times
-- **Guest policies** and visitor procedures
-
-### **Digital Onboarding**
-
-- **Mobile app** download and setup
-- **Online booking** system tutorial
-- **Payment methods** and billing information
-- **Communication preferences** and notifications
-- **Account management** and profile updates
-
-### **Staff Support**
-
-- **Assigned staff member** for initial support
-- **Regular check-ins** during first month
-- **Feedback collection** and improvement suggestions
-- **Additional training** or orientation if needed
-- **Ongoing support** and relationship building
-
-## Onboarding Best Practices
-
-### **Streamlined Process**
-
-- **Minimize steps** in registration process
-- **Clear instructions** at each stage
-- **Progress indicators** to show completion status
-- **Save progress** to allow completion later
-- **Mobile-friendly** design for easy access
-
-### **Personal Touch**
-
-- **Personalized welcome** messages and communications
-- **Staff introductions** and relationship building
-- **Customized recommendations** based on interests
-- **Follow-up calls** or messages after first visit
-- **Celebration** of milestones and achievements
-
-### **Clear Communication**
-
-- **Set expectations** about what to expect
-- **Provide timelines** for each step
-- **Offer support** and assistance throughout
-- **Address concerns** and questions promptly
-- **Gather feedback** to improve the process
-
-## Onboarding Automation
-
-### **Email Automation**
-
-- **Triggered emails** based on member actions
-- **Personalized content** based on membership type
-- **Timed sequences** for optimal engagement
-- **A/B testing** of different messages
-- **Performance tracking** and optimization
-
-### **SMS Automation**
-
-- **Appointment reminders** for tours and orientations
-- **Class booking** confirmations and updates
-- **Payment reminders** and billing notifications
-- **Engagement prompts** for inactive members
-- **Feedback requests** after key interactions
-
-### **In-App Automation**
-
-- **Push notifications** for important updates
-- **In-app messages** for feature tutorials
-- **Progress tracking** and milestone celebrations
-- **Personalized recommendations** based on behavior
-- **Gamification** elements to encourage engagement
-
-## Troubleshooting
-
-### **Common Issues**
-
-- **Registration problems** - Check form validation and payment processing
-- **Email delivery** - Verify email addresses and spam filters
-- **Account access** - Ensure proper login credentials and account status
-- **Payment issues** - Verify payment methods and billing information
-- **App problems** - Check device compatibility and app updates
-
-### **Member Support**
-
-- **Dedicated support** for new member questions
-- **Multiple contact** methods (phone, email, chat)
-- **Extended hours** during peak signup periods
-- **Staff training** on common issues and solutions
-- **Escalation procedures** for complex problems
-
-## Getting Started
-
-1. **Review your current** onboarding process and identify gaps
-2. **Set up automated** welcome email sequences
-3. **Train staff** on new member orientation procedures
-4. **Test the process** from a new member's perspective
-5. **Gather feedback** and continuously improve the experience
-
-Member onboarding sets the tone for your relationship with new members. A smooth, welcoming process helps ensure they feel valued and engaged from day one.
+- [Signup forms](/settings/signup-forms) - Build the form and its wizard steps.
+- [Memberships](/members/memberships) - What a selected plan creates for the new member.
+- [Documents and waivers](/content/documents) and [Document signatures](/content/document-signatures) - The documents shown during signup.
+- [Member portal](/settings/member-portal) - Where the new member signs in afterward.
+- [Booking policies](/operations/booking-policies) - The guest-booking toggle behind passwordless signup.

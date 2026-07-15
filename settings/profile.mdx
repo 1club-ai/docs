@@ -1,46 +1,93 @@
 ---
 title: Profile
-description: Edit your own name, photo, contact details, language, theme, and password.
+description: Manage your own admin account - name, photo, email, phone, password, language, and theme - from Settings > Profile.
+keywords: [profile, my account, change password, email verification, phone verification, language, theme, dark mode]
 ---
 
-**Settings > Profile** is your personal settings page. It's the only settings screen every admin user can open regardless of role - everything here is about you, not the organization.
+**Settings > Profile** is your personal account page. It is the one settings screen every admin user can open regardless of role, because everything here is about you, not the organization. You reach it from the account menu at the bottom of the sidebar or directly under the **My account** area of Settings.
+
+## Overview
+
+From your profile you can:
+
+- **Update your identity** - profile photo, first name, and last name shown across the admin.
+- **Manage your sign-in email** - and resend a verification email if it is not yet verified.
+- **Add and verify a phone number** - used for SMS notifications.
+- **Change your password** - with your current password.
+- **Switch language and theme** - from the account menu in the sidebar (not the profile form itself).
+
+You cannot change your own role here. Roles are managed by an admin under [Users](/settings/admin-users).
 
 ## What you can edit
 
-The page splits into two halves.
+The profile form has one section, **Profile information**, with a floating save bar that appears as soon as you change anything.
 
-### Profile information
+- **Profile image** - Upload from your device. Uploaded files are stored under `1club/users`. Your avatar appears next to your name in user lists and the account menu.
+- **First name**, **Last name** - Your display name in user lists and the account menu.
+- **Email** - Your sign-in email. A chip shows whether it is verified. If it is not, a warning icon appears with a send action - click it to trigger a fresh verification email.
+- **Phone** - Enter in international format. A chip shows whether the number is verified. If it is not, click the send action to open the verification dialog and confirm the number with a code. The verified chip tracks the number currently in the field, so an edited-but-unsaved number reads as unverified until you verify and save it.
 
-- **Profile image** - Upload from your device. Uploaded files go to Cloudinary under `1club/users`. The avatar appears next to your name throughout the admin and in audit log entries.
-- **First name**, **Last name** - Display name in user lists and the top-right account menu.
-- **Email** - Your sign-in email. A status chip shows whether it's verified; if not, **Resend verification** triggers a fresh verification email.
-- **Phone** - International format, used for SMS notifications.
+### How saving works
 
-### Preferences
-
-- **Language** - Switches the admin UI between English, French, Bulgarian, and Spanish. The change is applied immediately - you don't need to reload. Your choice is saved with your user account and also cached in browser local storage so the language is consistent on next sign-in.
-- **Theme** - **Light**, **Dark**, or **System** (follows your OS setting). Saved per browser, not per user.
-
-## How saving works
-
-Edit any field and a floating **Save** bar appears at the bottom of the page. Click it to commit. Saved fields (name, email, phone, language, profile image) sync across every browser and device you sign in from.
-
-Theme is the exception: it's saved per browser only. Switching theme takes effect immediately and persists for that browser, but it never leaves the local machine and the Save bar does not apply to it.
+Edit any field and a floating **Save** bar appears at the bottom of the page. Click it to commit. Your name, email, phone, and profile image sync across every browser and device you sign in from.
 
 ## Changing your password
 
-Click **Change password** in the top right. The dialog asks for your current password and a new one. If you signed in with Google, Apple, or Facebook and never set a local password, contact an org admin to use the **Set password** action from **Settings > Users** instead. See [Signing in](/reference/sign-in) for how sign-in methods link to one account.
+Click **Change password** in the top right to open the dialog. It asks for your current password, a new password, and a confirmation.
 
-## Your role and permissions
+- The new password must meet the listed password requirements (at least 8 characters).
+- Changing your password revokes your other active sessions for security, so you stay signed in on this device but are signed out elsewhere.
+- If you signed in with Google, Apple, or Facebook and never set a local password, you cannot use this dialog because it requires your current password. Ask an admin to send you a password reset from [Users](/settings/admin-users) instead. See [Signing in](/reference/sign-in) for how sign-in methods link to one account.
 
-Your profile doesn't let you change your own role - that's deliberate. To change who can do what, an Admin uses [Settings > Users](/settings/admin-users). What you see in the admin is determined by your role; see [Roles and permissions](/reference/roles-permissions) for the breakdown.
+## Language and theme
+
+Language and theme are not on the profile form. You set them from the account menu at the bottom of the sidebar.
+
+- **Language** - Choose English, French, Bulgarian, or Spanish. The change applies immediately and is saved to your account, so it follows you on your next sign-in.
+- **Theme** - Choose **Light**, **Dark**, or **System** (follows your operating system). Theme is saved per browser, so it does not leave the local machine.
 
 ## Notifications
 
-Notification preferences (which events email you, SMS you, or push to you) aren't on this page. They're configured under **Settings > Notifications** and are organization-wide rather than per-user.
+Which events email, SMS, or push to you is configured on a separate **Notifications** page under **My account**, not on the profile form.
+
+## Worked examples
+
+### Front desk staff at a padel club enabling SMS alerts
+
+A receptionist wants to receive SMS alerts for new bookings. On their profile they enter a phone number in international format, click the send action to verify it with the code they receive, and save. Their number now shows the verified chip and can receive SMS notifications.
+
+### Instructor switching the admin to French
+
+A jiu-jitsu coach prefers French. They open the account menu in the sidebar, pick **Français** under language, and the admin switches immediately. The choice is saved to their account, so it stays French the next time they sign in on any device.
+
+## Tips and best practices
+
+- **Verify your email and phone.** Unverified contact details can block or delay notifications and some sign-in flows.
+- **Use a real profile photo.** It makes your entries easier to recognise in shared user lists and activity.
+- **Keep your recovery method current.** If you rely on a social sign-in, make sure the linked email is one you control, since password resets go there.
+- **Save before you leave.** The floating save bar only commits when you click it - navigating away discards unsaved edits.
+
+## Troubleshooting
+
+**Issue**: The email verified chip stays as a warning after I clicked resend.
+
+**Solution**: The verification email was sent, but the chip only clears once you open the email and complete verification. Check your inbox and spam folder, then reload.
+
+**Issue**: My phone shows as unverified even though I verified it before.
+
+**Solution**: The verified chip tracks the number currently in the field. If you edited the number, verify the new one. If it matches your saved number and still reads unverified, save the profile and reload.
+
+**Issue**: The Change password dialog rejects me or I never set a password.
+
+**Solution**: The dialog needs your current password. If you only ever signed in with Google, Apple, or Facebook, you have no local password to enter. Ask an admin to send a password reset from [Users](/settings/admin-users), then set a password from the reset link.
+
+**Issue**: I want to change my own role.
+
+**Solution**: You cannot change your own role from your profile. Ask an admin to update it in [Users](/settings/admin-users). What you can see and do is set by your role - see [Roles and permissions](/reference/roles-permissions).
 
 ## Related
 
-- [Users](/settings/admin-users) - How invitations and roles are managed by admins.
+- [Users](/settings/admin-users) - How admins invite users and manage roles and password resets.
 - [Roles and permissions](/reference/roles-permissions) - What your role gives you access to.
+- [Signing in](/reference/sign-in) - Supported sign-in methods and how they link to one account.
 - [Organization](/settings/organization) - Org-wide identity and time zone.

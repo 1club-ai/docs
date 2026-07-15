@@ -1,6 +1,7 @@
 ---
 title: Signup forms
 description: The form builder under Settings > CRM > Forms. Design self-service signup pages that take a new person from a shared link to a fully onboarded contact - with optional plan, package, class-type, document, and signature steps.
+keywords: [signup form, form builder, onboarding, order form, self-service registration, public link, wizard, document acceptance]
 ---
 
 Signup forms are 1Club's form builder. Each form is a shareable public link that runs a configurable wizard, taking a brand new person from "never heard of you" to "fully onboarded contact in your system" in one flow. You build the form once under **Settings > CRM > Forms**, and the wizard adapts its steps to whatever you turn on.
@@ -34,7 +35,7 @@ Name, email, password, and any contact fields you require at signup. When the fo
 Pick a plan, a class type, and/or add packages and products to a cart. This step only appears when the form has at least one of those attached. You can merge it into the Details step with **Combine plan & user details into one step**.
 </Step>
 <Step title="Documents">
-Read and accept any documents that apply to the new contact. The wizard automatically picks up the [document rules](/settings/external-programs) and [document signatures](/content/document-signatures) that target member contact types - you don't attach documents to the form directly.
+Read and accept any documents that apply to the new contact. The wizard automatically picks up the [document rules](/content/documents) and [document signatures](/content/document-signatures) that target member contact types - you don't attach documents to the form directly.
 </Step>
 <Step title="Signature">
 Sign the accepted documents by drawing or typing. Skipped when the form's signature method is set to **No signature**.
@@ -141,14 +142,14 @@ https://<your-portal>/signup/<slug>
 The **Preview URL** column on the forms list links straight to it. Paste that link into emails, ads, signage, or your link-in-bio, or wire it to a button using the form's **Display mode**.
 
 <Note>
-The portal subdomain is set under **Settings > Member portal** (see the [member portal](/member-experience/member-portal)). Until that's configured, the **Preview URL** column is empty because there's no public host to build the link against.
+The portal subdomain is set under **Settings > Member portal** (see the [member portal](/settings/member-portal)). Until that's configured, the **Preview URL** column is empty because there's no public host to build the link against.
 </Note>
 
 The wizard is served first-party from your member portal, so the account it creates is signed in against the portal the moment signup completes - there's no cross-site login hop.
 
 ## Documents and signature
 
-The Documents and Signature steps are driven by your [document rules](/settings/external-programs) and [document signatures](/content/document-signatures), not by the form. A new contact created through any signup form is matched against every active rule that targets member contact types. If a rule matches, the wizard shows the document and the contact must accept it before continuing.
+The Documents and Signature steps are driven by your [document rules](/content/documents) and [document signatures](/content/document-signatures), not by the form. A new contact created through any signup form is matched against every active rule that targets member contact types. If a rule matches, the wizard shows the document and the contact must accept it before continuing.
 
 Two consequences:
 
@@ -173,6 +174,26 @@ Every successful submission creates:
 
 From there the contact behaves like any other member. They appear in the [member list](/members/member-list), their plan shows up under [memberships](/members/memberships), and any [smart tagging](/settings/smart-tagging) rules they match apply on the next sync.
 
+## Troubleshooting
+
+**The Preview URL column is empty**
+The public URL needs a portal subdomain. Set it under **Settings > Member portal**; until then there's no host to build the link against.
+
+**A plan I attached doesn't appear in the wizard**
+Only **active** plans render. Reactivate the plan under [Plans](/billing/plans) - the form picks it up on the next page load without re-saving the form.
+
+**The Selection step never shows**
+The step only appears when the form has something to select. Attach at least one plan, class type, package, or add-on product under **What members can choose**.
+
+**The Documents or Signature step is missing**
+Documents come from your document rules and [document signatures](/content/document-signatures), not the form - a step appears only when an active rule matches the new contact's member contact type. The Signature step is also skipped when the form's signature method is **No signature**.
+
+**A shared link returns "form not found"**
+The slug changed or the form was deleted. Changing a slug breaks every previously shared link, so avoid editing it once published.
+
+**A required signup field is missing from the Details step**
+Contact fields are configured centrally under **Settings > CRM > Contacts**, not per form. Set the field's **Signup visibility** to optional or required there, and it updates every form at once.
+
 ## Related
 
 <CardGroup cols={2}>
@@ -185,7 +206,7 @@ Pricing, signup fees, and renewal rules the form inherits per plan.
 <Card title="Document signatures" icon="file-signature" href="/content/document-signatures">
 Control which documents appear on which forms.
 </Card>
-<Card title="Member portal" icon="globe" href="/member-experience/member-portal">
+<Card title="Member portal" icon="globe" href="/settings/member-portal">
 The portal that serves the form, on the subdomain set under Settings > Member portal.
 </Card>
 </CardGroup>

@@ -1,18 +1,99 @@
 ---
 title: Document signatures
-description: View and manage signed documents and signature status.
+description: The ledger of signed waivers, terms, and policies - who accepted which document, when, how it was signed, and the evidence captured, including guardian signing for dependents.
+keywords: [document signature, signed waiver, typed-name acceptance, guardian signing, proxy signature, signature evidence, membership agreement, compliance]
 ---
 
-Document signatures tracks which members have signed required documents (waivers, terms, policies) so you can see completion status and access signed copies for compliance.
+Document signatures is the ledger of every accepted document in your organization. It records which member accepted which document, when, how it was signed, and the version of the document at the time - evidence you can produce for compliance. A signature is the proof that a member accepted a [required or optional document](/content/documents), captured when they sign through the member portal, the public signup wizard, or an acceptance link you send.
+
+Open **Members > Document signatures** (route `/members/document-signatures`). The signable documents and the rules that require them are configured separately under **Settings > Operations > Documents & Waivers**.
 
 ## Overview
 
-Open **Content > Document signatures** to see a list of signature records: which document was signed, by whom, when, and the version of the document at the time. Signatures are collected through the member portal or the public signup flow whenever a document rule requires them.
+- **Signature ledger** - One row per member and document, showing the latest acceptance with its status, date, and signature type.
+- **Signature detail** - Open a row to see the full signing history, the document version, the typed name, and captured evidence.
+- **Typed-name acceptance** - When a document rule requires it, the member's typed full name is recorded and shown on the signature.
+- **Signing evidence** - Drawn-signature image, acceptance timestamp, IP address, and device / user agent, captured by the signup wizard.
+- **Guardian / proxy signing** - A dependent's document can be accepted by their guardian; the ledger records the dependent as the subject and the guardian as the signer.
+- **Signed agreement PDF** - Download the rendered membership agreement (member details, household, accepted documents, and signature) on demand.
 
-Open a row to see the signer, the document version, and the timestamp.
+## The signatures list
+
+The list shows the most recent acceptance per member and document, with these columns:
+
+- **Document** - The title of the signed document.
+- **Contact** - The member the signature belongs to. Click the name to jump to their [profile](/members/member-profiles).
+- **Status** - **Signed** when an acceptance exists, or **Pending** when the document is required but not yet signed.
+- **Signed Date** - When the latest acceptance was recorded.
+- **Type** - **Electronic** (signed online) or **Physical** (a paper acceptance recorded in the system).
+
+From the toolbar you can jump to **Documents and Waivers** to manage the documents and rules, or create a new document.
+
+## Signature detail
+
+Click any row to open its detail page.
+
+- **Signature details** - The document (a link to its content item), the signed date(s), and the signature type.
+- **Signed history** - Every acceptance for that member and document, newest first, each with its timestamp and the document version at signing time. Because a document can be re-signed (for example after a new version), the history preserves each event rather than overwriting it.
+- **Status** - **Signed** or **Pending**.
+- **Document Version** - The version of the document that was accepted, so you can prove what the member actually agreed to.
+- **Typed name** - The full name the member typed, shown when the document required typed-name acceptance.
+- **Member** - Contact card for the signer.
+- **Signature evidence** - When present, a card with the drawn-signature image, the acceptance timestamp, the IP address, and the device / user agent.
+
+<Note>
+The evidence card only appears when those fields were captured. Signatures collected by the signup wizard carry the drawn image, IP, and user agent; acceptances from older flows, typed-name-only acceptance, or a physical record entered by staff may show fewer fields, and the card is hidden when none are present.
+</Note>
+
+### Downloading the signed agreement
+
+The **Download** button on a signature detail page produces the signed onboarding agreement as a PDF - the member's details, household, the documents they accepted, and their signature, with an IP and device footer. The PDF is generated on demand and served behind your admin session; it is never stored at a public URL.
+
+## Typed-name acceptance
+
+When a [document rule](/content/documents) has **Require review and typed name** switched on, the member must scroll through the whole document and type their full name before the accept button unlocks. That typed name is stored on the signature and shown as **Typed name** on the detail page, alongside the timestamp and any captured evidence. This is the strongest self-serve acceptance you can require and is the recommended setting for liability waivers.
+
+## Guardian and proxy signing for dependents
+
+When a household enrolls a dependent (for example a parent registering a child for a kids' program), the guardian accepts the dependent's documents on their behalf during the signup wizard. In the ledger:
+
+- The **subject** of the signature is the **dependent** - the row belongs to the child's contact and appears under their profile.
+- The **signer** is the **guardian** - the acceptance is attributed to the account owner who actually completed the wizard.
+
+This lets you route a minor's waiver to the `dependent` household role (see [Documents and waivers](/content/documents)) while keeping an accurate record that a responsible adult signed it. The guardian only signs documents they explicitly accepted in the wizard - the dependent's required documents are presented to the guardian, and each accepted one is recorded as a separate signature for the child.
+
+## How signatures are created
+
+Signatures land in the ledger from several flows:
+
+- **Public signup wizard** - The onboarding flow captures acceptances (including drawn signature, IP, and user agent) for the member and, where applicable, their dependents.
+- **Member portal** - Members sign outstanding required documents from their own portal.
+- **Acceptance link** - Staff can generate an acceptance link for a specific member and document (an e-signature token), which opens the document for that member to review and accept.
+- **Physical record** - A paper acceptance can be represented as a signature of type **Physical**.
+
+A member is not asked to re-sign for cosmetic edits to a published document; a fresh acceptance is only recorded when a genuinely new signature is submitted. A repeat submission of the same document version on the same day is rejected to avoid duplicate rows.
+
+## Tips and best practices
+
+- **Use typed-name acceptance for waivers.** It forces the member to scroll and type their name, and the typed name is preserved on the signature as evidence.
+- **Check status before high-risk activities.** A **Pending** row means a required document is unsigned - useful to confirm before a first climbing session, sparring class, or contact-sport match.
+- **Download the agreement for your records** when onboarding disputes arise; the PDF captures the exact documents and signature.
+- **Attribute minors correctly.** For dependents, expect the signature to sit on the child's record with the guardian as signer - that is the intended proxy model, not a data error.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| A member shows **Pending** for a document | The rule is mandatory but the member has not accepted yet | Ask the member to sign from their portal, or send an acceptance link |
+| A signature has no evidence card | The acceptance came from a flow that did not capture a drawn image, IP, or user agent (for example a physical or typed-name-only acceptance) | Expected - the card only renders when evidence exists |
+| No **Typed name** on a signature | The rule did not require typed-name acceptance, or the acceptance predates that requirement | Enable **Require review and typed name** on the rule under Documents & Waivers |
+| A dependent's waiver shows the parent as signer | Guardian / proxy signing - the dependent is the subject, the guardian is the signer | Expected behavior for household dependents |
+| A member was asked to sign again | A genuinely new signature was required; cosmetic edits alone do not re-gate | Confirm the latest version and that the earlier acceptance is still on file in the signed history |
+| The document I need is missing from the ledger | It has never been signed by anyone, or it is not published / not required by any rule | Configure a rule under [Documents and waivers](/content/documents) and publish the document |
 
 ## Related
 
-- [Documents](/content/documents) - Create and edit the documents members sign.
-- [Settings overview](/settings/overview) - Document rules live under Settings > Document rules.
-- [Member list](/members/member-list) - See which members have outstanding documents.
+- [Documents and waivers](/content/documents) - Define signable documents and the rules that require them, including household-role targeting for dependents.
+- [Accounts](/members/accounts) - Household accounts and the owner/adult/dependent roles behind guardian signing.
+- [Member profiles](/members/member-profiles) - See a single member's signatures in the context of their record.
+- [Settings overview](/settings/overview) - Where Documents & Waivers is configured.

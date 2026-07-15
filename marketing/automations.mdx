@@ -1,18 +1,21 @@
 ---
 title: Automations
-description: Build event-driven workflows that message members, manage tags, and notify staff automatically
+description: Build event-driven workflows that message members, manage tags, and notify staff automatically - with built-in reminders and one-click blueprints.
+keywords: [automations, workflows, triggers, blueprints, win-back, review request, birthday, booking reminder, drip campaign, notify staff]
 ---
 
 Automations are event-driven workflows that run in the background. A trigger fires (a booking is created, a membership expires, a payment fails), the contact is checked against the automation's entry conditions, and a sequence of steps then runs for that contact: send a message, wait, branch on a condition, add a tag, notify staff.
 
 ## Overview
 
-Use **Marketing → Automations** to view, edit, and create automations. The list is split into two sections:
+Use **Marketing > Automations** to view, edit, and create automations. The list is split into two sections:
 
-- **Built-in automations** - Seeded by 1club (for example, the booking reminder). You can adjust timing, channels, and entry conditions, but the step structure is fixed.
-- **Your automations** - Custom workflows you build from scratch. Available on the Grow plan.
+- **Built-in automations** - Seeded by 1club into every gym (the booking reminder and the membership-expiration reminder). You can adjust timing, channels, and entry conditions, but the step structure is fixed.
+- **Your automations** - Custom workflows you build from scratch, plus any suggested blueprints you have accepted. Available on the Grow plan.
 
-Each row shows the trigger, step count, total runs, failed runs, and the last time it fired.
+Each row shows the trigger, step count, total runs, failed runs, and the last time it fired. Toggle the switch on a row to activate or pause it.
+
+Above the list, a strip of **suggested blueprints** offers ready-made workflows (onboarding drip, review request, win-back, and more) that match your gym's setup. Accepting one drops a fully built, paused automation into your list for review. See [Blueprints: prebuilt automations](#blueprints-prebuilt-automations).
 
 ## How an automation runs
 
@@ -133,24 +136,82 @@ Send an in-app, email, SMS, or push notification to staff.
 - **Recipients** - By role (admin, manager, instructor, staff) or to the booking's assigned instructor.
 - **Content** - Subject and body, with variables for the contact and trigger event.
 
-## Built-in automations
+## Blueprints: prebuilt automations
 
-Built-in automations cover common needs without setup. One example ship by default:
+A **blueprint** is a prebuilt definition of a complete automation (a trigger plus a full step graph) authored by 1club. A blueprint is never executed on its own - it becomes a real automation only when it is turned into an org-owned row. There are two ways a blueprint reaches your gym: it is either **auto-provisioned** (seeded and locked) or **suggested** (offered to you, and built only when you accept it).
 
-- **24 hours before booking** - Reminder via email, push, and in-app.
+### Auto-provisioned (built-in) automations
 
-For built-in automations you can change:
+Two blueprints are seeded into every gym at creation. They appear under **Built-in automations** and are locked: you cannot change their step structure, and you cannot delete them.
 
-- The advance window (for time-based triggers).
-- The channels used by message steps.
+| Automation | Trigger | Default timing | Channels | State |
+| --- | --- | --- | --- | --- |
+| **Booking reminder** | Upcoming booking | 24 hours before start | Email, in-app | Paused |
+| **Membership expiration** | Membership expiring | 3 days before expiry | Email, in-app | Paused |
+
+Both ship **paused**. Sending unconfigured reminders the moment a gym is created would be surprising, so they stay off until you turn them on.
+
+For a built-in automation you can change:
+
+- The advance window (how long before the event it fires).
+- The channels used by the message step.
+- The message subject and content (edit the step directly).
 - The entry conditions (membership types, tags).
-- Per-club restrictions (apply to all gyms, or only specific ones).
+- The on/off state.
 
-The step structure itself is fixed and cannot be edited or deleted. To extend behavior, create a custom automation alongside.
+The step structure itself is fixed. Editing the message content or timing on a built-in automation is allowed on any plan - that is the point of shipping them. To add steps or branches, build a custom automation alongside.
+
+### Suggested blueprints
+
+Suggested blueprints are never seeded automatically. They appear as a strip of one-click cards above the automation list. Accepting one **instantiates** it: 1club builds a fully wired, **paused, editable** custom automation, stamped with the blueprint's identity so the same suggestion won't be offered again.
+
+A suggestion appears only when all three are true:
+
+- Your gym is on the **Grow plan** (custom automations require it).
+- You don't already own an automation from that blueprint (accepting is idempotent - one per gym).
+- Every prerequisite the blueprint declares is satisfiable for your gym (see [Prerequisites and gating](#prerequisites-and-gating)).
+
+The catalog of suggested blueprints:
+
+| Blueprint | Trigger | What it does | Prerequisites |
+| --- | --- | --- | --- |
+| **New-member onboarding drip** | Contact created | A three-touch welcome series over the first week (welcome, wait 2 days, tips, wait 3 days, "book your first session"), then tags the member as onboarded. | Onboarded tag (created for you) |
+| **Review request** | Booking checked in | Waits 2 hours after the session ends, then sends a review request (capped at one every 7 days). | Gym runs bookings |
+| **No-show win-back** | Booking no-show | Branches on whether the member still has an active membership, then sends a tailored nudge to each path. | Gym runs bookings |
+| **Membership win-back** | Membership cancelled | Tags the member as at-risk, waits 3 days, then sends a win-back message. | Membership plans exist, At risk tag (created for you) |
+| **Birthday celebration** | Contact birthday | Generates a warm, personalized birthday message with AI (saved as a draft for staff to review, never auto-sent). | None |
+| **Failed-payment recovery** | Payment failed | Notifies your admins and managers, then messages the member to update their payment details. | Stripe connected |
+
+After you accept a blueprint it lands paused in **Your automations**. Open it in the builder, review and tweak the copy, timing, and channels, then turn it on. Because it is a normal custom automation, you can freely add, remove, or rewire steps.
+
+### Prerequisites and gating
+
+Each blueprint declares typed **prerequisites** - dependencies it needs before it makes sense. Prerequisites fall into two kinds:
+
+- **Providable** - 1club can create the thing for you when you accept. Today this is tags: the tag is found-or-created (scoped to your gym) as part of instantiation, so a providable prerequisite never hides a suggestion. If instantiation fails, any tag it created is rolled back.
+- **Gating** - 1club cannot create it, so the blueprint is simply not suggested until you have it.
+
+| Prerequisite | Kind | Satisfied when |
+| --- | --- | --- |
+| Tag (for example Onboarded, At risk) | Providable | Always - created on accept |
+| Gym runs bookings | Gating | You have at least one class or area |
+| Membership plans exist | Gating | You have at least one plan |
+| Stripe connected | Gating | You have a Stripe integration configured |
+
+So a brand-new gym with no classes, no plans, and no payments connected sees only the blueprints that don't depend on those things (for example the onboarding drip and birthday celebration); the win-back and payment-recovery blueprints appear as you set the rest of the product up.
+
+### Template catalog
+
+The **Send message** step's content picker draws from a template catalog so you don't have to write every message inline. The catalog combines:
+
+- **System templates** - a curated set of 1club-authored message templates that are eligible for automations. If your gym has customized one of these templates, the picker shows your customized version.
+- **Custom templates** - your own reusable [message templates](/messaging/templates).
+
+Content bound from a template is snapshotted into the step when you save the automation, so later edits to the template do not silently change what an existing automation sends.
 
 ## Building a custom automation
 
-1. Go to **Marketing → Automations**.
+1. Go to **Marketing > Automations**.
 2. Click **Add Automation**.
 3. Give it a name and description.
 4. Select a **trigger** and configure its options.
@@ -159,22 +220,81 @@ The step structure itself is fixed and cannot be edited or deleted. To extend be
 7. For each **Send message** step, choose channels and either write content inline or select a template.
 8. Click **Save**.
 
-The automation is active immediately. You can pause it from the list at any time.
+The automation is saved paused by default. Review it, then turn it on when you're ready (see [Activating and pausing](#activating-and-pausing)).
 
-## Testing
+## Activating and pausing
 
-Use the **Test run** action on an automation to dispatch a single run against a contact you choose. The run executes the real steps (real emails, real SMS) so test against yourself or a designated test contact.
+New custom automations and accepted blueprints always land **paused** so you can review them before they touch a real member. When you're ready, flip the toggle on the automation's row (or save it as active from the builder) to start it. Flip it back to pause without deleting.
+
+Steps run for real once an automation is active - real emails, real SMS, real staff notifications. If you want to see how a workflow behaves before opening it to your whole audience, narrow the entry conditions to a tag that only a test contact carries, turn it on, trigger the event yourself, then widen the conditions once you're happy.
 
 ## Limits and behavior
 
 - Steps are executed by a background worker that polls every minute. Expect up to a minute of delay between when a step is scheduled and when it runs.
-- A step that errors is retried up to three times before being marked failed. Failed steps stop that branch of the run, but other branches continue.
-- Completed runs and processed events are archived after roughly 90 days. Failed runs are kept indefinitely so you can investigate.
+- A step that errors is retried up to three times (with exponential backoff) before being marked failed. Failed steps stop that branch of the run, but other branches continue.
+- Completed and cancelled runs are archived after about 90 days; processed trigger events after about 30 days. Failed runs are kept indefinitely so you can investigate.
 - One trigger event creates at most one run per contact per automation.
+
+## Worked examples
+
+### Membership win-back for a jiu-jitsu gym
+
+A member cancels their unlimited plan. You want a considered follow-up, not an instant plea.
+
+1. Accept the **Membership win-back** blueprint (or build the same shape by hand). It fires on **Membership cancelled**.
+2. Step 1 tags the contact **At risk** so you can also see churn on the member list.
+3. Step 2 is a **Wait** of 3 days - enough space to feel human.
+4. Step 3 sends an email and in-app message with a reason to return (a free open-mat week, say).
+5. Optionally add a **Condition** on **Has tag** before the message so members who already resubscribed drop out.
+
+### Post-session review request for a padel club
+
+You want reviews from players who actually showed up, without nagging regulars.
+
+1. Accept the **Review request** blueprint. It fires on **Booking checked in**.
+2. The first step is a **Wait** anchored to **booking end** (2 hours after the match), so the ask arrives once they've left the court.
+3. The **Send review request** step carries a frequency limit of one request per contact every 7 days, so a member who plays four times a week isn't asked four times.
+4. Turn on the **External review CTA** so a happy in-app rating offers a Google review link.
+
+### Birthday message for a yoga studio
+
+1. Accept the **Birthday celebration** blueprint. It fires on **Contact birthday**.
+2. The single **Send AI message** step is set to **Draft** and a **warm** tone, so each greeting is personalized but a staff member approves it in the [inbox](/messaging/overview) before it sends.
+3. Prefer fully automatic? Switch the step to **Auto** mode once you trust the output.
+
+### No-show win-back for a spinning studio
+
+1. Accept the **No-show win-back** blueprint. It fires on **Booking no-show**.
+2. A **Condition** on **Has active membership** splits the run: members who missed a class get a light "we missed you, rebook anytime" nudge on the **Yes** path.
+3. Contacts with no active membership take the **No** path and get a stronger win-back offer instead.
+
+## Tips and best practices
+
+- **Start from a blueprint.** Even if you plan to customize heavily, accepting a suggested blueprint gives you a correct trigger, timing, and step graph to edit rather than a blank canvas.
+- **Keep automations paused until you've read every step.** Content is snapshotted from templates on save, so proofread inside the builder, not in the template.
+- **Use entry conditions to avoid overlap.** If two automations react to the same trigger, scope each one with a membership type or tag so a contact doesn't get two messages at once.
+- **Anchor waits deliberately.** A reminder should measure from the booking start; a review request should measure from the booking end. The wrong anchor sends at the wrong moment.
+- **Prefer Draft mode for AI messages** until you've seen a few generated examples for your gym's voice.
+- **Set frequency limits on review requests** so frequent visitors aren't asked after every session.
+- **Notify staff, don't just message members,** on high-stakes triggers like failed payments - the sooner a human follows up, the more you recover.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| A suggested blueprint never appears | Its gating prerequisite isn't met (no classes/areas, no plans, or Stripe not connected), or your gym isn't on the Grow plan | Set up the missing piece, or upgrade to Grow. Providable tags are created for you and never block a suggestion. |
+| The **Add Automation** button or blueprint accept is blocked | Custom automations require an active Grow subscription | Upgrade the plan under **Revenue**, then retry. |
+| You can't accept a blueprint a second time | Blueprints are one-per-gym - you already own an automation from it | Open the existing automation from **Your automations** and edit that instead. |
+| An automation is active but nothing sends | The email or SMS channel has no integration configured, or entry conditions exclude everyone | Configure the provider under [Integrations](/settings/integrations); loosen or clear the entry conditions. |
+| Messages arrive a minute late | The step worker polls every minute | Expected - build in a small buffer rather than relying on second-level timing. |
+| A built-in automation won't let you add steps | Built-in (auto-provisioned) automations have a fixed structure | Edit the timing, channels, and content in place; build a separate custom automation for extra steps. |
+| A member got two messages from one event | Two automations share the trigger | Add non-overlapping entry conditions (membership type or tag) so only one applies. |
 
 ## Related
 
+- [Marketing overview](/marketing/overview) - How automations fit alongside promotions, pipeline, and the rest of the Marketing hub.
 - [Messaging templates](/messaging/templates) - Reusable content you can bind to Send message steps.
 - [Messaging overview](/messaging/overview) - Inbox, AI drafts, and one-off sends.
 - [Member list](/members/member-list) - Tags and segments used in entry conditions and Modify contact steps.
+- [Analytics: marketing](/analytics/marketing) - Automation run history and cross-feature performance.
 - [Integrations](/settings/integrations) - Configure email and SMS providers before using those channels.

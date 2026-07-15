@@ -1,99 +1,172 @@
 ---
 title: Member profile
-description: Everything attached to a single contact - notes, memberships, bookings, check-ins, transactions, messages, documents, credentials, and account links.
+description: The per-contact page that pulls together a member's identity, balances, memberships, bookings, check-ins, transactions, messages, documents, notes, credentials, and account links.
+keywords: [member profile, contact, notes, PIN, wallet balance, account balance, household, custom fields, activity timeline, portal invitation, credentials]
 ---
 
-The member profile is the per-contact page you land on after clicking a row in the [Member list](/members/member-list). It pulls together the contact's identity, balances, memberships, history, and integration links into one view. The URL is `/members/list/{contactId}`.
+The member profile is the per-contact page you land on after clicking a row in the [Member list](/members/member-list). It pulls together a contact's identity, balances, memberships, history, and integration links into one view. A **contact** is your organization's own copy of a person's record - name, email, phone, plus their memberships, invoices, and signatures. The URL is `/members/list/{contactId}`.
+
+## Overview
+
+From a member profile you can:
+
+- Read a live snapshot of what the member owes, what they have paid, and how often they visit.
+- Open the member's bookings, memberships, check-ins, transactions, messages, and signed documents on demand.
+- Edit the contact's details and custom fields, and archive or unarchive the record.
+- Add a booking, membership, check-in, or voucher redemption for the member in one click.
+- Keep internal notes, invite the member to the portal, and reset their portal password.
+- Manage access credentials (QR codes, access cards, PINs) when access control is on.
+- Link the member to households or companies, and view their Stripe or WebLock integration records.
 
 ## Page layout
 
 The page has two columns:
 
-- **Left sidebar** - the contact card: avatar, name, email, phone, status chip, accounts, custom fields, user-account section, credentials (when access control is on), payment methods, integration links (Stripe, WebLock), and a notes panel.
-- **Main column** - an info strip across the top, then seven or eight tabs underneath.
+- **Left sidebar** - the contact card: avatar, name, email, phone, accounts, custom fields, user-account section, credentials (when access control is on), integration links (Stripe, WebLock), payment methods, and a notes panel.
+- **Main column** - an info strip across the top, then the underlined tabs underneath.
 
 ## Info strip
 
-Four to five tiles at the top of the main column summarize the contact's current state:
+Tiles at the top of the main column summarize the contact's current state. Three tiles always show, and a fourth appears when progression tracking is enabled:
 
-- **Balance** - account balance plus wallet credit. Negative means the member owes you; positive means you owe them or they have credit. Hover the icons to redeem a voucher or add wallet credit.
-- **Total paid** - lifetime amount paid versus billed.
-- **Weekly attendance** - sparkline of recent check-ins. The dot lights up when the member has already checked in today.
-- **Level** - current progression level, when progression tracks are enabled. Plus icon assigns a new level.
+- **Due from member** - the amount this member currently owes. It turns red when the balance is negative (money is owed). A **Credit balance** sub-line shows any wallet credit on the account. Due and credit are shown separately and never netted against each other: a member who owes 100 and holds 100 in credit still shows 100 due. Use the redeem icon in this tile to redeem a voucher against the account.
+- **Total paid** - lifetime amount paid, with an "of X billed" sub-line so you can see paid versus billed at a glance.
+- **Attendance** - a sparkline of recent check-ins. The dot lights up when the member has already checked in today. Use the overflow icon to change the window: **Last 4 weeks**, **Last 12 weeks**, **Last 6 months**, **Last 12 months**, or **All time**. Your choice is remembered for the next profile you open.
+- **Level** - current progression level, shown only when progression tracks are enabled. The plus icon assigns a level.
 
 ## Header actions
 
-The page header has an **Add** menu, an **Edit** action, an **Archive** action, and a **Message** shortcut. The **Add** menu creates:
+For an active contact the header has an **Add** menu plus a **Message**, **Edit**, and **Archive** action (the last three collapse into an overflow menu on narrow screens). The **Add** menu creates:
 
 - **Booking** - opens the schedule pre-filtered to this contact.
 - **Membership** - opens the membership dialog with the contact pre-selected.
-- **Check-in** - records a visit (existing booking, existing membership, or new booking/membership in one step).
+- **Check-in** - records a visit (against an existing booking or membership, or a new booking or membership in one step).
 - **Voucher** - redeems a voucher against this contact's account.
-- **Household** or **Company** account - creates the account with this contact as primary.
 
-If the contact is archived, the header switches to a single **Unarchive** action.
+**Message** opens a new message pre-addressed to the contact. **Edit** opens the contact form. **Archive** removes the member from active use (see below).
+
+If the contact is archived, the header collapses to a single **Unarchive** action (visible to staff with the `members.manage.club` permission). An **archived member** is retained for financial and legal history but is hidden from listings, has its memberships and future bookings cancelled, and cannot log in until an admin unarchives it. Archiving is org-scoped: the same person can stay an active member of another organization.
 
 ## Tabs
 
+Each tab shows a count badge and loads its own data on demand, so opening the profile stays fast even for contacts with long histories.
+
 | Tab | What it shows |
 |------|---------------|
-| **Overview** | Engagement gauge and activity timeline (recent bookings, payments, messages, check-ins, notes) |
+| **Overview** | Engagement gauge and activity timeline |
 | **Bookings** | All bookings, including cancelled. Click through to the booking detail |
 | **Memberships** | Every membership ever assigned. Edit, pause, resume, renew, or cancel from here |
 | **Check-ins** | Visit history |
 | **Transactions** | Invoices and payments tied to this contact |
 | **Messages** | Email and SMS sent to or received from the contact |
 | **Signatures** | Signed documents (waivers, contracts) |
-| **Matches** | Match history, when ratings are enabled |
+| **Matches** | Match history, shown only when ratings are enabled |
 
-Each tab loads its own data on demand, so opening the profile is fast even for contacts with long histories.
+### Overview tab
+
+The Overview tab stacks two elements:
+
+- **Engagement gauge** - the member's engagement score and level. See [Engagement analytics](/analytics/engagement) for how the score is computed.
+- **Activity timeline** - a chronological feed of the member's bookings, check-ins, messages, and membership activity.
 
 ## Editing the contact
 
-Click **Edit** in the header. The form covers name, contact details, date of birth, type (member, lead, drop-in, lapsed, contact, staff), profile image, address, and any custom fields configured under **Settings > Custom fields**.
+Click **Edit** in the header. The form covers name, contact details, date of birth, type, profile image, address, and any custom fields configured under **Settings > Custom fields**. Contact **type** can be one of: member, staff, lead, contact, lapsed, or drop-in.
 
-Changing the contact's **type** is logged. Click the type chip in the page header to see the type-change history.
+Changing the contact's type is logged. Click the type chip in the page header to open its type-change history.
 
 ## Notes
 
-The notes panel at the bottom of the sidebar is a free-form running log. Each note is timestamped and edits update the timestamp. Notes are internal: members do not see them.
+The notes panel at the bottom of the sidebar is a free-form running log. Type a note and press the add button (or Ctrl+Enter) to save it. Each note is timestamped; editing a note updates its timestamp. Use the pencil and trash icons on a note to edit or delete it. Notes are internal - members never see them.
 
 ## User account
 
 The **User Account** block in the sidebar shows whether the contact has a member-portal login. Possible states:
 
-- **Unregistered** - no portal account exists. If the contact has an email, an **Invite** button appears.
-- **Invited** - invitation sent but not accepted. The block shows the expiration date. The overflow menu offers **Resend invitation** or **Delete invitation**.
-- **Active** / **Inactive** / **Suspended** / **Incomplete** - the account exists. Admins can use the overflow menu to set a password (for any user except themselves) or delete the org-user link.
+- **Unregistered** - no portal account exists. When the contact has an email, an **Invite** button appears to send a portal invitation.
+- The account exists (statuses such as **Active**, **Inactive**, **Suspended**, or an invitation still pending). The block shows the status chip, and the invitation expiry date while an invitation is outstanding.
 
-## Credentials
+The overflow menu on this block offers, depending on state:
+
+- **Reset password** - available for an active account when you are an admin and the account is not your own.
+- **Send invitation** / **Resend invitation** - re-sends a portal invitation while one is outstanding.
+- **Delete** - deletes an outstanding invitation, or removes the portal login link, for anyone but yourself.
+
+## Credentials and PIN
 
 When [access control](/settings/access-control) is enabled, a credentials block lists every QR code, access card, or PIN assigned to this contact. From here you can:
 
 - **Assign** an existing unassigned credential to the contact.
-- **Add** a new credential (manual enrollment, type plus identifier).
+- **Add** a new credential (manual enrollment - pick a type and enter its identifier).
 - Mark a credential **primary**, revoke it, or unassign it.
 
-See [Access cards](/members/member-cards) for credential types and lifecycle.
+A **PIN** is a type of credential: a 4-10 character alphanumeric code the member uses at a kiosk or door. Adding a new PIN replaces any existing active PIN for the contact. See [Access cards](/members/member-cards) for credential types and lifecycle.
 
 ## Accounts panel
 
-The Accounts block in the sidebar shows every household and company the contact belongs to, with the contact's role on each. Click an account name to jump to the [account detail page](/members/accounts). The plus button creates a new household with this contact as owner.
+The Accounts block in the sidebar shows every household and company the contact belongs to, with the contact's role on each. Click an account name to open the [account detail page](/members/accounts).
 
-When a contact is on a household account, the **Add** button on each account row lets you pull in another household member, and the trash icon detaches a member without deleting their contact record.
+- When the contact belongs to **no account**, the block shows an **Add** button that creates a new account (household or company) with this contact locked in as the owner.
+- When the contact **is on an account**, each account row shows the other members with their roles. The row's **Add** button attaches a new person to that account, and the trash icon detaches a member without deleting their contact record.
 
 ## Integrations
 
 When the contact has been pushed to external systems, the sidebar shows:
 
 - **Stripe customer** - customer ID, email, and creation date. **Sync** re-pulls Stripe's record.
-- **WebLock** - the WebLock user ID, or a prompt to sync. **Sync** re-pushes every active access grant for this contact to WebLock.
+- **WebLock** - the WebLock user ID, or a prompt to sync. **Sync** re-pushes every active access grant for this contact to WebLock and reports how many grants were pushed.
 
 These blocks only appear when the corresponding integration is installed and connected for your org.
 
 ## Payment methods
 
-Saved cards and bank accounts on file appear in the sidebar. They're the same payment methods available to use when adding payments to invoices or membership transactions.
+Saved cards and bank accounts on file appear in the sidebar. They are the same payment methods available when adding payments to invoices or membership transactions.
+
+## Worked examples
+
+### Front-desk check-in for a padel member who owes money
+
+1. Open the member from the [Member list](/members/member-list).
+2. The **Due from member** tile shows 30 in red - a court fee from last week.
+3. Use **Add > Check-in** to record today's visit against their membership.
+4. On the same profile, open the **Transactions** tab and take payment for the outstanding 30, or redeem a voucher from the **Due from member** tile if they have credit.
+
+### Onboard a new jiu-jitsu member to the portal
+
+1. Create or open the contact and click **Edit** to confirm the email is correct.
+2. In the **User Account** block, click **Invite**. The block switches to show the invitation and its expiry.
+3. If the member does not accept in time, use the overflow menu to **Resend invitation**.
+
+### Give a climbing member a door PIN
+
+1. Make sure access control is enabled for your org.
+2. In the credentials block, click **Add**, choose **PIN**, and enter a 4-10 character code.
+3. The PIN becomes the member's primary credential. Adding another PIN later replaces this one.
+
+### Track belt progression for a martial arts student
+
+1. Enable progression tracks so the **Level** tile appears in the info strip.
+2. Use the plus icon on the **Level** tile to assign the student's current belt.
+3. The Overview tab's activity timeline and the info strip keep the level visible for front-desk staff.
+
+## Tips & best practices
+
+- Read the info strip before every front-desk interaction: it answers "do they owe anything?", "have they checked in today?", and "how active are they?" without opening a tab.
+- Keep sensitive context (injuries, disputes, access notes) in the **Notes** panel, not in message threads - notes stay internal.
+- Prefer **Archive** over deletion when a member leaves: archiving preserves their financial and legal history and can be reversed with **Unarchive**.
+- Redeem vouchers and add wallet credit from the **Due from member** tile so the credit balance updates in place.
+- When a family shares billing, create the household from the paying member's profile so they are set as the owner automatically.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| No **Invite** button in the User Account block | The contact has no email address | Click **Edit** and add an email, then reopen the block |
+| **Reset password** missing from the overflow menu | The account is not active, you are not an admin, or it is your own account | Have an admin reset it; you cannot reset your own password from another user's profile |
+| Credentials block not visible | Access control is not enabled for the org | Enable it under [access control settings](/settings/access-control) |
+| PIN rejected when adding | PIN is not 4-10 alphanumeric characters | Use only letters and digits, 4 to 10 characters long |
+| Stripe or WebLock block missing | The integration is not installed or connected, or the contact has not been pushed yet | Connect the integration, then use **Sync** on the block once it appears |
+| Only an **Unarchive** button in the header | The contact is archived | Unarchive to restore active use (requires `members.manage.club`) |
 
 ## Related
 
@@ -101,5 +174,5 @@ Saved cards and bank accounts on file appear in the sidebar. They're the same pa
 - [Memberships](/members/memberships) - the org-wide membership grid
 - [Accounts](/members/accounts) - households and companies
 - [Attendance](/members/attendance) - check-in workflows
-- [Access cards](/members/member-cards) - credential management
+- [Access cards](/members/member-cards) - credential and PIN management
 - [Engagement analytics](/analytics/engagement) - how the gauge is computed

@@ -1,54 +1,166 @@
 ---
 title: Organization
-description: Organization-wide details, address, time zone, contact info, and supported locales for the admin.
+description: Configure organization-wide identity, address, time zone, locales, clubs, branding, and custom domains in 1Club Settings.
+keywords: [organization, settings, slug, timezone, clubs, branding, domains, locales, subscription]
 ---
 
-**Settings > Organization** holds the details that apply to your whole 1Club account, not to any one gym. Open it when you need to rename the org, change the slug, update the headquarters address, switch the time zone, or pick which languages the admin and member-facing apps offer.
+**Settings > Organization > Details** holds the identity that applies to your whole 1Club account, not to any one gym: name, slug, headquarters address, time zone, contact info, and supported languages. This page is the anchor for the wider Organization category, which also covers your clubs, branding, custom domains, users, and your 1Club platform subscription.
 
-For per-gym things like opening hours, address, and check-in mode, use **Settings > Clubs** instead. The two pages exist for different scopes - the org owns brand and identity, each gym owns its own physical setup.
+Per-gym things like opening hours, address, and check-in mode live on each club under **Settings > Clubs**, not here. The two scopes exist for different jobs: the organization owns brand and identity, and each gym owns its own physical setup. See [Organization and clubs](/reference/organization-clubs).
 
-## What you can edit
+## Overview
 
-The page is a single form with two sections.
+- **Organization identity** - Name, slug (your portal web address), and description.
+- **Contact and location** - Address, phone, time zone, email, and website, with map autocomplete.
+- **Localization** - Which languages members and staff can pick, and the default.
+- **Clubs** - Add and edit each physical location under **Settings > Clubs**.
+- **Branding** - Logo, colors, and fonts under **Settings > Member Apps > Branding**.
+- **Domains** - Custom domains for email, website, and portal under **Settings > Organization > Domains**.
+- **Subscription** - Your 1Club plan and billing portal under **Settings > Organization > Subscription**.
+
+## What you can edit on Details
+
+The Details page is a single form with three sections.
 
 ### Details
 
-- **Name** - Your organization's display name. Used in emails, member portals, and admin headers.
-- **Slug** - The URL-safe identifier. Lowercase letters, numbers, and hyphens only. It shows up in member portal URLs and other public links. Change it carefully - existing links break.
+- **Name** - Your organization's display name. Used in emails, the member portal, and admin headers. Required.
+- **Slug** - The URL-safe identifier. Lowercase letters, numbers, and hyphens only, and up to 40 characters. It becomes your member portal subdomain (`{slug}.portal.1club.ai`) and shows up in public links, so keep it short. Required, and it must be unique across all organizations.
 - **Description** - Optional short blurb shown on public surfaces such as the marketplace listing.
 
 ### Contact info
 
-- **Address** - Type or pick from the Mapbox autocomplete. Latitude and longitude are saved alongside so the server can derive your time zone automatically.
-- **Phone** - International format. Country code defaults from your address.
-- **Time zone** - The default for everything date-related across the admin. Today/this-week widgets, recurring jobs, and exports all use this. Address autocomplete pre-fills it; you can override.
-- **Email** - Generic contact email for the org. Members and the marketplace may surface this.
-- **Website** - Your main public site, if any.
+- **Address** - Type it or pick from the map autocomplete. When you select a suggestion, latitude and longitude are saved alongside the address so the server can derive your time zone.
+- **Phone** - International format. The country code defaults from your address country.
+- **Time zone** - The default for everything date-related across the admin: today and this-week widgets, recurring jobs, and exports. The address selection pre-fills it, and you can override it manually.
+- **Email** - Generic contact email for the org. Members and the marketplace may surface it. Must be a valid email address.
+- **Website** - Your main public site, if any. Must be a valid URL.
 
 ### Localization
 
-- **Supported locales** - The languages members can pick in your portal and which the admin offers in user profiles. Currently English, Spanish, French, German, Bulgarian, and Czech.
-- **Default locale** - The language used when a member's preference isn't known.
+- **Supported locales** - The languages members can pick in your portal and that the admin offers in user profiles. The available options are English, Spanish, French, German, Bulgarian, and Czech.
+- **Default locale** - The language used when a member's preference is not known. Defaults to English.
 
 ## How saving works
 
-The form uses a floating save bar. Edit any field and **Save** appears at the bottom. You're free to navigate away as long as you save first; nothing is auto-saved. After save, the new values propagate to every place in the admin that reads org settings (it's invalidated through TanStack Query, so most pages refresh without a reload).
+The form uses a floating save bar. Edit any field and a **Save** control appears at the bottom. Nothing is auto-saved, so you must save before leaving. After you save, the new values propagate to every place in the admin that reads organization settings; most pages refresh without a reload.
+
+### About the time zone
+
+The organization time zone is resolved from your coordinates or address only once, the first time it is set. Editing your address later does not silently move the org time zone, so if you relocate the headquarters, set the time zone yourself. Individual clubs behave differently: a club re-derives its own time zone whenever its address changes.
+
+<Note>
+Currency, invoice numbering, tax number, and billing preferences are not on this page. They live under **Settings > Revenue > General**. Signup-form field configuration - which contact fields are required, optional, or hidden - lives under **Settings > CRM > Contacts**. See [Members overview](/members/overview).
+</Note>
+
+## Clubs
+
+A club is a single physical location. Everything schedulable (areas, classes, staff shifts, check-in) belongs to a club, so you need at least one before members can book.
+
+### Creating or editing a club
+
+1. Go to **Settings > Clubs**. The list shows every location; filter by name, city, or state.
+2. Click **Add Club** to open the club form, or click an existing club to edit it.
+3. Fill in **Basic information** (**Club Name**, **Subtitle**, **Slug**, **Description**) and **Contact information** (**Email**, **Phone**, **Website**, address).
+4. Set **Operating hours**, **Sports**, and **Amenities**.
+5. Optionally assign **Club Managers** (staff who receive contact-form messages for this club) and upload **Club Images**.
+6. Save.
+
+### Club fields worth knowing
+
+- **Slug** - Must be unique across clubs; it appears in the club's public page URL.
+- **Status** - A club is `active` or `inactive`. Inactive clubs stay in the admin but are pulled from public surfaces.
+- **Sports and amenities** - Drive the marketplace listing and filtering. A club must be complete to stay published; an edit that leaves it incomplete is automatically unpublished.
+- **Google Business Profile / OpenStreetMap** - Connect a club to import address, hours, sports, amenities, photos, and reviews. Empty fields are filled and existing values are kept.
+- **Daily summary** - Per-club summary email to admins, with a configurable send time. New clubs get it on by default.
+- **Kiosk options** - Per-club kiosk toggles (check-in, classes, plans, products) are configured here and stored against the club.
+
+Deleting a club is blocked while it still has dependent data (bookings, areas, and so on); remove or reassign that first.
+
+## Branding
+
+Logo, favicon, colors, and fonts are configured under **Settings > Member Apps > Branding**, not on the Details page. Branding covers:
+
+- **Logos and images** - Light logo, dark logo, logo alt text, and favicon.
+- **Color scheme** - Primary color, header color, and their dark-mode variants.
+- **Typography** - Body font and heading font.
+
+Branding customization requires a **Grow** or **Run** plan. On the Free or Start plan, the page loads but saving is blocked with an upgrade prompt.
+
+## Domains
+
+Custom domains are managed under **Settings > Organization > Domains**. Each domain is attached for one **purpose**:
+
+- **Email (SendGrid)** - Send member email from your own domain.
+- **Website (CMS)** - Serve your CMS website on your own domain.
+- **Portal subdomain** - Serve the member portal on your own hostname instead of `{slug}.portal.1club.ai`.
+
+### Adding and verifying a domain
+
+1. Click **Add Domain**, enter the fully-qualified domain, and choose the purpose.
+2. 1Club shows the **DNS records to add** (type, name, value). Add them at your DNS provider.
+3. For website and portal domains, delete any leftover A, AAAA, or CNAME records for the same host first, or verification will fail.
+4. Wait for DNS to propagate, then click **Verify**.
+
+Domain status moves through:
+
+- **Pending verification** - Added, DNS not yet confirmed.
+- **Issuing SSL certificate** (`ssl_pending`) - DNS is confirmed, but the TLS certificate is still being issued. The domain is intentionally not live yet.
+- **Verified** - DNS confirmed and a valid certificate is being served. The domain is live.
+- **Failed** - Verification did not succeed.
+
+## Subscription
+
+Your 1Club platform plan lives under **Settings > Organization > Subscription**. This is what you pay 1Club (and where plan gates such as branding are decided), and it is separate from how you bill your own members, which is configured under **Settings > Revenue**.
 
 ## Who can edit
 
-Organization settings require the **Admin** role. Other roles see the page in read-only form or get a permission error. See [Roles and permissions](/reference/roles-permissions).
+Organization settings are gated on the organization settings permission, part of the **Admin** role's default bundle. Roles without it see the page read-only or get a permission error. Creating clubs and editing branding and domains require the organization management permission. See [Roles and permissions](/reference/roles-permissions).
 
-<Note>
-Signup-form configuration - which contact fields are required, optional, or hidden on public signup, and whether the family-members section is shown - lives under **Settings > Contacts**, not here. These choices are enforced server-side on the public signup endpoint. See [Members overview](/members/overview) for related runtime behavior.
-</Note>
+## Worked examples
 
-## Branding lives elsewhere
+### Racket club rebrands and moves online-first
 
-Logo, colors, fonts, and email templates are configured under **Settings > Branding**, not on this page. The Organization page is just identity and contact data.
+A padel and tennis club changes its name and wants a cleaner portal address. On **Details** they update **Name**, then edit **Slug** to `citypadel` so members reach `citypadel.portal.1club.ai`. Old links using the previous slug stop working, so they announce the new address. Under **Member Apps > Branding** they upload a new logo and set the primary color; because they are on the Run plan, the save succeeds.
+
+### Martial arts gym opens a second location
+
+A jiu-jitsu and muay-thai gym adds a second mat space. They go to **Settings > Clubs > Add Club**, name it, set its own address (which derives that club's time zone), select the `jiu-jitsu` and `muay-thai` sports, and set operating hours. The organization time zone is untouched; only the new club picks up the local zone.
+
+### Multi-language yoga studio
+
+A yoga and pilates studio serves English and Bulgarian members. Under **Localization** they add English and Bulgarian to **Supported locales** and set **Default locale** to English. Members now choose their language in the portal, and anyone whose preference is unknown sees English.
+
+### Serving the portal on a custom domain
+
+A climbing gym wants members to visit `members.gripcity.com` instead of the default subdomain. Under **Organization > Domains** they add the domain with purpose **Portal subdomain**, add the CNAME record shown, remove an old parking-page record, and click **Verify**. The domain sits in **Issuing SSL certificate** for a few minutes, then flips to **Verified** and goes live.
+
+## Tips and best practices
+
+- **Choose the slug carefully and early.** It is your portal web address. Changing it later breaks existing links and QR codes.
+- **Set the address by selecting a map suggestion**, not by typing freehand, so coordinates and time zone resolve correctly.
+- **Only enable locales you can support.** Adding a language exposes it to members even if your content is not translated yet.
+- **Keep club status honest.** Mark a location inactive rather than deleting it if you might reopen; deletion is blocked while data exists anyway.
+- **Verify domains during low traffic.** Website and portal domains are not live until the certificate is issued, so plan the cutover.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Save fails with "slug is already in use" | Another organization already claimed that slug | Pick a different slug; it must be globally unique |
+| Save fails saying the slug is too long | The slug exceeds 40 characters (it is your portal subdomain) | Shorten it to 40 characters or fewer |
+| Time zone did not change after editing the address | The org time zone resolves only once, when first set | Set the **Time zone** field manually |
+| Branding page blocks saving | You are on the Free or Start plan | Upgrade to Grow or Run under **Organization > Subscription** |
+| Custom domain stuck on "Issuing SSL certificate" | DNS is confirmed but the certificate is still being issued | Wait a few minutes and click **Verify** again |
+| Custom domain will not verify | Conflicting A, AAAA, or CNAME records for the same host | Delete the old records at your DNS provider, then verify |
+| Cannot delete a club | It still has bookings, areas, or other dependent data | Remove or reassign that data first |
+| The Organization page is read-only | Your role lacks the organization settings permission | Ask an Admin to grant it |
 
 ## Related
 
-- [Clubs](/reference/organization-clubs) - How orgs and gyms relate, and which settings live where.
-- [Roles and permissions](/reference/roles-permissions) - Who can edit org settings.
+- [Organization and clubs](/reference/organization-clubs) - How orgs and gyms relate, and which settings live where.
+- [Settings overview](/settings/overview) - The full map of Settings categories.
+- [Roles and permissions](/reference/roles-permissions) - Who can edit organization settings.
+- [Areas](/operations/areas) - Bookable spaces created within each club.
 - [Profile](/settings/profile) - Per-user preferences (language, theme, password).
 - [Members overview](/members/overview) - Contact and signup field configuration.

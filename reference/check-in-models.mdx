@@ -1,81 +1,202 @@
 ---
-title: "Check-in Models"
-description: "Choose how members get into your club — book and pay, walk-in with payment, or flexible check-in."
+title: "Check-in models"
+description: "Choose how members enter your gym - book and pay in advance, walk in with a payment check, or flexible check-in - and configure the settings that enforce it."
+keywords:
+  - check-in model
+  - book and pay
+  - walk-in
+  - flexible check-in
+  - entrance method
+  - enforce payment
+  - allow walk-ins
+  - anonymous check-in
 ---
 
-In a nutshell, 1club supports the three industry-standard ways members enter a club. You pick the model that matches how your business runs and configure a small set of toggles to enforce it.
+1club supports the three industry-standard ways members enter a gym. You pick the model that matches how your front desk runs and configure a small set of booking-policy settings to enforce it. The model is not a single switch - it is the combination of when you enforce payment and whether staff can check in people without a booking.
 
 ## Overview
 
-Every gym has its own front-desk culture. Some require members to book and pay before they ever set foot in the building. Others welcome walk-ins as long as the member has a paid membership or pays at the door. A third group - community gyms, martial-arts schools, kids' programs - log attendance on the spot and trust staff to handle payment separately.
+Every gym has its own front-desk culture. Some require members to book and pay before they set foot in the building. Others welcome walk-ins as long as the member has a paid membership or pays at the door. A third group - community gyms, martial-arts schools, kids' programs - log attendance on the spot and trust staff to handle payment separately.
+
+- **Book and pay** - members reserve and pay in advance; the schedule is the source of truth.
+- **Walk-in with payment check** - members can arrive without a booking, but the front desk confirms a membership, an external program, or a direct payment before letting them in.
+- **Flexible check-in** - staff log attendance as members arrive; payment status is visible but does not block entry.
+- **Entrance methods** - at check-in, staff record how the member is entering: membership, external program, or direct payment.
+- **Physical identification** - separately, [Access control](/settings/access-control) governs how members identify themselves at the door (QR code, access card, PIN).
 
 ### The three check-in models
 
-| Model | Booking required | Payment enforced | Typical clubs |
+| Model | Booking required | Payment enforced | Typical gyms |
 | :-- | :-- | :-- | :-- |
-| **Book & Pay** | Yes | Yes - at booking | Class-based studios, boutique fitness, racket sports |
-| **Walk-in \+ Payment Check** | No | Yes - at check-in | Drop-in yoga, casual gyms, day passes |
-| **Flexible Check-in** | No | No - staff judgment | Community gyms, martial-arts schools, kids' programs |
+| **Book and pay** | Yes | Yes - at booking | Class-based studios, boutique fitness, racket sports |
+| **Walk-in with payment check** | No | Yes - at check-in | Drop-in yoga, casual gyms, day passes |
+| **Flexible check-in** | No | No - staff judgment | Community gyms, martial-arts schools, kids' programs |
 
-The model is configured in two settings that work together:
+## The two settings that define a model
 
-- **Booking Policies** (`Settings → Booking Policies`) - the **Enforce payment** dropdown decides whether payment is required at booking, at check-in, or not at all. See [Booking Policies](/operations/booking-policies).
-- **Access Control Settings** (`Settings → Access Control Settings`) - controls whether walk-ins without a member account can be checked in. See [Access Control](/settings/access-control).
+A check-in model is the combination of two things, and both live on the **booking policy** that matches the booking or visit. See [Booking policies](/operations/booking-policies) for how to create and scope policies.
 
-### 1. Book & Pay
+- **Enforce payment** - a single dropdown with three options: **At booking**, **At check-in**, or **None**. This decides when payment is required.
+- **Allow walk-ins** and **Allow anonymous check-ins** - two toggles that decide whether staff can check someone in without an underlying booking.
+  - **Allow walk-ins** (`Settings > Booking Policies`) - "When enabled, staff can check in a contact without an existing booking." Use this for members who arrive without reserving.
+  - **Allow anonymous check-ins** - "When enabled, staff can check in visitors with no contact at all." Use this for guests and trial visitors who have no profile yet. It is independent of walk-ins.
+
+<Note>
+  These two toggles live on the booking policy, alongside **Enforce payment**.
+  They replace the older Flexible (Anonymous) Check-in toggle that used to live in
+  Access control settings. [Access control](/settings/access-control) now covers
+  only physical identification - member enrollment and which credentials (QR code,
+  access card, PIN) the scanner accepts - not whether walk-ins are allowed.
+</Note>
+
+### Book and pay
 
 Members must book in advance and pay before the booking is confirmed. No booking, no entry. The schedule is the source of truth.
 
 To configure:
 
-- In your booking policy, set **Enforce payment** to **At booking**.
-- **Check-in required** is usually on as well, so unclaimed bookings auto-mark as no-shows.
+- Set **Enforce payment** to **At booking** on the matching booking policy.
+- Turn **Check-in required** on so unclaimed bookings auto-mark as no-shows.
+- Leave **Allow walk-ins** and **Allow anonymous check-ins** off.
 
-### 2. Walk-in \+ Payment Check
+### Walk-in with payment check
 
 Members can show up without a booking, but the front desk must confirm an active membership, an external program, or collect a direct payment before letting them in.
 
 To configure:
 
-- In your booking policy, set **Enforce payment** to **At check-in**.
-- In Access Control Settings, turn **Check-in Mode** to **Flexible** if you also want to allow check-ins for people without a member account.
+- Set **Enforce payment** to **At check-in**.
+- Turn **Allow walk-ins** on so staff can check in a member who has no booking.
+- Turn **Allow anonymous check-ins** on as well if you also want to admit trial visitors who have no profile yet.
 
 When the front desk checks someone in, they pick an entrance method (membership, external program, or direct payment) - see below.
 
-### 3. Flexible Check-in
+### Flexible check-in
 
-Staff logs attendance as members arrive. Payment status is visible but does not block entry. The front desk uses judgment to follow up on overdue accounts.
+Staff log attendance as members arrive. Payment status is visible but does not block entry. The front desk uses judgment to follow up on overdue accounts.
 
 To configure:
 
-- In your booking policy, set **Enforce payment** to **None**.
-- In Access Control Settings, turn **Check-in Mode** to **Flexible** if you want anonymous check-ins for guests and trial visitors.
+- Set **Enforce payment** to **None**.
+- Turn **Allow walk-ins** on so staff can log attendance without a booking.
+- Turn **Allow anonymous check-ins** on if you want to record guests and trial visitors who have no profile.
 
 ## Entrance methods at check-in
 
 When the front desk checks a member in, they pick how the member is entering. Three entrance methods exist:
 
-- **Membership** - A check-in counts against the member's active membership. Usage is decremented automatically if the plan has a limit.
-- **External Program** - The member enters via a third-party program (a partner curriculum, a corporate-wellness benefit, a federation pass). See [External Programs](/settings/external-programs).
-- **Direct Payment** - The member pays for this single visit at the front desk.
+- **Membership** - the check-in counts against the member's active membership. If the plan has a session limit, usage is decremented automatically, using the same rule as a booking.
+- **External program** - the member enters via a third-party program (a partner curriculum, a corporate-wellness benefit, a federation pass), optionally with an extra per-visit fee. See [External programs](/settings/external-programs).
+- **Direct payment** - the member pays for this single visit at the front desk.
 
-Which entrance methods are required at check-in depends on your booking policy. If **Enforce payment** is set to **At check-in** (or to **At booking** with an outstanding balance on the booking), staff must select one of the three before the system records the check-in. If **Enforce payment** is **None**, the front desk can record the check-in without selecting a method.
+Which entrance methods are required at check-in depends on the matching booking policy. If **Enforce payment** is set to **At check-in** (or to **At booking** with an outstanding balance on the booking), staff must select one of the three before the system records the check-in. If **Enforce payment** is **None**, the front desk can record the check-in without selecting a method. Free classes never require a payment method.
+
+Because check-in reuses the booking pipeline, membership consumption, external-program accounting, and direct-payment transactions are recorded identically whether the member booked ahead or walked in.
+
+### Repeat scans
+
+A membership check-in with no booking and no class is idempotent for a short window. If the same member is scanned again within about five minutes on the same membership, 1club treats it as the same entry rather than creating a second attendance row or debiting a second session. Beyond that window, a genuine second visit the same day is allowed - there is no daily cap.
 
 ## Picking your model
 
-Most gyms settle on one model per location, sometimes with a different policy for personal training, wellness area, or special programs. If you run multiple locations under one organization, you can scope different booking policies to each - see the **Scope** section in [Booking Policies](/operations/booking-policies).
+Most gyms settle on one model per location, sometimes with a different policy for personal training, a wellness area, or special programs. If you run multiple locations under one organization, scope different booking policies to each - see the **Scope** section in [Booking policies](/operations/booking-policies).
 
 If you're not sure where to start:
 
-- A studio that sells classes online and runs a tight schedule wants **Book & Pay**.
-- A neighborhood yoga studio with lots of drop-ins wants **Walk-in \+ Payment Check**.
-- A martial-arts school or community gym where members come and go wants **Flexible Check-in**.
+- A studio that sells classes online and runs a tight schedule wants **Book and pay**.
+- A neighborhood gym with lots of drop-ins wants **Walk-in with payment check**.
+- A martial-arts school or community gym where members come and go wants **Flexible check-in**.
 
 You can change settings at any time. The new policy applies from the moment you save it. Existing bookings are not retroactively re-validated.
 
+## Worked examples
+
+### Padel and tennis club - book and pay
+
+You sell court time online and want guaranteed revenue per reservation.
+
+- **Enforce payment**: At booking.
+- **Check-in required**: on (no-shows are marked automatically at end of day).
+- **Allow walk-ins** / **Allow anonymous check-ins**: off.
+- Scope the policy to your court area types so the whole racket-sports schedule follows the same rule.
+
+### Drop-in yoga or Pilates studio - walk-in with payment check
+
+You want walk-ins welcome, but reception must collect payment or confirm a pass first.
+
+- **Enforce payment**: At check-in.
+- **Allow walk-ins**: on (members without a booking can be checked in).
+- **Allow anonymous check-ins**: on if you also run trial classes for visitors with no profile.
+- At the door, staff pick **Membership** for pass holders or **Direct payment** for a single class.
+
+### Jiu-jitsu or muay-thai academy - flexible check-in
+
+Students come and go around open-mat and class times; you handle billing on monthly memberships, not per visit.
+
+- **Enforce payment**: None.
+- **Allow walk-ins**: on so coaches can tap students in as they arrive.
+- **Allow anonymous check-ins**: on for prospective students trying a first session.
+- Payment status still shows on each check-in, so staff can follow up on overdue accounts without blocking the mats.
+
+### Climbing gym with day passes and members - mixed
+
+Members enter freely; day-pass visitors pay at the desk.
+
+- **Enforce payment**: At check-in.
+- **Allow walk-ins**: on for members without a reservation.
+- **Allow anonymous check-ins**: on for day-pass visitors with no account.
+- Add a **Day pass** as an [external program](/settings/external-programs) or use **Direct payment** for the single visit.
+
+### Corporate-wellness partner - external program entry
+
+A local employer sponsors sessions for its staff.
+
+- Create an [external program](/settings/external-programs) for the employer, with an optional per-visit fee billed to the partner.
+- At check-in, staff pick **External program** so the visit is accounted to the partner, not the individual.
+
+## Tips and best practices
+
+- **Model your front desk, not your ambitions.** Set **Enforce payment** to what reception actually does today. If staff always collect at the door, use **At check-in**.
+- **Walk-ins and anonymous check-ins are different.** A walk-in is a known contact without a booking; an anonymous check-in has no profile at all. Turn on only what you need.
+- **Keep Check-in required for the book-and-pay model.** It is what turns unclaimed bookings into no-shows and keeps attendance reports accurate.
+- **Use scope instead of many policies.** One org-wide policy plus a scoped exception (for example, personal training) is easier to reason about than several overlapping policies.
+- **Test end to end.** After changing a policy, make a real booking or walk-in and check someone in before going live.
+
+## Troubleshooting
+
+**Issue**: Front desk can't check a member in - the system asks for a payment method.
+
+**Cause**: The matching policy has **Enforce payment** set to **At check-in**, or to **At booking** with an outstanding balance on the booking.
+
+**Fix**: Have reception pick an entrance method - confirm the member's **Membership**, apply an **External program**, or take a **Direct payment** - then complete the check-in.
+
+**Issue**: Staff can't check in a member who has no booking.
+
+**Cause**: **Allow walk-ins** is off on the matching booking policy.
+
+**Fix**: Turn **Allow walk-ins** on in `Settings > Booking Policies` for the policy that applies to that club or class.
+
+**Issue**: Can't check in a trial visitor who has no profile.
+
+**Cause**: **Allow anonymous check-ins** is off. Walk-ins cover known contacts only.
+
+**Fix**: Turn **Allow anonymous check-ins** on. It is independent of **Allow walk-ins**, so enable both if you want either kind of no-booking entry.
+
+**Issue**: I looked for a "Check-in mode" or "Flexible" switch in Access control and couldn't find it.
+
+**Cause**: That toggle was replaced. Walk-in and anonymous check-in are now booking-policy settings.
+
+**Fix**: Use **Allow walk-ins** and **Allow anonymous check-ins** on the booking policy. [Access control](/settings/access-control) now only configures physical identification (QR code, access card, PIN).
+
+**Issue**: Scanning a member twice created only one attendance record.
+
+**Cause**: A repeat scan of the same membership within about five minutes is treated as the same entry, so it never double-counts or debits a second session.
+
+**Fix**: This is expected. A genuine second visit later the same day is recorded normally.
+
 ## Related
 
-- [Booking Policies](/operations/booking-policies) - Configure payment, anonymous bookings, and check-in rules.
-- [Access Control](/settings/access-control) - Configure check-in mode and identification methods per club.
-- [External Programs](/settings/external-programs) - Add partner offerings and corporate wellness benefits as entrance methods.
-- [Attendance](/members/attendance) - Record and review check-ins.
+- [Booking policies](/operations/booking-policies) - Configure **Enforce payment**, **Allow walk-ins**, and **Allow anonymous check-ins**.
+- [Access control](/settings/access-control) - Physical identification at the door: enrollment and QR/card/PIN methods.
+- [External programs](/settings/external-programs) - Add partner offerings and corporate-wellness benefits as an entrance method.
+- [Attendance](/members/attendance) - Record and review check-ins. Attendance and Check-ins live under **Schedule** in the admin.

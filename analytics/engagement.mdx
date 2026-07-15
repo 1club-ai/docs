@@ -1,82 +1,169 @@
 ---
 title: Engagement analytics
-description: Member engagement scores (0-100) - distribution, recent changes, and progression over time.
+description: Member engagement scores (0-100) - how they are calculated, the four scoring categories, the dashboard, and using scores for churn-risk and win-back.
+keywords:
+  - engagement score
+  - engagement level
+  - rockstar high medium low
+  - churn risk
+  - win-back
+  - engagement dashboard
+  - smart tagging scoring
 ---
 
-The **Engagement dashboard** shows how engaged your members are right now and how their scores have moved over time. Scores are a 0-100 number per contact, calculated by a background job from booking frequency, spending, recent activity, and tenure.
+The **Engagement dashboard** shows how engaged your members are right now and how their scores have moved over time. An engagement score is a 0 to 100 number per contact, written by a background job that combines four categories: financial activity, active services, physical activity, and overall member engagement (consistency, tenure, and value).
 
 <Note>
-Engagement *analytics* (this page) is the 0-100 scoring dashboard. The smart-tag category that groups members by recent check-ins is called **Attendance** and lives under [Smart Tagging](/settings/smart-tagging). They are different systems.
+Engagement *analytics* (this page) is the 0 to 100 scoring dashboard. The smart-tag category that groups members by recent check-ins is called **Attendance** and lives under [Smart tagging](/settings/smart-tagging). They are related but different systems - the score is a single number; Attendance is a tag.
 </Note>
+
+## Overview
+
+- A single **0 to 100 engagement score** per contact, mapped to one of four levels.
+- Scores computed from **four equally weighted categories** by default (financial, services, physical, engagement).
+- **Configurable weights and time windows** per organization under Smart tagging.
+- A **dashboard** with KPI cards, a score distribution, and a progression chart.
+- **Per-member drill-down** - switch the chart to a single member's score history.
+- **Score history** captured as contact facts, so you can see when and how a score changed.
 
 ## Score levels
 
-The score maps to one of four levels (thresholds are fixed):
+The score maps to one of four levels. The thresholds are fixed in code and are the same everywhere a level appears (the dashboard distribution, the score chip on member pages, and any tag-based automations driven by engagement):
 
-- **Rockstar** - 75 to 100. Highly engaged, frequent users.
-- **High** - 50 to 74. Well-engaged regulars.
-- **Medium** - 25 to 49. Moderate activity.
-- **Low** - 0 to 24. At-risk, infrequent.
-
-The same thresholds are used for the score chip on member pages and any tag-based automations driven by engagement.
+| Level | Score range | Meaning |
+| --- | --- | --- |
+| **Rockstar** | 75 to 100 | Highly engaged, frequent users |
+| **High** | 50 to 74 | Well-engaged regulars |
+| **Medium** | 25 to 49 | Moderate activity |
+| **Low** | 0 to 24 | At-risk, infrequent |
 
 ## How scoring is calculated
 
-The scoring service combines four equally-weighted categories by default:
+The final score is a weighted average of four category scores, each itself a 0 to 100 number. By default all four weigh **25%**:
 
-- **Financial activity** (25%) - Recent transactions and payment activity.
-- **Active services** (25%) - Active memberships and service usage.
-- **Physical activity** (25%) - Check-ins, bookings, visit frequency.
-- **Member engagement** (25%) - Activity consistency and tenure.
+- **Financial activity** (25%) - recent transactions and payment activity.
+- **Active services** (25%) - active memberships and service usage.
+- **Physical activity** (25%) - check-ins, bookings, and visit frequency.
+- **Member engagement** (25%) - activity consistency, tenure, and lifetime value.
 
-Weights and time windows are configurable per organization under [Smart Tagging](/settings/smart-tagging) - if scoring is disabled there, this dashboard shows no data. The "recent activity" window is derived from your engagement tag period; the "very recent" window is fixed at seven days.
+Weights and time windows are configurable per organization under [Smart tagging](/settings/smart-tagging). If you change the weights so they no longer sum to 100, the service normalizes them automatically before applying. The final score is rounded and clamped to the 0 to 100 range. **If scoring is disabled under Smart tagging, this dashboard shows no data.**
 
-Scores are written by a background job, not computed live. The dashboard reads from the stored scores, so newly created activity won't reflect until the next aggregation runs.
+### Time windows
 
-## What's on the page
+Three windows drive the math:
+
+- **Recent activity** - derived from your engagement tag period (30 days if not set). This is the main window for "did they do anything lately".
+- **Very recent activity** - fixed at **7 days**. Activity inside this window earns a bonus.
+- **Historical data** - the fetch window for gathering a member's raw activity (90 days by default).
+
+### What each category rewards
+
+Each category starts at 0 and builds up. Understanding the steps helps you read a score.
+
+- **Financial activity** - 0 if there are no transactions in the recent window. Otherwise it starts at 50, adds 30 if there was a transaction in the last 7 days, and adds 20 for two or more recent transactions (capped at 100).
+- **Active services** - 0 if the member has no active membership. Otherwise it starts at 70, adds 15 for more than one active membership, and adds 15 for tenure of three months or more. A **paused** membership still counts as active here, because the contractual relationship is intact - a temporary hold should not crater the score.
+- **Physical activity** - 0 if there were no check-ins in the recent window. Otherwise it starts at 40, adds 30 for a check-in in the last 7 days, adds 20 for four or more recent check-ins (or 10 for two or more), and adds 10 if there is any recent booking.
+- **Member engagement** - combines three signals: recent check-in consistency (up to 40), tenure (up to 30 for a year or more), and lifetime spend (up to 20 for spend over 1,000).
+
+<Note>
+Scores are recalculated only for **active members** (contacts of type member with at least one active membership). A member without an active membership will not get a fresh score on the nightly run.
+</Note>
+
+### When scores are written
+
+Scores are not computed live. They are written by the daily member smart-tagging job that runs **nightly at 03:00 UTC**, right after tags are updated, and on demand when you use **Sync now** on the [Smart tagging](/settings/smart-tagging) page. The dashboard reads the stored score, so newly created activity is reflected only after the next run. Each time a score changes, the change is recorded as a contact fact, which is what powers the progression chart and the per-member history.
+
+## Worked examples
+
+These use the default equal weights (25% each) and default windows (30-day recent, 7-day very-recent).
+
+### A regular who just paid (martial arts)
+
+A jiu-jitsu member trained 5 times in the last 30 days (2 of them this week), has an active membership going back 8 months, and paid their monthly dues 3 days ago.
+
+- Financial: recent payment, within 7 days = 50 + 30 = **80**.
+- Services: active membership + 8 months tenure = 70 + 15 = **85**.
+- Physical: check-ins in window, one this week, 4+ visits = 40 + 30 + 20 = **90**.
+- Engagement: 4+ check-ins (40) + 6-to-12-month tenure (20) = **60**.
+- Score = (80 + 85 + 90 + 60) / 4 = **79 -> Rockstar**.
+
+### A quiet member on a hold (Pilates / yoga)
+
+A reformer client paused their membership for the summer, last visited 6 weeks ago, and has made no payments in the last 30 days.
+
+- Financial: no recent transactions = **0**.
+- Services: paused membership still counts as active, 5 months tenure = 70 + 15 = **85**.
+- Physical: no check-ins in the recent window = **0**.
+- Engagement: no recent check-ins, 5-month tenure (10) = **10**.
+- Score = (0 + 85 + 0 + 10) / 4 = **24 -> Low**.
+
+The high services score keeps them off zero, but the Low level correctly flags that they have gone quiet - a good win-back candidate.
+
+### Weighting for a check-in-driven gym
+
+A strength-and-conditioning gym cares more about attendance than spend. Under Smart tagging you raise **Physical activity** to 40% and **Member engagement** to 30%, dropping Financial and Services to 15% each. Now a member who shows up constantly but pays annually (few transactions) scores higher, matching how you actually think about engagement.
+
+## What is on the page
 
 ### Filters
 
-- **Date range** - Defaults to the last 90 days for the progression chart.
-- **Contact type** - Restrict the progression chart to specific contact types (member, lead, drop-in, etc.).
-- **Member** - Select a single contact to switch the chart from organization-wide averages to that member's own progression.
+- **Time range** - the standard analytics range picker. Like other day-based dashboards it defaults to the last 30 days; widen it to see a longer progression.
+- **Contact type** - restrict the chart to specific contact types (member, drop-in, and so on).
+- **Member** - select a single contact to switch the chart from organization-wide averages to that member's own progression.
 
 ### KPI cards
 
 Four cards across the top:
 
-- **Total members** - All contacts considered for scoring in your org.
-- **Average score** - Mean across members who have a score, plus the count of scored members as a subtitle.
-- **Recent tag changes** - Engagement-related tag changes in the last seven days.
-- **Recent score changes** - Score updates in the last seven days.
+- **Total members** - count of contacts of type member or drop-in in your organization (archived contacts are excluded).
+- **Average score** - mean across members who have a score, with the count of scored members shown underneath.
+- **Recent tag changes** - tag additions and removals recorded in the last 7 days.
+- **Recent score changes** - score updates recorded in the last 7 days.
 
 ### Score distribution
 
-A row showing how many members sit in each level: **Rockstar**, **High**, **Medium**, **Low**. Each is a count, color-coded.
+A row of four counts showing how many members sit in each level: **Rockstar** (green), **High** (blue), **Medium** (amber), **Low** (red). This is your at-a-glance health check.
 
 ### Progression chart
 
-A line chart of average engagement score over time. The Y-axis is fixed at 0 to 100. The time bucket adapts to the date range.
+A line chart of the average engagement score over time. The Y-axis is fixed at 0 to 100 and the time bucket adapts to the range. The line is built from recorded score-change events grouped by day and averaged, so it tracks how scores move as the nightly job re-runs, rather than a snapshot of every member each day.
 
-When you select a single member, the chart switches to that member's individual score history (rendered green instead of blue). The legend label changes from **Average score** to **Engagement score**.
+When you select a single member, the chart switches to that member's individual score history (rendered green instead of blue) and the legend changes from **Average score** to **Engagement score**. A panel above the chart shows the member's **current score** and any tags. If a member has no score yet, you will see **No score** and the chart will be empty.
 
-If a member doesn't have a score yet, you'll see **No score** in the panel above the chart and the chart will be empty.
+## Using this for churn-risk and win-back
 
-## How to use this
+- **Spot at-risk members early.** If the **Low** count grows week over week, members are slipping. Cross-check against recent tag changes for context.
+- **Build a win-back audience.** Use the **Low** count as the size of a re-engagement campaign, then target those members with a promotion or an automation.
+- **Reward Rockstars.** Use the Rockstar count as the audience size for a loyalty offer or referral ask.
+- **Track a specific member's journey.** Pick a member in the dropdown to see how their score moved - useful when investigating a churn case or qualifying a referral candidate.
+- **Tune before you trust.** Calibrate weights and windows under Smart tagging until the levels match your instinct about who is engaged, then use the dashboard for tracking.
 
-- **Spot at-risk members early**. If the Low count grows week over week, members are slipping. Cross-check against recent tag changes for context.
-- **Reward Rockstars**. Use the count of Rockstar-level members as the audience size for a loyalty campaign.
-- **Track a specific member's journey**. Pick a member in the dropdown to see how their score moved - useful when investigating a churn case or qualifying a referral candidate.
-- **Tune scoring before you trust it**. Calibrate weights and time windows under Smart Tagging until the levels match your gut feel about who's engaged, then use the dashboard for tracking.
+## Tips and best practices
+
+- **Match the weights to your model.** A high-volume gym should weight Physical activity; a boutique studio that sells packages might weight Financial and Services. See the [check-in-driven gym example](#weighting-for-a-check-in-driven-gym).
+- **Set the recent-activity window deliberately.** It comes from your engagement tag period. A 30-day window suits most clubs; shorten it if your members visit several times a week and you want the score to react faster.
+- **Give new data time.** Scores update on the nightly run (or via **Sync now**). Do not expect a payment made an hour ago to move the dashboard immediately.
+- **Read the level, not just the number.** A Low member with a high services score (paused membership) is a different case from a Low member with no membership at all - open their profile to see which.
+
+## Troubleshooting
+
+- **Dashboard shows no data at all** - Symptom: cards read 0 and the chart is empty. Cause: engagement scoring is disabled under Smart tagging (the metrics endpoint returns nothing when scoring is off). Fix: enable scoring under [Smart tagging](/settings/smart-tagging).
+- **A member shows No score** - Symptom: the per-member panel reads "No score". Cause: the member has no active membership, or the nightly job has not run since they became active. Fix: confirm they have an active membership, then run **Sync now** on the Smart tagging page.
+- **Average score looks too high** - Symptom: the average seems better than reality. Cause: members without a score are excluded from the average, so a small pool of engaged members can skew it. Fix: read the **scored members** count under the Average card alongside it.
+- **Progression chart is flat or sparse** - Symptom: few points on the line. Cause: the line only plots days on which scores actually changed, and a short history has few events. Fix: widen the time range.
+- **Score did not update after activity** - Symptom: a member trained or paid but their score is unchanged. Cause: scores are written by the nightly job, not live. Fix: wait for the next run or use **Sync now**.
+- **A paused member still scores as "active service"** - This is intended. A paused membership keeps the services category up because the contractual relationship is intact.
 
 ## Limitations
 
-- The dashboard is read-only. To change thresholds or weights, edit Smart Tagging settings.
-- There's no "no-engagement-yet" filter - members without a score are silently excluded from the average and chart.
-- Scores need data. Brand-new members and members in their first few weeks may not have a stable score until the next aggregation pass.
+- The dashboard is read-only. To change thresholds or weights, edit [Smart tagging](/settings/smart-tagging) settings.
+- Level thresholds (75 / 50 / 25) are fixed and not configurable - only the weights and windows are.
+- There is no "no-score-yet" filter - members without a score are silently excluded from the average and chart.
+- Scores need data. Brand-new members may not have a stable score until they have accrued a few weeks of activity and the job has run.
 
 ## Related
 
 - [Smart tagging](/settings/smart-tagging) - Where engagement scoring is enabled and tuned.
 - [Members analytics](/analytics/members) - Member-level metrics not tied to scoring.
-- [Analytics overview](/analytics/overview) - Other dashboards.
+- [Analytics overview](/analytics/overview) - Other dashboards and how filters work.
+- [Promotions](/marketing/promotions) - Turn a Low or Rockstar cohort into a targeted offer.

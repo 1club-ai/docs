@@ -1,28 +1,128 @@
 ---
 title: Payments
-description: View and manage payment records and payment status
+description: Track, record, and refund payments in 1Club - see payment status and method, record manual and split payments against transactions, apply wallet credit, and issue full or partial refunds.
+keywords:
+  [
+    payments,
+    record payment,
+    payment method,
+    refund,
+    partial refund,
+    split payment,
+    wallet credit,
+    payment status,
+    payment links,
+  ]
 ---
 
-**In a nutshell:** The Payments section shows all payment records, status, and payment history so you can track what has been collected and resolve failed or pending payments.
+The **Payments** tab is the record of every payment your organization has taken - manual payments logged by staff, card payments captured by a provider, and wallet credit applied at checkout. Use it to see what has been collected, which method was used, who recorded it, and to issue refunds. A payment settles one or more [transactions](/billing/transactions); the payment carries an amount, a method, a status, and a link to the transactions it paid.
 
 ## Overview
 
-Use **Billing → Payments** to see payments made by members, filter by status or date, and drill into individual payment details. Payments are created when invoices are paid (e.g. via Stripe) or when you record manual payments.
+Use **Revenue > Payments** to review payments, filter by status, drill into a single payment, and refund it. Payments are created when a member pays online, when a scheduled bill run charges a card, or when a staff member records a manual payment at the front desk.
 
-## Key features
+- **Payment list** - Every payment with its status, method, amount, and the admin who recorded it.
+- **Payment details** - Open a payment to see amount, method, status, the linked transactions, the **Created by** admin, and any provider references (for example a Stripe payment intent).
+- **Record payments** - Log a manual payment (cash, card terminal, bank transfer) against a transaction or invoice.
+- **Split and partial payments** - Take part of a balance now, or split a charge across a primary method and wallet credit.
+- **Refunds** - Reverse a payment in full or in part.
 
-- **Payment list** - View all payments with status (succeeded, failed, pending, refunded).
-- **Payment details** - Open a payment to see amount, method, invoice link, the **Created by** admin (when the payment was recorded by a staff member), and the related member.
-- **Filters** - Filter by date range, status, club, or member.
-- **Failed payments** - Identify and retry or update failed payments.
+## The payment list
 
-## Payment list columns
+Open **Revenue > Payments**. The grid shows these columns:
 
-The grid includes a **Created by** column that shows the admin who recorded the payment. For payments captured automatically by Stripe (online checkout, scheduled bill runs), the column is empty - those are system-recorded. For manually recorded payments (front desk, phone, bank transfer logged by staff), the column shows the admin's name.
+- **Date** - When the payment was recorded.
+- **Contact** - The member the payment is for.
+- **Amount** - The payment amount and currency.
+- **Payment method** - The method used (for example Cash, Card, or a card provider).
+- **Status** - Succeeded, pending, failed, refunded, partially refunded, cancelled, or processing.
+- **Created by** - The admin who recorded the payment.
+
+Tabs across the top filter by status: **All**, **Succeeded**, **Pending**, and **Failed**, each with a count. Click a row to open the payment. Where you have the right permission, the row action menu offers **Delete** for eligible payments (see [Deleting a payment](#deleting-a-payment)).
+
+The **Created by** column shows the admin who recorded the payment. For payments captured automatically by a provider (online checkout, scheduled bill runs), the column is empty - those are system-recorded. For manually recorded payments (front desk, phone, bank transfer logged by staff), it shows the admin's name.
 
 <Note>
   The standalone **Transactions** column has been removed from the payments grid. To see the transactions linked to a payment, open the payment details. The full transaction history is still available on [Transactions](/billing/transactions).
 </Note>
+
+## Payment status
+
+A payment moves through these states:
+
+- **Pending** - Recorded but not yet settled (for example a manual payment awaiting confirmation, or an online payment mid-flow).
+- **Processing** - The provider is capturing the payment.
+- **Succeeded** - The money is in. This is the only state a payment can be refunded from.
+- **Failed** - The attempt did not go through.
+- **Cancelled** - The payment was called off before it settled.
+- **Refunded** - The full amount has been refunded.
+- **Partially refunded** - Part of the amount has been refunded.
+
+## Recording a payment
+
+Most manual payments are recorded as part of a flow rather than from a blank form - completing an order, settling an invoice, or taking money at the point of sale all record a payment behind the scenes. When you record one, 1Club needs:
+
+- **Amount** - How much is being paid.
+- **Payment method** - Which configured method the money came in on (see [Payment methods](/settings/payment-methods)).
+- **What it settles** - A transaction, several transactions, or an invoice.
+
+For example, completing a draft order opens the **Complete order** dialog, where you pick a payment method; 1Club then records a payment against each of the order's unpaid transactions with that method. See [Orders](/billing/orders).
+
+<Note>
+  Payments handled entirely by a provider's own checkout (for example an online card payment via the hosted flow) are captured by that provider and cannot be re-recorded as manual payments. Log manual payments for money you collect yourself - cash, a card terminal, or a bank transfer.
+</Note>
+
+### Payment methods used
+
+Each payment records the **method** it came in on. Methods belong to a channel:
+
+- **Manual** - Methods you take and log yourself, such as cash, an in-person card terminal, or a bank transfer. You define these under [Payment methods](/settings/payment-methods).
+- **Card provider** - Online card payments captured through the connected provider's checkout.
+- **myPOS** - Payments taken through a myPOS terminal or link. See [myPOS](/settings/integrations/mypos).
+- **Wallet** - The member's stored wallet balance, applied as credit (see [Wallet credit](#wallet-credit)).
+
+The method shown on a payment tells you where the money physically came from, which matters when you reconcile the till or a bank statement.
+
+## Partial and split payments
+
+You do not have to settle a balance in one payment.
+
+- **Partial payment (one transaction)** - Record less than the full amount against a single transaction. The transaction moves to **partially paid** and keeps an outstanding balance you can collect later.
+- **Settling several transactions at once** - You can record one payment against multiple transactions, but only when the payment covers all of them in full. A single lump sum cannot be split partially across several transactions, so a multi-transaction payment must equal the sum of their outstanding balances.
+- **Paying someone else's share** - A payment can be recorded against a different payer than the transaction owner (for example a member paying their share of a group booking). This payer override is only allowed when the payment settles a single transaction.
+
+### Splitting across a method and wallet credit
+
+You can combine a primary method with wallet credit in one checkout:
+
+- **Member portal** - Wallet credit is applied automatically. The order deducts the wallet balance (up to the amount due) and the member pays only the remainder by card or on arrival. The breakdown shows a **Wallet** line (for example `Wallet: -10.00`) above the total, and the **Pay** button reflects the post-wallet amount.
+- **Admin point of sale** - When you take a payment with a primary method (card, cash, and so on), you can also apply wallet credit as a secondary payment via the **Also apply wallet credit ({balance} available)** checkbox and an **Amount from wallet** field. The split is shown as "Wallet {amount} + {remainder} via primary method". The wallet toggle is hidden when the wallet already covers the full amount (you can then pay entirely from the wallet).
+
+The amount drawn from a wallet is always capped at the member's balance and the outstanding amount.
+
+## Refunds
+
+There are two distinct refund paths in 1Club, and it helps to know which one you are using.
+
+### Refunding a payment
+
+You can reverse a specific payment from its record:
+
+1. Open the payment from **Revenue > Payments**.
+2. Choose to refund it. Leave the amount empty for a **full refund**, or enter an amount for a **partial refund**.
+3. Confirm.
+
+The payment status changes to **refunded** (full) or **partially refunded** (partial). Only a **succeeded** payment can be refunded - attempting to refund a pending, failed, or already-refunded payment is rejected. Issuing a payment refund requires the **billing manage** permission at the organization level.
+
+<Note>
+  Refunding a payment records the reversal against that payment. For a card payment, returning money to the original card is handled through the connected provider. For cash, the operator hands the money back at reception and the payment record reflects the refund.
+</Note>
+
+### Automatic wallet-credit refunds
+
+Some flows refund a member automatically by crediting their **wallet** rather than reversing the original tender. This happens, for example, when a booking is cancelled under a cancellation policy, when an order is cancelled, or when a member's entrance method changes at check-in (they paid directly, then a membership or program is used to admit them instead). In that last case, 1Club both marks the original payment as refunded and credits the refunded amount to the member's wallet, so they can spend it on a future booking or purchase.
+
+Cancellation refunds follow the tiered rules on the matching booking policy - see [Booking policies](/operations/booking-policies).
 
 ## Payment links
 
@@ -41,18 +141,75 @@ The launcher also reflects the link's state, for example:
   Payment links for transactions (such as a booking or membership charge) show the transaction's reference. Only genuine invoices are labelled "Invoice #".
 </Note>
 
-## Wallet credit
+## Deleting a payment
 
-If a member has a wallet balance, it can be put towards what they owe at checkout.
+A payment can be deleted only when all of the following hold: it did not come from a card provider (no provider references and not a provider method) and it is linked to a single transaction. Deleting recalculates the affected transaction's status back to paid, partially paid, or pending based on what remains. Provider-captured payments and payments spanning multiple transactions cannot be deleted - refund them instead. Deletion requires the **billing delete** permission at the organization level.
 
-- **Member portal** - Wallet credit is applied automatically. The order deducts the wallet balance (up to the amount due) and the member pays only the remainder by card or on arrival. The breakdown shows a **Wallet** line (for example `Wallet: -10.00`) above the total, and the **Pay** button reflects the post-wallet amount.
-- **Admin point of sale** - When you take a payment with a primary method (card, cash, and so on), you can also apply wallet credit as a secondary payment via the **Also apply wallet credit ({balance} available)** checkbox and an **Amount from wallet** field. The split is shown as "Wallet {amount} + {remainder} via primary method". The wallet toggle is hidden when the wallet already covers the full amount (you can then pay entirely from the wallet).
+## Worked examples
 
-The amount drawn from a wallet is always capped at the member's balance and the outstanding amount.
+### Padel court paid half now, half on arrival
+
+A member books a court and pays half at the desk, settling the rest when they arrive.
+
+- Record a **partial payment** for half against the booking transaction; it moves to **partially paid**.
+- On arrival, record a second payment for the remainder to bring it to **paid**.
+
+### Boxing gym monthly fee split across card and wallet
+
+A member has 10.00 of wallet credit and owes 40.00 for the month.
+
+- At the point of sale, take the primary method (card) and tick **Also apply wallet credit (10.00 available)**.
+- The split shows "Wallet 10.00 + 30.00 via primary method"; the card is charged 30.00.
+
+### Cancelled climbing session refunded to wallet
+
+A climber cancels a booked session within the free-cancellation window.
+
+- The booking is cancelled and, under the cancellation policy, the amount is credited to the climber's **wallet** automatically.
+- The original payment is reflected as refunded; the wallet balance is available for their next visit.
+
+### Front-desk cash payment recorded in error
+
+Staff logged a cash payment against the wrong member.
+
+- If it is a single-transaction, non-provider payment, **delete** it - the transaction status recalculates automatically.
+- If it cannot be deleted, **refund** it in full instead, then record the correct payment.
+
+## Tips & best practices
+
+- **Refund, do not delete, provider payments.** Card-provider and multi-transaction payments cannot be deleted. Use a full refund to reverse them so the audit trail stays intact.
+- **Read Created by to tell manual from automatic.** A blank **Created by** means the provider captured it; a name means a staff member logged it. This is your first check when reconciling the till.
+- **Match the method to the money.** Record the payment on the method it actually came in on (cash, terminal, transfer) so your Payments tab reconciles against your bank and till.
+- **Use partial payments for deposits.** Take a deposit as a partial payment and collect the balance later rather than forcing payment in full up front.
+- **Send a payment link for outstanding balances.** Rather than chasing a member for card details, send the branded payment link and let them pay on your own site.
+
+## Troubleshooting
+
+**Issue**: I cannot refund a payment.
+
+**Solution**: Only **succeeded** payments can be refunded. If the payment is pending, failed, cancelled, or already refunded, there is nothing to reverse. Check the status chip on the payment. You also need the **billing manage** permission at the organization level.
+
+**Issue**: The **Delete** action is disabled on a payment.
+
+**Solution**: Deletion is only allowed for non-provider payments linked to a single transaction. Card-provider payments and payments spanning multiple transactions cannot be deleted - refund them instead.
+
+**Issue**: A multi-transaction payment is rejected.
+
+**Solution**: A single payment can settle several transactions only when it covers them all in full. Record separate payments, or record a partial payment against each transaction individually.
+
+**Issue**: The wallet toggle is missing at the point of sale.
+
+**Solution**: The wallet already covers the full amount due, so the secondary-tender toggle is hidden - you can pay entirely from the wallet. It reappears when the wallet only partly covers the balance.
+
+**Issue**: A payment shows the wrong payer.
+
+**Solution**: A payment can be recorded against a payer other than the transaction owner only for a single transaction (for example a group-booking participant paying their share). For multi-transaction settlements, the payment is recorded against the transaction owner.
 
 ## Related
 
-- [Invoices](/billing/invoices) — Invoices generate payments when paid.
-- [Payment methods](/settings/payment-methods) — Configure which payment methods your organization accepts.
-- [Transactions](/billing/transactions) — View full transaction history.
-- [Booking Policies](/operations/booking-policies) - Decide whether payment is collected at booking, at check-in, or not at all through the **Enforce payment** dropdown.
+- [Orders](/billing/orders) - Complete an order to record payment against its transactions.
+- [Transactions](/billing/transactions) - The charges a payment settles.
+- [Invoices](/billing/invoices) - Invoices generate payments when paid.
+- [Payment methods](/settings/payment-methods) - Configure which payment methods your organization accepts.
+- [myPOS](/settings/integrations/mypos) - The provider behind payment links and terminal payments.
+- [Booking policies](/operations/booking-policies) - Decide when payment is collected, and the tiered rules for cancellation refunds.

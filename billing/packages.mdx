@@ -1,36 +1,125 @@
 ---
 title: Packages
-description: Bundle plans and products into a single fixed-price package you can sell on the POS and signup forms
+description: Bundle plans and products into a single fixed-price offer you can sell on the POS and signup forms, with revenue split back to each component.
+keywords: ["package", "bundle", "fixed price", "plan bundle", "product bundle", "revenue split", "order form", "point of sale", "starter pack", "trial bundle"]
 ---
 
-Packages let you bundle plans and products into a single fixed-price offer. Instead of selling a membership and a starter product separately, you wrap them into one package at one price - and 1Club handles splitting the revenue back out to the underlying items.
+A package bundles one or more plans and products into a single fixed-price offer. Instead of selling a membership and a starter product separately, you wrap them into one package at one price, and 1Club splits the revenue back out to the underlying items so each is still recorded against its own account.
 
-## What is a package?
+You manage packages under **Revenue > Packages** in the admin.
 
-A package is a catalog item that bundles one or more plans and products and charges a single fixed price for the whole bundle. The in-app description reads: "Bundle plans and products into a single fixed-price package you can sell on the POS and signup forms."
+## Overview
 
-When a package is sold, 1Club creates an order that deconstructs into the underlying memberships and product sales. The fixed package price is allocated across those items by their list price, so each membership and product is still recorded against its own revenue.
+- **Bundle plans and products** - A package contains any mix of [plans](/billing/plans) and [products](/billing/products), each with its own quantity.
+- **One fixed price** - You set a single price for the whole bundle, independent of the components' list prices.
+- **Automatic revenue split** - On sale, the fixed price is allocated across the components in proportion to their list prices, so each membership and product records its own share.
+- **Sold on the POS and signup forms** - Packages get their own tab on the point of sale and can turn a signup form into an order form.
+- **Visibility and status** - Control who sees a package and whether it's active.
+- **Images, features, and color** - Add up to five images, a feature list, and a display color.
 
-## Creating a package
+## The list page
 
-1. Go to **Billing → Packages**.
-2. Click to add a package and open the package dialog.
-3. Add the **items in this package** - the plans and products you want to bundle.
-4. Set the **single fixed price charged for the whole package**.
-5. Review the **bundle saving** - the difference between the combined list price of the items and the package price.
+Packages are shown in a data grid with columns for **Name**, **Price**, **Items** (the component count), **Visibility**, and **Status** (Active or Inactive), plus a row menu to edit or delete. Click a row to open the package dialog.
+
+## Creating or editing a package
+
+1. Go to **Revenue > Packages**.
+2. Click **Add package** to open the package dialog.
+3. Enter a **Name** and the **Package price** - the single fixed price charged for the whole bundle.
+4. Under **Items in this package**, use **Add Plan** and **Add Product** to add components, and set a **Qty** for each. A package must contain at least one item.
+5. Optionally set **Visibility**, **Active**, a **Description**, an **Image**, and a **Color**.
 6. Save.
+
+### Per-field reference
+
+- **Name** - required.
+- **Package price** - the single fixed price for the whole bundle. This is what the customer is charged, regardless of the sum of the components' list prices.
+- **Items in this package** - the plans and products included. Add a plan or a product row, choose the item, and set its **Qty**. Only active plans and products can be selected. The item pickers show each option's list price for reference.
+- **Visibility** - **Public**, **Member only**, or **Private** (admin-only).
+- **Active** - inactive packages are hidden from the POS and order forms.
+- **Description**, **Image** (up to five), **Color** - display fields shown on the package and public surfaces.
+
+<Note>
+Packages are categorized and priced at the package level; the components keep their own revenue accounts. There's no separate tax field on a package - tax is applied per component at sale time using your organization's tax settings (see [How the revenue split works](#how-the-revenue-split-works)).
+</Note>
+
+## How the revenue split works
+
+When a package is sold, 1Club expands it into its component memberships and product sales. The fixed package price (times the quantity sold) is allocated across those components in proportion to each component's list price, using largest-remainder rounding so the parts sum back to the package price exactly. Each component is then recorded against its own revenue account, exactly as if it had been sold individually at the allocated amount.
+
+Tax follows the same path as the rest of your catalog. The allocated amounts run through the normal per-component tax pipeline, so:
+
+- With **tax-inclusive** rates, the customer pays the package price and tax is carved out of each component's share.
+- With **tax-exclusive** rates, tax is added on top of each component (the customer pays the package price plus tax).
+
+Because the split is proportional to list prices, a bundle priced below the sum of its parts passes that discount through to every component proportionally.
 
 ## Where packages are sold
 
 ### Point of sale
 
-Packages appear on the POS in their own **Packages** tab. Adding a package to the cart shows a cart line with a breakdown of its component plans and products.
+Packages appear in their own **Packages** tab on the point of sale. Adding a package to the cart records it as a package line that expands into its component plans and products on completion.
 
 ### Signup forms
 
-You can attach packages to a signup form to turn it into an **order form**. The in-app help reads: "Attach packages to turn this form into an order form where members can add or remove packages and products." Members can then add or remove packages and optional add-on products during signup, with a running order summary alongside the selection step.
+Attaching packages to a [signup form](/settings/signup-forms) turns it into an **order form** where members can add or remove packages during signup. You can also attach optional [products](/billing/products) as add-ons alongside, with a running order summary as the member builds their order.
+
+## Worked examples
+
+### Racket club starter pack
+
+You want new members to join and walk away kitted out.
+
+- Create a package _Padel starter_ containing your _Monthly padel_ plan (Qty 1) and a _Padel starter kit_ product (Qty 1).
+- Set the **Package price** below the combined list price to make the bundle attractive.
+- The membership and the kit each record their own share, so pro-shop revenue stays separated from membership revenue.
+
+### Climbing day + gear rental
+
+- Bundle a _Day pass_ plan with _Shoe rental_ and _Harness rental_ products into a _Beginner day_ package at one price.
+- Sell it on the POS Packages tab; the rentals and the pass expand as separate lines on completion.
+
+### Martial arts trial with a gi
+
+- Create a _Trial month + gi_ package pairing a starter membership plan with a _Uniform (gi)_ product.
+- Attach it to your signup form so prospects can buy the whole trial bundle when they register online.
+
+### Multi-month pass block
+
+- Create a package containing a single class-pack plan with **Qty 3** for members who want a term's worth up front, priced below three individual packs.
+
+## Tips & best practices
+
+- **Price the bundle, not the parts.** The package price is what the customer pays; the split to components is automatic. Set the price for the offer you want to make.
+- **Keep components active.** A package that references an inactive plan or product can't be sold - the sale expansion validates that every component is still active.
+- **Use packages for onboarding.** A "join + starter kit" or "trial + gear" bundle is the cleanest way to combine a membership with retail or rental in one transaction.
+- **Reach for the right tool.** Use a package to sell different things together at a fixed price; use a [promotion](/marketing/promotions) to discount a single plan or product.
+
+## Troubleshooting
+
+**Issue**: A package won't save.
+
+**Solution**: A package must contain at least one item. Add at least one plan or product row before saving.
+
+**Issue**: A plan or product isn't in the item picker.
+
+**Solution**: Only **active** plans and products can be added to a package. Activate the item first, then add it.
+
+**Issue**: Selling a package fails or is blocked.
+
+**Solution**: The sale expansion re-checks that every component plan and product is still active. If a component was deactivated after the package was built, reactivate it (or edit the package to remove it).
+
+**Issue**: A package doesn't appear on the POS or signup form.
+
+**Solution**: Confirm the package is **Active** and its **Visibility** allows it in that context. On signup forms, the package also has to be attached to the form.
+
+**Issue**: The component revenue amounts don't look round.
+
+**Solution**: That's expected. The fixed price is split proportionally to list prices with largest-remainder rounding, so individual component amounts can be uneven while summing exactly to the package price.
 
 ## Related
 
-- [Membership plans](/billing/plans) - the plans you bundle into packages.
+- [Plans](/billing/plans) - the membership and pass templates you bundle into packages.
+- [Products](/billing/products) - the retail, add-on, and rental items you bundle in.
 - [Transactions](/billing/transactions) - how package sales are recorded and split.
+- [Signup forms](/settings/signup-forms) - attach packages to build an order form.

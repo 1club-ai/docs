@@ -1,75 +1,97 @@
 ---
 title: Payment methods
-description: Configure which payment methods your organization accepts and how they appear at checkout
+description: Configure which payment methods your organization accepts at checkout and in the member portal, and which one is preselected for member bookings.
+keywords: [payment method, cash, card, Stripe, wallet, manual payment, checkout, preferred payment method]
 ---
 
-**In a nutshell:** Configure which payment methods your organization accepts (cash, card via Stripe, wallets, custom manual methods) and choose which one is preselected when members book in the portal.
+Payment methods are the ways your organization can take money - cash, card via Stripe, in-app wallet credit, and any custom manual method you define. You configure them under **Settings > Billing > Payment methods**, control where each one is visible, and choose which method members see preselected when they book in the portal.
 
 ## Overview
 
-Open **Settings → Billing → Payment methods** to see every payment method available to your organization. The list combines two sources:
+The **Payment methods** list combines two sources:
 
-- **System payment methods** — provided by 1Club (e.g. Stripe Card if you have Stripe connected). You can't edit or delete these, but you can change their visibility for member-facing flows.
-- **Organization payment methods** — methods you create yourself, typically for manual collection (e.g. cash, bank transfer, wallet).
+- **System methods** - provided by 1Club, marked with a **System** chip. Stripe Card appears here once you connect Stripe. You can't create, edit, or delete these from this page.
+- **Organization methods** - manual methods you create yourself, for money you collect outside a payment gateway (cash, bank transfer, and similar).
+
+Each row shows the method's **Name**, **Code**, **Visibility**, and a **Preferred** toggle (for methods available to member bookings). System methods sort to the top of the list.
 
 ## Adding a manual payment method
 
-1. Navigate to **Settings → Billing → Payment methods**
-2. Click **Add Payment Method**
+1. Go to **Settings > Billing > Payment methods**.
+2. Click **Add payment method**.
 3. Fill in:
-   - **Name** — what the method is called in the admin and at checkout (e.g. "Cash", "Bank transfer")
-   - **Code** — short identifier used in reports and integrations
-   - **Visibility** — Private (admin only), Public, or Member only (visible in the member portal/app)
-4. Save
+   - **Name** - what the method is called in the admin and at checkout (for example, "Cash" or "Bank transfer").
+   - **Code** - a short identifier used in reports and integrations (for example, `cash`, `venmo`, `square`).
+   - **Visibility** - **Private** (admin only), **Public**, or **Member only** (shown in the member portal and app).
+4. Click **Save**.
 
-Manual methods are recorded against payments without going through a payment gateway — useful for in-person collection or any flow where you settle outside Stripe.
+Manual methods record a payment without going through a gateway - useful for in-person collection or any flow you settle outside Stripe. Every manual method you create belongs to the **Manual** channel automatically; there's no channel picker.
 
 ## Editing or deleting a method
 
-- **Edit** — Click the row's edit action to update name, code, or visibility
-- **Delete** — Only methods that are not referenced by any existing payment can be deleted. If a method has been used, change its visibility instead
+- **Edit** - open an organization method to change its **Name** or **Visibility**. The **Code** is locked after creation, because reports and integrations reference it.
+- **Delete** - only methods that aren't referenced by any existing payment can be deleted. If a method has been used, change its **Visibility** to hide it instead - this keeps historical payments intact.
+- **System methods** can't be edited or deleted here. For Stripe Card, the row's action links to **Configure Stripe integration** so you manage it under [Integrations](/settings/integrations).
 
-System methods (those provided by 1Club) cannot be deleted; only their visibility settings are editable.
+## Preferred method for member bookings
 
-## Setting the preferred method for member bookings
-
-The **Preferred payment method for member bookings** control sets which method is preselected when a member books a class in the member portal. Pick from the methods that are visible to members, or leave it as "None" to require members to choose explicitly.
+Methods that are available to member bookings show a **Preferred** toggle in the list. Turn it on for one method to preselect it when a member books a class in the member portal, reducing checkout friction. Turning on a different method's toggle moves the preference; turn the current one off to leave members with no preselection so they choose explicitly.
 
 ## Channels
 
-Each payment method belongs to a channel:
+Every method belongs to a channel, which determines how a payment is processed:
 
-- **Manual** — Recorded outside any gateway (e.g. cash, bank transfer)
-- **Stripe (Card)** — Card processing via your connected Stripe account
-- **Wallet** — In-app wallet credit
+- **Manual** - recorded outside any gateway (cash, bank transfer). This is the channel for every method you create.
+- **Stripe (Card)** - card processing through your connected Stripe account. Provided as a system method.
+- **Wallet** - in-app wallet credit. Provided as a system method.
 
-Channel determines how a payment is processed when the method is selected. Channel is set when the method is created and cannot be changed later.
+A method's channel is fixed. To take card payments you don't create a Stripe method - you connect Stripe and the system Stripe Card method appears automatically.
 
-## Common tasks
+## Worked examples
 
 ### Accept cash at the front desk
 
-1. Add a manual method named "Cash" with visibility set to **Private**
-2. Front desk staff can select it on point-of-sale and walk-in payments
+1. Add a manual method named "Cash" with **Visibility** set to **Private**.
+2. Front-desk staff can select it on point-of-sale and walk-in payments, while members never see it in the portal.
 
-### Let members pay with a card in the portal
+### Let members pay by card in the portal
 
-1. Connect Stripe in [Integrations](/settings/integrations)
-2. The Stripe Card method appears automatically in **Payment methods** as a system method
-3. Set its visibility so members can see it, and optionally mark it as the preferred method for bookings
+1. Connect Stripe under [Integrations](/settings/integrations).
+2. The Stripe Card system method appears automatically in **Payment methods**.
+3. Make sure it's visible to members, then turn on its **Preferred** toggle so it's preselected for bookings.
 
 ### Add bank transfer for invoiced billing
 
-1. Add a manual method named "Bank transfer" with visibility **Private**
-2. Use it when reconciling paid invoices for organizations or families that pay by transfer
+1. Add a manual method named "Bank transfer" with **Visibility** set to **Private**.
+2. Use it when reconciling paid invoices for corporate accounts or families that settle by transfer.
+
+### Sell class packs on a wallet at a climbing gym
+
+If members top up an in-app wallet and spend it on drop-ins, keep the system **Wallet** method visible to members so wallet credit is an option at checkout, and reserve a **Private** "Cash" method for the desk.
 
 ## Tips & best practices
 
-- **Keep codes stable** — They're referenced in reports and integrations
-- **Use visibility, not deletion** — Hiding a deprecated method keeps historical payments intact
-- **One preferred method** — Only one method is preselected for member bookings; pick the one most members use to reduce friction
+- **Keep codes stable.** They're referenced in reports and integrations, and can't be changed after a method is created.
+- **Hide, don't delete.** Changing a deprecated method's visibility keeps historical payments intact; deletion is blocked once a method has been used.
+- **Pick one preferred method.** Only one method is preselected for member bookings - choose the one most members use.
+- **Set visibility deliberately.** Anything set to **Public** or **Member only** shows in the member portal and app; use **Private** for desk-only methods like cash.
+
+## Troubleshooting
+
+**A method won't delete**
+It's referenced by at least one existing payment. Change its **Visibility** to hide it instead of deleting.
+
+**Members can't pay by card in the portal**
+Connect Stripe under [Integrations](/settings/integrations), then confirm the Stripe Card method's **Visibility** allows members to see it.
+
+**The Preferred toggle isn't shown for a method**
+Only methods available to member bookings show the toggle. Check that the method's visibility makes it available to members.
+
+**A member sees a method they shouldn't at checkout**
+Set that method's **Visibility** to **Private** so it's admin-only.
 
 ## Related
 
-- [Integrations](/settings/integrations) — Connect Stripe so card payments become available
-- [Payments](/billing/payments) — Review actual payment records by method
+- [Integrations](/settings/integrations) - connect Stripe so card payments become available.
+- [External programs](/settings/external-programs) - third-party entrance methods whose per-visit fees are collected with these payment methods.
+- [Payments](/billing/payments) - review actual payment records by method.

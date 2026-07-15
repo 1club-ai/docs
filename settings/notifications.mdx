@@ -1,0 +1,173 @@
+---
+title: "Notifications"
+description: "Choose which notification categories you receive and on which channels, and understand how staff alerts route to the right people."
+keywords: [notifications, notification settings, channels, in-app, push, email, SMS, staff alerts, subscriptions, booking alerts, notification categories]
+---
+
+Notification settings control which categories of notifications you personally receive and on which channels they reach you. A **notification** is the system's record of something that happened, addressed to a person ("a member booked a court", "a renewal payment failed"). It is delivered through one or more **channels** - in-app, push, email, or SMS - and which channels fire for you, per category, is exactly what this page governs.
+
+These preferences are per user: each staff member sets their own. They do not change what the system generates, only how it reaches you.
+
+## Overview
+
+- **Per-category toggles** - Turn each notification category on or off for yourself.
+- **Per-category channels** - For an enabled category, choose which channels deliver it.
+- **Only relevant categories shown** - You see the categories you can actually receive, based on your role and whether you have an instructor profile.
+- **Opt-in vs on-by-default** - Most categories are on by default; booking-activity categories start off until you opt in.
+- **Staff routing** - Member-action alerts (new booking, new signup, new message) route to specific roles and to the relevant instructors automatically.
+
+## Managing your preferences
+
+Open **Settings > My notifications** (in the **Me** category of Settings). Each row is one category with:
+
+1. **The category label** on the left.
+2. **A switch** to enable or disable that category for you.
+3. **A Channels selector** (shown only when the category is enabled) where you pick the delivery channels.
+
+Changes save immediately when you toggle a switch or change channels - there is no separate save button. A confirmation toast appears on success.
+
+## Notification categories
+
+The categories fall into two groups: your own personal activity, and staff alerts about what members do.
+
+### Personal categories (always available)
+
+These concern your own account and are offered to every staff member:
+
+| Category | Label | What it covers |
+| --- | --- | --- |
+| `message` | My inbox | New messages sent to you. |
+| `task` | My tasks | Task-related notifications assigned to you. |
+| `booking` | My bookings | Activity on your own bookings. |
+| `billing` | My billing | Your own billing notifications. |
+
+### Staff-alert categories (shown when relevant to you)
+
+These notify staff about member actions. You only see a category if it can actually route to you (see [Which categories you see](#which-categories-you-see)):
+
+| Category | Label | Fires when | Routes to |
+| --- | --- | --- | --- |
+| `user_booking` | User bookings | A member books or cancels | Admins, managers |
+| `class_instructor` | Class bookings | A member books or cancels a class | The class's instructors |
+| `user_membership` | User memberships | A member buys a membership | Admins, managers |
+| `user_message` | User messages | A member sends an inbound message | Admins, managers, front desk, instructors |
+| `user_review` | User reviews | A member leaves a review | Admins and managers; the reviewed session's instructor |
+| `user_signup` | User signups | A new member signs up themselves | Admins, managers |
+
+Renewal-payment-failure alerts route to admins and managers and are delivered under your **My billing** category.
+
+<Note>
+Per-event booking alerts for a specific event are gated by that event's own "notify staff" setting, not by a toggle here. When an organizer turns that on, the alert always reaches admins and managers regardless of their personal **User bookings** preference, so it does not appear as a separate switch on this page.
+</Note>
+
+### Which categories you see
+
+The list is filtered to what you can receive:
+
+- **Personal categories** (My inbox, My tasks, My bookings, My billing) always appear.
+- **Role-based staff categories** appear when your role is in the alert's recipient roles. An admin or manager sees User bookings, User memberships, User signups, and so on; front desk sees User messages.
+- **Instructor categories** (Class bookings, and instructor reviews) appear when you have an instructor profile, so you're notified about your own classes and sessions.
+
+Owners are treated as admins for relevance, so they see every category.
+
+## Channels
+
+A notification can be delivered on any of these channels:
+
+- **In-app** - Appears in your notification center inside 1Club. Turning this off for a category removes those notifications from the notification center entirely.
+- **Push** - The mobile-app nudge. Push and in-app are two channels of the same notification and share its read state, not two separate notifications.
+- **Email** - Sent through SendGrid, using your organization's branding.
+- **SMS** - A text message, sent through Twilio, used for staff alerts where a mobile number is on file.
+
+In this settings screen you select **In-App** and **Email** per category. Push is governed by your mobile app, and SMS is used by the platform for staff alerts where configured; both ride the same per-category preferences model.
+
+### How channels resolve
+
+For each category, the effective channels are the ones you selected, intersected with the channels that category actually supports - you never receive a channel you didn't ask for. Beyond that:
+
+- **Category off** - You receive nothing for that category, on any channel.
+- **On-by-default categories with no saved preference** - You receive them on their default channels (In-App and Email).
+- **Opt-in categories** (User bookings and My bookings) - You receive nothing until you enable them; they start off by design to avoid noise from high-volume booking activity.
+
+<Note>
+Deleted, invited (invitation not yet accepted), and inactive accounts are never notified on any channel, regardless of preferences. This is a structural safeguard, not something you configure.
+</Note>
+
+## Staff notification routing
+
+Staff alerts about member actions are resolved and delivered automatically. Understanding the routing helps you set expectations for your team:
+
+- **By role** - Alerts like New booking, New membership, and New signup go to every active user whose role matches (admins and managers for most; front desk and instructors are also included for inbound messages).
+- **By instructor** - Class-booking and instructor-review alerts resolve to the instructors of the specific class or session involved: the directly assigned instructor for one-to-one sessions, plus the class's instructors for class bookings. Only active instructors with an active linked account are reachable.
+- **Deduplicated** - If one person matches more than one rule for the same event (for example an admin who also teaches the booked class), they receive a single notification, not one per rule.
+- **Per-recipient channels** - Each recipient's own notification preferences decide which channels fire for them. One person may get a new booking in-app while another gets it by email.
+
+Delivery per channel is independent: an email failure doesn't suppress the in-app notification, and vice versa.
+
+## Worked examples
+
+### Yoga studio owner who wants signal, not noise
+
+You run a busy pilates and yoga studio and don't want a ping for every class booking.
+
+- Leave **User bookings** off (it starts off anyway).
+- Keep **User memberships** and **User signups** on with **In-App** and **Email** so you see new members and new revenue.
+- Keep **My inbox** on so member replies reach you.
+
+### Instructor at a climbing gym
+
+You teach classes and want to know about your own sessions only.
+
+- **Class bookings** appears because you have an instructor profile - keep it on to be told when someone books your class.
+- **User reviews** appears too - keep it on to see reviews of your sessions.
+- You won't see admin-only categories like User signups, because they never route to you.
+
+### Front desk at a racket-sports club
+
+You triage member enquiries at reception.
+
+- **User messages** appears for your role - keep it on with **In-App** so inbound member emails and messages surface immediately at the desk.
+- Turn on **User bookings** if reception also tracks new court bookings; leave it off if that's noise for you.
+
+### Studio manager who prefers email digests over in-app
+
+You'd rather everything arrive by email.
+
+- For each staff category you care about, open its **Channels** selector and choose **Email** only, removing **In-App**.
+- Those categories then skip the notification center and land in your inbox instead.
+
+## Tips & best practices
+
+- **Start from the defaults.** Most categories are on with In-App and Email out of the box. Turn things off rather than trying to enable everything.
+- **Opt in to booking alerts deliberately.** User bookings and My bookings are off by design; enable them only if you actually want per-booking pings.
+- **Use channels to match how you work.** Front-desk staff often prefer In-App; owners who live in email can drop In-App for staff categories.
+- **Remember routing is role-based.** If a colleague isn't getting an alert, check their role and instructor profile before assuming a preference is wrong - some categories simply never route to some roles.
+
+## Troubleshooting
+
+**Issue**: I'm not receiving a category I expect.
+
+**Cause / fix**: Either the category is toggled off, or it's an opt-in category (User bookings, My bookings) you haven't enabled. Turn the switch on and confirm at least one channel is selected.
+
+**Issue**: A category I want isn't even listed on the page.
+
+**Cause / fix**: The list only shows categories that can route to you. Admin-only categories won't appear for a front-desk or instructor account, and instructor categories require an instructor profile. Adjust the person's role or instructor profile if they genuinely need it.
+
+**Issue**: I enabled a category but still get nothing.
+
+**Cause / fix**: Check the **Channels** selector for that row - if no channels are selected the category effectively delivers nothing. Also confirm the account isn't invited-but-not-accepted or inactive, which never receive notifications.
+
+**Issue**: A staff member gets duplicate alerts for the same booking.
+
+**Cause / fix**: They shouldn't - matching multiple routing rules for one event is deduplicated to a single notification. If you see genuine duplicates, confirm they aren't two different categories (for example a class instructor also being an admin who enabled User bookings), which are distinct notifications by design.
+
+**Issue**: Turning off In-App didn't stop the email (or vice versa).
+
+**Cause / fix**: Channels are independent. Removing In-App only stops the notification-center entry; you must also remove Email from that category's channels to stop the email.
+
+## Related
+
+- [Inbox](/messaging/overview) - Where member messages that trigger message notifications live.
+- [Email inboxes](/settings/email-inboxes) - Capture inbound member email so it generates new-message alerts.
+- [Admin users](/settings/admin-users) - Roles determine which staff-alert categories a person can receive.
+- [Profile](/settings/profile) - Your other personal settings.

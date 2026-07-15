@@ -1,0 +1,166 @@
+---
+title: Data import
+description: Import members, memberships, plans, classes, bookings, invoices, and transactions from CSV under Settings > Data Tools > Import, with AI-assisted column mapping, a validated preview, and a controlled execute step.
+keywords: [data import, CSV import, import members, AI import, field mapping, bulk import, migrate from legacy system, preview import]
+---
+
+Data import brings your existing records into 1Club from CSV files. It lives under **Settings > Data Tools > Import** and runs as a four-step wizard: pick what you are importing, upload the file, review a validated preview, then execute. An AI analyzer can detect the record type and map your columns for you, so a file exported from another system usually imports without hand-editing the headers.
+
+You can import seven record types: members (contacts), memberships, plans, classes, bookings, invoices, and transactions. Files must be CSV and up to 10 MB.
+
+## Overview
+
+- **AI-powered import** - upload a CSV and let AI detect the record type and map your columns to 1Club fields, with a confidence score and reasoning.
+- **Manual import** - pick the record type yourself and download a matching template.
+- **Per-type templates** - download a CSV template with the exact expected columns for any record type.
+- **Validated preview** - see total, valid, and invalid row counts and per-row errors before anything is written.
+- **Selective execute** - only valid rows are imported; invalid rows are reported, not saved.
+- **Chained member import** - a single member row can also create a transaction, a membership, a wallet credit, and household dependents.
+- **Idempotent re-runs** - existing members (matched by email) are reused rather than duplicated.
+
+## The import wizard
+
+The wizard has four steps, shown as a stepper across the top: **Select Entity**, **Upload File**, **Preview**, and **Import**.
+
+### Recommended import order
+
+Because records reference each other, import them in dependency order. The wizard states it on the first step:
+
+1. Members (contacts)
+2. Plans
+3. Memberships
+4. Classes
+5. Bookings
+6. Invoices
+
+Transactions can be imported on their own or created as part of a chained member import. Before importing, make sure your **Clubs**, **Areas**, and **Instructors** already exist, because classes and bookings reference them by name or email.
+
+### Step 1 - Select entity
+
+You have two paths on this step.
+
+**AI-powered import.** Upload a CSV into the AI card. The analyzer reads the headers and the first few rows, then proposes:
+
+- the detected record type, with a confidence percentage,
+- a short reasoning line explaining the detection,
+- a set of column-to-field mappings, shown as `"Your Column" -> field` chips.
+
+If the detection looks right, continue and the mapping is applied automatically. If it is off, you can still pick the record type manually below.
+
+**Manual selection.** Choose one of the record-type cards (Members, Plans, Memberships, Classes, Bookings, Invoices, Transactions). Each card shows a short description of what it imports.
+
+### Step 2 - Upload file
+
+If you uploaded through the AI card, your file carries over and the wizard notes it is already uploaded. Otherwise, upload the CSV here. Use **Download Template** to get a CSV with the exact expected column names for the selected record type; fill it in and upload it back. Only `.csv` files are accepted.
+
+### Step 3 - Preview
+
+The preview validates every row against the selected record type without saving anything. You get three counts: **Total Rows**, **Valid Rows**, and **Invalid Rows**. Filter tabs let you view **All**, **Invalid**, or **Valid** rows, and each invalid row lists its specific validation errors. You can download the previewed rows (with their status and errors) as a CSV to fix them offline.
+
+<Warning>
+Invalid rows are never imported. Only valid rows are written when you execute, so a preview with invalid rows will import fewer records than the file contains. Fix the flagged rows and re-upload if you need all of them.
+</Warning>
+
+### Step 4 - Import
+
+Executing writes the valid rows to your organization. The results screen reports **Total Rows**, **Imported**, **Skipped**, and **Errors**, and lists the first several row-level errors if any occurred. Use **Import another** to start a fresh import.
+
+For **membership** imports, executing first opens a short dialog asking whether to mark the associated transactions as paid. If you tick **Mark as paid**, you choose a payment type: **Cash**, **Check**, **Bank Transfer**, or **Other**.
+
+## Field mapping and templates
+
+Each record type has a fixed set of expected fields. The template download gives you those exact column headers.
+
+| Record type | Key expected columns |
+| --- | --- |
+| Members (contacts) | `firstName`, `lastName`, `name`, `email`, `phone`, `address`, `city`, `state`, `country`, `postalCode`, `dateOfBirth`, `tags`, `gender`, `notes`, `club` (plus chained columns, below) |
+| Plans | `clubName`, `name`, `description`, `price`, `billingFrequency`, `signupFee`, `maxUses`, `validityPeriod`, `sports`, `isActive` |
+| Memberships | `contactName`, `contactEmail`, `planName`, `startDate`, `endDate`, `status`, `price`, `billingFrequency`, `autoRenew`, `signupFee`, `maxUses`, `used`, `usesRemaining` |
+| Classes | `clubName`, `instructorEmail`, `name`, `description`, `price`, `maxCapacity`, `startTime`, `endTime`, `sport`, `status`, `isFree` |
+| Bookings | `contactEmail`, `clubName`, `areaName`, `className`, `startTime`, `endTime`, `status`, `totalPrice`, `notes` |
+| Invoices | `contactEmail`, `invoiceNumber`, `invoiceDate`, `dueDate`, `status`, `subtotal`, `taxAmount`, `totalAmount`, `notes`, `description`, `quantity`, `unitPrice` |
+| Transactions | `contactEmail`, `amount`, `date`, `description`, `paymentStatus`, `transactionType`, `currency`, `taxAmount`, `totalAmount` |
+
+Useful conventions the importer follows:
+
+- **Member name** - use either `name` (a full name that is split into first and last) or `firstName` plus `lastName`. At least one is required.
+- **Custom fields** - for member imports, any column whose header starts with `custom_` is treated as a contact custom field automatically. Do not map those to standard fields.
+- **Dates** - accepted formats are `dd.MM.yyyy`, `dd.MM.yyyy HH:mm:ss`, `yyyy-MM-dd`, `yyyy-MM-dd HH:mm:ss`, and ISO-8601. A row with an unparseable date is flagged in the preview.
+- **Transactions default to paid**, using your organization currency when none is given.
+
+## Chained member import
+
+A member import is more than contacts. When the extra columns are present on a member row, the same row can also create related records in one pass:
+
+- **A transaction** - `transactionAmount`, `transactionDate`, `transactionDescription`, `transactionPaymentStatus`, `transactionType`, `transactionCurrency`, `transactionTaxAmount`, `transactionTotalAmount`.
+- **A membership** - `planName`, `membershipStartDate`, `membershipEndDate`, `membershipStatus`, `membershipPrice`, `membershipBillingFrequency`, `membershipAutoRenew`, `membershipSignupFee`, plus session totals `membershipMaxUses`, `membershipUsed`, `membershipUsesRemaining`.
+- **A wallet credit** - `wallet`, a decimal amount credited to the member's wallet.
+- **Household dependents** - `dependent`, a comma-separated list of dependent names (for example children or minors) added under this member's household.
+
+### How duplicates are handled
+
+Members are matched by email within your organization. If a row's email already exists:
+
+- The existing member is reused, not recreated.
+- The transaction, wallet credit, and notes on that row are skipped, so re-running an import does not double-charge or double-note anyone.
+- A membership or dependents on that row are still attached to the existing member. This is how you deliberately import several rows for the same member (one per membership) or add family members to an existing account.
+
+Memberships themselves are de-duplicated by member, plan, and start date, so the same membership row imported twice is not duplicated.
+
+## Worked example: migrating from a legacy system
+
+Suppose a padel and tennis club is moving off an old spreadsheet-based system and exports a members file, `members.csv`, with columns like `Full Name`, `Email`, `Mobile`, `Join Date`, `Plan`, `Membership Start`, `Total Sessions`, `Sessions Used`, and `Kids`.
+
+1. Go to **Settings > Data Tools > Import**.
+2. Drop `members.csv` into the **AI-powered import** card. The analyzer detects **Members (Contacts)** and proposes a mapping such as `"Full Name" -> name`, `"Mobile" -> phone`, `"Join Date" -> createdAt`, `"Plan" -> planName`, `"Membership Start" -> membershipStartDate`, `"Total Sessions" -> membershipMaxUses`, `"Sessions Used" -> membershipUsed`, and `"Kids" -> dependent`.
+3. Confirm and continue to the **Preview**. Two rows are flagged: one has `Join Date` as `31/13/2023` (an impossible date) and one is missing an email. The counts read 48 valid, 2 invalid.
+4. Download the invalid rows, fix the date and add the missing email in your source, and re-upload. The preview now reads 50 valid, 0 invalid.
+5. Execute. Because these rows carry a plan and a start date, each member is created together with a session-based membership, and any names in the `Kids` column are added as household dependents under the parent. Session usage imports so remaining sessions are correct from day one.
+
+Because members were matched by email, running the same file again would reuse every member rather than creating duplicates, and would only add memberships or dependents that were not already there.
+
+### Other vertical examples
+
+- **Martial arts gym** - import a `plans.csv` first (belt-progression memberships with `maxUses` per grading block), then a members file that references those plans by `planName` so each student lands on the right package.
+- **Pilates and yoga studio** - import class-pack memberships with `membershipBillingFrequency` set to `one_time` and `membershipMaxUses` for the pack size, so class credits carry over.
+- **Climbing gym** - import `transactions.csv` of past day-pass sales keyed by `contactEmail`, leaving `paymentStatus` blank so they default to paid in your organization currency.
+
+## Tips and best practices
+
+- **Let the AI analyzer go first.** It maps most legacy exports correctly, and you can still override the record type manually.
+- **Import in dependency order** (members, plans, memberships, classes, bookings, invoices) so references resolve.
+- **Set up clubs, areas, and instructors before importing** classes and bookings, which reference them by name or email.
+- **Use the preview as a linter.** Download the invalid rows, fix them in your source file, and re-upload rather than editing inside 1Club.
+- **Re-running is safe for members.** Email matching means a second run reuses members and only adds missing memberships or dependents.
+- **For member imports, prefix custom columns with `custom_`** so they map to contact custom fields automatically.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Upload rejected | The file is not a CSV, or is over 10 MB | Export as CSV and split large files under 10 MB |
+| AI analysis fails | The CSV is empty or the type could not be detected | Continue with manual selection and download the matching template |
+| Rows flagged as invalid dates | The date is not in a supported format | Use `dd.MM.yyyy`, `yyyy-MM-dd`, a variant with time, or ISO-8601 |
+| Member rows rejected for no name | Neither `name` nor `firstName` is present | Provide `name` (full) or `firstName` (and optionally `lastName`) |
+| Fewer records imported than expected | Invalid rows are skipped on execute | Fix the rows flagged in the preview and re-import |
+| Re-import did not re-add transactions | The member already exists (matched by email) | Expected behavior - existing members are reused and their transactions and notes are not re-run |
+| Contact import blocked | Bulk contact import requires a paid plan (trials are allowed) | Upgrade your 1Club plan, or import during your trial |
+| Membership import blocked | It would exceed your active-member quota | Free up capacity or upgrade your 1Club plan |
+| A class or booking row cannot find its club, area, or instructor | The referenced record does not exist yet | Create the club, area, or instructor first, then re-import |
+
+## Related
+
+<CardGroup cols={2}>
+<Card title="Data export" icon="download" href="/settings/export">
+Export your records back out to CSV.
+</Card>
+<Card title="Members overview" icon="users" href="/members/overview">
+Contacts, custom fields, and how imported members behave.
+</Card>
+<Card title="Memberships" icon="id-card" href="/members/memberships">
+The membership catalog and checkout that chained imports create against.
+</Card>
+<Card title="Plans" icon="tags" href="/billing/plans">
+Plans that membership imports reference by name.
+</Card>
+</CardGroup>

@@ -1,0 +1,161 @@
+---
+title: Products
+description: Build your catalog of sellable items - retail, add-ons, and rentals - with categories, brands, price, revenue account, visibility, and optional stock tracking.
+keywords: ["product", "retail", "pro shop", "add-on", "rental", "product category", "brand", "barcode", "revenue account", "inventory", "stock", "point of sale", "POS"]
+---
+
+Products are the sellable items in your catalog that aren't memberships: pro-shop retail, consumable add-ons, and gear rentals. Each product has a name, a price, a revenue account for accounting, a visibility level, and can be grouped by category and brand. Products are what you ring up at the point of sale, bundle into packages, and offer as add-ons on signup order forms.
+
+You manage products under **Revenue > Products** in the admin.
+
+## Overview
+
+- **One catalog for everything you sell** - Retail goods, add-ons, and rentals all live here as products; memberships and passes live in [Plans](/billing/plans) instead.
+- **Category and brand grouping** - Tag each product with a category (used to group the POS) and an optional brand.
+- **Price and revenue account** - Set the price in your organization's currency and route the revenue to a specific accounting code.
+- **Visibility** - Control whether a product is public, member-only, or admin-only.
+- **Barcode** - Store a barcode for scan-to-sell at the point of sale.
+- **Images, features, and color** - Add up to five images, a bulleted feature list, and a color for display.
+- **Optional stock tracking** - When inventory management is enabled, track on-hand quantities, receive and adjust stock, and consume stock automatically on each sale.
+
+## The list page
+
+Products are shown in a data grid with columns for **Name**, **Price**, **Visibility**, and **Status** (Active or Inactive), plus a row menu to edit or delete. Click any row to open the product's detail page.
+
+The page header has three actions:
+
+- **Add Product** - opens the product dialog.
+- **Categories** - opens the category manager (see [Categories and brands](#categories-and-brands)).
+- **Brands** - opens the brand manager.
+
+## Creating or editing a product
+
+Click **Add Product** (or edit an existing row) to open the product dialog.
+
+The dialog asks for:
+
+- **Product Name** - required.
+- **Club** - which club the product belongs to. For single-club organizations the lone club is selected automatically; multi-club organizations pick one, or leave it unset to make the product available across clubs.
+- **Category** - the product category, used to group products on the POS. Type to search existing categories, or type a new name to create one inline.
+- **Brand** - an optional brand. Type to search, or type a new name to create one inline.
+- **Barcode** - an optional code (up to 64 characters) for scan-to-sell at the point of sale.
+- **Price** - the sell price in your organization's currency.
+- **Revenue Account** - the accounting code the sale is booked against. Leave it as **None (uses default)** to fall back to your organization's default account, or pick a specific account (shown as `code - name`).
+- **Visibility** - **Public** (visible to anyone), **Member only** (visible after sign-in), or **Private** (admin-only, e.g. staff-only items).
+- **Active** - inactive products are hidden from the POS and can't be added to packages or order forms, but existing sales are preserved.
+- **Description** - free text shown on the product's detail page and public surfaces.
+- **Features** - a tag list of short selling points.
+- **Images** - up to five images; the first is used as the primary image.
+- **Color** - a display color for the product.
+
+<Tip>
+Products do not carry their own tax rate. Tax is applied at the point of sale using your organization's tax settings, and the product's **Revenue Account** determines which accounting code the sale (and its tax) lands on. Set up your accounts and tax rates once, then just pick the right account per product.
+</Tip>
+
+### The product detail page
+
+Click a product row to open its detail page. It shows a **Product Details** card (price, description, features, revenue account, and status/visibility chips) and an **Images** gallery you can drag to reorder. Use the header buttons to **Edit** or **Delete** the product. If inventory management is on, the page also shows a **Stock** section and a **Recipe** action (see [Inventory and stock](#inventory-and-stock)).
+
+### Categories and brands
+
+Both categories and brands are managed from the Products page header:
+
+- **Categories** group products on the point of sale and are sortable; drag to set the order the groups appear in. Renaming is inline. Deleting a category clears it from any products that used it (the products remain).
+- **Brands** are an optional label. Deleting a brand clears it from its products.
+
+You can also create a category or brand on the fly from the product dialog by typing a new name in the picker.
+
+## Where products are sold
+
+### Point of sale
+
+Products are the first tab on the **point of sale**. They're grouped into sections by category, so your POS layout mirrors the category order you set. Uncategorized products fall into their own group. If a product has a barcode, staff can scan it to add it to the cart.
+
+### Packages
+
+Products can be bundled with plans into a fixed-price [package](/billing/packages). When a package sells, its fixed price is split proportionally across the component plans and products, so each product still records revenue against its own revenue account.
+
+### Signup order forms
+
+On a [signup form](/settings/signup-forms), you can attach products as **add-on products** - optional items a member can add to their order during signup. Attaching packages turns the signup form into an order form; add-on products then appear alongside as optional extras.
+
+## Inventory and stock
+
+Stock tracking is optional and off by default. Turn it on under **Settings** by enabling **Inventory Management** (which enables ingredient tracking, a stock ledger, and recipe-based consumption). Once enabled, each product's detail page gains a **Stock** section and a **Recipe** action.
+
+- **Direct stock** - Simple retail goods (a can of drink, a grip) are tracked directly: their on-hand count decrements on each sale.
+- **Recipe-based** - A product that's assembled from ingredients (for example a mixed drink) can have a **Recipe** of ingredients; selling it consumes the ingredients instead.
+- **Availability** - The Stock section shows total on-hand for the currently selected club (or the sum across clubs when "All clubs" is active), with a warning chip when it hits zero.
+- **Movements ledger** - Every change is recorded as a movement (sale, adjustment, waste, receipt) with a quantity, type, and a link back to the order that caused it.
+- **Not tracked** - A product with no recipe and no direct stock shows "This product is not tracked", meaning it sells without touching inventory.
+
+Receiving and adjusting stock require the inventory manage permission; a signed adjustment requires a reason.
+
+## Worked examples
+
+### Pro shop for a racket club
+
+You sell grips, overgrips, strings, and branded tees at the front desk.
+
+- Create a **Category** called _Pro shop_ and add each item as a product in it, with a **Brand** (Wilson, Head, Babolat) where relevant.
+- Set a **Barcode** on each so the desk can scan them at the POS.
+- Route them to a _Retail sales_ **Revenue Account** so retail revenue is separated from membership revenue in reporting.
+- If you enable inventory, track direct stock on strings and grips and receive stock when a delivery arrives.
+
+### Drinks and towels as add-ons
+
+You want members to grab a sports drink or rent a towel at checkout.
+
+- Create products _Sports drink_ and _Towel_ in a _Cafe & add-ons_ category, set **Member only** visibility if they're for members.
+- They appear on the POS Products tab, and you can attach them as **add-on products** on your signup order form so new members can add them during signup.
+- For the sports drink, enable direct stock so the fridge count stays accurate; for a mixed smoothie, define a **Recipe** so selling it draws down the ingredients.
+
+### Gear rental at a climbing gym
+
+You rent shoes and harnesses to drop-in climbers.
+
+- Create products _Shoe rental_ and _Harness rental_ in a _Rentals_ category at the rental price.
+- Sell them on the POS alongside a day pass in a single order.
+- Bundle a _Beginner day_ package that combines a day pass plan with shoe and harness rentals at one fixed price (see [Packages](/billing/packages)).
+
+### Trial bundle for a martial arts gym
+
+- Create a _Uniform (gi)_ product and route it to an _Equipment_ revenue account.
+- Build a package that pairs a starter membership plan with the gi at a welcome price; the package split records the membership and the gi separately.
+
+## Tips & best practices
+
+- **Use categories deliberately.** They drive the POS layout, so name and order them the way you want staff to find things.
+- **Pick the right revenue account per product.** This is what keeps retail, rentals, and equipment revenue separated in your accounting and analytics. Leave it as default only when you genuinely want the fallback.
+- **Set barcodes for anything sold by scan.** It speeds up the POS and reduces mis-rings.
+- **Prefer Inactive over Delete.** Deactivating hides a product from the POS, packages, and order forms while preserving its sales history.
+- **Only enable inventory when you'll maintain it.** Stock tracking is most useful for fast-moving retail and consumables; leave slow or one-off items untracked.
+
+## Troubleshooting
+
+**Issue**: A product doesn't appear on the point of sale.
+
+**Solution**: Confirm the product is **Active** and its **Visibility** isn't set to Private for a context where it shouldn't be hidden. Also check the club scope - a product tied to another club won't show for the currently selected club.
+
+**Issue**: The product shows under the wrong group on the POS, or in an "uncategorized" group.
+
+**Solution**: Set or change the product's **Category**. Products with no category fall into the ungrouped section. Reorder categories from the **Categories** manager to control group order.
+
+**Issue**: I can't add a product to a package or an order form.
+
+**Solution**: Only **Active** products can be bundled into packages or attached as add-on products. Reactivate the product first.
+
+**Issue**: The Stock section says "This product is not tracked".
+
+**Solution**: The product has neither direct stock nor a recipe. Receive stock to start direct tracking, or define a **Recipe** of ingredients if the product is assembled. If you don't see a Stock section at all, inventory management isn't enabled under **Settings**.
+
+**Issue**: Revenue for a product is landing in the wrong account.
+
+**Solution**: Edit the product and set its **Revenue Account** explicitly instead of **None (uses default)**. Existing sales aren't re-booked; the change applies to future sales.
+
+## Related
+
+- [Packages](/billing/packages) - bundle products and plans into a single fixed-price offer.
+- [Plans](/billing/plans) - membership and pass templates (the other half of your catalog).
+- [Transactions](/billing/transactions) - how product sales are recorded and split.
+- [Signup forms](/settings/signup-forms) - attach products as add-ons to turn a form into an order form.

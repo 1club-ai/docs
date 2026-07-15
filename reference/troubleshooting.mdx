@@ -1,6 +1,7 @@
 ---
 title: Troubleshooting
-description: Common issues you might hit using the 1Club admin, and what to check.
+description: Common issues you might hit using the 1Club admin - sign-in, permissions, bookings, check-ins, payments, organizations and clubs, exports - and what to check for each.
+keywords: ["troubleshooting", "can't sign in", "permission denied", "walk-in check-in", "stripe decline", "refund greyed out", "missing data", "wrong organization", "wrong club", "export limit"]
 ---
 
 This page collects the issues we see most often in practice. For anything that isn't on this list, contact support via the admin's help menu.
@@ -14,7 +15,7 @@ Check, in order:
 1. **The org URL is right**. Each organization has its own subdomain on the admin. If you're at the wrong subdomain, your credentials won't be recognized even when they're correct.
 2. **The email is the one your invite went to**. If you've been invited under a different email than you usually use, sign in with that one.
 3. **Your account is still active**. Ask an Admin in your org to open **Settings > Users** and confirm your row exists with status **Active**. If it shows **Invited** or **Expired**, the invitation never completed - have them resend it.
-4. **You're not signed into a different org**. The top-right org switcher might have you in another organization where this user doesn't exist.
+4. **You're not signed into a different org**. The organization switcher in the sidebar might have you in another organization where this user doesn't exist. See [Organizations and clubs](/reference/organization-clubs).
 5. **You're using the sign-in method tied to your account**. Google, Apple, Facebook, and email/password all resolve to one account by email. If "Continue with Google" doesn't recognize you, confirm that Google account uses the same email as your 1club account. See [Signing in](/reference/sign-in).
 
 ### Password reset email never arrives
@@ -38,11 +39,29 @@ If you should have access and don't:
 
 1. Ask an Admin to verify your role under **Settings > Users**.
 2. Sign out and back in to refresh your role claims.
-3. Check that you're in the right organization (top-right org switcher).
+3. Check that you're in the right organization (organization switcher in the sidebar). Roles are granted per organization, so a role you hold in one org doesn't carry into another. See [Organizations and clubs](/reference/organization-clubs).
 
 ### Custom roles don't exist
 
 1Club doesn't support custom roles. The five canonical roles cover the common admin shapes; there's no role builder, no per-permission toggle, and no way to scope an Admin to a subset of modules. If the existing roles don't fit, the usual answer is to use Manager (which is full operational access minus settings) or to give Admin temporarily and remove it later.
+
+## Organizations and clubs
+
+### Members, bookings, or invoices you expect are missing
+
+All data is scoped by organization. Records created in one organization are invisible in another, even when the same person administers both. Confirm the active organization with the switcher in the sidebar, then re-check. If a location's activity looks empty, confirm the club switcher too - you may be on a different club, or an admin "All clubs" view that spreads the data across locations. See [Organizations and clubs](/reference/organization-clubs).
+
+### A club is missing from the switcher
+
+Only **Active** clubs appear in the club switcher and in members' booking choices. Open **Settings > Clubs**, open the club, and set its status to **Active**. A single active club means no switcher is shown at all - that's expected.
+
+### You can't delete a club
+
+A club that still has associated data (bookings, areas, members, and so on) is protected from deletion, and the admin blocks it with "Cannot delete club: it has associated data." Reassign or remove that data first, or set the club to **Inactive** to take it offline without deleting its history.
+
+### Currency, time zone, or locale is wrong across the admin
+
+These are organization-level settings, not per-club. Update them under **Settings > Organization**; the change propagates to every page that reads org settings. See [Organization settings](/settings/organization).
 
 ## Dashboard and analytics
 
@@ -71,8 +90,21 @@ If the booking policy at this club has **Enforce payment** set to **At check-in*
 ### Booking doesn't appear in the calendar
 
 - The calendar filter has a date and (sometimes) an area/class filter. Confirm the booking falls inside both.
-- Confirm the booking didn't fail to create. The Bookings list under **Operations > Bookings** is the source of truth.
+- Confirm the booking didn't fail to create. The Bookings list under **Schedule > Bookings** is the source of truth.
 - Verify your role permits viewing other people's bookings. Instructors with own-scope can only see their own.
+- Confirm you're on the right club. A booking made against one club won't show while you're viewing another, or while an admin "All clubs" view spreads it among locations. See [Organizations and clubs](/reference/organization-clubs).
+
+### An area is missing from the booking dialog or schedule
+
+The schedule and booking flow only show **Active** areas. Open **Resources > Areas** and check the area's status - Inactive and Maintenance areas are hidden. Also confirm its area type isn't hidden under **Settings > Operations > Schedule display**. See [Areas](/operations/areas).
+
+### The booking price is zero or looks wrong
+
+The line total is seeded from the area's **Price per hour** multiplied by the booked duration, before discounts. If the total is zero, the area has no hourly price set - open the area under **Resources > Areas** and set one. If it's higher or lower than expected, check for a [promotion](/marketing/promotions) applied at checkout or a [booking policy](/operations/booking-policies) that changes payment timing. See [Areas](/operations/areas).
+
+### Check-in isn't consuming a membership or credit
+
+Check-in runs through the same pipeline as booking, so a check-in only draws down a membership or package when the member actually has an entitlement that covers this activity. Confirm the member has an active [membership](/members/memberships) or remaining package credits for the class or area, that the membership hasn't expired, and that the booking policy's **Enforce payment** setting matches how you intend to collect. If there's no entitlement, the system falls back to collecting payment per the policy.
 
 ## Payments
 
@@ -82,7 +114,11 @@ This is almost always a card issue (insufficient funds, blocked by issuer, wrong
 
 ### Refund button is greyed out
 
-You can only refund a payment that's in the **Succeeded** state. Pending payments need to settle first; failed payments can't be refunded because nothing was captured.
+You can only refund a payment that's in the **Succeeded** state. Pending payments need to settle first; failed payments can't be refunded because nothing was captured. See [Payments](/billing/payments).
+
+### You can't take card payments at all
+
+If the card form won't load or every charge fails before it reaches the issuer, the organization's Stripe integration isn't connected for the mode you're in. A **live mode** org needs its own Stripe account connected via Stripe Connect; a **test mode** org uses 1Club's platform account. Check the connection and mode under **Settings > Integrations > Stripe**. See [Stripe](/settings/integrations/stripe).
 
 ## Exports
 
@@ -118,5 +154,8 @@ The admin's help menu (top-right) has direct links to support and the AI assista
 ## Related
 
 - [Roles and permissions](/reference/roles-permissions) - The full permission matrix.
+- [Organizations and clubs](/reference/organization-clubs) - How org and club scoping decide what data you see.
 - [Check-in models](/reference/check-in-models) - How door check-ins relate to bookings and payments.
+- [Areas](/operations/areas) - Area status, pricing, and why an area might not show.
+- [Stripe](/settings/integrations/stripe) - Payment connection and test/live mode.
 - [Settings > Export](/settings/export) - Limits and behavior for CSV exports.

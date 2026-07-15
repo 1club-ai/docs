@@ -1,15 +1,39 @@
 ---
 title: Memberships
-description: The org-wide membership grid, with pause, resume, renew, and cancel flows.
+description: The org-wide membership grid. Sell, pause, resume, renew, and cancel memberships, and track how members consume their usage allowance.
+keywords:
+  - membership
+  - pause membership
+  - resume membership
+  - renew membership
+  - cancel membership
+  - usage allowance
+  - class pack
+  - auto-renew
 ---
 
-A membership is an instance of a [plan](/billing/plans) assigned to a specific contact. The plan defines price, billing frequency, scope, and use limits; the membership snapshots those values at the moment of sale and tracks the member's usage and billing schedule from then on.
+A membership is an instance of a [plan](/billing/plans) assigned to a specific contact. The plan defines price, billing frequency, scope, and use limits; the membership snapshots those values at the moment of sale and tracks that member's usage and billing schedule from then on. Editing the plan later does not rewrite memberships already sold, so each member keeps the terms they bought.
 
 The same contact can hold more than one membership at the same time (for example a monthly main plan plus a 10-class add-on pack). The Memberships page lists every membership in the org, regardless of status.
 
+## Overview
+
+The Memberships page is where you manage the full lifecycle of every membership in the org. From here you can:
+
+- **Sell a membership** - assign a plan to a contact, snapshot its terms, and optionally take payment in the same step.
+- **Track usage** - see how many sessions each capped membership has left, at a glance, with a usage bar.
+- **Pause and resume** - freeze billing and access for a member on holiday, injured, or on medical leave, without losing the time they paid for.
+- **Renew** - extend a recurring membership by one more billing period, with or without collecting payment.
+- **Cancel** - end a membership immediately or at the end of the current period.
+- **Filter and search** - status tabs with live counts, a billing-frequency filter, and search by member or plan.
+
+<Note>
+  A membership and a booking share the same payment, pricing, and usage-consumption code. A membership consumed at check-in behaves exactly as it does when consumed through a booking - there is no separate "membership check-in" logic. See [Check-in models](/reference/check-in-models).
+</Note>
+
 ## Opening the page
 
-Go to **Members** in the main menu, open the overflow next to **Add Member**, and pick **Memberships**. The URL is `/members/memberships`.
+Go to **Members** in the main menu and open the **Memberships** tab. The URL is `/members/memberships`. Memberships sits alongside **List**, **Access cards**, **Accounts**, **Matches**, and **Document signatures** under the Members section.
 
 ## Tabs and counts
 
@@ -23,75 +47,206 @@ Tabs filter by status, with server-side counts in each badge:
 - **Cancelled** - cancelled either immediately or at end of period.
 - **Expired** - past the end date without renewal.
 
-The frequency filter in the drawer narrows by billing frequency: one-time, weekly, monthly, quarterly, annually, custom, or "any recurring" as a catch-all.
+<Tip>
+  A membership whose renewal charge is declined can be moved to an internal "pending payment" state by the billing engine until the payment settles. It is not one of the tabs above; it reappears as **Active** once the outstanding charge is paid.
+</Tip>
+
+The frequency filter in the drawer narrows by billing frequency: **recurring** (any recurring cadence), **one-time**, **weekly**, **monthly**, **quarterly**, **annually**, or **custom**.
 
 ## Grid columns
 
-Each row shows the member, the plan, billing frequency, price, current period, status chip, payment status, and usage allowance. Click a row to open the membership detail page.
+Each row shows:
+
+- **Contact** - the member who holds the membership.
+- **Plan** - the plan the membership was sold under.
+- **Price** - the snapshotted price, with the billing frequency underneath.
+- **Auto renew** - Yes/No (shown as "-" for one-time memberships).
+- **Usage** - the allowance bar (see [How usage is counted](#how-usage-is-counted)). Shows **Unlimited** when the plan has no use cap.
+- **Period** - the current period's start and end dates ("Ongoing" for recurring memberships with no fixed end).
+- **Status** - the status chip.
+- **Payment status** - whether the membership's charges are paid, pending, or overdue.
+
+Click a row to open the membership detail page. The row action menu exposes **View**, **Edit**, and the lifecycle actions that apply to the current status.
 
 ## Adding a membership
 
 Click **Add Membership**. The dialog lets you:
 
-1. Pick the contact.
-2. Pick the plan. Fields auto-populate from the plan: price, billing frequency, signup fee, max uses, scope (which classes, areas, or instructors the membership covers).
-3. Adjust start date. The end date and renewal date are computed from the billing frequency, but admins can override.
-4. Set auto-renew (only for recurring frequencies; defaults from the plan).
-5. Optionally take payment in the same step. If the plan requires payment upfront, the payment section opens automatically and the membership cannot be saved without it.
+1. **Pick the contact.** On an existing membership this field is locked - a membership can't be reassigned to a different member.
+2. **Pick the plan.** Fields auto-populate from the plan: price, billing frequency, signup fee, max uses, and scope (which classes, areas, or instructors the membership covers).
+3. **Adjust the start date.** The end date and renewal date are computed from the billing frequency, but you can override them.
+4. **Set auto-renew.** Only available for recurring frequencies; defaults from the plan.
+5. **Apply a discount (optional).** Enter a promotion code or pick a discount in the price section. The discount lowers the saved price, so recurring renewals inherit the reduced amount going forward. Only discount-type promotions apply here, not wallet vouchers.
+6. **Take payment (optional).** If the plan requires payment upfront, the payment section opens automatically and the membership cannot be saved without a payment method. The signup fee is charged as a separate transaction and is not reduced by a discount.
 
-Editing an existing membership uses the same dialog with a stricter scope validator, so admins can fix snapshots after a plan has been edited post-sale.
+### Editing a membership
+
+Editing an existing membership uses the same dialog. Because a plan can be edited after a membership was sold, the edit form also exposes the snapshot fields - **renewal date**, **billing frequency**, **max uses**, **uses remaining**, **session unit**, and **scope** - so you can repair a stale snapshot directly on the membership without touching the plan.
+
+<Warning>
+  To enter or leave the paused state, use the **Pause** and **Resume** actions, not the edit dialog. Pausing has side effects (voiding scheduled charges, shifting the renewal clock) that the generic edit form deliberately does not perform.
+</Warning>
 
 ## The lifecycle
 
-Memberships move through these states. The actions available on each row reflect the current state.
+Memberships move through the states below. The actions available on each row reflect the current status.
 
 ### Pause and resume
 
-Use **Pause** to put a membership on hold. Billing stops and access is blocked while paused. When you **Resume**, the end date and renewal date shift forward by the pause duration so the member recovers the time they paid for.
+Use **Pause** (available only from **Active**) to put a membership on hold. Billing stops, access is blocked, and any pending future recurrence charge is voided so the member is not billed during the freeze. The renewal clock stops too.
 
-The pause dialog accepts an optional reason (e.g. vacation, injury, medical leave) and an optional auto-resume date. Leave the resume date blank to require manual resumption.
+The pause dialog offers:
+
+- **Schedule an auto-resume date** - toggle it on to set a **Resume On** date; the membership resumes automatically on that date. Leave it off for an indefinite pause that requires manual resumption.
+- **Reason (optional)** - a free-text note (e.g. vacation, injury, medical leave), up to 500 characters.
+
+When you **Resume** (available only from **Paused**), the end date and renewal date shift forward by the pause duration so the member recovers exactly the time they paid for. The resume dialog previews the new dates before you confirm. Resuming does not itself create a new charge; the billing engine seeds the next renewal charge from the shifted renewal date once it falls due.
 
 ### Renew
 
-**Renew** appends a new billing period to a recurring membership. The renewal dialog shows the resulting new period dates. One-time memberships cannot be renewed; create a new membership instead.
+**Renew** appends a new billing period. It is available for active, pending, used, and expired memberships, but not for paused, cancelled, or one-time ones.
+
+- If the membership is still within its current period, the new period stacks on top of the existing end/renewal date.
+- If it has expired or its end date is in the past, the new period starts today.
+
+The renew dialog previews the resulting **New billing period** dates and the price. If the plan requires payment upfront you must pick a payment method to renew; otherwise you can renew now and leave the charge pending for later settlement. One-time memberships show a warning and cannot be renewed - create a new membership instead.
 
 ### Cancel
 
-**Cancel** offers two modes:
+**Cancel** is available for any membership that is not already cancelled or expired. What the dialog offers depends on auto-renew:
 
-- **Cancel at end of period** - the membership stays active until the current period ends, then will not renew. The current scheduled cancellation date shows on the row as "Cancelling on {date}".
-- **Cancel immediately** - status flips to cancelled today and access is revoked immediately.
+- **Auto-renewing memberships** get a choice of two modes:
+  - **Cancel at end of period** - the membership stays active until the current period ends, then will not renew. The row shows "Cancelling on {date}". This is the default.
+  - **Cancel immediately** - the status flips to cancelled, the end date is set to today, and access is revoked at end of day.
+- **Non-renewing memberships** (including one-time packs) are cancelled immediately - there is no future period to cancel against.
 
-A membership that is already scheduled to cancel can be flipped to "cancel immediately" from the same dialog.
+Either mode voids any pending future recurrence charges so the member is not billed again. A membership already scheduled to cancel at period end can be flipped to immediate cancellation from the same dialog.
 
 ### Delete
 
-Deletion is only available when the membership has no transactions. To remove a membership that has been paid against, cancel it instead so financial history is preserved.
+Deletion is only available to admins with the delete permission, and only when the membership has **no** transactions. To remove a membership that has been paid against, cancel it instead so financial history is preserved. Attempting to delete a membership with transactions is blocked with a clear error.
 
 ## How usage is counted
 
-When a membership has `maxUses` set, each booking against it debits one use at the moment the booking is created. Cancelling the booking restores the use. A check-in that is linked to a booking does not double-debit, because the booking has already paid for the session.
+A membership tracks usage only when the plan sets a use cap (**Max Uses**). Uncapped memberships show **Unlimited** and are never debited. The usage bar reads as consumed / total in the plan's **session unit**:
 
-A pre-existing booking honors the membership even after the membership has been exhausted or has flipped out of active status:
+- **Bookings** - each session counts as one unit.
+- **Hours** - each session debits its duration in hours, so a 90-minute court booking debits 1.5 hours.
+
+When and how a use is debited:
+
+- **Booked in advance** - the use is debited when the booking is created. Cancelling the booking restores the use (never above the max), and if the membership had flipped to **Used**, restoring a use flips it back to **Active**.
+- **Consumed at check-in** - a member checked in directly against the membership (no prior booking) debits a use at check-in. When the last use is consumed the membership flips to **Used**.
+- **No double-debit** - a check-in linked to a booking does not debit again, because the booking already paid for the session.
 
 <Note>
   An exhausted or no-longer-active membership still honors bookings that were created against it while it was active. The booking debited a use at booking time, so check-in for that specific booking goes through even if the membership has since hit zero uses or expired. See [Attendance](/members/attendance) for the walk-in versus pre-booked distinction.
 </Note>
 
-## Membership scope (validFor)
+## Membership scope
 
-Memberships can be scoped to specific classes, areas, or instructors. The scope is set on the plan and copied to the membership at sale. When a booking is being created, only memberships whose scope covers the chosen class/area/instructor are offered as payment options.
+Memberships can be scoped to specific **classes**, **areas**, or **instructors** (the `validFor` snapshot). The scope is set on the plan and copied to the membership at sale. When a booking is being created, only memberships whose scope covers the chosen class, area, or instructor are offered as a payment option.
 
-Admins can edit the scope on an existing membership if the plan's snapshot is stale.
+If the plan restricts bookable hours (for example an off-peak plan valid 20:00-23:00 on weekdays), a booking that falls outside that window - or straddles its boundary - is not covered by the membership.
+
+You can edit the scope on an existing membership if the plan's snapshot is stale.
 
 ## Auto-renew
 
-Recurring memberships can auto-renew. When the period ends, a renewal transaction is generated and charged against the member's saved payment method. Auto-renew is only available for active, used, or pending memberships, and defaults to the plan's `defaultAutoRenewal` setting.
+Recurring memberships can auto-renew. When the period ends, a renewal transaction is generated and charged against the member's saved payment method. Auto-renew is only available for active, used, or pending memberships, and defaults to the plan's default-auto-renewal setting. If a renewal charge is declined, the membership is deactivated until the payment settles, then reactivates and resumes its billing cycle from the failed period.
+
+## Worked examples
+
+### Unlimited yoga membership (Pilates/Yoga)
+
+A studio sells an "Unlimited Monthly Yoga" plan.
+
+- **Billing frequency** - monthly, **auto-renew** on.
+- **Max Uses** - empty, so the usage column shows **Unlimited** and no session is ever debited.
+- **Scope** - classes, limited to the yoga class type.
+
+The member books as many yoga classes as they like each month. Each renewal charges the card on file. If they go on holiday, **Pause** with an auto-resume date freezes billing and pushes the renewal date out by the freeze length.
+
+### 10-class pilates reformer pack (Pilates/Yoga)
+
+A reformer studio sells a "10-Class Reformer Pack".
+
+- **Billing frequency** - one-time, **auto-renew** off.
+- **Max Uses** - 10, **session unit** Bookings.
+- **Scope** - classes, limited to the reformer class type.
+
+Each reformer booking debits one use; the usage bar counts down 0/10 to 10/10. When the tenth session is consumed the membership moves to the **Used** tab. Because it is one-time, **Renew** is not offered - sell the member a fresh pack. If a booking is cancelled, the use is returned and a **Used** pack flips back to **Active**.
+
+### Racket-club court hours (Racket sports)
+
+A padel club sells "20 Court Hours Monthly".
+
+- **Billing frequency** - monthly, **auto-renew** on.
+- **Max Uses** - 20, **session unit** Hours.
+- **Scope** - areas, limited to the court area type.
+
+A 90-minute court booking debits 1.5 hours from the allowance, a 60-minute booking debits 1. When the member runs out of hours before the month ends, the membership shows **Used**; renewing (or the auto-renewal at period end) resets the allowance for the new period.
+
+### Membership hold for an injured athlete (Martial arts)
+
+A jiu-jitsu gym runs an "Unlimited Monthly" plan. A member tears a ligament and needs six weeks off.
+
+- Open the member's membership and click **Pause**.
+- Enter a **Reason** of "injury" and either schedule the resume date six weeks out or leave it indefinite.
+- Billing stops and the scheduled renewal charge is voided. On resume, the renewal date shifts forward by the exact pause length, so the member loses none of the time they paid for.
+
+## Tips & best practices
+
+- **Let the plan carry the defaults.** Configure price, use limits, scope, and default auto-renewal on the [plan](/billing/plans) so every sale snapshots consistent terms. Only override on the membership for genuine exceptions.
+- **Prefer cancel over delete.** Delete is blocked once any transaction exists, and cancelling preserves the financial trail. Reserve delete for memberships created in error before any charge.
+- **Use pause, not cancel, for temporary absences.** Pause preserves paid-for time and the member's history; cancelling and re-selling does not.
+- **Schedule the resume date when you know it.** A scheduled auto-resume keeps a paused membership showing a coherent renewal date and reactivates without staff action.
+- **Watch the Used tab for one-time packs.** Members on the **Used** tab have consumed their allowance and (for one-time packs) need a new membership, not a renewal.
+
+## Troubleshooting
+
+**Issue**: The membership won't save - it says payment is required.
+
+**Cause**: The plan has "require payment upfront" on and the discounted total is still above zero.
+
+**Fix**: Add a payment method in the payment section of the Add Membership dialog, or apply a discount that zeroes the total. Free plans (zero price and zero signup fee) save without payment.
+
+**Issue**: I can't find the **Renew** action on a membership.
+
+**Cause**: Renew is hidden for paused, cancelled, and one-time memberships.
+
+**Fix**: Resume a paused membership first. For a one-time pack, create a new membership. For cancelled memberships, sell a fresh one.
+
+**Issue**: A member's booking went through even though their pack shows zero uses.
+
+**Cause**: The booking was created while the membership still had a use; the use was debited at booking time.
+
+**Fix**: This is expected. The pre-booked session is already paid for and check-in proceeds. New bookings are blocked once the allowance is exhausted.
+
+**Issue**: I paused a membership but the member was still charged.
+
+**Cause**: The charge was raised before the pause, or the membership was edited rather than paused.
+
+**Fix**: Always use the **Pause** action - it voids pending recurrence charges. If a charge already settled, handle it through the refund flow in [Transactions](/billing/transactions).
+
+**Issue**: The **Delete** action is missing or fails.
+
+**Cause**: Either you lack the delete permission, or the membership has transactions.
+
+**Fix**: Cancel the membership instead to retain its financial records. Only transaction-free memberships can be hard-deleted.
+
+**Issue**: A membership isn't offered as a payment option when booking a class.
+
+**Cause**: The membership's scope doesn't cover that class, area, or instructor - or the booking falls outside the plan's allowed hours.
+
+**Fix**: Open the membership, check the scope section, and widen it if the snapshot is stale. Confirm the booking time falls inside any plan operating-hours window.
 
 ## Related
 
-- [Billing > Plans](/billing/plans) - the plan templates memberships are built from
-- [Member profile](/members/member-profiles) - per-member memberships, on the Memberships tab
-- [Attendance](/members/attendance) - check-ins, usage counting, and the pre-booked-versus-walk-in distinction
-- [Transactions](/billing/transactions) - the invoices and payments memberships generate
-- [Check-in models](/reference/check-in-models) - how memberships interact with bookings at the door
+- [Plans](/billing/plans) - the plan templates memberships are built from.
+- [Member profile](/members/member-profiles) - per-member memberships, on the member's Memberships tab.
+- [Attendance](/members/attendance) - check-ins, usage counting, and the pre-booked-versus-walk-in distinction.
+- [Transactions](/billing/transactions) - the invoices and payments memberships generate.
+- [Check-in models](/reference/check-in-models) - how memberships satisfy payment and access at the door.
+</content>
+</invoke>

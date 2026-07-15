@@ -88,7 +88,7 @@ Response:
 ### Conditional requests
 
 The response sends an `ETag` built from `version`. Send it back as `If-None-Match`
-to get a cheap `304 Not Modified` when nothing has changed — useful as a polling
+to get a cheap `304 Not Modified` when nothing has changed - useful as a polling
 fallback where you don't run webhooks.
 
 ```bash
@@ -131,7 +131,7 @@ Query parameters: `clubId` (optional), `sport` (optional), `from`/`to` (required
 }
 ```
 
-The top-level `cursor` is the reconciliation cursor at read time — store it and pass it to the [change feed](#availability-change-feed) to catch up later.
+The top-level `cursor` is the reconciliation cursor at read time - store it and pass it to the [change feed](#availability-change-feed) to catch up later.
 
 ## Availability change feed
 
@@ -170,12 +170,12 @@ To reconcile: pass your last stored `cursor`, apply each change by re-pulling
 Keep paging while `hasMore` is `true`.
 
 <Note>
-  On **first sync** you have no cursor — do a full grid pull and start from the
+  On **first sync** you have no cursor - do a full grid pull and start from the
   `cursor` it returns (starting from `0` for a live club replays its whole
   history). The feed serves a **rolling history**; if your cursor predates it
   after a long outage, re-baseline with a full grid pull. Some changes (e.g.
   `area.updated`) carry a **coarse, wide** `from`/`to` window rather than a single
-  slot — re-pull the whole window. See the
+  slot - re-pull the whole window. See the
   [webhooks guide](/api-reference/channel-integration/webhooks#reconcile-after-downtime)
   for the full reconciliation flow.
 </Note>
@@ -184,6 +184,6 @@ Keep paging while `hasMore` is `true`.
   Availability is a snapshot. 1Club remains the source of truth: booking
   creation re-checks availability atomically, so a slot that was open a moment
   ago may be rejected if it was taken in between. Always handle a booking
-  rejection gracefully — and use [webhooks](/api-reference/channel-integration/webhooks)
+  rejection gracefully - and use [webhooks](/api-reference/channel-integration/webhooks)
   plus this feed to keep the snapshot fresh.
 </Note>

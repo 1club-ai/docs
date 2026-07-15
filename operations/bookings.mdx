@@ -3,9 +3,18 @@ title: "Bookings"
 description: "Create, edit, cancel, and take payment on reservations for areas, classes, and instructors."
 ---
 
-A booking is the unit of revenue. Every reservation - a member joining a class, renting an area, booking a one-on-one with an instructor, or buying an [event ticket](/operations/events) - is stored as a booking row with one or more transactions attached. The list page lives at **Operations > Bookings**; the detail page is where you handle payment, check-in, cancellation, and notes.
+A booking is the unit of revenue. Every reservation - a member joining a class, renting an area, booking a one-on-one with an instructor, or buying an [event ticket](/operations/events) - is stored as a booking row with one or more transactions attached. The list page lives under **Schedule > Bookings**; the detail page is where you handle payment, check-in, cancellation, and notes.
 
 If you haven't picked a check-in flow yet, start with [Check-in models](/reference/check-in-models). The payment and cancellation rules are set per [booking policy](/operations/booking-policies).
+
+## Overview
+
+- **One record for every reservation** - area rentals, class seats, instructor sessions, and event tickets are all bookings with transactions attached.
+- **Book on behalf of anyone** - reception can create a booking for a member, and (when the policy allows) for someone without a profile yet.
+- **Price the moment you book** - the dialog shows a live breakdown from the resource price, membership coverage, external programs, promotions, and manual adjustments.
+- **Take payment and check-in from one place** - add a payment, confirm a pending booking, and check the member in without leaving the detail page.
+- **Recurring reservations** - repeat area and instructor bookings on a pattern, then edit or cancel this instance or all future ones.
+- **Full money trail** - transactions, payments, and refunds are all visible per booking for a clean audit.
 
 ## The list page
 
@@ -70,6 +79,54 @@ The cancellation creates a refund transaction (visible on the Transactions tab) 
 When the booking type is area or instructor, you can set a recurrence pattern in the dialog. Editing a recurring booking lets you change the current instance only, or apply changes to all future occurrences. Deleting offers the same scoping.
 
 The **Bookings** tab on the detail page lists every sibling occurrence in the recurrence series.
+
+## Worked examples
+
+### Padel court booked over the phone
+
+A regular calls to book a court for tonight. Reception opens **Add booking**, picks the contact, sets **Type** to **Area**, selects the court, and sets the hour. The price breakdown shows the court's per-hour rate. Because the booking is admin-created, **At booking** payment enforcement is bypassed - the reservation is recorded and the balance is collected at the desk when they arrive. For a doubles game, add the other players so each guest seat carries its own share.
+
+### Personal-training session
+
+To book a one-on-one, set **Type** to **Instructor** and pick the coach. The instructor's session price seeds the breakdown. If the member's plan covers PT, switch the entrance to their membership and the booking price resets to 0.
+
+### Standing weekly court
+
+A member wants the same court every Tuesday at 18:00. Create an **Area** booking, turn on recurrence with a weekly pattern, and set an end date. The **Bookings** tab then lists every occurrence; edit or cancel one week without touching the rest, or apply a change to all future weeks.
+
+### Recording a class booking that's already paid
+
+A member paid cash at the desk for a drop-in yoga class. Create a **Class** booking, add the payment on the detail page, and uncheck **Send confirmation email** if they were already told in person.
+
+## Tips & best practices
+
+- **Use admin bookings for phone and walk-in reservations.** They bypass upfront-payment enforcement, so you can record the booking now and collect at check-in - the policy still protects you at the door.
+- **Check the price breakdown before saving.** It's the fastest way to confirm a membership or external program is covering the visit, or that a promotion applied.
+- **Pay multi-transaction bookings from the right place.** For a single balance, use **Add payment**; for individual lines of a recurring series or multi-line order, use the **Transactions** tab.
+- **Cancel with a reason.** The reason and refund are recorded and the member is notified automatically, which keeps disputes clean.
+- **Prefer entrance switching over manual price edits.** Setting the entrance to a membership or external program zeroes the price correctly, rather than hand-editing the total.
+
+## Troubleshooting
+
+**Issue**: I can't complete a check-in - payment is blocked.
+
+**Solution**: The matching [booking policy](/operations/booking-policies) enforces payment at check-in (or at booking with an outstanding balance). Take payment with **Add payment**, confirm an active membership, or apply an external program, then check the member in.
+
+**Issue**: The booking price is 0 and I expected a charge.
+
+**Solution**: The entrance method is set to a membership or external program, both of which carry no per-booking charge. Switch the entrance to a paid method to recalculate the price.
+
+**Issue**: The end time won't snap to the length I want.
+
+**Solution**: The **booking duration step** on the policy controls allowed lengths. Adjust the step (or min/max slot) on the matching [booking policy](/operations/booking-policies).
+
+**Issue**: A partial payment across several transactions was rejected.
+
+**Solution**: Partial multi-transaction payments aren't supported from **Add payment** - it settles all balances atomically. Pay the lines individually from the **Transactions** tab instead.
+
+**Issue**: The member didn't get a confirmation email.
+
+**Solution**: **Send confirmation email** is only offered on create, and editing never re-sends it. If it was unchecked, notify the member from **Notify participants** or [Compose](/messaging/compose).
 
 ## Related
 

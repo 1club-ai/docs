@@ -1,0 +1,157 @@
+---
+title: Member portal
+description: Configure the member-facing portal under Settings > Member Apps > Member portal - turn the portal on, choose which pages members see, group and publish pages, and confirm the portal web address.
+keywords: [member portal, portal pages, portal subdomain, public pages, AI assistant, self-service, member app]
+---
+
+The member portal is the self-service web app your members sign in to. From **Settings > Member Apps > Member portal** you decide whether the portal is on, which pages appear in its navigation, how those pages are grouped, and which of them the public can browse without signing in. A live preview on the same screen shows the portal exactly as members will see it.
+
+The portal is served on your organization's subdomain, `{slug}.portal.1club.ai`, or on a custom portal hostname if you have verified one. The slug itself is set on the [Organization](/settings/organization) page, not here.
+
+## Overview
+
+- **Enable or disable the portal** - one switch turns the whole member portal on or off.
+- **AI assistant** - add an in-portal assistant that helps members with bookings, memberships, and club info.
+- **Legal and cookie consent** - turn on legal documents and a cookie-consent banner for the portal.
+- **Portal pages** - choose which pages appear, reorder them, rename them, set their icons, and add extra instances of some page types.
+- **Page groups** - organize pages into labelled folders in the portal navigation.
+- **Public pages** - let unauthenticated visitors browse selected pages (classes, plans, instructors, areas) before they sign in.
+- **Live preview** - an embedded frame renders the real portal as you edit, plus an **Open** button to view it in a new tab.
+
+## Where the portal address comes from
+
+The portal URL is built from your organization **Slug**:
+
+```
+https://{slug}.portal.1club.ai
+```
+
+If you have added and verified a domain with purpose **Portal subdomain** under **Settings > Organization > Domains**, the portal is served on that hostname instead. The web address is read-only on this page.
+
+<Note>
+If your organization has no slug yet, the portal cannot generate a URL. The page shows an **Organization Slug Required** warning with a **Go to Organization Settings** button. Set the slug on the [Organization](/settings/organization) Details page first. This is the same subdomain that [signup forms](/settings/signup-forms) use to build their public links.
+</Note>
+
+## General settings
+
+### Enable member portal
+
+The master switch. When off, members cannot reach the portal at all and the preview is replaced with a disabled notice. Turn it on once your slug is set and you have decided which pages to show. Turning the portal off does not delete any member data; it only closes the front door.
+
+### AI assistant
+
+Adds an AI assistant launcher inside the portal. Members can ask it to help with bookings, memberships, and general club information. This toggle is only editable while the portal is enabled.
+
+### Legal and cookie consent
+
+Turns on legal documents and the cookie-consent experience for the portal. Enabling it seeds a default set of legal documents for your organization if they are missing (the seeding is safe to run repeatedly, so it never duplicates documents you already have). This portal legal toggle is independent of the website's own legal setting.
+
+## Portal pages
+
+The **Portal Pages** panel is where you build the portal's navigation. Each row is a page that members see in their sidebar. You control the set, the order, the labels, the icons, and which pages are public.
+
+### Adding and removing pages
+
+- Use **Add** to pick from pages that are not yet enabled.
+- Reorder enabled pages to change the order they appear in the portal navigation.
+- Some page types can be added more than once. For those, the Add menu offers **Add another ...** so you can create a second instance (for example, more than one booking calendar). Extra instances get their own slug and label.
+
+### Page types you can enable
+
+Core pages:
+
+- **Dashboard** - the member's home screen.
+- **Classes** - browse and book classes.
+- **Plans** - view available plans.
+- **Messages** - the member's message thread with your club.
+- **My account** - profile, memberships, and account settings.
+
+Optional pages:
+
+- **Posts** - announcements and updates.
+- **FAQs** - a frequently-asked-questions page.
+- **How to guides** - help content.
+- **Calendar** - a booking calendar. Supports multiple instances.
+- **Book** - a search-and-book entry point.
+
+<Note>
+The old combined **Schedule** page is marked deprecated in the picker. New portals should use the unbundled pages (Classes, Calendar, Book) instead of the single Schedule page.
+</Note>
+
+In addition to the built-in pages, the picker automatically offers one page per **bookable area type** and one page per **instructor type** you have configured, so members can browse, for example, "Courts" or "Coaches" directly. These are driven by your [area types](/operations/areas) and [instructor types](/operations/instructors); add or rename them there and they appear here.
+
+### Per-page settings
+
+Open a page's settings to control how it appears:
+
+- **Icon** - the navigation icon for the page.
+- **Label** - a custom navigation label. Leave it empty to use the default, and use the translate option to provide per-locale labels.
+- **Public** - whether unauthenticated visitors can see this page (see below).
+- **Group** - which group (folder) the page belongs to.
+
+### Page groups
+
+Use **Groups** to organize pages into labelled folders in the portal navigation. This keeps a longer navigation tidy, for example grouping several area-type pages under a "Facilities" folder. Groups have their own label and can be translated per locale.
+
+### Public pages
+
+A public page is visible to visitors who have not signed in. This lets prospects browse your classes, plans, instructors, or areas before creating an account, while still requiring sign-in to actually book or reach their account. Mark a page public from its per-page settings. Only the pages you explicitly mark are exposed; everything else stays behind sign-in.
+
+## How saving works
+
+Changes to the enable toggle, AI assistant, pages, groups, and public flags are staged locally and a floating save bar appears when there are unsaved changes. Click **Save** to apply them. The **Legal and cookie consent** toggle is the exception: it saves immediately when you flip it.
+
+## Worked examples
+
+### Padel club opens a public class browser
+
+A padel and tennis club wants prospects to see the weekly class list from an ad link without signing up. On **Member portal** they enable the portal, add the **Classes** page, open its settings, and mark it **Public**. They leave **My account** and **Messages** private. Now the ad link opens the portal's class list for anyone, and booking prompts a sign-in.
+
+### Martial arts gym groups its programs
+
+A jiu-jitsu and muay-thai gym has separate instructor types for each discipline. Those show up as pages in the picker. They enable both, open **Groups**, create a "Programs" group, and assign both pages to it so members see a single "Programs" folder in the portal navigation.
+
+### Yoga studio adds a second booking calendar
+
+A yoga and pilates studio wants one calendar for reformer sessions and one for mat classes. They add a **Calendar** page, then use **Add another Calendar** to create a second instance, give each a custom label and slug, and reorder them.
+
+### Climbing gym turns on the AI assistant
+
+A climbing gym enables the portal, then flips on **AI assistant** so members can ask "what beginner classes are on this week?" and get booking help without messaging a human. Because the toggle only works while the portal is enabled, they enable the portal first.
+
+## Tips and best practices
+
+- **Set the slug before enabling the portal.** Without it there is no URL and the page blocks with a warning. The slug is on the [Organization](/settings/organization) page.
+- **Preview before you announce.** The live frame renders the real portal, so use it to confirm the navigation looks right before you share the link.
+- **Keep public pages minimal.** Expose only what helps a prospect decide (classes, plans), not member-only pages.
+- **Prefer the unbundled pages** over the deprecated Schedule page for new portals.
+- **Use groups once you have many pages**, especially when area-type and instructor-type pages multiply the navigation.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Portal preview shows a "disabled" notice | The portal is turned off | Flip **Enable member portal** on and save |
+| "Organization Slug Required" warning, no portal URL | The organization has no slug | Set the **Slug** on the [Organization](/settings/organization) Details page |
+| AI assistant toggle is greyed out | The portal is disabled | Enable the portal first, then set the AI assistant toggle |
+| A page members expect is missing | It is not in the enabled list | Add it from the **Add** menu in Portal Pages and save |
+| Prospects cannot see classes without signing in | The page is not marked public | Open the page's settings and turn on **Public** |
+| Custom portal domain not used | The domain is not verified | Verify a **Portal subdomain** domain under **Settings > Organization > Domains** |
+| A page's custom label is not showing in another language | No translation set for that locale | Use the translate option in the page's label settings |
+
+## Related
+
+<CardGroup cols={2}>
+<Card title="Organization" icon="building" href="/settings/organization">
+Set the slug that becomes your portal subdomain, and verify a custom portal domain.
+</Card>
+<Card title="Signup forms" icon="clipboard-list" href="/settings/signup-forms">
+Public onboarding forms served on the same portal subdomain.
+</Card>
+<Card title="Areas" icon="map" href="/operations/areas">
+Area types that surface as bookable pages in the portal picker.
+</Card>
+<Card title="Instructors" icon="users" href="/operations/instructors">
+Instructor types that surface as pages in the portal picker.
+</Card>
+</CardGroup>

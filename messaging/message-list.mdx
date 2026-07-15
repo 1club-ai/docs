@@ -1,31 +1,56 @@
 ---
 title: Inbox
-description: One conversation-style list for every outbound and inbound message, with thread roll-ups, draft chips, and a detail pane.
+description: The 1Club messaging inbox - one conversation-style list of every outbound and inbound message, with thread roll-ups, draft chips, channel signals, and a detail pane that opens the thread or compose form.
+keywords: [inbox, messages, conversation list, thread, draft, inbound, outbound, delivery status, message channel, whatsapp, reply]
 ---
 
-The inbox is the main view of the **Messages** section. The left pane lists conversations; the right pane shows the selected thread or compose form. On mobile the right pane slides up as a sheet over the list.
+The inbox is the main view of the **Messages** section. The left pane lists conversations; the right pane shows the selected thread or the compose form. On mobile the right pane slides up as a sheet over the list. Each row is a conversation - a piece of human-authored, replyable correspondence between your club and a member - not an individual delivery.
+
+## Overview
+
+- **Conversation rows, not message rows.** Each row rolls up a whole thread: an outbound send and its replies, or an inbound submission and your responses.
+- **Recipient-first display.** Rows are keyed to who the conversation is with - one contact, a pair, or a group.
+- **Draft, thread, and channel signals.** A **Draft** chip, a thread counter, a WhatsApp badge, and a relative timestamp sit on each row.
+- **Click to open.** Selecting a row opens the thread view, or the compose pane if the row is still a draft.
+- **Real-time.** New inbound replies appear without a manual refresh.
+- **Scoped by role.** Admins and managers see the whole organization; instructors see only conversations for members at the clubs they teach.
 
 ## How the list is built
 
-The list queries `/v1/messages` filtered to top-level rows (no `replyToMessageId`). Each row is a conversation, not an individual message: outbound sends with their replies, inbound submissions with your responses, drafts not yet sent.
+The list queries `/v1/messages` filtered to top-level rows (those with no `replyToMessageId`). Each row is therefore a conversation head: outbound sends with their replies, inbound submissions with your responses, and drafts not yet sent.
 
-Rows are sorted by `createdAt` descending and paginated 25 at a time. **Load more** at the bottom extends the page size.
+Rows are sorted by `createdAt` descending and paginated 25 at a time. **Load more** at the bottom extends the page in 25-row steps.
 
 ## What a row shows
 
-Each row is built around the recipients of the conversation:
+Each row is built around the counterparty of the conversation:
 
 - A **single contact** shows that contact's avatar and full name.
 - A **pair of contacts** shows two stacked avatars and "Firstname, Firstname".
 - A **group of 3+** shows the first contact's avatar with a `+N` badge and "Firstname + N others".
+- An **inbound message with no stored recipients** falls back to the **sender's** avatar and name - this is how a member-initiated conversation renders.
 
 To the right of the name you may see:
 
+- A **WhatsApp** badge next to a single contact whose WhatsApp number is verified.
 - A **Draft** status chip when the message has not been sent yet.
-- The relative time of the latest message (`sentAt` if sent, `createdAt` if draft).
+- The relative time of the latest message (`sentAt` if sent, `createdAt` if still a draft).
 - A **thread counter** badge (the small number bubble) showing how many messages are in the conversation, including the original.
 
-Below the name is a snippet: the subject if there is one, otherwise the first 80 characters of the body with HTML stripped.
+Below the name is a snippet: the subject if there is one, otherwise up to the first 80 characters of the body with HTML stripped.
+
+## Channels and direction
+
+A message carries a **channel** and a **direction**, both stored on the record.
+
+- **Channel** (`type`) is `email`, `sms`, or `whatsapp`. The same channel-neutral content is projected to whichever channel a message was sent on.
+- **Direction** marks transport provenance: `outbound` = sent from the platform, `inbound` = received from outside (for example a member's email into the club's inbox). Direction reflects provenance, not authorship - a member composing in the portal or app produces an **outbound** message addressed to staff, because it originated on the platform.
+
+The underlying `/v1/messages` endpoint accepts filters for `contactId`, `status`, channel `type`, `inboxId`, and `direction`, which is how the same list powers scoped views (see below).
+
+<Note>
+When a message is sent **on behalf of** a specific person - today, a class instructor via the "send from the instructor" option - the inbox shows that person's name and avatar as the sender, matching the email the member received. The record's underlying `senderId` still points at the staff user accountable for the send.
+</Note>
 
 ## Selecting a row
 
@@ -36,28 +61,65 @@ Clicking a row updates the URL to `/messages/<id>` and renders the right pane:
 
 When you click **Reply** the URL becomes `/messages/<id>/reply` and the compose pane takes over the right side with the original sender pre-selected as the recipient and the subject pre-filled with `Re: <subject>`.
 
+On desktop, opening the inbox with nothing selected auto-opens the first conversation so the detail pane is not blank. On mobile the list stays put until you pick a row.
+
 ## Real-time updates
 
-The inbox subscribes to the notification WebSocket. Every time a message event for the current organization arrives, the list and the open thread refetch. New inbound replies appear without a manual refresh.
+The inbox subscribes to the notification WebSocket. Every time a `message`-category event for the current organization arrives, the list and the open thread refetch, so new inbound replies appear without a manual refresh.
 
 ## Status and engagement signals
 
-The inbox does not surface per-recipient delivery state directly in the list, but the underlying records track it. Each `message_recipient` has a `deliveryStatus` that can be `queued`, `sent`, `processed`, `delivered`, `deferred`, `bounced`, `dropped`, `failed`, `spam`, `unsubscribed`, or `skipped`, plus an `engagementStatus` of `open`, `click`, `unsubscribe`, or `spamreport`, and timestamps for each transition. Webhook handlers from SendGrid and Twilio update these fields as events come in.
+The message-level `status` is simple: `draft` or `sent`. The inbox uses it to decide whether selecting a row opens compose or the thread view.
 
-The message-level `status` is simpler: just `draft` or `sent`. The inbox uses that to decide whether selecting a row opens compose or the thread view.
+Per-recipient delivery detail is tracked on the record but not surfaced directly in the list. Each recipient has a `deliveryStatus` that can be `queued`, `sent`, `processed`, `delivered`, `deferred`, `bounced`, `dropped`, `failed`, `spam`, `unsubscribed`, or `skipped`, plus an `engagementStatus` of `open`, `click`, `unsubscribe`, or `spamreport`, with timestamps for each transition. Webhook handlers from SendGrid (email) and Twilio (SMS) update these fields as events arrive.
 
-## Audience filters and admin vs instructor view
+## Audience scope: admin vs instructor view
 
-Admins and managers see the organization-wide inbox: every message attached to the org. The right-pane **Compose** button is enabled and the audience filters and template picker are available.
-
-Instructors see a club-scoped slice: conversations involving members at the clubs they teach at. The compose button hides the audience filter and template picker; replies to existing inbound messages still work.
+- **Admins and managers** see the organization-wide inbox: every message attached to the org. The right-pane **Compose** button is enabled, and the audience filter and template picker are available when composing.
+- **Instructors** see a club-scoped slice: conversations involving members at the clubs they teach at. Their compose form hides the audience filter and template picker; replying to existing inbound messages still works.
 
 ## Permissions
 
-Reading the inbox requires `messages.read.own`. Composing or replying requires `messages.create.own`. Audience filters and access to organization-wide custom templates require admin or manager scope.
+- Reading the inbox requires `messages.read.own` (broader `messages.read.club` / `messages.read.organization` holders see more).
+- Composing or replying requires a `messages.create` permission.
+- The audience filter and organization-wide templates require manager or admin scope.
+
+## Worked examples
+
+### Spotting a member reply (climbing gym)
+
+A boulderer replied to your route-setting update. Because the inbox refetches on the WebSocket event, the conversation jumps with an incremented thread counter and a fresh timestamp - no refresh needed. Click it to open the thread and reply inline.
+
+### Finishing a draft blast (martial arts)
+
+You started a message to all jiu-jitsu members about a belt-grading date but did not send it. It sits in the list with a **Draft** chip. Clicking the row opens the compose pane instead of a thread, so you can finish and send it.
+
+### Reading a group thread (racket sports)
+
+You messaged four padel members about a doubles ladder. The row shows the first member's avatar with a `+3` badge and "Firstname + 3 others". Opening it shows the single outbound message and any replies threaded beneath.
+
+## Tips & best practices
+
+- **Watch the thread counter.** A rising number bubble means new replies have landed in that conversation.
+- **Let the auto-select help on desktop.** The first conversation opens on load, so you can triage without an extra click.
+- **Use Reply, not a fresh compose, to keep threads intact.** Replying preserves the conversation and pre-fills the recipient and `Re:` subject.
+- **Load more, then scroll.** The list starts at 25 rows; extend it before hunting for an older conversation.
+- **Verify WhatsApp before relying on it.** The WhatsApp badge tells you a contact's number is verified and reachable on that channel.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| An expected conversation is missing from the list | It is older than the loaded page | Click **Load more** to extend the list, or open it directly by URL |
+| Instructor cannot see a member's message | Instructors are scoped to their own clubs' members | Confirm the member belongs to a club the instructor teaches at; an admin sees the full org inbox |
+| A new reply did not appear | The WebSocket event was missed or the tab was backgrounded | Reload the inbox; the list refetches on load |
+| Compose or reply is unavailable | Missing a `messages.create` permission | Grant the relevant messaging permission via roles and permissions |
+| A row shows the sender instead of a recipient | It is an inbound, member-initiated conversation with no stored recipients | Expected - the inbox falls back to the sender's identity for inbound threads |
+| Delivery looks stuck at "sent" | Per-recipient delivery detail is not shown in the list | Delivery and engagement status are tracked on the record via SendGrid/Twilio webhooks, not surfaced in the row |
 
 ## Related
 
-- [Compose](/messaging/compose) - The send and reply flow that the right pane drives.
+- [Compose](/messaging/compose) - The send and reply flow the right pane drives.
 - [Templates](/messaging/templates) - Templates the compose pane reads from.
 - [Messaging overview](/messaging/overview) - How the inbox fits with automations and AI replies.
+- [Automations](/marketing/automations) - Automated, trigger-based sends that also land in the inbox.

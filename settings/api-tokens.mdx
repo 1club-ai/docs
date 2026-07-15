@@ -1,65 +1,151 @@
 ---
-title: API Tokens
-description: Create and manage API keys for programmatic access to your organization's data.
+title: API tokens
+description: Create, scope, edit, and revoke API tokens for programmatic access to your organization's data, from Settings > API tokens.
+keywords: [api tokens, api keys, scopes, programmatic access, integrations, mcp, webhooks, revoke token]
 ---
 
-**In a nutshell:** API Tokens let you generate keys that external systems (websites, integrations, scripts) can use to access your organization's data via the public API.
+API tokens are keys that external systems - your website, an integration, or a script - use to read and write your organization's data through the public API, without anyone sharing an admin login. Each token carries its own set of scopes and its own optional expiry, so you can grant exactly the access an integration needs and revoke it independently.
 
 ## Overview
 
-Navigate to **Settings → API Tokens** to create and manage API keys for your organization. Each token grants scoped, programmatic access to your data without sharing your admin credentials.
+From **Settings > API tokens** you can:
 
-## Creating an API Token
+- **Create tokens** with a name, optional description, scopes, and an optional expiry.
+- **Scope each token** to specific resources and actions (read, write) so it can only touch what it needs.
+- **Edit** a token's name, description, scopes, and expiry after creating it.
+- **Revoke** a token instantly when it is no longer needed or may be compromised.
+- **See at a glance** each token's prefix, scopes, expiry, last-used date, and created date.
 
-1. Click **Create Token**
-2. Fill in the token details:
-   - **Name** — A label to identify where this token is used (e.g. "Website Integration")
-   - **Description** — Optional note on what the token is used for
-   - **Scopes** — Select the resources and permission level (Read or Write) for each
-   - **Expires** — Set an expiry date or leave empty for a token that never expires
-3. Click **Save**
-4. Copy the token immediately — it will not be shown again after you close the dialog
+The same page also hosts your **MCP endpoint** and **Webhooks** (see [MCP and webhooks](#mcp-and-webhooks)).
 
-## Token scopes
-
-Each token is granted access to specific resources with either **Read** or **Write** permission:
-
-- **Read** — Allows fetching data (GET requests)
-- **Write** — Allows creating and updating data (POST/PUT/PATCH requests)
-
-Select only the scopes needed for the integration. Avoid granting write access unless the external system needs to create or modify data.
-
-## Token expiry
-
-| Option | Use when |
-|--------|----------|
-| 1 hour / 6 hours / 1 day | Short-lived scripts or one-time operations |
-| 1 week / 2 weeks / 1 month | Temporary integrations or testing |
-| No expiry | Long-running integrations that you actively manage |
-
-Tokens with no expiry remain active until you revoke them manually.
-
-## Revoking a token
-
-1. Find the token in the list
-2. Click **Revoke Token**
-3. Confirm the action
-
-Revoking a token is immediate and permanent. Any integration using that token will stop working. Create a new token if the integration needs to continue.
+<Note>
+Programmatic API access is a paid feature. On a free or trial plan you can view and revoke existing tokens, but the **Add** button is disabled until you upgrade. A banner at the top of the page explains this when it applies.
+</Note>
 
 ## Access and permissions
 
-Creating and revoking API tokens requires the **settings.manage.organization** permission. This means only admins and users with full settings management can access this page — managers and other roles cannot create or view API tokens.
+- **Viewing** the token list requires the `settings.read.organization` permission.
+- **Creating, editing, and revoking** tokens requires `settings.manage.organization`.
 
-## Security best practices
+In practice, only admins (and owners) hold organization settings management, so managers and other roles cannot create or view API tokens. See [Roles and permissions](/reference/roles-permissions).
 
-- **Give tokens descriptive names** so you know what each one is for
-- **Use the minimum required scopes** — do not grant write access if only read is needed
-- **Set an expiry** for tokens used in short-term scripts or testing
-- **Revoke unused tokens** — regularly audit the token list and remove tokens that are no longer in use
-- **Never share tokens** in source code, emails, or public channels
+## Creating a token
+
+1. Click **Add** in the API tokens section.
+2. Fill in the token details:
+   - **Name** - A label that identifies where this token is used, for example "Website class feed".
+   - **Description** - An optional note on what the token is for.
+   - **Expires** - Pick an expiry from the dropdown, or leave it as **No expiry** for a token you manage manually.
+   - **Scopes** - In the resource table, open the **Permissions** dropdown next to each resource and select the actions you want to allow. Leave a resource untouched for no access to it. You must select at least one scope.
+3. Click **Save**.
+4. Copy the token immediately from the success banner. The raw token is shown only once and is never displayed again after you dismiss the banner. Store it in your integration's secret store.
+
+The token list shows only a short **prefix** of each token for identification, never the full value.
+
+## Token scopes
+
+Scopes use the format `resource:action`. Each token is a set of these strings. The resource table in the dialog offers the resources and actions that are currently available:
+
+| Resource         | Available actions |
+| ---------------- | ----------------- |
+| **Classes**      | Read              |
+| **Content**      | Read              |
+| **Clubs**        | Read              |
+| **Transactions** | Read              |
+| **Areas**        | Read              |
+| **Bookings**     | Read, Write       |
+
+- **Read** allows fetching data (GET requests).
+- **Write** allows creating and updating data.
+
+Write actions are highlighted in the interface so you can spot them at a glance. Grant only the scopes an integration needs, and avoid write access unless the external system genuinely has to create or change data. The available resources and actions can grow over time; the dialog always reflects the current list.
+
+<Note>
+A wildcard scope exists that grants access to all current and future scopes. Treat it as an all-access key: use it only for a fully trusted, internally managed integration, and prefer explicit `resource:action` scopes everywhere else.
+</Note>
+
+## Token expiry
+
+| Option                     | Use when                                       |
+| -------------------------- | ---------------------------------------------- |
+| 1 hour / 6 hours / 1 day   | Short-lived scripts or one-time operations     |
+| 1 week / 2 weeks / 1 month | Temporary integrations or testing              |
+| No expiry                  | Long-running integrations that you actively manage |
+
+Tokens with no expiry stay active until you revoke them. The list shows the time remaining for tokens that will expire, and **Expired** once they lapse.
+
+## Editing a token
+
+Open a token's actions menu and choose edit to change its name, description, scopes, or expiry. Editing does not reveal the raw token again.
+
+<Warning>
+Choosing an expiry in the edit dialog sets a fresh countdown from now. If you edit a token without picking an expiry option, its expiry is cleared and it becomes a no-expiry token. Set the expiry deliberately each time you edit.
+</Warning>
+
+## Revoking a token
+
+1. Find the token in the list.
+2. Open its actions menu and choose **Revoke**.
+3. Confirm.
+
+Revoking is immediate and permanent. Any integration using that token stops working at once. Create a new token if the integration needs to continue.
+
+## MCP and webhooks
+
+The API tokens page also surfaces two related integration points:
+
+- **MCP endpoint** - An informational panel shows your Model Context Protocol endpoint (`mcp.1club.ai`), which lets AI assistants connect to your organization using an API token.
+- **Webhooks** - A separate section on the same page lets you register endpoint URLs that 1Club calls when events happen, each with its own signing secret. The secret, like a token, is shown only once when created. See the [Webhooks reference](/api-reference/channel-integration/webhooks).
+
+## Worked examples
+
+### Website pulling the class schedule for a padel club
+
+Your marketing site shows the upcoming padel timetable. Create a token named "Website schedule", grant **Classes: Read**, **Clubs: Read**, and **Areas: Read**, and leave everything else off. The site can render the schedule but can never modify anything. Give it **No expiry** and rotate it if the site is rebuilt.
+
+### A booking integration for a climbing gym
+
+A third-party kiosk needs to read availability and create bookings. Create a token named "Kiosk bookings", grant **Bookings: Read** and **Bookings: Write**, plus **Areas: Read** and **Clubs: Read** for context. Set a **1 month** expiry while you pilot the integration, then extend or reissue once it is stable.
+
+### A short-lived data export script
+
+You need to pull transactions once for a year-end reconciliation at a yoga studio. Create a token named "Year-end export", grant **Transactions: Read**, set the expiry to **1 day**, run the script, and let the token lapse on its own.
+
+## Tips and best practices
+
+- **Name tokens descriptively** so you always know what each one powers.
+- **Use the minimum scopes** an integration needs, and avoid write access when read is enough.
+- **Prefer explicit scopes over the wildcard** unless the integration is fully trusted and internally managed.
+- **Set an expiry** for scripts and pilots so forgotten tokens cannot linger.
+- **Watch the last-used date** to spot tokens that are no longer active and revoke them.
+- **Store tokens in a secret manager** - never commit them to source code, paste them into emails, or share them in chat.
+- **Revoke and reissue on any suspicion** of exposure; there is no way to reveal an existing token again.
+
+## Troubleshooting
+
+**Issue**: The Add button is disabled.
+
+**Solution**: API access is a paid feature. Free and trial plans can view and revoke tokens but not create them. Upgrade the plan, then create the token.
+
+**Issue**: I closed the dialog and lost the token value.
+
+**Solution**: The raw token is shown only once. Revoke the token and create a new one, and copy it before dismissing the banner this time.
+
+**Issue**: An integration suddenly returns authorization errors.
+
+**Solution**: Check whether the token expired (the list shows **Expired**) or was revoked. Also confirm the token has the scopes the request needs - a read-only token cannot create or update data. Reissue with the correct scopes if needed.
+
+**Issue**: A manager cannot see the API tokens page.
+
+**Solution**: Viewing tokens requires organization settings access, which only admins hold. Ask an admin to create or manage the token.
+
+**Issue**: My integration gets 403s on writes even with a token.
+
+**Solution**: The token needs a write scope for that resource (for example **Bookings: Write**). Edit the token and add the write action, or reissue it with the right scopes.
 
 ## Related
 
-- [Integrations](/settings/integrations) — Connect third-party services like Stripe and Google.
-- [Public API](/api-reference) — API reference documentation.
+- [Public API](/api-reference/introduction) - API reference documentation and authentication.
+- [Webhooks](/api-reference/channel-integration/webhooks) - Event callbacks configured on the same page.
+- [Integrations](/settings/integrations) - Connect third-party services like Stripe and Google.
+- [Roles and permissions](/reference/roles-permissions) - Why only admins can manage tokens.

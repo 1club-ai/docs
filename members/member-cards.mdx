@@ -1,31 +1,44 @@
 ---
 title: Access cards
-description: Manage the QR codes, access cards, and PINs that members use to check in at a reader or kiosk.
+description: Manage the QR codes, access cards, and PINs that members present at a reader or kiosk to check in, and assign, revoke, or delete those credentials.
+keywords: [access cards, credentials, QR code, NFC card, PIN code, check-in, kiosk enrollment, revoke, member identification]
 ---
 
-Access cards is the org-wide registry of credentials your members use to identify themselves: a QR code on their phone, a physical access card, or a PIN code. Each credential has a unique identifier, a status, and an optional contact assignment.
+Access cards is the org-wide registry of the credentials your members use to identify themselves: a QR code on their phone, a physical access card, or a PIN code. Each credential has a type, a unique identifier, a status, and an optional assignment to a contact. When a member presents a credential at a reader or kiosk, the system matches it to a contact and runs the same check-in flow you would run by picking the person by hand.
 
-This page is named **Access cards** in the UI, even though it covers more than physical cards. The same page is reachable from the **Members** overflow menu and from a member's profile.
+This page is named **Access cards** in the admin (URL `/members/access-cards`) even though it covers more than physical cards. The same registry is reachable from the **Members** overflow menu and from a member's profile.
+
+## Overview
+
+From Access cards you can:
+
+- See every credential ever enrolled in the org, with its assigned contact, type, number, status, and dates.
+- Enroll (add) a new QR code, access card, or PIN and optionally assign it to a member in one step.
+- Assign an unassigned credential to a contact and mark it their primary credential.
+- Revoke an active credential (keeps it as an audit record) or delete an unassigned/revoked one outright.
+- Jump to [Access control settings](/settings/access-control), where check-in mode and identification methods are configured.
+
+Which credential types you can enroll depends on the identification methods enabled for the club. Only enabled types appear in the **Add Credential** dialog, and the server rejects a disabled type with a message pointing you to **Settings > Access Control > Identification methods**.
 
 ## Credential types
 
 There are three credential types, matching the three identification methods configured under [Access control](/settings/access-control):
 
-- **QR Code** - a code scannable at a reader or in the member portal.
-- **Access Card** - a physical card with a number printed or encoded on it.
-- **PIN Code** - a numeric code the member enters on a keypad.
+- **QR Code** - a code scannable at a reader, kiosk, or in the member portal.
+- **Access Card** - a physical card with a number printed or encoded on it (for example an NFC UID).
+- **PIN Code** - a numeric or short alphanumeric code the member enters on a keypad.
 
-The identifier value can be anything that uniquely identifies the credential within your org: a card serial, an NFC UID, a QR string, or a PIN. The hint on the enrollment form is "Enter the card number, NFC ID, or QR code value."
+The identifier value can be anything that uniquely identifies the credential within your org: a card serial, an NFC UID, a QR string, or a PIN. The hint on the enrollment form is "Enter the card number, NFC ID, or QR code value". When you pick **PIN Code**, the field switches to a PIN entry with the hint "4-10 alphanumeric characters". Identifiers are encrypted at rest and only decrypted for admin display in this grid.
 
 ## Opening the page
 
-Go to **Members > Access cards**, or open the overflow menu next to **Add Member** on the member list and pick **Access Cards**. The page shows every credential ever enrolled in the org.
+Go to **Members > Access cards**, or open the overflow menu next to **Add Member** on the member list and pick **Access Cards**. The page shows every credential ever enrolled in the org, newest first.
 
 The **Settings** button in the top right jumps to [Access control settings](/settings/access-control), where check-in mode and identification methods are configured.
 
 ## Grid columns
 
-- **Assigned to** - the contact the credential belongs to, with avatar. A `+N more` chip appears when a credential is assigned to more than one contact (rare; allowed for household-style sharing). Unassigned credentials show an **Unassigned** chip.
+- **Assigned to** - the contact the credential belongs to, with avatar. A `+N more` chip appears when a credential has more than one active assignment (rare; allowed for household-style sharing). Unassigned credentials show an **Unassigned** chip.
 - **Type** - QR Code, Access Card, or PIN Code.
 - **Number** - the credential's identifier.
 - **Status** - active, suspended, revoked, or expired.
@@ -38,34 +51,42 @@ Click a row to inspect or act on the credential.
 
 Click **Add Credential** in the top right:
 
-1. Pick the type (QR Code, Access Card, PIN Code).
-2. Enter the identifier.
-3. Optionally pre-assign it to a contact. New credentials are added as non-primary; you can mark the credential primary later from its detail page (or from the contact's Access cards tab).
+1. Pick the **Type** (QR Code, Access Card, or PIN Code). Only the types enabled for the club are listed.
+2. Enter the **Credential identifier** (or **PIN Code** if you chose PIN).
+3. Optionally pre-assign it to a contact.
 
-The credential is enrolled and appears in the grid immediately. You can also enroll a credential from a member's profile sidebar, which assigns it to that contact in one step.
+New credentials are enrolled as non-primary; you can mark the credential primary later from its detail page or from the contact's Access cards tab. The credential appears in the grid immediately. You can also enroll a credential from a member's profile sidebar, which assigns it to that contact in one step.
+
+### Self-enrollment at a kiosk
+
+If **credential enrollment** is enabled for a club in access control settings, a member can enroll a physical card themselves at a kiosk: they identify with their QR code and then tap the new card on the reader. The kiosk auto-detects the credential type from the scan and enrolls it as that member's primary credential. Cards enrolled this way appear in the grid alongside admin-enrolled ones.
+
+### Auto-provisioned credentials
+
+When a member needs an access grant (for example, when their membership or booking becomes active) and they have no primary credential yet, the system provisions one automatically from the club's enabled methods: it prefers a PIN if PIN is enabled, otherwise a QR code derived from the member's check-in code. This is why a member can appear in the grid with a credential nobody manually created. Auto-provisioning only happens when access control is configured for the club or org; it never invents a PIN for an org that never enabled access control.
 
 ## Assigning to a member
 
-Unassigned credentials show an **Assign** action in the row menu. Pick a contact and choose whether this is their **primary** credential. A contact can have at most one primary credential; assigning a new primary automatically demotes the previous one.
+Unassigned credentials show an **Assign** action in the row menu. Pick a contact and use the **Set as primary credential for this contact** checkbox to decide whether this becomes their primary. A contact can have at most one primary credential; assigning a new primary automatically demotes the previous one.
 
-From a member's profile, the **Assign** button in the credentials block lets you pick from the pool of unassigned credentials. The **Add** button enrolls a brand-new credential and assigns it in one step.
+From a member's profile, the **Assign** button in the credentials block lets you pick from the pool of unassigned credentials, and the **Add** button enrolls a brand-new credential and assigns it in one step. A credential is always assigned to exactly one target - normally a contact, though the platform also assigns credentials to a membership or booking behind the scenes.
 
 ## Revoking and deleting
 
 The row menu adapts to the credential's current state:
 
-- **Unassigned and active** - can be assigned or **deleted** outright. Deletion is only allowed when there are no assignments on record.
+- **Unassigned and active** - can be **assigned** or **deleted** outright. Deletion is only allowed when there are no assignments on record.
 - **Assigned and active** - can be **revoked**. The credential is marked revoked and rejected at the reader from then on; the row stays in the grid for audit.
 - **Revoked** - can be **deleted** if you want to clear it from the grid. Otherwise it stays as a historical record.
 
-Revoking by default revokes every active assignment of the credential. If a member loses their card, revoke the old credential and enroll a new one for them.
+Revoking captures a reason (defaulting to "Revoked by admin") and by default revokes every active assignment of the credential. The confirmation reads: "The credential will be deactivated but the record will be kept for audit purposes." Deleting warns that it "will permanently remove the credential and all related records. This action cannot be undone." If a member loses their card, revoke the old credential and enroll a new one for them.
 
 ## Statuses
 
 - **Active** - in use, accepted by readers.
 - **Suspended** - temporarily disabled.
 - **Revoked** - permanently disabled. The record is kept for the audit trail.
-- **Expired** - past the optional `expiresAt` date.
+- **Expired** - past the optional expiry date.
 
 ## How credentials interact with check-in
 
@@ -74,6 +95,57 @@ How strict the door is, and what happens when a credential is presented, depends
 - **Strict** mode requires a credential to match an active booking or membership.
 - **Flexible** mode allows walk-ins and anonymous check-ins.
 - A scanned credential is matched to its primary contact, and the rest of the check-in flow proceeds as if you had selected that contact manually.
+
+Successful scans update the credential's last-used timestamp, so a credential that never registers a scan is a useful signal that a card is faulty or was never handed out.
+
+## Worked examples
+
+### Issuing physical cards for a gym
+
+A 24/7 strength-and-conditioning gym wants a fob-style card for every member so the front door works unattended.
+
+1. In [Access control](/settings/access-control), enable **Access Card** as an identification method and set the check-in mode to **Strict** so only members with an active membership get in.
+2. For each new member, click **Add Credential**, choose **Access Card**, scan or type the card's NFC UID into the identifier field, and pre-assign it to the contact.
+3. Hand over the card. When a member cancels, revoke their card so it is rejected at the door immediately, and delete it later if you want it out of the grid.
+
+### QR check-in for a Pilates or yoga studio
+
+A reformer Pilates studio runs class-based check-in and does not want to distribute hardware.
+
+1. Enable **QR Code** as the identification method.
+2. Leave enrollment to the platform: each member gets an auto-provisioned QR credential tied to their check-in code, which they show from the member portal.
+3. At the desk or kiosk, scan the member's QR at the start of class. In Strict mode the scan is accepted only if they have a spot in that class.
+
+### PIN keypad for a climbing gym
+
+A bouldering gym has a keypad at the entrance and wants no phones or cards involved.
+
+1. Enable **PIN Code** as the identification method.
+2. New members are auto-provisioned a PIN (PIN is preferred when enabled), or you can set a specific one via **Add Credential > PIN Code** using 4-10 alphanumeric characters.
+3. If a member forgets or shares their PIN, revoke it and enroll a new one.
+
+### Household sharing at a racket-sports club
+
+A padel and tennis club lets a family share one access card. Enroll one **Access Card** and assign it to each family member, marking one person as primary. The grid shows the primary contact plus a `+N more` chip. Any household member can enter, and the check-in flow resolves the tap to the primary contact.
+
+## Tips & best practices
+
+- Enable only the identification methods you actually use. The **Add Credential** type list and the auto-provisioning logic both follow the club's enabled methods.
+- Prefer **revoke** over **delete** for anything a member has actually used. Revoking keeps the audit trail; deleting is best reserved for unassigned mistakes or clearing already-revoked records.
+- Keep one primary per member. If you assign a second primary, the old one is demoted automatically, but it is worth confirming who the primary contact is before a busy check-in period.
+- For lost cards, revoke first, then enroll the replacement, so there is never a live duplicate.
+- Use a consistent identifier convention (for example the number printed on the card) so the **Number** column is easy to scan when troubleshooting at the desk.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| A credential type is missing from the **Add Credential** dropdown | That identification method is not enabled for the club | Enable it under **Settings > Access Control > Identification methods** |
+| Enrolling fails with a "not enabled for this club" error | The credential type is disabled for the club tied to that membership or booking | Enable the method in access control settings, or enroll a type that is allowed |
+| A member is rejected at the reader | Credential is revoked or expired, or check-in mode is Strict and they have no matching booking or membership | Check the **Status** column; re-enroll if revoked, and confirm their booking/membership - see [Check-in models](/reference/check-in-models) |
+| Cannot delete a credential | It has assignments on record | Revoke it instead; deletion is only allowed for credentials with no assignments |
+| A member has a QR or PIN nobody created | It was auto-provisioned when they gained an access grant | Expected behavior; revoke and re-enroll if you want a different identifier |
+| Kiosk tap does not enroll a card | Credential enrollment is off for that club | Enable enrollment in access control settings, then have the member tap again after scanning their QR |
 
 ## Related
 

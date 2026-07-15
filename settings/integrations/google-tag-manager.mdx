@@ -1,15 +1,28 @@
 ---
 title: Google Tag Manager
-description: Load a Google Tag Manager container on your member portal and CMS website
+description: Load a Google Tag Manager container on your member portal and CMS website with no code, then track page views, sign-ups, bookings, and purchases through your own tags.
+keywords: ["google tag manager", "gtm", "ga4", "google analytics", "conversion tracking", "datalayer", "member portal analytics", "website tracking", "meta pixel"]
 ---
 
 This integration loads a Google Tag Manager (GTM) container on your 1Club public-facing surfaces - the member portal and the CMS website - without any code changes. Paste your container ID once and 1Club injects the GTM snippet on every page load. From there, your GTM workspace controls what fires (GA4, Meta Pixel, conversion pixels, custom tags, and so on).
+
+Google Tag Manager is a paid-plan integration. Organizations on the Free plan or still in the Grow trial cannot save a container ID until they upgrade.
+
+## Overview
+
+- **No-code container loading** - Save a container ID and 1Club injects the GTM snippet; no redeploy needed.
+- **Portal and website** - The same container loads on both the member portal and the CMS website.
+- **Built-in dataLayer events** - 1Club pushes standard events (page views, sign-up, login, booking, payment, form submit) so you can wire them to GA4 or any tag.
+- **Your workspace, your rules** - GA4, Meta Pixel, conversion pixels, and custom tags are all configured inside GTM, not in 1Club.
+- **Consent-ready** - Compatible with Google Consent Mode configured in your container.
 
 ## Before you start
 
 You need a GTM container ID in the format `GTM-XXXXXXX`. Find it on the workspace overview screen in [tagmanager.google.com](https://tagmanager.google.com), next to your container name.
 
 If you want to use Google Analytics 4, configure the GA4 Configuration tag inside your GTM container. 1Club does not accept a standalone GA4 measurement ID - everything goes through GTM.
+
+You also need an upgraded plan (Grow trial and Free plans are blocked from saving a container ID).
 
 ## Connect Google Tag Manager
 
@@ -64,12 +77,43 @@ For drop-in GA4 coverage, map the events above to GA4's recommended names where 
 
 The GTM snippet runs on every page load. If you operate under GDPR, ePrivacy, or similar regulations, configure consent in your GTM container using Google's Consent Mode and gate marketing or analytics tags on the appropriate consent state. 1Club's cookie banner records the visitor's preferences but does not configure GTM tags for you.
 
+## Worked examples
+
+### Padel club measuring booking conversions
+
+A padel club runs Google and Meta ads and wants to know which spend produces court bookings. Save the GTM container ID in 1Club, then in GTM create a **Custom Event** trigger on `booking_created` and forward it to a GA4 event and the Meta Pixel. Because 1Club pushes `booking_created` with `booking_id` and `event_source` automatically, the club sees booking conversions attributed to campaign and surface without touching any code.
+
+### Yoga studio tracking free-trial sign-ups
+
+A yoga studio's goal is portal sign-ups from its website. In GTM, add a trigger on `sign_up` and remap `form_submitted` to GA4's `generate_lead` for contact-form leads. The `event_source` parameter lets the studio split reports between website leads and portal sign-ups in GA4.
+
+### Gym reporting membership purchases as revenue
+
+A fitness gym forwards `payment_success` to GA4's `purchase`, adding `transaction_id`, `value`, and `currency` in the GA4 Event tag. Revenue from portal checkout then shows up in GA4's monetization reports alongside the `invoice_id` 1Club already passes.
+
+## Tips and best practices
+
+- Keep all tags in GTM, not scattered across tools. 1Club only loads the container; everything else (GA4, pixels, remarketing) lives in your GTM workspace so you can change it without a code change.
+- Publish your GTM workspace after every change. 1Club loading the container does nothing until you publish the version that contains your tags and triggers.
+- Use the built-in `event_source` parameter to separate portal and website performance in the same GA4 property.
+- Test with [Tag Assistant](https://tagassistant.google.com) on both the portal and the CMS website after saving, since they load the same container independently.
+- If you operate under GDPR or ePrivacy, wire your marketing and analytics tags to Google Consent Mode in GTM before you start advertising.
+
 ## Disconnect
 
-Clear the **GTM Container ID** field and save. The GTM snippet stops being injected on subsequent page loads. Existing visitors with the script already loaded keep it until they navigate away or refresh.
+Click **Deactivate** on the integration page, or clear the **GTM Container ID** field and save. Either way the GTM snippet stops being injected on subsequent page loads. Existing visitors with the script already loaded keep it until they navigate away or refresh.
 
 ## Troubleshooting
 
-- **Tag not firing** - confirm the ID format (must start with `GTM-`, uppercase, letters and digits only) and that you saved the form. Then open your public site and use [Tag Assistant](https://tagassistant.google.com) to confirm the container loaded.
-- **Events missing in GA4** - GTM publishes are independent of 1Club. Confirm the GA4 tag inside your container is firing on the right triggers and that you published the latest workspace version in GTM.
-- **Tag loads on portal but not website (or vice versa)** - both surfaces read from the same organization setting, so a missing tag usually means the ID was not saved, the site is on an older cached HTML response, or the public org payload was not refreshed. Reload the page once to pick up the latest container ID.
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Tag not firing at all | The ID format is wrong or the form wasn't saved | Confirm the ID starts with `GTM-` (uppercase, letters and digits only) and that you saved, then check with [Tag Assistant](https://tagassistant.google.com) |
+| Container loads but no events in GA4 | The GA4 tag or its triggers aren't set up, or the workspace wasn't published | Confirm the GA4 tag fires on the right triggers in GTM and that you published the latest version |
+| Tag loads on portal but not website (or vice versa) | The page is serving a cached HTML response or the public org payload wasn't refreshed | Reload the page once to pick up the latest container ID; both surfaces read the same setting |
+| Save rejected with a validation error | The container ID doesn't match `GTM-` followed by letters and digits | Copy the exact ID from the GTM workspace overview |
+| Save blocked with a plan message | Your organization is on Free or still in the Grow trial | Upgrade the plan, then save |
+
+## Related
+
+- [Integrations overview](/settings/integrations) - the full integrations catalog.
+- [Website](/content/website) - the CMS website surface where the container loads.

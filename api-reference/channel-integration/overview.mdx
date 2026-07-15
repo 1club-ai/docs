@@ -5,7 +5,7 @@ description: "Sync bookings and contacts from a partner booking platform into 1C
 
 The channel integration lets a partner booking platform (for example a padel community app with court booking, player ratings, and matchmaking) sell your courts and push the resulting bookings into 1Club. 1Club stays the single source of truth for court inventory, so the same court can be booked from your own tools and the partner channel without double-booking.
 
-This is a channel-manager model: the partner is one sales channel, and 1Club is the hub that owns the inventory and the booking record. The API is generic — any integration with an API key can use it.
+This is a channel-manager model: the partner is one sales channel, and 1Club is the hub that owns the inventory and the booking record. The API is generic - any integration with an API key can use it.
 
 <Note>
   In 1Club a bookable court is an **area** (areas are typed by sport, e.g.
@@ -21,7 +21,7 @@ to three things it holds in 1Club:
 
 <CardGroup cols={3}>
   <Card title="Areas & availability" icon="calendar">
-    Your bookable courts and their computed open slots — the shared inventory,
+    Your bookable courts and their computed open slots - the shared inventory,
     changed by every channel.
   </Card>
   <Card title="Bookings & revenue" icon="calendar-check">
@@ -53,7 +53,7 @@ to three things it holds in 1Club:
 ## What syncs
 
 - **Bookings** - the partner creates and cancels bookings through the API.
-- **Contacts** - each customer is matched to a contact in your gym's CRM by email, and created if new. Contact sync happens automatically as a by-product of booking sync — see [How contacts sync](/api-reference/channel-integration/bookings#how-contacts-sync) for matching rules, guarantees, and the full flow diagram.
+- **Contacts** - each customer is matched to a contact in your gym's CRM by email, and created if new. Contact sync happens automatically as a by-product of booking sync - see [How contacts sync](/api-reference/channel-integration/bookings#how-contacts-sync) for matching rules, guarantees, and the full flow diagram.
 
 ## How money is recorded
 
@@ -62,21 +62,21 @@ You collect payment on your side; 1Club records the booking so it counts for rev
 - **`paid`** - 1Club records a paid booking transaction, settled against a dedicated **External / API** payment method (on the `manual` channel, so no card is charged). It shows in revenue as paid.
 - **`unpaid`** - 1Club records the transaction as outstanding. It shows in revenue as accrued, with nothing paid yet.
 
-`amount` is optional and defaults to the area's price for the slot. Refund handling and collection stay on your side — cancelling a booking releases the area and issues no refund from 1Club.
+`amount` is optional and defaults to the area's price for the slot. Refund handling and collection stay on your side - cancelling a booking releases the area and issues no refund from 1Club.
 
 ## How it works
 
 1. **Create an API key** under **Settings - API Tokens** with the `areas:read`, `bookings:read`, and `bookings:write` scopes. See [Authentication](/api-reference/channel-integration/authentication).
-2. **Discover areas** (your courts) and read their availability — per court or as a club-wide grid of computed slots. See [Areas and availability](/api-reference/channel-integration/areas-and-availability).
+2. **Discover areas** (your courts) and read their availability - per court or as a club-wide grid of computed slots. See [Areas and availability](/api-reference/channel-integration/areas-and-availability).
 3. **Create bookings** with a payment status and optional amount. See [Bookings](/api-reference/channel-integration/bookings).
 4. **Cancel or look up** a booking by the 1Club booking id returned on create.
 5. **Stay in sync** by registering a webhook endpoint under **Settings - APIs and MCP** and reconciling with the change feed. See [Webhooks](/api-reference/channel-integration/webhooks).
 
 ## Staying in sync
 
-1Club is a shared inventory: the same court can be booked from your app, the club's own tools, another channel, a class, or an event. To keep your calendar live you need to know when availability changes — not just discover it at booking time. Three mechanisms work together:
+1Club is a shared inventory: the same court can be booked from your app, the club's own tools, another channel, a class, or an event. To keep your calendar live you need to know when availability changes - not just discover it at booking time. Three mechanisms work together:
 
-- **Availability change webhooks (push).** Register an HTTPS endpoint and 1Club sends a signed `availability.changed` event within seconds whenever a court's bookable availability changes on **any** channel. The event is a thin invalidation — it tells you *which area and window changed*, and you re-pull the authoritative availability for that window. See [Webhooks](/api-reference/channel-integration/webhooks).
+- **Availability change webhooks (push).** Register an HTTPS endpoint and 1Club sends a signed `availability.changed` event within seconds whenever a court's bookable availability changes on **any** channel. The event is a thin invalidation - it tells you *which area and window changed*, and you re-pull the authoritative availability for that window. See [Webhooks](/api-reference/channel-integration/webhooks).
 - **The read API is the source of truth (pull).** Webhooks tell you *when* to read; [`GET /availability`](/api-reference/channel-integration/areas-and-availability) tells you *what's true*. Every read carries a `version`/`cursor` so you can tell whether it already reflects a webhook you're holding. Booking creation still re-checks atomically and rejects conflicts, so a stale calendar can never cause a double-booking.
 - **The change feed is the backstop (reconcile).** Webhooks are delivered at-least-once but can be missed (your endpoint is down, a deploy, a network blip). [`GET /availability/changes?since=<cursor>`](/api-reference/channel-integration/areas-and-availability#availability-change-feed) returns every change since a cursor, so you can catch up exactly and never drift. Poll it periodically (e.g. every few minutes) and after any downtime.
 

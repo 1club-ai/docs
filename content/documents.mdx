@@ -1,51 +1,150 @@
 ---
-title: Content items
-description: Write posts, how-to guides, FAQs, and reusable content blocks in a block editor with language variants and SEO fields.
+title: Documents and waivers
+description: Define signable documents (liability waivers, terms, policies) and use document rules to require the right members to accept them, with audience targeting and mandatory gating.
+keywords: [waiver, liability waiver, document rule, required document, typed-name acceptance, consent, onboarding, compliance, minor waiver, guardian]
 ---
 
-The **Content** tab under **Content** (at `/content/items`) holds standalone content pieces you write yourself: posts, how-to guides, FAQs, and reusable blocks. They live independently from the website builder, but the website's **News**, **FAQ**, **How-to**, and **Block** sections render them.
+Documents and waivers are the signable agreements your members accept - liability waivers, terms of service, codes of conduct, and policies. Each document is paired with one or more **document rules** that decide who must accept it and how strictly acceptance is enforced. A document rule describes whether a signup or setup document is required and how it is gated, so the right people are asked to sign the right agreements at the right moment.
 
-## The four item types
+Manage both from **Settings > Operations > Documents & Waivers** (route `/settings/operations/waivers`). The page has two sections: **Documents** (the agreements themselves) and **Document Rules** (the targeting and enforcement layer on top of them).
 
-- **Post** - news, blog entries, member spotlights. Each post has a slug that becomes `/news/<slug>` on the public site.
-- **How-to guide** - longer-form instructional content. Useful for onboarding articles or training plans.
-- **FAQ** - a single question and answer. Group them with tags so the website's FAQ section can filter to one topic.
-- **Block** - a reusable chunk of rich content keyed by slug. Reference it from a website **Block** section to drop the same copy onto multiple pages.
+## Overview
 
-The list page groups items by type and shows each group as a sortable list. Drag a row by its handle to reorder; the order saves automatically and the same drag-drop component is used on [Areas](/operations/areas). If two admins reorder the same group at the same time, the second save returns a `409` conflict and the page reloads with the latest order; redo the drag.
+- **Author documents** - Documents are content items of type `document`, written in the same block editor as posts and FAQs. They carry a title, slug, body, and language variants.
+- **Target an audience** - Each rule filters by contact type, plan, tags, and household role. A contact must match every populated filter category to be asked to sign.
+- **Mandatory gating** - A mandatory document blocks a member from using the platform until they accept it (it drives the incomplete-setup state). Optional documents are surfaced but never block.
+- **Typed-name acceptance** - Require members to scroll through the document and type their full name before they can accept. Available only on mandatory documents.
+- **Guardian signing for minors** - Target a rule at the `dependent` household role; the guardian accepts on the dependent's behalf during signup.
+- **Multiple rules per document** - The same document can be targeted by several rules. When rules overlap, the strictest wins: any mandatory rule makes it mandatory, any typed-name rule makes typed-name required.
+- **Version-aware, not disruptive** - A signature counts as accepted regardless of the stored document version. Cosmetic edits to a published document do not re-gate members who already signed.
 
-## Creating an item
+## Authoring a document
 
-Click the **+** button in the top right and pick a type from the menu. You land in the item editor with a default slug and an empty body.
+A document is a CMS content item with its type set to `document`, so it is written in the same block editor as your other [content](/content/overview) (posts, FAQs, reusable blocks), with the same title, slug, body, and language-variant support.
 
-The editor uses Editor.js, so you compose with **blocks** rather than free-form HTML: paragraphs, headings, lists, tables, code blocks, embedded media, and quotes. The right sidebar carries the metadata: title, slug, status, visibility, tags, author, featured flag, and SEO fields.
+1. On **Settings > Operations > Documents & Waivers**, click **Add document**. This opens the content editor with the type pre-set to `document`.
+2. Give it a **Title** (for example, `Liability waiver`) and write the body in the block editor.
+3. Set the **status** to **Published**. Only published documents are enforced - a draft or archived document is skipped by every rule, so members are never asked to sign it.
+4. Save. The document now appears as a card in the **Documents** section and becomes selectable when you create a rule.
 
-Two additional fields, **Summary** and **Keywords**, are used by the platform's AI features to surface and search this item.
+<Tip>
+Write one document per agreement (waiver, terms, code of conduct) so each can be targeted, versioned, and reported on independently. Use language variants on the document itself so members see the agreement in their own language when they sign.
+</Tip>
 
-Edits autosave once you stop typing; the floating save bar at the bottom of the screen confirms when changes are pending and when they have committed. Required fields are title, slug, and type. You cannot save until those are set.
+## Creating a document rule
 
-## Language variants
+A rule connects a published document to an audience and sets how acceptance is enforced.
 
-Every item can have one variant per organization language. Variants share the same slug but each carry their own title, body, and SEO copy.
+1. In the **Document Rules** section, click **Add Rule**.
+2. Fill in the dialog:
+   - **Name** - An internal label for the rule (for example, `Adults - liability waiver`). Members never see this.
+   - **Document** - Pick the published document this rule enforces.
+   - **Contact Filters** - Narrow the audience (see below). Leave a filter empty to place no restriction on that dimension.
+   - **Optional** - Off by default, so documents are mandatory unless you flip this on.
+   - **Require review and typed name** - Force the member to scroll through the document and type their full name before accepting.
+   - **Active** - Whether the rule is currently in effect.
+3. Click **Save**. To edit or delete a rule later, click its card in the **Document Rules** section.
 
-In the editor header, the **language switcher** lists every variant for the current slug; pick another language to jump to it. Open the **Copy** dropdown to translate the current variant: choose a target language and the item is duplicated with the translation pre-filled. You can also use the plain **Copy** action to fork the current variant without translating.
+## Contact filters (audience targeting)
 
-On the list page, each row shows the languages that exist for that slug and lets you create missing variants directly from the row menu.
+Filters decide who a rule applies to. The four categories combine with **AND**: a contact must match every category that has values set. Within a single category, matching **any** value is enough (**OR**). A category you leave empty places no restriction, so a rule with no filters at all applies to everyone.
 
-## Statuses and visibility
+### Contact Types
 
-Each item carries a `status` of **Draft**, **Published**, or **Archived**, and a `visibility` (defaults to **Public**). Drafts are hidden from the public site; archived items stay in the database but do not render. The website builder only pulls **Published** items into its live-data sections.
+Match on the kind of contact. The available types are **Member**, **Drop-in**, **Lead**, **Staff**, **Lapsed**, and **Contact**. Use this to ask, for example, only drop-in visitors to sign a one-time liability release, or only members to sign the full membership terms.
 
-## SEO fields
+### Plan
 
-The sidebar exposes a dedicated **SEO** section: meta title, meta description, and an excerpt used for previews. The slug becomes the URL path. Use the meta description for search snippets - it is also picked up by social previews when the item is shared.
+Match on the plans a contact holds through an active membership. Select one or more [plans](/billing/plans); the rule then applies to anyone whose active membership is on one of those plans. During signup - before a membership exists - the rule matches against the plan the member is purchasing in the wizard.
 
-## Deleting an item
+### Tags
 
-Use the **Delete** button in the editor header. Deletion is per-variant: removing the English version does not delete other languages. The action is permanent and returns to the items list.
+Match on contact tags (for example, a `competition-squad` or `under-18` tag). Use tags when your audience does not map cleanly to a contact type or plan.
+
+<Warning>
+Tag filters are skipped during the public signup flow, because a brand-new contact has no tags yet. A rule that relies only on a tag filter will not surface at signup - it will apply later, once the contact is tagged. For documents that must be signed at signup, target by contact type, plan, or household role instead.
+</Warning>
+
+### Household Role
+
+Match on a contact's role within a [household account](/members/accounts): **Owner**, **Adult**, or **Dependent**. This is how you route a minor's waiver to the `dependent` role so it is presented to the guardian to sign on the child's behalf.
+
+## Mandatory gating vs optional
+
+Every rule is **mandatory** unless you switch on **Optional**.
+
+- **Mandatory** (default) - The member cannot finish using the platform until they accept the document. Mandatory documents feed the incomplete-setup state: an authenticated member with an unsigned mandatory document is gated until it is signed.
+- **Optional** - The document is offered but never blocks access. Optional documents are useful for informational consents (marketing preferences, photo release) that you want to record but not enforce.
+
+## Typed-name acceptance
+
+**Require review and typed name** makes acceptance deliberate: the member must scroll through the full document and type their full name before the accept button unlocks. This produces a stronger evidentiary record for waivers and legal agreements.
+
+This option is only meaningful on mandatory documents. If a rule is optional, the toggle is disabled and the setting is forced off - review and typed name can only be required on mandatory documents. If you make a mandatory rule optional later, its typed-name requirement is cleared automatically.
+
+## Worked examples
+
+### Climbing gym - lead-climbing waiver tied to one plan
+
+A climbing gym requires a belay-and-lead-climbing liability waiver only from members on its **Lead Climbing** plan; recreational top-rope members do not need it.
+
+1. Author a published document `Lead climbing liability waiver`.
+2. Create a rule named `Lead climbers - liability waiver`:
+   - **Document**: `Lead climbing liability waiver`
+   - **Plan**: `Lead Climbing`
+   - **Optional**: off (mandatory)
+   - **Require review and typed name**: on
+3. Now only members whose active membership is on the Lead Climbing plan are gated until they scroll through and type their name to accept.
+
+### Martial arts - a minor's waiver signed by the guardian
+
+A jiu-jitsu academy enrolls children through a household account, and the parent must accept the injury-risk waiver for each child.
+
+1. Author a published document `Youth participation and injury-risk waiver`.
+2. Create a rule named `Dependents - youth waiver`:
+   - **Document**: `Youth participation and injury-risk waiver`
+   - **Household Role**: `Dependent`
+   - **Optional**: off (mandatory)
+3. During signup, the guardian completing the wizard is shown the dependent's waiver and accepts it on the child's behalf. The resulting signature records the child as the subject and the guardian as the signer. See [Document signatures](/content/document-signatures) for how proxy signing is recorded.
+
+### Racket sports - one-time release for drop-in visitors
+
+A padel club lets non-members pay per court but wants a signed release from every drop-in.
+
+1. Author a published document `Drop-in court-use release`.
+2. Create a rule named `Drop-ins - court release`:
+   - **Document**: `Drop-in court-use release`
+   - **Contact Types**: `Drop-in`
+   - **Optional**: off (mandatory)
+
+### Whole-club code of conduct
+
+To require every contact to accept a code of conduct, create a rule with **no contact filters** and leave it mandatory. An empty filter set means the rule applies to everyone.
+
+## Tips and best practices
+
+- **Publish before you target.** A rule pointing at a draft document silently enforces nothing. Confirm the document status is **Published**.
+- **Name rules for their audience, not the document.** `Dependents - youth waiver` tells you at a glance who it hits; `Waiver rule 2` does not.
+- **Prefer contact type, plan, or household role for signup-time documents.** Tag filters do not fire during public signup.
+- **Keep documents single-purpose.** One agreement per document makes targeting, typed-name requirements, and the signatures ledger clean.
+- **Use language variants** on the document so members sign in their own language; the signing flow resolves the variant that matches the member's locale.
+- **Deactivate instead of delete** when you want to pause a rule but keep its history - toggle **Active** off rather than removing it.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| A member is never asked to sign a document | The document is not **Published**, or the rule is inactive | Publish the document; toggle the rule **Active** on |
+| A rule does not fire at signup even though the audience seems right | The rule relies on a **tag** filter, which is skipped during public signup | Re-target by contact type, plan, or household role |
+| The **Require review and typed name** toggle is greyed out | The rule is **Optional** - typed name is only allowed on mandatory rules | Turn **Optional** off to make the rule mandatory |
+| Too many (or too few) members are gated | Filters combine with AND across categories | Widen by clearing a filter category, or narrow by adding values; remember an empty category means "no restriction" |
+| A previously signed member is prompted again | Expected only when a new signature is genuinely required; cosmetic edits do not re-gate | Confirm the member has a signature on file in [Document signatures](/content/document-signatures) |
+| A dependent's waiver is not offered during signup | The rule's **Household Role** does not include `Dependent`, or the document is unpublished | Add `Dependent` to the rule and publish the document |
 
 ## Related
 
-- [Website builder](/content/website) - Reference Block items from website sections, and surface posts/FAQs via the News, FAQ, and How-to sections.
-- [Media](/content/media) - Upload images that the block editor can insert.
-- [Settings overview](/settings/overview) - Configure the languages your organization supports.
+- [Document signatures](/content/document-signatures) - The ledger of who signed what, when, and how, including guardian signing for dependents.
+- [Content overview](/content/overview) - The block editor and content types used to author document bodies and language variants.
+- [Accounts](/members/accounts) - Household accounts and the owner/adult/dependent roles that household-role targeting uses.
+- [Plans](/billing/plans) - The plans that plan-based targeting matches against.
+- [Settings overview](/settings/overview) - Where Documents & Waivers lives among the other settings.

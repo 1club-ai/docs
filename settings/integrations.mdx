@@ -1,9 +1,18 @@
 ---
 title: Integrations
-description: Connect 1Club with payment providers, calendars, analytics, and access control systems
+description: Connect 1Club with payment providers, calendars, analytics, access control, POS, and messaging from Settings > Integrations
+keywords: [integrations, stripe, mypos, google calendar, google business, google tag manager, weblock, hype, whatsapp, social booking, payment provider]
 ---
 
-Integrations connect 1Club with external services so your bookings, payments, and access control work alongside the tools you already use. Manage everything from **Settings → Integrations** - install, configure, and uninstall each integration from one place.
+Integrations connect 1Club with external services so your bookings, payments, access control, and marketing work alongside the tools you already use. You manage every integration from one place - **Settings → Integrations** - where you install, configure, test, and remove each one. Connecting and configuring integrations is a paid-plan feature, so on the Free plan and during the Grow trial the catalog is visible but locked until you upgrade.
+
+## Overview
+
+- Browse the full catalog on the **Settings → Integrations** page, split into **Installed integrations** (active connections, with a count) and **Available integrations** (everything you can still add).
+- Nine integrations across payments, Google services, access control, point of sale, messaging, and growth.
+- Each card carries a **Learn more** link (to these docs) plus an action - **Install** for an available integration, **Configure** for an active one.
+- Every integration stores its own configuration and status, so you can install several at once (for example Stripe for online payments and WebLock for door access).
+- **Social Booking** is built in and always active - it needs no install step, no external account, and stays usable even on the Free plan and the trial.
 
 ## Available integrations
 
@@ -15,34 +24,86 @@ Integrations connect 1Club with external services so your bookings, payments, an
     Accept card payments through myPOS hosted checkout, with sandbox and live modes.
   </Card>
   <Card title="Google Calendar" href="/settings/integrations/google-calendar">
-    Sync bookings to and from Google Calendar, per area or per instructor.
+    Sync area bookings to and from Google Calendar for scheduling and resource management.
   </Card>
   <Card title="Google Business Profile" href="/settings/integrations/google-business">
-    Import verified business locations from Google as gyms in 1Club.
+    Import verified business locations and details from Google into 1Club.
   </Card>
   <Card title="Google Tag Manager" href="/settings/integrations/google-tag-manager">
-    Inject Google Tag Manager and GA4 tracking into your public surfaces.
+    Load a Google Tag Manager container (and your own GA4 tags) on the member portal and CMS website.
   </Card>
   <Card title="WebLock" href="/settings/integrations/weblock">
-    Sync memberships and bookings to physical door access through WebLock (Valnes).
+    Sync bookings and memberships to physical door access and per-usage PINs through WebLock (Valnes).
+  </Card>
+</CardGroup>
+
+The following three integrations live in the same catalog. Their dedicated guides are in progress; the summaries below describe what each one does today.
+
+<CardGroup cols={2}>
+  <Card title="Hype POS" icon="utensils">
+    Send orders from 1Club to the Hype POS for fiscalization and kitchen display, and sync the Hype menu (categories and products) back into 1Club.
+  </Card>
+  <Card title="WhatsApp" icon="comment">
+    Send and receive WhatsApp messages from the 1Club inbox using your own WhatsApp Business number, connected through Meta Embedded Signup.
+  </Card>
+  <Card title="Social Booking" icon="share-nodes">
+    Turn your Instagram, Facebook, and other social profiles into a booking channel with tagged "Book now" links, and see which platforms drive bookings.
   </Card>
 </CardGroup>
 
 ## How it works
 
-Every integration on the **Settings → Integrations** page has the same lifecycle:
+Every catalog integration follows the same lifecycle, though the details differ per provider:
 
-1. **Activate** - click **Activate** on an integration card. Some integrations open a configuration page immediately, others kick off an OAuth flow (Stripe, Google Calendar, Google Business Profile).
+1. **Install** - click **Install** on an available integration card. Some integrations open a configuration page immediately (myPOS, Google Tag Manager, Google Business Profile, WhatsApp), some create the connection and then open their page for setup (WebLock, Hype, Google Calendar), and Stripe kicks off account creation.
 2. **Configure** - on the integration's own page, fill in credentials, mappings, or sync rules. Each integration has its own settings - see the per-integration pages above.
-3. **Test** - integrations that take credentials (myPOS, WebLock) expose a **Test connection** button so you can validate before going live. Stripe and Google integrations validate during the OAuth round-trip.
-4. **Use** - once active, the integration runs in the background. Status, last-sync timestamps, and any errors appear on its page.
-5. **Deactivate** - the **Deactivate** action removes the integration. External data already exchanged (events in Google, charges in Stripe, grants in WebLock) is not retroactively deleted.
+3. **Test or validate** - WebLock exposes a **Test connection** action, myPOS has **Validate configuration** (a local check of your stored credentials), and Stripe and Google integrations validate during the OAuth or onboarding round-trip.
+4. **Use** - once active, the integration runs in the background. It appears under **Installed integrations** with its status, and you manage it from its **Configure** action.
+5. **Deactivate** - the **Deactivate** / **Remove** action removes the integration. Data already exchanged externally (events in Google, charges in Stripe, PIN grants in WebLock) is not retroactively deleted.
+
+<Note>
+  Installing, configuring, and testing integrations requires the **settings.manage.organization** permission (admins and users with full settings management). Viewing the catalog needs only **settings.read.organization**. Existing integrations stay visible and removable even when the paid-plan lock is active, so you never lose access to a connection you already set up.
+</Note>
 
 ## Choosing a payment provider
 
-1Club supports Stripe and myPOS as payment providers. You can have both installed at once, but most operators pick one based on country and preferences:
+1Club supports **Stripe** and **myPOS** as payment providers. You can have both installed at once, but most operators pick one based on country and preferences:
 
-- **Stripe** is the broader option - widest country coverage, digital wallets, Connect onboarding, and a large dashboard ecosystem.
-- **myPOS** is a fit if you already have a myPOS merchant account or operate in a region where myPOS is the established provider.
+- **Stripe** is the broader option - widest country coverage, digital wallets, Stripe Connect onboarding, automatic payouts, and a large dashboard ecosystem.
+- **myPOS** is a fit if you already have a myPOS merchant account or operate in a region where myPOS is the established provider. Customers pay on myPOS's hosted checkout page, so card data never touches 1Club.
 
-Both integrations support a test/sandbox mode so you can try them end-to-end before charging real cards.
+Both providers support a test/sandbox mode so you can run the full checkout flow before charging real cards.
+
+## Worked examples
+
+**Padel club taking online court payments (Stripe).** A racket-sports club installs Stripe, runs a few bookings in test mode using Stripe test cards to confirm the portal checkout works, then upgrades to a paid plan and toggles **Live mode** to onboard its own Stripe Connect account. Court bookings and coach sessions now collect real payments at checkout.
+
+**Boxing gym in a myPOS region.** A martial-arts gym already banks with myPOS. It installs myPOS, pastes its Configuration Pack from the myPOS Checkout Store, validates the configuration, and starts collecting membership dues through hosted checkout - no second payment processor needed.
+
+**Climbing centre with door access.** A climbing gym installs WebLock so that an active membership or a confirmed booking opens the door, then maps its WebLock groups and readers to 1Club areas. It keeps Stripe installed in parallel for online payments.
+
+**Yoga studio marketing its schedule.** A yoga/Pilates studio uses the always-on Social Booking tool to generate a tagged "Book now" link for its Instagram bio, then checks **Analytics → Bookings by source** to see how many reformer bookings came from Instagram versus its website.
+
+## Tips & best practices
+
+- Try every payment provider in test/sandbox mode first. A test payment through the real checkout flow is the only reliable proof that live credentials will work.
+- Keep only the integrations you actually use active. Fewer active integrations means fewer places to reconcile and fewer moving parts when something looks off.
+- If you run more than one club, remember that integration configuration is per organization - installing Stripe once covers all clubs in that organization.
+- Upgrade to a paid plan before you plan to go live with payments. Live Stripe and live myPOS both require a paid subscription, not the Free plan or the Grow trial.
+
+## Troubleshooting
+
+- **The whole catalog is greyed out / "not available"** - your organization is on the Free plan or still in the Grow trial. Connecting and configuring integrations is a paid feature. Upgrade to unlock installs and configuration. Social Booking stays available regardless.
+- **I can see integrations but cannot install or configure them** - you are missing the **settings.manage.organization** permission. Ask an admin to grant it, or have an admin perform the setup.
+- **An integration I removed still shows external data** - deactivating stops 1Club from creating new activity, but it does not delete data already sent to the provider. Manage that from the provider's own dashboard (for example refunds in Stripe or myPOS).
+- **Google Tag Manager shows as "Available" even though I added a container ID** - the container ID lives on your organization settings and syncs to the integrations list on load. Reopen **Settings → Integrations** to refresh the card, or re-save the container ID.
+
+## Related
+
+- [Stripe](/settings/integrations/stripe) - card and wallet payments with test and live modes.
+- [myPOS](/settings/integrations/mypos) - hosted-checkout card payments and payment links.
+- [Google Calendar](/settings/integrations/google-calendar) - two-way booking sync.
+- [Google Business Profile](/settings/integrations/google-business) - import verified locations.
+- [Google Tag Manager](/settings/integrations/google-tag-manager) - analytics and tags on your public surfaces.
+- [WebLock](/settings/integrations/weblock) - door access and per-usage PINs.
+

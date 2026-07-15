@@ -1,23 +1,96 @@
 ---
 title: Media
-description: Upload and manage images and files for your website and documents
+description: Upload, organize, and reuse images and videos for your website, documents, and emails. Files are stored in Cloudinary and shared across the platform.
+keywords: [media library, images, videos, upload, Cloudinary, alt text, website assets]
 ---
 
-**In a nutshell:** The Media library stores images and files you use in documents, website pages, and emails so you can reuse them and keep branding consistent.
+The Media library is your organization's shared store of images and videos. You upload a file once, give it a name and alt text, and then reuse it anywhere in the platform: website sections, content blocks, documents, and emails. Files live in Cloudinary (1Club's file storage), so the library holds a record of each asset, its metadata, and where it came from, while Cloudinary serves the actual file.
 
 ## Overview
 
-Use **Content → Media** to upload, organize, and manage media files. Files are typically stored in your configured storage (e.g. Cloudinary). You can browse by type, search, and insert media into documents and website content.
+- **One shared library per organization.** Every image or video is scoped to your organization and available to all admins who can access Marketing.
+- **Upload images and videos.** Drag a file into the upload dialog; it goes straight to Cloudinary and a media record is created for it.
+- **Rich metadata.** Each asset has a name, optional alt text (for accessibility and SEO), an optional caption, and a type (image or video).
+- **Search and browse.** Find assets by name or alt text, sort by date, and preview thumbnails in a grid.
+- **Reuse everywhere.** Pick from the library wherever an image field appears: website hero and gallery sections, content blocks, documents, and email templates.
+- **Auto-registered assets.** Images you set elsewhere in 1Club (club photos, plan images, area photos) are added to the library automatically, so everything lives in one place.
+- **Clean deletes.** Deleting a record also removes the underlying file from Cloudinary, individually or in bulk.
 
-## Key features
+## Where media lives in the admin
 
-- **Upload** — Add images and other files; supported formats depend on your integration.
-- **Library** — Browse and search media; view thumbnails and metadata.
-- **Usage** — Insert media into documents, website blocks, and email templates.
-- **Organization** — Optional folders or tags to keep media findable.
+Open **Marketing > Media**. The list view shows one row per asset with a thumbnail, name, alt text, type, and the date it was added. Use the search and column sort to find things; select multiple rows for bulk actions.
+
+## Uploading media
+
+1. On **Marketing > Media**, click **Add**.
+2. In the dialog, click **Upload** and pick an image or video from your computer. The file uploads to Cloudinary and a preview appears.
+3. Fill in the metadata:
+   - **Name** (required) - a human-friendly label used to find the asset later. Defaults to the file name if you leave it blank after uploading.
+   - **Alt text** - a short description of the image. Used for accessibility and read by search engines; set it on anything that appears on your public website.
+   - **Caption** - optional longer text some sections can display beneath the image.
+4. Save. The asset now appears in the library and is ready to use.
+
+<Note>
+  Uploads have size limits: **10 MB for images** and **100 MB for videos**. Only
+  image and video files are accepted. The type (image or video) is detected
+  automatically from the file.
+</Note>
+
+## Editing an asset
+
+Open the row actions and choose **Edit** to change an asset's **name**, **alt text**, or **caption**. The underlying file and its URL do not change when you edit metadata, so anything already using the image keeps working. To replace the actual file, upload a new asset and re-point the sections that used the old one.
+
+Two other row actions help day to day:
+
+- **Copy URL** puts the asset's direct Cloudinary URL on your clipboard. Use it when a field asks for an image URL rather than a library picker (for example, a custom script or an external tool).
+- **Delete** removes the record and the file from Cloudinary. This is permanent.
+
+## Organizing and finding media
+
+- **Search** matches your query against both the **name** and the **alt text**, case-insensitive, with name matches ranked first. Naming files well ("padel-court-evening", "reformer-studio-wide") makes them findable months later.
+- **Sort by date** to surface your most recent uploads; the list defaults to newest first.
+- **Alt text doubles as a keyword.** Since search looks at alt text too, a descriptive alt text both improves accessibility and makes the asset easier to locate.
+
+## Where media is used
+
+The library feeds the rest of the platform:
+
+- **Website sections.** Image fields in the [website builder](/content/website) (hero backgrounds, galleries, CTA images, club photos) open the media picker. Uploading from that picker also lands the file in this library.
+- **Content and documents.** [Content items](/content/documents) such as blocks and posts pull images from the library.
+- **Emails.** Email templates can reference library assets so campaigns stay on-brand.
+- **Automatically registered images.** When you save an image URL elsewhere in 1Club - a club cover photo, a plan image, an area photo - a media record is created for that URL if one does not exist yet. This keeps the library as the single inventory of every image your organization uses, even ones set from other screens.
+
+## Worked examples
+
+**Padel club - hero and gallery.** You photograph your courts at golden hour. Upload the four best shots, name them `padel-court-01` through `04`, and write alt text like "Outdoor padel court at sunset". In the website builder, add a **gallery**-variant hero and pick these four; they render as a tiled gallery on the home page, and their alt text carries into the public site for SEO.
+
+**Yoga studio - a short promo clip.** You have a 40-second reformer class video. Upload it (under the 100 MB video limit); the library tags it as a video automatically. Reference it as the sole background of a **background**-variant hero so the class motion plays behind your headline. Videos must be the only item in a hero background, so do not mix the clip with still images in that section.
+
+**Martial arts gym - reusing one logo everywhere.** Upload your dojo crest once with a clear name ("bjj-crest-white"). Use **Copy URL** to drop it into an email header and pick the same asset from the media library for a website content block, so the mark stays identical across surfaces.
+
+**Cleaning up after a rebrand.** After new photography arrives, select all the old shots in the list and use the bulk **Delete** action. The records and their Cloudinary files are removed together, so you are not paying to store images no page references anymore.
+
+## Tips & best practices
+
+- **Write alt text on anything public.** It is your accessibility baseline and it feeds both website SEO and the library's own search.
+- **Name files for search, not for storage.** "reformer-studio-wide" beats "IMG_4821". You will thank yourself when a section needs "that wide studio shot".
+- **Compress before uploading.** Cloudinary can transform images, but starting from a reasonably sized file keeps you under the 10 MB limit and speeds up your pages.
+- **Delete unused assets in bulk.** After a redesign, prune the old set in one pass rather than one file at a time.
+- **Prefer the library picker over pasted URLs** in the website builder, so every image you use is tracked and reusable.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| Upload rejected before it starts | File is not an image or video, or exceeds the size limit (10 MB image / 100 MB video) | Convert or compress the file, or trim the video, then re-upload |
+| File uploaded but the row has no thumbnail | The asset is a video, or the URL did not save | Videos preview with a player rather than a static thumbnail; re-open the asset to confirm the URL is present |
+| An image still shows on the site after you deleted it | The section still references the old URL, or a published release predates the delete | Re-pick a new image in the website builder and publish a new release |
+| Can't find an asset you know you uploaded | Search only matches name and alt text | Add or fix the alt text, or sort by date to scan recent uploads |
+| Deleted a file but it lingers in Cloudinary | Cloudinary removal failed while the record was still deleted | The record is gone from 1Club; contact support if you need the orphaned Cloudinary file cleaned up |
 
 ## Related
 
-- [Documents](/content/documents) — Add media to document content.
-- [Website](/content/website) — Use media in website builder blocks.
-- [Integrations](/settings/integrations) — Configure file storage (e.g. Cloudinary).
+- [Website](/content/website) - Website sections pull their images and videos from this library.
+- [Content items](/content/documents) - Blocks, posts, and documents that embed media.
+- [Reviews](/content/reviews) - Another Marketing tab that shapes your public site.
+- [Integrations](/settings/integrations) - Where file storage (Cloudinary) is configured.

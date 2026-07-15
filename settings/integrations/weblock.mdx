@@ -1,57 +1,114 @@
 ---
 title: WebLock
-description: Sync memberships and bookings to physical door access through WebLock (Valnes)
+description: Turn 1Club memberships and bookings into physical door access through the WebLock (Valnes) access control system, with per-usage PINs and booking-driven light rules.
+keywords: ["weblock", "valnes", "access control", "door access", "physical access", "pin", "keycard", "rfid", "light rules", "group mapping", "business id"]
 ---
 
-The WebLock integration ties 1Club to the Valnes WebLock physical access control system. Members and bookings in 1Club become access grants in WebLock - the right doors open at the right times without staff handing out PINs or fobs by hand. Area-to-device mappings also let you drive WebLock light rules from the booking schedule.
+The WebLock integration ties 1Club to the Valnes WebLock physical access control system. Memberships and bookings in 1Club become access grants in WebLock, so the right doors open at the right times without staff handing out PINs or fobs by hand. Area-to-device mappings also let bookings drive WebLock light rules, so a court or studio lights up while it is in use.
+
+WebLock is a paid-plan integration. Organizations on the Free plan or still in the Grow trial cannot configure or test it until they upgrade.
+
+## Overview
+
+- **Membership-driven access** - Active members on a plan are granted the WebLock group you map that plan to.
+- **Booking-driven access** - One-off bookings grant a group based on the area type, class type, or instructor type of the booking.
+- **Per-usage credentials** - Each grant carries the contact's check-in PIN and any key cards; if a contact has neither, WebLock generates a one-time PIN for the grant.
+- **Light rules from the schedule** - Map an area to a WebLock reader so its lighting rule applies while a booking is active.
+- **Configurable buffers** - Separate buffers control how early access opens and how early light rules apply relative to a booking.
+- **Automatic revocation** - Cancelling a booking or expiring a membership removes the matching grant.
+
+## How access is decided
+
+When 1Club syncs a grant, it picks the WebLock group in this order:
+
+- **Memberships** use the group mapped to the member's plan.
+- **Bookings** use the first match of: the booking area's **area type**, then **class type**, then **instructor type**, and finally the **default for bookings** if none of those is mapped.
+
+Credentials come from the contact: their 1Club check-in PIN and RFID/NFC key cards are pushed to WebLock as PIN and keycard entries. When a contact has no PIN or key card, WebLock generates a one-time PIN for that grant.
 
 ## Before you start
 
-- A WebLock (Valnes) account with a **Business ID** and groups and readers already configured in the WebLock console.
-- The list of groups and readers you intend to map - 1Club fetches them after you connect, but knowing what each one represents on the physical side makes mapping faster.
+- A WebLock (Valnes) account with a **Business ID**, and groups and readers already configured in the WebLock console.
+- The list of groups and readers you intend to map. 1Club fetches them after you connect and test, but knowing what each one represents on the physical side makes mapping faster.
+- An upgraded plan (Grow trial and Free plans are blocked from configuring).
+
+Valnes API credentials are held at the platform level, so you do not enter a username or password in 1Club - only your Business ID.
 
 ## Connect WebLock
 
 1. Go to **Settings → Integrations** and click **Activate** on the WebLock card.
-2. Enter your **Business ID**.
-3. Adjust the two buffer values if you want (defaults are sensible):
-   - **Grant Buffer Minutes** (0-120, default 15) - how long before a booking starts that access becomes valid, and how long after it ends that it remains valid.
-   - **Rules Buffer Minutes** (0-120, default 5) - how long before/after a booking the area's light or device rules apply.
-4. Click **Test connection** to verify the Business ID and confirm 1Club can reach WebLock.
-5. Save.
+2. On the WebLock (Valnes) Configuration page, enter your **Business ID**.
+3. Adjust the two buffer values if you want (the defaults are sensible):
+   - **Grant buffer (minutes)** (0-120, default 15, adjustable in steps of 5) - how long before a booking starts that access becomes valid, and how long after it ends that it remains valid.
+   - **Rules buffer (minutes)** (0-120, default 5, adjustable in steps of 1) - how long before and after a booking the area's light or device rules apply.
+4. Click **Test connection**. 1Club saves the configuration first, then verifies the Business ID and confirms it can reach WebLock. A successful test flips the integration status to **Active**.
+5. Click **Save** to store any later changes.
 
-Once the connection tests successfully, the **Group mapping** and **Device mapping** sections become editable.
+Once the connection tests successfully, the **Group mapping** and **Devices mapping** sections load your WebLock groups and readers and become editable.
 
 ## Group mapping
 
-Group mapping decides which WebLock access group is granted for each entitlement in 1Club. Every mapping is optional - leave a row as **—** to skip it.
+The **Group mapping** section decides which WebLock access group is granted for each entitlement in 1Club. Every row is optional - leave a row on the blank option to skip it. Choose a group from the **WebLock group** dropdown next to each item.
 
-- **Plans → group** - which group active members on each plan belong to. Most operators map "Standard" plan to "Members" and so on.
-- **Area type → group**, **Class type → group**, **Instructor type → group** - which group a one-off booking grants. Pick whichever axis matches how you organize doors.
-- **Default group** - fallback group used for any booking that does not match a mapping above.
+- **Plans (membership grants)** - which group active members on each plan belong to. Most operators map a "Standard" plan to a "Members" group, and so on.
+- **Area types (booking grants)**, **Class types (booking grants)**, **Instructor types (booking grants)** - which group a one-off booking grants. Pick whichever axis matches how you organize doors.
+- **Default for bookings** - the fallback group used for any booking that doesn't match a mapping above.
 
-## Device mapping
+## Devices mapping
 
-Device mapping is independent from group mapping and drives WebLock light rules.
+The **Devices mapping** section is independent from group mapping and drives WebLock light rules.
 
-- **Area → reader/device** - assigns one WebLock reader to each 1Club area. When a booking starts in that area, the reader's lighting rule applies (e.g. turn on lights, indicate occupied).
+- **Area → WebLock reader** - assigns one WebLock reader to each 1Club area. When a booking starts in that area, the reader's lighting rule applies on the rules-buffer schedule (for example, turning lights on or marking the space occupied).
 
-Leave **—** to opt an area out of light rules.
+Leave the blank option selected to opt an area out of light rules.
 
 ## What syncs
 
-- New memberships and bookings create access grants in WebLock, with a PIN generated per grant.
-- Cancelling a booking or expiring a membership revokes the corresponding access grant.
-- Light/device rules apply on the buffer schedule you configured.
-- Access grants and the events from readers (door opened, denied) are visible under **Settings → Access Control** in 1Club.
+- New memberships and bookings create access grants in WebLock, using the contact's PIN and key cards, or a generated one-time PIN.
+- Cancelling a booking or expiring a membership revokes the corresponding grant (its group membership window and light rule are removed; shared cards are left in place).
+- Light and device rules apply on the rules-buffer schedule you configured.
+- Access grants and reader events are visible under [Access Control](/settings/access-control) in 1Club.
 
-## Disconnect
+## Worked examples
 
-Click **Deactivate** on the integrations list. This stops 1Club from creating new grants in WebLock. Existing grants in WebLock are not retroactively removed - delete or expire them in the WebLock console if needed.
+### Climbing gym: 24/7 member access on a plan
+
+A climbing gym sells an "Unlimited" plan whose members come and go outside staffed hours. In **Group mapping**, map the Unlimited plan to a WebLock group whose readers cover the front door and the bouldering hall. Every active member on that plan is granted that group, and their 1Club check-in PIN opens the door. When a membership expires, the grant is revoked automatically, so lapsed members lose access without staff intervention.
+
+### Padel club: court access plus lights on booking
+
+A padel club wants a member's booking to unlock the correct court door and switch that court's lights on. Map the padel **area type** to a "Courts" group in **Group mapping**, and in **Devices mapping** map each court area to its own WebLock reader. Set the **grant buffer** to 15 minutes so players can get in a little early, and the **rules buffer** to 5 minutes so the lights come on just before the slot starts and go off shortly after it ends.
+
+### Martial-arts academy: instructor-led sessions
+
+A jiu-jitsu academy runs private sessions where only the coaching room should open. Map the relevant **instructor type** to a "Private room" group. Because bookings resolve area type first, then class type, then instructor type, keep the room's area type unmapped so the instructor-type rule is what grants access for those sessions.
+
+## Tips and best practices
+
+- Run **Test connection** before you expect any groups or readers to appear. The mapping dropdowns only populate after a successful test.
+- Map on the axis you actually organize doors by. If doors map to memberships, use plan mapping; if they map to what's booked, use area or class type. You don't need to fill in every axis.
+- Set the **default for bookings** group as a safety net so a newly created area type or class type still grants some access before you map it explicitly.
+- Keep the **grant buffer** larger than the **rules buffer**: you usually want the door to open a little before the lights come on.
+- Set member check-in PINs and key cards in 1Club before the first sync so WebLock uses real credentials instead of generating one-time PINs.
 
 ## Troubleshooting
 
-- **Test connection fails** - the Business ID is wrong, or your WebLock account has no API access. Confirm with your WebLock administrator.
-- **Group dropdowns are empty** - "No WebLock groups available. Verify the Business ID and test the connection." Re-run **Test connection** after fixing the Business ID.
-- **Member can't open the door** - check **Settings → Access Control** for the access grant. If it's missing, the plan or booking may not be mapped. If it's there but `validFrom` is in the future, lower the **Grant Buffer Minutes**.
-- **Lights don't come on for a booking** - the area is not mapped to a reader in **Device mapping**, or the **Rules Buffer Minutes** is larger than the time until the booking starts.
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| **Test connection** fails | The Business ID is wrong, or your WebLock account has no API access | Confirm the Business ID with your WebLock administrator and retry |
+| Group dropdowns are empty | The connection hasn't been tested successfully, or the Business ID is wrong (the section shows "No WebLock groups available. Verify the Business ID and test the connection.") | Fix the Business ID and re-run **Test connection** |
+| Reader dropdowns are empty | Same cause as empty groups, or no readers exist in the WebLock console | Confirm readers exist in WebLock, then re-test the connection |
+| A member can't open the door | The plan or booking isn't mapped to a group, or the grant hasn't started yet | Check the grant under [Access Control](/settings/access-control); if it exists but starts in the future, raise the **grant buffer** |
+| Lights don't come on for a booking | The area isn't mapped to a reader, or the rules buffer is smaller than the time until the booking starts | Map the area in **Devices mapping** and check the **rules buffer** |
+| Configuring is blocked with a plan message | Your organization is on Free or still in the Grow trial | Upgrade the plan, then configure |
+
+## Disconnect
+
+Click **Deactivate** on the integrations list. This stops 1Club from creating new grants in WebLock and clears the WebLock references stored on your contacts. Existing grants in WebLock are not retroactively removed - delete or expire them in the WebLock console if needed.
+
+## Related
+
+- [Access Control](/settings/access-control) - per-club check-in modes and where access grants and reader events appear.
+- [Plans](/billing/plans) - the membership plans you map to WebLock groups.
+- [Areas](/operations/areas) - the areas you map to WebLock readers for light rules.
+- [Integrations overview](/settings/integrations) - the full integrations catalog.

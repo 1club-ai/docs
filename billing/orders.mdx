@@ -1,0 +1,219 @@
+---
+title: Orders
+description: Understand orders as multi-line purchase containers - what an order holds, its draft, completed, and cancelled lifecycle, how you complete or cancel one, and how orders relate to transactions, invoices, and payments.
+keywords:
+  [
+    orders,
+    order,
+    checkout,
+    draft order,
+    complete order,
+    cancel order,
+    point of sale,
+    line items,
+    transactions,
+    invoices,
+    payments,
+  ]
+---
+
+An order is a single purchase container that groups one or more line items a member is buying together - memberships, products, court and class bookings, event tickets, and packages. Each order carries its own status, an aggregate payment status, and links out to the bookings, memberships, and transactions it creates when it is completed. Use **Revenue > Orders** to review, complete, and cancel every purchase your organization has taken.
+
+## Overview
+
+The **Orders** tab is the record of every basket your organization has assembled, whether it came from the point of sale, a member checking out in the portal, or an admin building a purchase by hand.
+
+- **Multi-line containers** - One order can mix a membership, a court booking, and a couple of retail products on the same receipt.
+- **Line item types** - Orders hold `booking`, `membership`, `membership signup fee`, `product`, `discount`, and `package` lines.
+- **Lifecycle** - Every order is **Draft**, **Completed**, or **Cancelled**.
+- **Two statuses per order** - An order status (draft/completed/cancelled) and a rolled-up payment status (paid, partially paid, pending, or refunded) across its transactions.
+- **Fulfilment on completion** - Completing a draft turns its lines into real bookings, memberships, and product transactions, and records payment.
+- **Reversible** - Cancelling a completed order reverses its bookings, cancels its memberships, and voids its transactions.
+- **Linked records** - Each order line links to the booking, membership, and transaction it produced, so you can trace a purchase end to end.
+
+## What an order contains
+
+An order is the parent; its **line items** are the children. Each line has a type that decides what completing the order creates:
+
+- **Booking** - A court, class, instructor, or event-ticket reservation. Becomes a booking record with its own transaction.
+- **Membership** - A plan purchase. Becomes a membership, and its signup fee (when the plan charges one) is carried as a separate **membership signup fee** line.
+- **Product** - A retail or food-and-drink item sold by quantity at a unit price (for example a drink, towel, or racket rental).
+- **Package** - A bundle sold as one item; it is expanded into its component membership and product lines at order-create time.
+- **Discount** - A negative line written when a promotion is applied at completion, so the line-item total matches what the member actually pays.
+
+An order also carries a **member** (the contact it belongs to), an optional **club**, and an optional order-level **note** (for example kitchen instructions or a buzzer/pager number for a food order). A product-only order can be anonymous, but any order containing a booking or membership line must have a member attached.
+
+## The order list
+
+Open **Revenue > Orders**. The list shows every order with these columns:
+
+- **#** - The order number.
+- **Member** - The contact the order belongs to (blank for anonymous product-only sales).
+- **Status** - Draft, Completed, or Cancelled.
+- **Payment status** - The rolled-up payment state across the order's transactions (hidden while the order is still a draft with no live transactions).
+- **Items** - How many line items the order holds.
+- **Total** - The order total, shown tax-exclusive in the admin grid.
+- **Created at** - When the order was opened.
+
+Tabs across the top filter by status: **All**, **Draft**, **Completed**, and **Cancelled**, each with a live count. Sort defaults to newest first. The row action menu offers **View** and, unless the order is already cancelled, **Cancel**. The **Point of sale** button in the top right jumps to the POS to start a new sale.
+
+<Note>
+  Orders are created from the point of sale, from member checkout in the portal, or from a booking flow - not from an "Add order" button on this tab. The Orders tab is where you review and resolve those orders after they exist.
+</Note>
+
+## Order status and the lifecycle
+
+There are exactly three order statuses:
+
+- **Draft** - The basket is assembled but not yet paid or fulfilled. Nothing has been booked or charged. Draft orders can still be edited (their line items, member, club, and note replaced).
+- **Completed** - The order has been executed: its lines are now real bookings, memberships, and transactions, and payment has been recorded (or left pending for pay-on-arrival).
+- **Cancelled** - The order has been voided. For a draft this is just a status change; for a completed order it reverses everything the order created.
+
+The allowed transitions are:
+
+- **Draft -> Completed** when you complete (execute) the order.
+- **Draft -> Cancelled** when you discard a draft.
+- **Completed -> Cancelled** when you reverse a finished order.
+
+A cancelled order is terminal - it cannot be re-opened, and attempting to cancel it again is rejected.
+
+## Payment status vs order status
+
+The **payment status** is separate from the order status and is rolled up from the order's transactions:
+
+- **Paid** - Every live transaction on the order is paid.
+- **Partially paid** - Some transactions are paid (or one is marked partially paid) while others are still outstanding.
+- **Refunded** - At least one transaction has been refunded.
+- **Pending** - Transactions exist but none are settled yet.
+- **Hidden** - No live transactions yet (a draft, or a fully voided order), so the chip is not shown rather than reading "pending" for something that was never billed.
+
+Voided transactions are ignored in this roll-up, so a voided line does not drag an otherwise-paid order into a misleading state.
+
+## Completing a draft order
+
+Completing (executing) a draft is what turns intent into records.
+
+1. Open the draft from **Revenue > Orders**.
+2. Click **Complete order** in the top right.
+3. In the **Complete order** dialog, pick a **payment method** (required when the order total is greater than zero). Add wallet credit as a secondary tender if you want a split - see [Payments](/billing/payments).
+4. Confirm. The order is executed: each line becomes a booking, membership, or product transaction, and payment is recorded against the resulting transactions with the method you chose.
+
+The in-app help reads: "Add a payment method and complete the order to create bookings, memberships, and transactions." A zero-total order (for example a booking fully covered by a membership) completes without a payment method.
+
+<Note>
+  If you choose pay-on-arrival, the booking is confirmed but its transaction is left **pending** - no wallet debit and no card charge. Collect payment on site later. The order still moves to **Completed**; only its payment status stays open.
+</Note>
+
+## Cancelling an order
+
+1. Open the order and click **Cancel**, or use the **Cancel** row action in the list.
+2. Confirm in the **Cancel order** dialog ("Are you sure you want to cancel this order? This action cannot be undone.").
+
+What cancelling does depends on the order's state:
+
+- **Draft** - The status flips to **Cancelled**. Nothing else happens because nothing was created.
+- **Completed** - Each booking line is cancelled through the standard booking-cancellation flow, each membership line is cancelled immediately, and every related transaction is voided. Then the order status becomes **Cancelled**. This reversal is idempotent, so an already-cancelled booking or already-voided transaction is skipped rather than erroring.
+
+<Note>
+  Cancelling a completed order does not by itself hand cash back. A booking that was paid may generate a wallet-credit refund through the cancellation flow (subject to your cancellation policy), and voiding the transaction stops it counting toward revenue. To reverse a specific card or cash payment, use the refund action on that payment - see [Payments](/billing/payments).
+</Note>
+
+## Editing a draft
+
+Only **draft** orders can be edited. Editing replaces the order's line items and, optionally, its member, club, and note. Once an order is completed it is immutable - you cancel and rebuild rather than edit. Attempting to edit a non-draft order is rejected with "Only draft orders can be updated".
+
+## How orders relate to transactions, invoices, and payments
+
+An order is the top of the money trail:
+
+- **Order -> transactions** - Completing an order creates one transaction per billable line (a booking transaction, a membership transaction, a product transaction). The order's payment status is the roll-up of these transactions' statuses. See [Transactions](/billing/transactions).
+- **Transactions -> invoices** - Transactions can be grouped onto an invoice for the member. The invoice is the document; the order is the basket that produced the underlying transactions. See [Invoices](/billing/invoices).
+- **Transactions -> payments** - A payment is recorded against one or more transactions to settle them. Completing an order records a payment against the order's transactions with the method you selected. See [Payments](/billing/payments).
+
+The order detail page surfaces these links directly. Each line's **Linked to** column deep-links to the **booking**, **membership**, and **transaction** it produced, and when an order has been synced to an external system (for example a POS for fiscalisation) an **Integrations** card shows the linked system and sync time.
+
+## Worked examples
+
+### Padel court plus racket rental in one sale
+
+A member books an hour on court 2 and rents a racket at the desk.
+
+- The order holds two lines: a **booking** (the court) and a **product** (racket rental).
+- Complete it with **Card** as the payment method.
+- Completion creates a booking transaction and a product transaction; the order payment status becomes **Paid**.
+- The booking line's **Linked to** column points at the new booking and its transaction.
+
+### Jiu-jitsu drop-in taken at the front desk
+
+A visitor pays for a single mat session and grabs a bottle of water.
+
+- Built at the point of sale as a **product**-only or booking-plus-product order.
+- Take **Cash**; the order completes and its transactions are marked paid.
+- If they later decide not to train, cancel the completed order to void the transactions, then refund the cash from the payment record.
+
+### Pilates membership with a signup fee
+
+A new client joins on a monthly reformer plan that charges a joining fee.
+
+- The order carries a **membership** line plus a **membership signup fee** line.
+- Complete it with the client's chosen method. Completion creates the membership and its transactions.
+- The **Linked to** column takes you to the new membership under [Memberships](/members/memberships).
+
+### Climbing day pass sold with a promotion
+
+A walk-in buys a day pass and you apply a discount code at checkout.
+
+- The order holds the **booking** (or membership) line; applying the promotion at completion writes a negative **discount** line so the order total matches what the climber pays.
+- The discount line references the promotion it came from. See [Promotions](/marketing/promotions).
+
+### Class pack sold as a package
+
+A yoga studio sells a 10-class pass.
+
+- The order holds a **package** line, which is expanded into its component lines when the order is created.
+- Complete it as one basket; the components fulfil together. See [Packages](/billing/packages).
+
+## Tips & best practices
+
+- **Read status as two facts, not one.** "Completed" says the order was fulfilled; the payment-status chip says whether the money is in. A completed order can still be **Pending** if you took it pay-on-arrival.
+- **Clear your Draft tab.** Drafts are abandoned or in-progress baskets. Complete the real ones and discard the stale ones so the tab reflects live work.
+- **Cancel, do not edit, a finished order.** Completed orders are immutable by design. If a purchase is wrong after completion, cancel it (which reverses the bookings, memberships, and transactions) and build a fresh order.
+- **Use the note field for fulfilment context.** Kitchen instructions or a pager number on a food-and-drink order ride along on the order and flow to a connected POS.
+- **Follow the Linked to trail for disputes.** When a member queries a charge, open the order and jump straight to the booking, membership, or transaction from the item grid rather than searching each list.
+
+## Troubleshooting
+
+**Issue**: The **Complete order** button is missing.
+
+**Solution**: It only shows for **draft** orders. A completed or cancelled order has nothing left to execute.
+
+**Issue**: Completing the order fails with a message about a required payment method.
+
+**Solution**: The order total is greater than zero, so the **Complete order** dialog needs a payment method before it can record payment. Pick one (or apply wallet credit / pay-on-arrival). A zero-total order completes without one.
+
+**Issue**: I cannot edit an order - it says only draft orders can be updated.
+
+**Solution**: The order is already completed or cancelled. Cancel it and build a new draft instead of editing.
+
+**Issue**: A completed order shows **Pending** payment status.
+
+**Solution**: The order was taken pay-on-arrival, so its transactions are still open. Record the payment against those transactions to move it to **Paid** - see [Payments](/billing/payments).
+
+**Issue**: I cancelled a completed order but the member still expects their money back.
+
+**Solution**: Cancelling voids the transactions and may credit wallet through the cancellation flow, but it does not automatically reverse a specific card or cash payment. Refund the payment from its record on the [Payments](/billing/payments) tab.
+
+**Issue**: The payment-status chip is missing on a draft.
+
+**Solution**: That is expected. A draft has no live transactions yet, so there is nothing to roll up and the chip stays hidden until the order is completed.
+
+## Related
+
+- [Payments](/billing/payments) - Record payments, take split payments, and issue refunds against an order's transactions.
+- [Transactions](/billing/transactions) - The individual charges an order creates.
+- [Invoices](/billing/invoices) - Group transactions into a member invoice.
+- [Packages](/billing/packages) - Bundles that expand into order line items.
+- [Plans](/billing/plans) - Membership plans sold as membership lines.
+- [Memberships](/members/memberships) - The memberships an order creates.
+- [Bookings](/operations/bookings) - The bookings an order creates.
+- [Promotions](/marketing/promotions) - Discounts applied to an order at completion.

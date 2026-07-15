@@ -1,0 +1,145 @@
+---
+title: Kiosk app
+description: Set up the 1club self-service kiosk for member check-in, class check-in, area and plan booking, and browsing plans and products on a tablet at your gym.
+---
+
+The kiosk app is a self-service screen you run on a tablet or touchscreen at your gym's entrance or front desk. Members identify themselves to check in, staff work a class roster, and visitors browse and book classes, areas, and plans without waiting for a staff member. The kiosk runs in a browser on a dedicated device and stays signed in to one gym.
+
+Each capability is a toggle you control per gym, so the kiosk shows only what that location needs.
+
+## What the kiosk does
+
+The kiosk home screen shows a tile for each enabled capability:
+
+- **Check in** - a member identifies themselves and the kiosk records their check-in.
+- **Classes** - browse the day's schedule and check in to a class.
+- **Plans** - browse plans and subscribe on-site.
+- **Products** - browse your product catalog.
+- **Area tiles** - one tile per area type you choose to show, leading to area booking.
+
+A member never signs in on the kiosk. Booking and subscription flows finish on the member's own phone by scanning a QR code the kiosk displays, which deep-links into their member portal.
+
+## Setting up a device
+
+The kiosk lives at your organization's kiosk address (for example, `your-org.kiosk.1club.ai`). When only one gym has the kiosk enabled, the address resolves to it automatically; with several enabled, the URL includes the gym's slug.
+
+<Steps>
+  <Step title="Enable the kiosk for a gym">
+    Go to **Settings > Member Apps > Kiosk App**
+    (`/settings/member-experience/kiosk`) and turn on **Enable Kiosk** for the
+    gym. Use **Copy link** to grab that gym's kiosk URL.
+  </Step>
+  <Step title="Open the URL on the device">
+    Open the kiosk URL in the device's browser. Chrome kiosk mode or iPad Guided
+    Access keep the device locked to the kiosk.
+  </Step>
+  <Step title="Sign in once">
+    Sign in with a staff account. Only users with admin-portal access for that
+    organization can set up a kiosk: admin, manager, front desk, instructor, or
+    the owner. The device stays signed in afterward.
+  </Step>
+  <Step title="Pick a gym if prompted">
+    When more than one gym has the kiosk enabled, choose the gym after signing
+    in. A single enabled gym skips the picker.
+  </Step>
+</Steps>
+
+To switch the device to a different gym later, long-press the logo on the kiosk to re-enter setup.
+
+<Note>
+  The person who signs in only provisions the device. Members and visitors use
+  the kiosk without any account of their own.
+</Note>
+
+## Member check-in
+
+From the **Check in** tile (or a class's check-in screen), a member identifies themselves. The kiosk previews what the check-in would use, shows a confirmation screen with the member's name and the entry it will record, and commits it only after staff or the member confirms. An abandoned confirmation clears itself after 30 seconds.
+
+### Identification methods
+
+Which methods appear depends on your [Access control](/settings/access-control) identification methods and the kiosk toggles below.
+
+| Method          | How it works                                                                                           | Enabled by                                           |
+| :-------------- | :----------------------------------------------------------------------------------------------------- | :--------------------------------------------------- |
+| **QR code**     | The kiosk camera or a connected scanner reads the member's QR code.                                    | Access control identification method **QR Code**     |
+| **Access card** | The member taps or scans a physical card.                                                              | Access control identification method **Access Card** |
+| **PIN code**    | The member enters the last 4 digits of their PIN on the on-screen keypad.                              | Access control identification method **PIN Code**    |
+| **Phone QR**    | The kiosk displays a static QR that the member scans with their phone to open their portal.            | Kiosk toggle **Enable check-in with QR**             |
+| **Search**      | Staff search by name or phone and pick the member.                                                     | Kiosk toggle **Enable search to check in**           |
+| **List**        | On a class check-in screen, staff see the class's booked, not-yet-checked-in attendees and tap a name. | Kiosk toggle **Enable class roster check-in**        |
+
+See [Access cards](/members/member-cards) for the QR, card, and PIN credentials members present.
+
+### What a check-in resolves to
+
+The kiosk mirrors the admin check-in rules and resolves the member to one of these entries:
+
+- **Booking** - the member has a confirmed booking whose check-in window is open at this gym.
+- **Membership** - no booking, but the member holds an eligible membership for general entry. If the plan limits sessions, the confirmation screen shows uses remaining and the visit decrements it.
+- **Free class walk-in** - the member walks in to a free class.
+- **Membership class walk-in** - the member walks in to a class covered by an eligible membership.
+
+If the member is already checked in for that booking or class, the kiosk shows a warning instead of recording a duplicate.
+
+### When the front desk is required
+
+Some cases cannot be completed unattended and the kiosk stops the member with a front-desk-required result. Staff handle these from the admin. This happens when:
+
+- The member has an active membership, but it has an unpaid balance, a scope that does not apply, or no uses left.
+- The only way in is a pay-per-visit (direct payment) or an [external program](/settings/external-programs), which needs operator validation.
+- A booking has an outstanding balance that must be paid first.
+
+For the full matrix of when a member gets in, what payment is enforced, and how walk-ins are handled, see [Check-in models](/reference/check-in-models).
+
+## Self-enrolling a credential
+
+When credential enrollment is enabled in [Access control](/settings/access-control), a member can register their own access card at the kiosk. The member first authenticates (for example by scanning their phone QR), then taps or scans the new card to enroll it. If enrollment is turned off, the kiosk tells the member it is not available.
+
+## Browsing and booking
+
+### Classes
+
+The **Classes** tile shows the schedule by day. A member taps a class to see its details, then starts check-in from there.
+
+### Areas and courts
+
+Each area type you choose to show appears as its own tile on the home screen. A member picks the area and time slot, reviews the booking summary, and scans the displayed QR code with their phone to complete the booking in their portal.
+
+### Plans
+
+The **Plans** tile lists the plans available at that gym with pricing and session details. A member taps a plan, reviews it, and scans the displayed QR code to subscribe from their phone.
+
+### Products
+
+The **Products** tile displays your product catalog, grouped by category with prices, for members to browse on-screen.
+
+## Kiosk settings
+
+Configure the kiosk per gym under **Settings > Member Apps > Kiosk App** (`/settings/member-experience/kiosk`). A live preview on the left reflects each change. Enable **Enable Kiosk** for a gym first to reveal the rest:
+
+| Setting                            | What it controls                                                                  |
+| :--------------------------------- | :-------------------------------------------------------------------------------- |
+| **Enable check-in on home screen** | Show the **Check in** tile. On by default.                                        |
+| **Enable check-in with QR**        | Show the static phone QR members scan to open their portal. Off by default.       |
+| **Enable search to check in**      | Let staff search by name or phone to check a member in. Off by default.           |
+| **Enable class roster check-in**   | Show the **List** of booked attendees on a class check-in screen. Off by default. |
+| **Show classes**                   | Show the **Classes** tile. On by default.                                         |
+| **Show plans**                     | Show the **Plans** tile. On by default.                                           |
+| **Show products**                  | Show the **Products** tile. Off by default.                                       |
+| **Area types to show**             | The area types that appear as home-screen tiles. Empty means none.                |
+| **Instructor types to show**       | The instructor types the kiosk surfaces. Empty means none.                        |
+| **Background image or video**      | Media shown full-screen behind the home screen, with a darkening overlay.         |
+
+<Note>
+  The QR, access card, and PIN identification tabs come from your [Access
+  control](/settings/access-control) settings, not from this page. A gym with
+  only PIN or card enabled still shows the **Check in** tile so staff can reach
+  the check-in screen.
+</Note>
+
+## Related
+
+- [Check-in models](/reference/check-in-models) - how members get in, and when payment is enforced
+- [Access control](/settings/access-control) - identification methods, check-in mode, and credential enrollment
+- [Access cards](/members/member-cards) - the QR codes, cards, and PINs members present at the kiosk
+- [Attendance](/members/attendance) - review the check-ins the kiosk records

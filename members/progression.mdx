@@ -1,0 +1,139 @@
+---
+title: Progression
+description: Track member belts, ranks, and skill levels with stripes, promotion history, and per-sport progression tracks for martial arts, BJJ, swimming, and any graded sport.
+---
+
+Progression tracks a member's rank in a graded sport - a BJJ belt, a karate kyu grade, a swim level, or any ladder your gym runs. Staff assign the rank; the member sees it read-only. Every promotion is recorded, so a member's belt history is a full timeline, not just a current value.
+
+Progression has three building blocks:
+
+- **Track** - one ladder for one sport (for example "Brazilian Jiu-Jitsu - Adult"). A track has a name, a sport, an optional description, and a maximum stripe count.
+- **Level** - a rung on the ladder (for example "White", "Blue", "Purple"). A level has a skill name, an optional sub-label, an optional belt color, and a position in the ladder.
+- **Stripes** - small increments earned at the current level, from 0 up to the track's maximum. Stripes model the tabs on a belt tip before the next full promotion.
+
+<Note>
+  Progression is staff-managed. Members cannot grade themselves, book a test, or
+  request a promotion. There is no member-facing exam or scheduling flow - a
+  member only ever views the rank an instructor assigned.
+</Note>
+
+## The track catalog
+
+Open **Settings > CRM > Progression** (`/settings/crm/progression`) to manage tracks. The page shows a card per track with its sport, level count, and an enable switch.
+
+There are two kinds of track:
+
+- **Global templates** - ready-made ladders 1club ships for common sports. They are shared across all gyms and are read-only. You turn them on or off with the card's switch but cannot edit their levels.
+- **Custom tracks** - tracks your organization creates and owns. They carry a **Custom** badge, are always active, and are fully editable.
+
+### Enabling a global template
+
+Flip the switch on a global template card to enable it for your gym. Once enabled, the track becomes available when assigning levels to members and appears in the members list filter and the progression report.
+
+Turning a global template off is blocked while any member is still assigned to it. Remove those assignments first, then disable the track.
+
+### Creating a custom track
+
+Click **Create track** to build your own ladder. The dialog asks for:
+
+- **Track name** - what the ladder is called.
+- **Sport** - picked from the sports list.
+- **Description** - optional context shown on the card.
+- **Max stripes** - the stripe cap for this track, 0 to 10. Set it to 0 for tracks that do not use stripes.
+
+Saving opens the levels editor so you can add rungs straight away.
+
+### Customizing a global template
+
+To adapt a shipped ladder, open a global template card and choose **Customize**. This forks the template into a custom, org-owned copy: it duplicates every level, disables the original global for your gym, and re-points any existing member assignments to the new copy. The forked track then behaves like any other custom track - edit its levels freely.
+
+<Info>
+  Customizing is one-directional. The fork is a snapshot of the template at that
+  moment; later changes to the shipped template do not flow into your copy.
+</Info>
+
+## Levels within a track
+
+Open a track card to manage its levels. Each level has:
+
+- **Skill** - the rung's main name (for example "Blue belt" or "Level 3").
+- **Level** - an optional sub-label shown after the skill (for example a specific degree or grade).
+- **Description** - optional notes about the rung.
+- **Color** - an optional hex color used to render the belt swatch throughout the product.
+- **Order** - levels are shown in ladder order; reorder them to match your grading sequence.
+
+You can only add, edit, reorder, or delete levels on custom tracks. Global template levels are read-only until you customize the track. Deleting a level is blocked while any member is currently assigned to it.
+
+<Tip>
+  Set a belt **color** on every level. The color drives the belt swatch shown on
+  the member list, the member profile, and the assignment dialog, so a
+  color-coded ladder reads at a glance.
+</Tip>
+
+## Assigning a level to a member
+
+Open a member profile and use the **Level** row in the info strip. The **Assign level** action opens the progression dialog, where you:
+
+<Steps>
+  <Step title="Pick a track">
+    Choose which ladder to grade on. When only one track is enabled, this step
+    is skipped automatically.
+  </Step>
+  <Step title="Pick a level">
+    Select the rung. The picker shows each level's belt color and sub-label.
+  </Step>
+  <Step title="Set stripes">
+    Choose how many stripes the member holds at this level. This control only
+    appears when the track's max stripes is greater than 0, and is capped at
+    that maximum.
+  </Step>
+  <Step title="Add notes">
+    Optionally record why the promotion was awarded. Notes are saved with the
+    entry.
+  </Step>
+</Steps>
+
+A member does not need a linked login to be graded - progression is assigned to the contact, so you can rank a walk-in or a child account.
+
+### Promotion history
+
+Every save appends a new entry to the member's timeline. Level changes, stripe-only bumps, and note edits all create their own row. The member's **current** rank on a track is simply the most recent entry for that track.
+
+The dialog lists the full history below the assign form, newest first, each row showing the date, track, belt swatch, level, and any notes. You can delete an individual history entry; when you do, the next-most-recent entry automatically becomes the current rank. Deleting history requires the same manage permission as assigning.
+
+## How members view their rank
+
+In the [member portal](/members/member-profiles), a member's profile shows a **Progression levels** section listing their current rank on each enabled track. Each card shows the track name, sport, the level, the level description, when it was assigned, and any notes staff attached.
+
+This view is read-only. Members see the rank you assigned and its history but cannot change it. The section only appears when the member is viewing a specific gym; on the wider marketplace it is hidden.
+
+## Filtering the member list by level
+
+The [member list](/members/member-list) surfaces progression in two places:
+
+- A **Progression** column shows each member's current belt swatch and level per enabled track.
+- The filter drawer has a **Level** section. Pick one or more levels to show only members currently at those ranks. When several tracks are enabled, the levels are grouped by track.
+
+The filter matches a member's **current** rank only, so a promoted member stops matching their old level.
+
+## The progression report
+
+Open **Analytics > Members > Progression report** (`/analytics/members/progression-report`) for a gym-wide view. The report has one tab per enabled track, with a badge showing how many members are on it.
+
+Each tab lists members with their current level and their full promotion history rendered as a chain of level chips from oldest to newest. Members are ordered so the most actively progressing appear first. Use the export button to download the report.
+
+## Permissions
+
+- Viewing tracks, levels, and a member's progression needs `members.read.club`.
+- Assigning levels, enabling or disabling a track, and deleting history need `members.manage.club`.
+- Creating, editing, or deleting custom tracks and their levels needs `settings.manage.organization`.
+
+See [Roles and permissions](/reference/roles-permissions) for how these map to roles.
+
+## Related
+
+- [Members overview](/members/overview) - where members and their profiles live.
+- [Member list](/members/member-list) - the contacts grid and its level filter.
+- [Member profiles](/members/member-profiles) - the profile info strip where levels are assigned.
+- [Member analytics](/analytics/members) - other member reports alongside the progression report.
+- [Roles and permissions](/reference/roles-permissions) - who can view versus manage progression.

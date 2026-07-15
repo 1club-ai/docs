@@ -1,0 +1,114 @@
+---
+title: Point of sale
+description: Ring up memberships, passes, bookings, packages, and retail products in person at the front desk, take payment, and check members in - all from the POS register.
+---
+
+The point of sale (POS) is the in-person register your staff use at the front desk. From one screen you can sell a membership, a class booking, a day pass, a retail product, or a bundled package, take payment, and check the member in - in a single order.
+
+The POS is a thin, fast way to build an [order](/pos/orders) and settle it. Everything it creates (bookings, memberships, product sales, transactions, and payments) lands in the same records as the rest of 1Club, so a sale rung up at the desk shows up in [Transactions](/billing/transactions), [Payments](/billing/payments), and on the member's profile exactly as it would from any other surface.
+
+## Opening the register
+
+Go to **POS** in the main menu. The URL is `/pos`.
+
+The POS only appears when it is turned on for your organization. If you do not see it, an admin can enable it under **Settings > Operations > POS** (see [POS settings](#pos-settings) below).
+
+## The register layout
+
+The register has two panes:
+
+- **Catalog** (main area) - a tabbed grid of everything you can sell.
+- **Order summary** (right sidebar) - the current cart, the member it is for, running totals, and the action buttons.
+
+### Catalog tabs
+
+The catalog is split into tabs so you can find what you are selling quickly:
+
+- **Products** - retail products, grouped by [category](/pos/products).
+- **Passes** - one-time plans (day passes, single-entry passes).
+- **Memberships** - recurring plans.
+- **Classes** - today's classes.
+- **Events** - live, bookable [events](/operations/events); events with ticket tiers open a menu to pick a tier.
+- **Areas** - bookable areas, priced per hour.
+- **Instructors** - bookable instructors, priced per hour.
+- **Packages** - fixed-price [packages](/billing/packages) that bundle plans and products.
+
+Click any card to add it to the order. Products, passes, packages, and event tickets can be added more than once and show a quantity stepper in the cart.
+
+### Building the order
+
+Each line in the order summary can be adjusted before you take payment:
+
+- **Quantity** - use the stepper on products, passes, packages, and event tickets.
+- **Membership start date** - set per membership line. If the plan has a signup fee, it shows as its own sub-line.
+- **Booking date and time** - area and instructor bookings default to the next full hour; adjust with the date and time picker. Class and event bookings inherit their time from the class or event.
+- **Entrance method** - every booking line needs one: pay directly, use one of the member's eligible memberships, or use an external program. The price updates to match the method you pick (a membership entry resolves to zero, direct payment uses the resource price).
+- **Notes** - add a per-product note (for example a preparation instruction), and an order-level note for the whole ticket (for example kitchen instructions or a buzzer number).
+
+The sidebar shows a live **subtotal**, **tax**, and **total**, recalculated on the server as you change the cart.
+
+### The member
+
+Use the contact selector at the top of the sidebar to attach the order to a member, or click the add button to create a new contact without leaving the register.
+
+A member is required when the cart contains a booking, a membership, or a package (packages can deconstruct into memberships). Product-only orders can be completed without a member attached.
+
+## Completing an order
+
+Click **Complete** to open the confirmation dialog, then confirm. Completing an order runs three steps in sequence:
+
+1. **Create and execute the order** - the line items become real bookings, memberships, and product transactions.
+2. **Take payment** - a payment is recorded against the generated transactions using the payment method you selected.
+3. **Check in** (optional) - when "check in on complete" is on, each booking created by the order is checked in immediately. This is on by default, since the whole party is usually standing at the desk.
+
+### Payment methods
+
+The payment method selector appears whenever the order has an amount left to pay. Which methods are offered depends on what your organization has enabled under [Payment methods](/settings/payment-methods):
+
+- **Cash and other manual methods** - recorded by the operator at the desk.
+- **Member wallet credit** - draws down the member's wallet balance.
+- **Card via Stripe** - charged online through Stripe.
+- **Card on a terminal** - card tenders settled on a connected payment terminal (for example myPOS).
+
+If a promotion brings the payable total to zero (for example a 100%-off pass code), the order completes without asking for a payment method.
+
+### Applying a promotion
+
+When the cart has a booking or membership line and a member is selected, you can apply a [promotion](/marketing/promotions) code in the confirmation dialog. The discount is applied to a single eligible line and recorded as a discount line on the order.
+
+### Saving for later
+
+You do not have to finish an order in one go:
+
+- **Save and close** stores the order as a **draft** you can resume later.
+- If you owe money but have not chosen a payment method, completing instead saves the order as a draft.
+- **Discard** removes the current order.
+
+The **Orders** button above the catalog lists your in-progress drafts. Pick one to load it back into the register, or open **All orders** to jump to the full [Orders](/pos/orders) list.
+
+## POS settings
+
+POS is a per-organization feature you turn on and off.
+
+Go to **Settings > Operations > POS** and toggle it on. When off, the **POS** menu item is hidden and the register is unavailable.
+
+Turning POS on or off requires organization settings permission. Viewing the setting requires read access to settings.
+
+## Who can use the POS
+
+The POS is permission-gated, not role-gated. Staff need billing permissions for the location they are selling at:
+
+- Reading the register and its catalog uses read access to billing.
+- Creating, completing, and cancelling orders uses create access to billing.
+
+Front-desk staff have these permissions by default. See [Roles and permissions](/reference/roles-permissions) for the full model.
+
+## Related
+
+- [Orders](/pos/orders) - the records the POS creates, and how they are settled.
+- [Products](/pos/products) - the retail catalog the Products tab draws from.
+- [Packages](/billing/packages) - fixed-price bundles sold on the POS.
+- [Plans](/billing/plans) - the membership and pass templates behind the Memberships and Passes tabs.
+- [Payments](/billing/payments) - where POS settlements are recorded.
+- [Payment methods](/settings/payment-methods) - which tenders the POS can accept.
+- [Transactions](/billing/transactions) - the obligations a completed order generates.

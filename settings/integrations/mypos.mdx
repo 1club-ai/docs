@@ -1,11 +1,21 @@
 ---
 title: myPOS
-description: Accept card payments through myPOS hosted checkout, with sandbox and live modes
+description: Accept card payments through myPOS hosted checkout, with a shared sandbox test mode and a live mode backed by your own myPOS Checkout Store
+keywords: [mypos, hosted checkout, payment provider, configuration pack, checkout store, payment link, test mode, live mode, ipn]
 ---
 
 myPOS is a card payment provider you can use alongside or instead of Stripe. Customers are redirected to myPOS's hosted checkout page to enter their card details, then bounced back to 1Club once the payment completes. Card data never touches 1Club servers - all processing happens on myPOS's PCI-certified infrastructure.
 
 You can try myPOS end-to-end in **Test** mode against a shared sandbox without any credentials, then switch to **Live** mode with your own myPOS Checkout Store when you are ready to take real money.
+
+## Overview
+
+- Hosted-checkout payments: customers pay on myPOS's page and return to 1Club, so no card data touches your systems.
+- Two modes: a shared **Test** sandbox (no credentials) and a **Live** mode backed by your own myPOS Checkout Store.
+- Two ways to supply live credentials: a single **Configuration Pack** (recommended) or five values entered by hand.
+- **Validate configuration** runs a local check of your stored credentials; a real test payment is the true proof they work.
+- Payment status returns automatically through a signed myPOS notification (IPN), settling linked transactions and bookings.
+- Send a member a **myPOS payment link** for any outstanding, payable transaction.
 
 ## Before you start
 
@@ -100,11 +110,11 @@ The **Capabilities** section controls which payment surfaces the integration ser
 
 For an outstanding transaction, you can send the member a link to pay through myPOS instead of charging a saved card.
 
-1. Open the transaction from **Billing → Transactions**.
+1. Open the transaction from **Revenue → Transactions**.
 2. Choose **Send myPOS payment link**. This is available only while the transaction is still payable (pending, overdue, or partially paid).
 3. Review the amount and recipient, add an optional message, and send.
 
-The member receives an email with a link that opens myPOS hosted checkout for the exact amount due. Each link is valid for **7 days**. Sending payment links requires the **billing.manage** permission.
+The member receives an email with a link that opens myPOS hosted checkout for the exact amount due. Each link is valid for **7 days**. Sending payment links requires the **billing.manage.organization** permission.
 
 ## What syncs
 
@@ -126,3 +136,25 @@ Click **Deactivate** on the myPOS page and confirm. This removes the integration
 - **Customers see a signature error on the checkout page** - the public certificate registered with myPOS does not match the private key on file. Regenerate the key pair in myPOS, download the new public certificate from the Integration tab, and paste the new private key and certificate here.
 - **Payment succeeded on myPOS but the transaction stays unpaid in 1Club** - the IPN webhook did not reach 1Club. Confirm the notification URL is allowed in your myPOS store settings, then re-trigger the notification from myPOS.
 - **Live payments fail but test mode works** - double-check you are in **Live** mode and that you entered live credentials (a Configuration Pack from your real store, not the sandbox).
+
+## Worked examples
+
+**Squash club that already banks with myPOS.** A racket-sports club with an existing myPOS merchant account installs myPOS, opens its Checkout Store's **Easy Setup** screen, generates a **Configuration Pack**, and pastes it into 1Club. It validates the configuration, saves, then runs one real court booking to confirm hosted checkout settles the transaction. No Stripe account needed.
+
+**Boxing gym collecting an overdue membership fee.** A martial-arts gym has a member whose card on file was declined. Instead of chasing them at the front desk, staff open the overdue transaction under **Revenue → Transactions**, choose **Send myPOS payment link**, and the member pays on their own phone within the 7-day window. The IPN settles the transaction automatically.
+
+**Yoga studio rehearsing before launch.** A Pilates/Yoga studio without myPOS credentials yet installs myPOS in **Test** mode, walks through the full checkout with myPOS test cards, and confirms receipts and booking confirmations look right. When its myPOS store is ready it switches to **Live** and pastes its real Configuration Pack.
+
+## Tips & best practices
+
+- Prefer the **Configuration Pack** over manual entry. It bundles all five credentials as one Base64 string, so there is nothing to mistype.
+- Remember that **Validate configuration** is a local check only - it cannot confirm myPOS recognizes your store. Always follow it with a real test payment.
+- Leave the masked private key and certificate fields blank when editing later. Only paste a value when you are deliberately replacing it.
+- Keep the notification (IPN) URL allowed in your myPOS store settings, otherwise payments succeed on myPOS but never settle in 1Club.
+
+## Related
+
+- [Integrations](/settings/integrations) - the full integration catalog and how installs work.
+- [Stripe](/settings/integrations/stripe) - the alternative card payment provider, with digital wallets and Stripe Connect.
+- [Transactions](/billing/transactions) - where payable transactions live and where you send a payment link.
+- [Payments](/billing/payments) - the payment records myPOS settles.

@@ -1,11 +1,22 @@
 ---
 title: "Areas"
-description: "Configure the physical spaces members book - courts, rooms, fields - with operating hours, pricing, and amenities."
+description: "Configure the physical spaces members book - courts, rooms, fields - with area types, operating hours, pricing, attributes, and schedule colors."
+keywords: ["area", "court", "room", "field", "area type", "attributes", "surface", "operating hours", "price per hour", "padel court", "tennis court"]
 ---
 
-Areas are the bookable physical spaces in your gym: tennis courts, fitness rooms, soccer fields, studios, pools. Each area belongs to one gym, has an area type for grouping, an hourly price, operating hours, amenities, and a color used on the schedule.
+Areas are the bookable physical spaces in your gym: tennis and padel courts, fitness rooms, soccer fields, studios, pools, and climbing walls. Each area belongs to one gym, has an area type for grouping, an hourly price, operating hours, a set of attributes, and a color used on the schedule.
 
-You manage areas under **Operations > Areas** (also reachable via the **Resources** route in the admin).
+You manage areas under **Resources > Areas** in the admin.
+
+## Overview
+
+- **Group by gym and area type** - Areas are organized per gym, and each area is tagged with an area type (Court, Room, Field, Studio) that carries its own sports and default player count.
+- **Price per hour** - Seed the booking price from a per-hour rate, multiplied by the booked duration.
+- **Concurrency** - Model a multi-court resource with a max concurrent bookings count.
+- **Attributes** - Tag intrinsic, sport-aware characteristics (indoor/outdoor, surface, lighting, climate, sport-specific features) that describe what the area *is*.
+- **Operating hours** - Set per-day open and close times, or fall back to the gym's default hours.
+- **Visibility and status** - Control who sees the area and whether it appears on the schedule.
+- **Schedule color** - Choose the color the area's blocks use on the calendar.
 
 ## The list page
 
@@ -18,26 +29,40 @@ Click **Add** in a gym section header to create an area scoped to that gym, or o
 The area dialog asks for:
 
 - **Name** and **Gym** - which gym the area belongs to.
-- **Area type** - the grouping (Court, Room, Field, etc.). Area types are managed under **Settings > Area types** and carry their own sort order.
-- **Description** and **Images** - shown on the public booking pages.
+- **Area type** - the grouping (Court, Room, Field, Studio, etc.). Area types are managed under **Settings > Area types**, carry their own sort order, and define the **sports** played in that type of space plus a **default max players**. The chosen area type's sports also decide which attributes are offered (see below).
+- **Description** and **Images** (up to 5) - shown on the public booking pages.
 - **Color** - the color used for the area's blocks on the schedule.
 - **Price per hour** - in your organization's currency. Used when a booking is created against this area; the booking duration multiplied by this rate seeds the line total before discounts.
-- **Max concurrent bookings** - how many simultaneous bookings the area accepts (e.g. a 4-court padel area might be set to 4 if you model it as a single resource).
+- **Max concurrent bookings** - how many simultaneous bookings the area accepts (e.g. a 4-court padel block modeled as a single resource might be set to 4). Minimum 1.
+- **Status** - **Active**, **Inactive**, or **Maintenance**. The schedule page filters its area query to active areas, so inactive and maintenance areas don't appear on the calendar.
 - **Visibility** - **Public** (visible to anyone), **Member only** (visible after sign-in), or **Private** (admin-only). The visibility chip appears on the detail page and the row.
-- **Status** - **Active**, **Maintenance**, or **Inactive**. The schedule page filters its area query to `status=active`, so non-active areas don't appear on the calendar.
-- **Amenities** - multi-select from the organization's amenity list.
-- **Operating hours** - per-day open/close times, with an option to fall back to the gym's default hours.
+- **Attributes** - a multi-select of the area's intrinsic characteristics (see below).
+- **Operating hours** - per-day open and close times, with an option to fall back to the gym's default hours.
+
+### Area attributes
+
+Attributes describe what an area physically *is* - separate from club-level amenities, which describe services the whole club offers (showers, parking, cafe). Attributes are set per area, so Court 1 can be floodlit while Court 2 is not. They power marketplace filtering and help members pick the right space.
+
+The catalog is platform-curated and grouped into five categories:
+
+- **Environment** - Indoor, Outdoor, Covered, Semi-covered.
+- **Lighting** - Floodlights, Natural light.
+- **Climate** - Heated, Air-conditioned, Climate controlled.
+- **Surface** - sport-specific, e.g. Clay, Grass, Acrylic hard court, Carpet, Artificial grass (racket); Natural turf, Artificial turf, Sport court, Sand (team); Rubber flooring (fitness); Sprung floor, Marley floor (studio and dance); Tatami (martial arts).
+- **Feature** - sport-specific, e.g. Panoramic glass (padel), Lifting platform and Functional rig (fitness), Ballet barre (dance), Boxing ring and Cage (martial arts), Lap lanes (water), Bouldering wall, Top rope, Lead wall, Auto belay (climbing).
+
+The picker is **sport-aware**. Universal attributes (environment, lighting, climate) always show. Surface and feature attributes appear only when they match the area type's sports - so a padel court offers Artificial grass and Panoramic glass, a dojo offers Tatami and Cage, and a climbing area offers Bouldering wall and Auto belay. If you haven't picked an area type yet, all attributes show until you do. An attribute you've already selected is never hidden, even if you later change the area type.
 
 ## The area detail page
 
 Click an area row to open its detail page. The header shows the name with action buttons to toggle visibility (cycles Private to Member only to Public), edit, and delete. The body has two cards:
 
-- **Information** - area type, price per hour, status chip, color swatch, visibility chip, description, and amenities.
+- **Information** - area type, price per hour, status chip, color swatch, visibility chip, description, and attributes.
 - **Operating hours** - the weekly schedule, read-only.
 
 If the area has images, a sortable image gallery sits above the information card. Drag thumbnails to reorder.
 
-Deleting an area is destructive: it removes the area, all its bookings, and the invoices linked to those bookings. The confirmation dialog spells this out before you commit.
+Deleting an area is destructive: it removes the area, all its bookings, and the invoices linked to those bookings. The confirmation dialog spells this out before you commit. Prefer setting an area to **Inactive** if you only want to stop new bookings.
 
 ## How areas show up on the schedule
 
@@ -45,8 +70,63 @@ The [Schedule](/operations/schedule) page reads active areas and renders one col
 
 The booking dialog uses the area's price per hour to seed the price breakdown. A [booking policy](/operations/booking-policies) scoped by area type can override payment timing or refund rules for a subset of areas.
 
+## Worked examples
+
+### Padel club with indoor and outdoor courts
+
+You run six padel courts and want members to filter by conditions.
+
+- Create an **Area type** called _Padel court_ under **Settings > Area types**, with the sport set to padel.
+- Add one area per court. On the indoor courts set attributes **Indoor**, **Panoramic glass**, **Artificial grass**, **Climate controlled**. On the outdoor courts set **Outdoor**, **Floodlights**, **Artificial grass**.
+- Set **Price per hour** per court, and give indoor and outdoor courts different colors so the schedule reads at a glance.
+- Pair with a [booking policy](/operations/booking-policies) scoped to the _Padel court_ area type for lead times and cancellation windows.
+
+### Multi-sport racket center
+
+You offer tennis, padel, and squash.
+
+- Create three area types (_Tennis court_, _Padel court_, _Squash court_) so the attribute picker offers the right surfaces for each (Clay and Acrylic hard court for tennis, Artificial grass for padel).
+- Reorder areas within each gym so your show-court or premium courts appear first in the booking flow.
+
+### Martial arts dojo
+
+- Create a _Mat area_ (sport: jiu-jitsu, muay-thai) and set attributes **Indoor**, **Tatami**, **Mats**, **Air-conditioned**.
+- Add a _Ring_ area for boxing with **Boxing ring**, or a _Cage_ area for MMA with **Cage** and **Padded walls**.
+
+### Climbing gym
+
+- Create a _Bouldering_ area with **Bouldering wall** and **Training board**, and a _Roped_ area with **Top rope**, **Lead wall**, and **Auto belay**.
+- Use **Max concurrent bookings** to cap how many climbers can book a wall session at once.
+
+## Tips & best practices
+
+- **Set the area type first.** It scopes the attribute picker to relevant surfaces and features and seeds the default player count, so create your area types before your areas.
+- **Attributes are for members, not billing.** They drive filtering and discovery; price and payment live on the area and the [booking policy](/operations/booking-policies).
+- **Prefer Inactive over Delete.** Deleting removes bookings and invoices. Use **Inactive** or **Maintenance** to take a court offline temporarily.
+- **Give each area a distinct color** so the schedule is readable when several areas run side by side.
+- **Model multi-court blocks deliberately.** Either create one area per court (best for per-court pricing and attributes) or one area with **Max concurrent bookings** set to the court count (simpler, but no per-court detail).
+
+## Troubleshooting
+
+**Issue**: An area doesn't appear on the schedule.
+
+**Solution**: The schedule only shows **Active** areas. Check the area's status is Active, not Inactive or Maintenance. Also confirm its area type isn't hidden under **Settings > Operations > Schedule display**, or toggle it back on in the resource filter panel.
+
+**Issue**: The attribute I want isn't in the list.
+
+**Solution**: The picker filters to attributes relevant to the area type's sports. Set or change the **Area type** so its sports match (e.g. pick a racket sport to see Panoramic glass and Artificial grass). Universal attributes (Indoor, Floodlights, Heated) always show.
+
+**Issue**: I can't delete an area.
+
+**Solution**: Deleting an area also deletes its bookings and their invoices, so the confirmation is deliberate. If you only want to stop new bookings, set the area to **Inactive** instead.
+
+**Issue**: My reorder didn't stick.
+
+**Solution**: If another admin reordered the same gym's areas at the same time, the later save is rejected and the list reloads to the latest order. Reapply your order on the refreshed list.
+
 ## Related
 
 - [Schedule](/operations/schedule) - Where bookings against areas show up.
 - [Bookings](/operations/bookings) - Day-to-day reservation management.
 - [Booking policies](/operations/booking-policies) - Rules that apply per area type.
+- [Classes](/operations/classes) - Group activities held in an area.

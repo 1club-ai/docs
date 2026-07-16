@@ -1,73 +1,196 @@
 ---
 title: Pipeline
-description: Kanban view of your deals - drag and drop between stages, click a column to add a deal there.
+description: Work your sales deals on a Kanban board - drag cards between stages, add deals per column, and configure your own stages, sources, and custom deal fields under Settings > Deals.
+keywords: [sales pipeline, deals, CRM, kanban board, deal stages, deal sources, custom deal fields, close lost reason, win probability]
 ---
 
-The **Marketing > Pipeline** page shows every open deal as a card on a Kanban board, with one column per stage. It's the operational view of your CRM - the same records appear on the [Deals](/marketing/deals) page as a sortable table.
+The **Marketing > Pipeline** page is the operational view of your CRM. Every deal (a potential sale tied to a contact) appears as a card in a Kanban column, one column per stage. You drag cards from stage to stage as an opportunity moves toward won or lost, and the board totals your open value as you go.
 
-Use Pipeline when you want to work your opportunities. Use Deals when you want to bulk-edit or sort by a column.
+Pipeline and [Deals](/marketing/deals) are two views of the same records, toggled at the top of the page. Use **Pipeline** when you want to work opportunities one by one. Use **Deals** when you want a sortable, bulk-editable table.
+
+## Overview
+
+The board gives you:
+
+- **A Kanban column per stage**, colored with the stage color you set under **Settings > Deals**.
+- **Live totals** - deal count and total value per column, plus a summary row across the whole pipeline.
+- **Drag-and-drop stage moves**, with a forced close-lost reason when you drop into a lost stage.
+- **Quick add** - click a column to add a deal already in that stage.
+- **Per-card actions** - view the contact, edit the deal, or delete it.
+- **Configurable pipeline** - your own stages, sources, and custom deal fields, set under **Settings > Deals**.
+
+## Switching between Pipeline and Deals
+
+At the top of the page a toggle switches between **Pipeline** (the board) and **Deals** (the table). Your choice is remembered per browser, so you land on the same view next time. The **Add deal** button in the top right is available in both views.
 
 ## What's on the board
 
-At the top, you see a summary: total deal count and total pipeline value (the sum of every deal's value, formatted in your org currency).
+A summary row at the top shows four cards:
 
-Below that, each stage is a column with:
+- **Total deals** - the number of open deals on the board.
+- **Total value** - the raw sum of every deal's value, in your org currency.
+- **Avg probability** - the average win probability across all deals.
+- **This month** - how many deals were created in the current calendar month.
 
-- The stage **name** in the stage color (set under **Settings > Deals > Stages**).
+Below the summary, each stage is a column with:
+
+- The stage **name** in the stage color.
 - A subtitle showing the **deal count** and **total value** in that stage.
 - All deals currently in that stage, as draggable cards.
 
-Each deal card shows the contact's name, the source chip (if any), the deal value, win probability, expected close date, and the assigned user. If a deal is in a lost stage, a red box shows the recorded lost reason.
+Each deal card shows the contact's name, the source chip (if a source is set, in the source color), the deal value, the win probability, the expected close date, and the assigned user. If a deal sits in a lost stage, a red box shows the recorded lost reason.
 
 ## Adding a deal
 
 Two ways:
 
-- **Click any stage column** (anywhere except a deal card) to open the **Add deal** dialog with that stage preselected.
+- **Click any stage column** (anywhere except on a deal card) to open the **Add deal** dialog with that stage preselected.
 - **Click Add deal** in the top right and pick a stage from the dropdown.
 
-In the dialog you set the contact, value, probability, expected close date, source, and assignee, plus any custom deal fields configured under settings.
+In the dialog you set:
+
+- **Contact** - toggle between **Select existing** (pick a contact) and **Create** (fill in a new contact inline; it is saved as a lead). A deal always belongs to a contact.
+- **Stage** - which column the deal starts in. Lost and won stages are tagged in the dropdown.
+- **Source** - optional; where the lead came from. The list comes from **Settings > Deals > Sources**.
+- **Value** - the deal amount, entered in your org currency.
+- **Probability (%)** - win likelihood. This auto-fills from the stage's default probability whenever you change the stage, but you can override it.
+- **Expected close date** - drives forecasting on the [Marketing analytics](/analytics/marketing) dashboard.
+- **Assigned to** - the admin user who owns the deal. Defaults to you.
+- **Notes** - free text.
+- **Custom fields** - any extra fields configured under **Settings > Deals > Fields** appear in their own section.
 
 ## Moving deals between stages
 
 Two ways:
 
 - **Drag and drop** the card from one column to another. A spinner appears on the card while the move is in flight.
-- **Click the card** to open it and change the stage in the deal dialog.
+- **Click the card** to open it and change the **Stage** in the deal dialog.
 
-When you drop a deal into a stage of type **lost**, a dialog appears asking for a close-lost reason. The deal won't move until you provide one. This is enforced so your "why did we lose this?" reporting stays usable.
+When you drop a deal into a stage of type **lost**, a dialog appears asking for a close-lost reason. The deal will not move until you provide one, so your "why did we lose this?" reporting stays usable. There is no equivalent prompt for won stages - moving a deal into a won stage is treated as a success without further input.
 
-There's no equivalent prompt for the won stages - moving a deal into a won stage is treated as a success without further input.
+Changing the stage also resets the deal's probability to that stage's default probability (you can edit it again afterward).
 
 ## Card actions
 
 Click the three-dot menu on any card for **View**, **Edit**, or **Delete**:
 
-- **View** opens the contact's detail page with the **Deals** tab selected, so you can see all deals for that contact in context.
-- **Edit** opens the same dialog as creating a deal, but with the existing values.
-- **Delete** permanently removes the deal after confirmation.
+- **View** opens the contact's profile with the **Deals** tab selected, so you can see all deals for that contact in context.
+- **Edit** opens the same dialog as creating a deal, prefilled with the existing values.
+- **Delete** permanently removes the deal after a confirmation prompt.
 
-## Configuring stages and sources
+## Configuring stages, sources, and fields
 
-The stage columns you see come from your **Settings > Deals > Stages** configuration. There you can:
+Everything the board displays comes from **Settings > Deals**, which has three tabs: **Stages**, **Sources**, and **Fields**. Editing these requires the `marketing.manage.club` permission; read-only staff can view the board but not change its configuration.
 
-- **Rename, recolor, and reorder** stages.
-- **Mark a stage's type** as open, won, or lost. The "lost" type is what triggers the close-lost reason prompt on drag.
-- **Add or remove** stages.
+### Stages
 
-Sources (the colored chip on the card) come from **Settings > Deals > Sources** - configure the list of sources your business actually uses (website, referral, walk-in, paid ads, etc.) so reporting matches reality.
+The **Stages** tab lists your stages as a sortable list. Each row shows a color dot, the stage name, and chips for its type, its default probability, and a **Default** marker if it is the default stage for new deals. Drag a row to reorder; the new order is saved and becomes the left-to-right column order on the board.
 
-Custom deal fields - anything beyond name, value, probability, source, and close date - are also configured under **Settings > Deals**.
+Click **Add** to create a stage, or a row's edit action to change one. The stage dialog has:
+
+- **Name** - the column label.
+- **Color** - the column and card accent color (color picker).
+- **Type** - **Open**, **Won**, or **Lost**. The **Lost** type is what triggers the close-lost reason prompt on the board. **Won** and **Lost** are your terminal outcomes.
+- **Default probability** - 0 to 100. New deals dropped or created in this stage start at this probability.
+- **Default stage** - marks this as the stage new deals default to.
+- **Active** - whether the stage is in use.
+
+Use **Reset to default** (top right, with a confirmation) to restore the standard six-stage pipeline. Reset matches your existing stages by name, keeps them where it can, and moves any deals from removed stages onto the nearest default stage of the same type (open, won, or lost) so no deal is orphaned.
+
+The default set is:
+
+| Stage | Type | Default probability |
+| --- | --- | --- |
+| New Deal | Open | 10% |
+| Qualified | Open | 50% |
+| Negotiation | Open | 70% |
+| Proposal Sent | Open | 90% |
+| Closed Won | Won | 100% |
+| Closed Lost | Lost | 0% |
+
+### Sources
+
+The **Sources** tab controls the source chip on each card. Configure the list of sources your business actually uses (website, referral, walk-in, paid ads, and so on) so reporting matches reality. Each source has a **Name**, an optional **Description**, a **Color**, a **Default source** toggle, and an **Active** toggle. Sources are sortable, and **Reset to default** restores the standard list.
+
+### Fields (custom deal fields)
+
+The **Fields** tab adds custom fields beyond the built-in name, value, probability, source, and close date. They appear in a **Custom fields** section of the deal dialog. Each field has:
+
+- **Name** - the internal field key.
+- **Label** - what staff see on the form.
+- **Type** - text, textarea, number, email, phone, date, select, multiselect, checkbox, or radio.
+- **Placeholder** and **Default value** - optional input hints.
+- **Required** - whether the field must be filled.
+- **Active** - whether the field is in use.
+
+Fields are sortable, which sets the order they appear in the dialog.
 
 ## Forecasting
 
-The board doesn't run a separate forecast model. Pipeline value (total or per stage) is the raw sum of deal values. If you want probability-weighted forecasts, that's part of the [Marketing analytics](/analytics/marketing) dashboard.
+The board does not run a separate forecast model. Pipeline value (total or per stage) is the raw sum of deal values. For probability-weighted forecasts, conversion rates, and won/lost trends, use the [Marketing analytics](/analytics/marketing) dashboard, which reads the expected close dates and probabilities you set here.
 
-## Tips
+## Worked examples
 
-- **Keep stages few**. Five to seven columns is usually enough; more than ten and the board becomes hard to read.
-- **Use the source chip** to spot where your wins come from at a glance.
-- **Set expected close dates** on every deal. They drive the forecasting calculations in the analytics dashboard.
+### Padel club membership pipeline
+
+A padel club runs trials and converts them into annual memberships. Set up **Settings > Deals** like this:
+
+- **Stages** (rename or add from the defaults):
+  - Enquiry (Open, 10%) - default stage
+  - Trial booked (Open, 40%)
+  - Trial played (Open, 70%)
+  - Membership offered (Open, 90%)
+  - Member (Won, 100%)
+  - Not converted (Lost, 0%)
+- **Sources**: Website, Walk-in, Google, Instagram, Member referral.
+- **Custom fields**: "Skill level" (select: beginner / intermediate / advanced) and "Preferred play time" (select: mornings / evenings / weekends).
+
+Day to day, front desk creates a deal the moment someone asks about a trial, sets the source and value (the annual membership price), and drags the card right as the prospect books, plays, and signs up. When a prospect goes cold, drag the card to **Not converted** and record why (for example "price", "moved away", "chose competitor") so the club can spot patterns.
+
+### Personal-training package pipeline
+
+A gym selling multi-session PT packages can keep it lean: **Lead** (Open) -> **Consultation booked** (Open) -> **Package sold** (Won) / **Declined** (Lost). Add a "Goal" text custom field so the assigned trainer sees the prospect's objective on the card, and set each deal's value to the package price for a live view of PT revenue in the pipeline.
+
+## Tips & best practices
+
+- **Keep stages few.** Five to seven columns is usually enough; past ten, the board gets hard to read.
+- **Set realistic default probabilities.** They pre-fill each deal and feed the analytics forecast, so a stage's default should reflect how often deals at that point actually close.
+- **Always set an expected close date.** It drives the forecasting on the analytics dashboard.
+- **Use sources consistently.** The source chip is only useful for spotting where wins come from if staff pick one every time.
+- **Record honest lost reasons.** The close-lost prompt exists so you can analyze why deals slip; vague reasons make the report useless.
+- **Assign every deal.** A clear owner keeps opportunities from stalling between stages.
+
+## Troubleshooting
+
+**Issue**: The board shows "No deal stages found."
+
+**Cause**: Your organization has no stages configured.
+
+**Fix**: Open **Settings > Deals > Stages** and click **Reset to default** to create the standard six-stage pipeline, or add your own stages.
+
+**Issue**: A deal will not move when I drop it into a lost column.
+
+**Cause**: Lost stages require a close-lost reason.
+
+**Fix**: Enter a reason in the dialog that appears. The move completes only once a reason is provided.
+
+**Issue**: I changed a deal's stage and its probability changed on its own.
+
+**Cause**: Changing the stage resets the probability to that stage's default probability.
+
+**Fix**: This is expected. Edit the probability again after choosing the stage if you need a different value.
+
+**Issue**: I cannot delete a stage.
+
+**Cause**: The stage cannot be removed in its current state (for example it still has deals assigned to it).
+
+**Fix**: Move or reassign the deals off the stage first, or use **Reset to default**, which reassigns deals from removed stages automatically.
+
+**Issue**: A source I created does not appear on the deal dialog.
+
+**Cause**: The source is inactive, or it was reordered stale by a concurrent edit.
+
+**Fix**: Confirm the source is set to **Active** under **Settings > Deals > Sources**, and reload the page so the source list is fresh.
 
 ## Related
 

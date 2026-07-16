@@ -1,0 +1,216 @@
+---
+title: "Pricing rules"
+description: "Configure dynamic pricing for bookings - peak and off-peak surcharges, weekend premiums, and conditional discounts scoped to areas, instructors, and class types, with percentage or fixed adjustments applied to the calculated booking price."
+keywords: ["pricing rules", "dynamic pricing", "peak pricing", "off-peak discount", "surcharge", "pricing sheet", "price per hour", "padel peak hours", "weekend premium", "conditional pricing", "percentage adjustment", "fixed amount"]
+---
+
+Pricing rules let you adjust the price of a booking based on when it happens and what it is for. Each rule defines an adjustment (a percentage or a fixed amount), a scope (which areas, instructors, or class types it applies to), and a set of conditions (time of day, day of week, booking timing, demand, duration, date range, or plan). When a booking's context matches a rule, that rule's adjustment is applied on top of the resource's base price.
+
+You manage pricing rules on the **Pricing rules** page. Open it from the **Resources > Areas** header using the **Pricing rules** button (it opens the Settings page at `/settings/billing/pricing-rules`).
+
+## Overview
+
+- **Percentage or fixed adjustments** - Raise or lower the price by a percentage (-100% to +100%) or by a fixed amount in your currency (negative for a discount).
+- **Scope by resource** - Target specific **Areas**, **Instructors**, or **Class types**, or leave a scope open to apply it to every resource of that type.
+- **Conditional matching** - Attach conditions so a rule only fires in a time window, on certain days, for bookings made far enough ahead, above a duration threshold, in a date range, or for members on specific plans.
+- **Stackable rules** - Create multiple rules; every rule that matches a booking is applied, so you can layer a weekend premium on top of a peak-hour surcharge.
+- **Time-window splitting** - When a rule uses a time range, the booking is split at the window boundaries so only the portion inside the window is adjusted.
+- **Pricing sheets** - The same engine prices every slot across a day, which is what powers the per-slot prices shown on the booking calendar and in booking search.
+- **Base price is untouched** - Rules adjust the resource's base price (area price per hour, instructor hourly rate, or class price); they do not replace it.
+
+## The list page
+
+The page opens with an info banner explaining dynamic pricing, followed by a table of your rules with these columns:
+
+- **Name** - the rule name.
+- **Adjustment** - the percentage or fixed value, signed. Increases show in one color and discounts (negative values) in another so you can read the intent at a glance.
+- **Scope** - a summary of the scoped resources, for example _All_ when unscoped, or _Areas (3)_ when three areas are targeted.
+- **Conditions** - a count of attached conditions, or _No conditions_.
+- **Status** - **Active** or **Inactive**. Only active rules are considered when pricing a booking.
+
+Use **Add** to create a rule, or the row menu to **edit** or **delete** one. Deleting a rule is permanent and asks for confirmation.
+
+## Creating or editing a rule
+
+Click **Add** (or edit an existing row) to open the rule dialog. It has three sections: **Basic Information**, **Scope**, and **Conditions**.
+
+### Basic information
+
+- **Rule Name** (required) - a label such as _Padel peak hours_ or _Weekday off-peak discount_.
+- **Description** - optional free text to explain the rule to other staff.
+- **Adjustment Type** - **Percentage** or **Fixed Amount**.
+- **Percentage Adjustment (%)** - shown when the type is Percentage. Accepts -100 to +100. Enter a positive number to increase the price and a negative number to decrease it.
+- **Fixed Amount** - shown when the type is Fixed Amount. Enter the amount to add per hour; use a negative value for a discount.
+- **Active** - toggle the rule on or off without deleting it.
+
+### Scope
+
+The scope decides which bookings a rule can apply to. Add one or more scope entries; each entry has a **Scope Type** and a list of resources:
+
+- **Areas** - the rule applies only to bookings against the selected areas (courts, rooms, fields).
+- **Instructors** - the rule applies only to bookings against the selected instructors.
+- **Class types** - the rule applies only to class bookings of the selected class types.
+
+For any scope entry, leave the selector empty to match **all** resources of that type. A rule with no scope entries at all matches every booking (subject to its conditions).
+
+<Note>
+Scope entries are combined with AND. If you add both an Areas entry and an Instructors entry, a booking must carry both an area and an instructor to match. In practice, use one scope type per rule unless you specifically need that combination. A scope also gates by resource presence: an Areas-scoped rule never applies to a class or instructor-only booking, so area rules do not leak into other booking types.
+</Note>
+
+### Conditions
+
+Conditions further restrict when a rule fires. Add as many as you need - **all** conditions must pass for the rule to apply (AND logic). A rule with no conditions applies whenever its scope matches.
+
+- **Weekdays with Time Range** - choose weekdays (optional; empty means every day) plus a **Start Time** and **End Time**. The rule applies to bookings whose start time falls in that window, evaluated in your organization's timezone. The end time is exclusive (a 12:00-14:00 window covers slots from 12:00 up to, but not including, 14:00). This is the condition that splits a booking at the window boundary.
+- **Days of Week** - restrict to specific days without a time range (for example, weekends only).
+- **Availability** - fire based on how full the resource is over the next X days, compared with an operator (>, <, >=, <=) and a percentage. Useful for demand-based pricing.
+- **Booking Timing** - fire based on how many days ahead the booking is made, compared with an operator and a day count. Useful for early-bird discounts or last-minute surcharges.
+- **Demand Level** - fire on **Low Demand** or **High Demand**, which the system derives automatically from availability.
+- **Duration Threshold** - fire only when the booking is at least a **Minimum duration (hours)**.
+- **Date Range** - fire only between a **Start Date** and **End Date** (interpreted as whole days in your organization's timezone), for seasonal pricing.
+- **Plan** - fire only for members on the selected plans (leave empty for all plans). Bookings with no active plan do not match a plan-restricted rule.
+
+## How a rule matches a booking
+
+When the system prices a booking, it loads every **active** rule for your organization and keeps the ones that match, in this order:
+
+1. **Scope check** - the booking must carry the resource the scope targets. An Areas scope requires an area; a Class types scope requires a class booking. If the scope lists specific IDs, the booking's area, instructor, or class type must be one of them. Empty IDs mean any resource of that type.
+2. **Condition check** - every attached condition must pass (weekday and time window, days, duration, date range, plan, and the availability, booking-timing, and demand checks).
+
+Every rule that passes both checks is applied. There is no "first match wins" - matching rules stack.
+
+## How the booking price is computed
+
+The price is built from a base rate and then adjusted by the matching rules.
+
+**Base price.** The base comes from the booked resource:
+
+- **Area** bookings use the area's **price per hour** multiplied by the duration.
+- **Instructor** bookings use the instructor's **hourly rate**.
+- If a booking has both an area and an instructor, their hourly rates are **summed**.
+- **Class** bookings use the class's own price as a fixed base.
+- If no rate is set, the base is zero.
+
+**Time-window splitting.** If any matching rule uses a Weekdays-with-Time-Range condition, the booking is split into segments at the window boundaries, so each segment is either fully inside or fully outside the window. The base price is prorated across the segments by duration.
+
+**Applying adjustments.** For each segment, the system applies each matching rule in turn:
+
+- **Percentage** rules multiply the current segment price: `adjustment = currentPrice x percentage / 100`, added to the running price. Multiple percentage rules compound (each applies to the running total, not the original base).
+- **Fixed Amount** rules add the amount **per hour**: a fixed amount is multiplied by the segment's duration in hours (so a fixed -10 becomes -5 for a 30-minute segment).
+
+A segment price is floored at zero (a discount can bring a segment to free but not negative), and the segment totals are summed into the final price.
+
+**Tax.** After the final price is computed, tax is applied using your organization's tax configuration, producing the tax rate, tax amount, and the total price with tax.
+
+<Note>
+Membership coverage is resolved before pricing rules. If a member's plan covers the booking (a free session or included hours), the booking is priced at zero and pricing rules do not apply.
+</Note>
+
+## Pricing sheets
+
+A pricing sheet is the calculated price for every bookable slot of a resource across a day, produced by running the same pricing engine slot by slot. Sheets are what let the admin calendar and booking search show a price under each time slot without a separate calculation per click.
+
+- Slots are generated across the resource's effective operating hours (falling back to 06:00-22:00 when hours are not set), stepped by the booking policy's duration step or a default slot length (30 minutes; configurable from 5 to 240 minutes).
+- Each slot is priced with the active rules for that start time, so peak and off-peak differences appear directly on the calendar.
+- Sheets can be generated for a single resource on one day, or in batch for multiple areas and instructors across a date range.
+- The response also carries the effective booking policy (minimum and maximum slot length, duration step, notice, and how far ahead members can book) so the calendar can size and constrain slot selection.
+
+You do not build pricing sheets by hand - they are generated automatically wherever prices need to be shown. Editing a pricing rule refreshes the sheets within about a minute (rules are cached briefly for performance).
+
+## Worked examples
+
+### Padel peak-hour surcharge
+
+Charge more for prime evening court time on weekdays.
+
+- **Adjustment Type**: Percentage, **+25%**.
+- **Scope**: Areas - your padel courts (leave empty to cover every court).
+- **Conditions**: Weekdays with Time Range - Monday to Friday, 18:00 to 22:00.
+
+A 60-minute booking at 17:30 crosses the 18:00 boundary: the first 30 minutes stay at the base rate and only the 18:00-18:30 portion gets the +25%, because the booking is split at the window edge.
+
+### Off-peak gym discount
+
+Encourage midday visits to your fitness studio.
+
+- **Adjustment Type**: Percentage, **-20%**.
+- **Scope**: Areas - the gym floor or studio.
+- **Conditions**: Weekdays with Time Range - Monday to Friday, 09:00 to 16:00.
+
+Alternatively use a **Fixed Amount** of -5 to knock a flat five off each hour booked in the window.
+
+### Weekend court premium
+
+Add a flat premium to tennis and padel courts on Saturday and Sunday.
+
+- **Adjustment Type**: Percentage, **+15%**.
+- **Scope**: Areas - your tennis and padel courts.
+- **Conditions**: Days of Week - Saturday, Sunday.
+
+Because rules stack, a Saturday 19:00 padel booking can pick up both the weekend premium and the peak-hour surcharge if both rules match.
+
+### Early-bird class discount
+
+Reward members who book a spin or reformer class well ahead of time.
+
+- **Adjustment Type**: Percentage, **-10%**.
+- **Scope**: Class types - Spinning (or Reformer Pilates).
+- **Conditions**: Booking Timing - more than (>) 7 days ahead.
+
+### Long-session climbing discount
+
+Give a break to climbers who book a longer wall session.
+
+- **Adjustment Type**: Percentage, **-15%**.
+- **Scope**: Areas - your bouldering or roped areas.
+- **Conditions**: Duration Threshold - minimum 2 hours.
+
+### Member plan rate
+
+Offer a standing discount to members on a premium plan for personal training.
+
+- **Adjustment Type**: Percentage, **-20%**.
+- **Scope**: Instructors - your personal trainers.
+- **Conditions**: Plan - your Premium plan.
+
+## Tips & best practices
+
+- **Name rules for their intent.** _Padel peak +25%_ reads better in the list than _Rule 3_.
+- **Keep one scope type per rule** unless you deliberately want to require a booking to carry two resources at once.
+- **Use the sign deliberately.** Positive percentages and fixed amounts increase the price; negatives discount it. Fixed amounts are per hour, so they scale with duration.
+- **Remember rules stack.** If two rules can match the same booking, both apply and percentages compound. Check overlapping time windows and scopes so you do not double-charge or over-discount by accident.
+- **Set a base price first.** Rules adjust the area price per hour, instructor hourly rate, or class price. With no base rate, there is nothing to adjust and the slot prices at zero.
+- **Deactivate instead of deleting** a seasonal rule you will reuse. Toggle **Active** off and back on rather than recreating it.
+- **Mind the timezone.** Time windows and date ranges are evaluated in your organization's timezone, not the admin's browser timezone.
+
+## Troubleshooting
+
+**Issue**: A rule never applies to a booking.
+
+**Solution**: Confirm the rule is **Active**, that the booking carries the scoped resource (an Areas-scoped rule does nothing for a class or instructor-only booking), and that every condition passes. Remember conditions are AND - one failing condition blocks the whole rule.
+
+**Issue**: The discount is bigger or smaller than expected on a longer booking.
+
+**Solution**: Fixed Amount adjustments are applied **per hour**, so a fixed -10 becomes -20 over two hours. Use a percentage if you want the adjustment to stay proportional regardless of duration.
+
+**Issue**: Only part of my time-window booking got the surcharge.
+
+**Solution**: That is expected. A Weekdays-with-Time-Range condition splits the booking at the window edges, so only the portion inside the window is adjusted. The end time is exclusive.
+
+**Issue**: Two rules both fired and the price compounded.
+
+**Solution**: Matching rules stack; there is no single-winner. Narrow the scopes or time windows so only the intended rule matches, or deactivate one of them.
+
+**Issue**: A booking priced at zero and ignored the rule.
+
+**Solution**: Membership coverage is resolved before pricing rules. If the member's plan covers the booking, it is free and no rule applies. Check the member's active membership.
+
+**Issue**: I edited a rule but the calendar still shows old prices.
+
+**Solution**: Pricing rules are cached briefly (about a minute) so the calendar can price many slots quickly. Wait a moment and refresh; the pricing sheets will pick up the change.
+
+## Related
+
+- [Areas](/operations/areas) - Set the price per hour that rules adjust, and reach the Pricing rules page from the Areas header.
+- [Plans](/billing/plans) - Membership plans referenced by the Plan condition and by membership coverage.
+- [Booking policies](/operations/booking-policies) - Control when members pay, slot lengths, and cancellation rules that work alongside pricing.

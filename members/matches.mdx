@@ -1,111 +1,182 @@
 ---
-title: "Matches and ratings"
-description: "Record competitive match results, track per-sport skill ratings, and rank players for tennis, padel, and pickleball with the 1club Rating system."
+title: Matches
+description: Record competitive match results and track per-sport player skill with the 1club Rating (Glicko-2) system.
+keywords:
+  - matches
+  - player rating
+  - glicko-2
+  - ranking
+  - tennis
+  - padel
+  - pickleball
+  - leaderboard
 ---
 
-The 1club Rating system lets you record competitive match results and maintain a per-sport skill rating for every player. Ranked matches move each player's rating up or down based on who they beat, so members build a comparable standing over time. The feature is built for set-based racket sports.
+**Matches** let you record the outcome of competitive games between members and turn those results into a per-sport skill rating for each player. Every recorded match is scored with the Glicko-2 algorithm, so a player's rating reflects not just wins and losses but the strength of their opponents and how confident the system is in the estimate. The page lives at **Members > Matches** and appears once you turn on the 1club Rating feature.
 
-Matches live under **Members > Matches** (`/members/matches`), and each player's rating also surfaces on their [member profile](/members/member-profiles) and in the [member list](/members/member-list).
+## Overview
 
-## Turning on matches and rating
+The Matches page is where staff log games and review the rating history that comes out of them.
 
-Matches and ratings are off by default. Turn them on at **Settings > Matches & Rating** (`/settings/crm/matches`) by switching on **Enable 1club Rating**. Changing this setting requires the organization settings permission.
+Key capabilities:
 
-While the feature is off, the **Matches** menu item is hidden and the match endpoints return an error. Turning it on reveals the **Matches** list, the **Matches** tab on member profiles, and a per-sport rating column option in the member list.
+- **Record match results** - Log a match between two sides for a supported sport, with set-by-set scores and an auto-detected winner.
+- **Per-sport player ratings** - Every player carries an independent rating for each sport, computed with Glicko-2.
+- **Singles and doubles** - Head-to-head matches (tennis, pickleball) and team matches (padel doubles) are both supported.
+- **Ranked vs friendly** - Choose whether a match feeds the rating system or is recorded for the record only.
+- **Verified matches** - Matches anchored to a real booking carry full rating weight; casually recorded ones count at a reduced weight.
+- **Edit and disqualify** - Correct a mis-entered result or void a match, reversing its rating impact.
+- **Rating on the member profile** - Each member's matches and ratings surface on their profile.
+- **Filtering** - Filter the list by sport, type, and status.
 
 <Note>
-  All players start at a rating of 1000 with a rating deviation of 200. Ratings
-  only change once you start recording ranked matches.
+Matches and ratings are separate from **progression levels** (belts, tiers, skill grades). Recording a match never changes a member's progression assignment, and vice versa. See [Member profile](/members/member-profiles) for progression.
 </Note>
+
+## Turn on 1club Rating
+
+The Matches page and all rating behavior are gated behind an organization feature flag. Until it is on, there is no Matches menu item, no Matches tab on member profiles, and the match API returns a "not enabled" error.
+
+To enable it:
+
+1. Go to **Settings > CRM > Matches & Rating**.
+2. Toggle **Enable 1club Rating** on.
+
+Turning it on exposes the **Members > Matches** page, adds a **Matches** tab to member profiles, and starts computing ratings as ranked matches are recorded.
 
 ## Supported sports
 
-Match recording and rating are limited to set-based racket sports:
+Match recording and rating are available for the sports that have a scoring schema:
 
-- **Tennis** - singles, one player per side.
-- **Pickleball** - singles, one player per side.
-- **Padel** - doubles, two players per side.
+| Sport | Format | Scoring |
+| --- | --- | --- |
+| Tennis | Singles (1 player per side) | Best-of sets |
+| Padel | Doubles (2 players per side) | Best-of sets |
+| Pickleball | Singles (1 player per side) | Games modelled as sets |
 
-Each match is scored as a series of sets (up to five). The winner is worked out automatically from the set scores, so you never pick the winner by hand. Other sports in your catalog are not eligible for match recording.
+The number of players per side comes from the sport configuration and is enforced when a match is saved. Other racket sports such as squash, badminton, and table tennis exist elsewhere in 1Club (for example as area types), but they are **not** currently available for match recording or rating - only the three sports above have a result schema. If you need one of them scored, treat that as a future request rather than something you can log today.
 
-## Recording a match
+## Record a match
 
-From **Members > Matches**, click **Add match**. You need the member management permission to record a match. The dialog asks for:
+You can start a match from the **Add match** button on the Matches page, or from the **Matches** tab of a member's profile. Recording a match requires the **members.manage.club** permission.
 
-- **Sport** - one of the supported racket sports above. This also sets how many players each side needs (one for tennis and pickleball, two for padel).
-- **Type** - **Friendly** or **Ranked**. See [Friendly versus ranked](#friendly-versus-ranked) below.
-- **Played at** - the date and time the match took place.
-- **Gym** - the gym the match belongs to. This is required and anchors the match to your organization.
-- **Team 1** and **Team 2** rosters - pick the players for each side. Only contacts linked to a registered user can be selected, because a rating attaches to that user account. A player cannot appear on both sides.
-- **Set scores** - enter the score for each set. Add up to five sets. Tied set scores are not allowed, and the sets must produce a clear winner.
+In the **Add match** dialog:
 
-Save the match to record it. If the type is **Ranked**, ratings are applied immediately.
+1. **Sport** - Pick the sport. The dialog restricts this to the supported sports and uses the sport's team size to decide how many player slots each side gets.
+2. **Type** - Choose **Ranked** or **Friendly**:
+   - **Ranked** matches update player ratings.
+   - **Friendly** matches are recorded but leave every rating untouched.
+3. **Played at** - Set the date and time the match was played. Defaults to now.
+4. **Club** - Choose the club the match belongs to. This is required and anchors the match to your organization.
+5. **Team 1** and **Team 2** - Select the players on each side. Each side must be filled to the sport's team size (one player for singles, two for padel doubles), and no player may appear on both sides.
+6. **Set scores** - Enter the score for each set (up to five). The two scores in a set cannot be tied. Use **Add set** for additional sets.
+7. The dialog shows the derived winner ("Winner: Team 1/2") below the scores. The winner is computed automatically from how many sets each side took - you never pick it manually.
+8. Save the match.
 
-### Friendly versus ranked
+<Warning>
+Only contacts that are linked to a registered user account can be added to a match, because a rating attaches to a user, not to a bare contact. The player picker only lists contacts that have a linked account. If a member is missing from the picker, link their account first (see [Member profile](/members/member-profiles)).
+</Warning>
 
-The **Type** field decides whether a match affects ratings:
+### Verified vs unverified matches
 
-- **Ranked** - the result is recorded and every participant's per-sport rating is updated.
-- **Friendly** - the result is recorded for history, but no ratings change.
+A match can be tied to a booking. When it is, the match is treated as **verified** and its rating change is applied at full weight. A match recorded without a booking still moves ratings, but at half weight, so casual, self-reported results do not carry the same confidence as a match that maps to a real court reservation. You do not need to link a booking to record a match; it just changes how much the result counts toward ratings.
 
-Use friendly matches when you want a record of casual play without moving anyone's standing.
+### Edit a match
+
+Open a match from the list to view its detail page, then use **Edit**. Editing reverses the match's original rating impact, then recomputes and re-applies the rating from the corrected result. A disqualified match cannot be edited.
+
+### Disqualify a match
+
+To void a match, use **Disqualify** from the row actions or the detail page. You must enter a reason. Disqualifying:
+
+- Marks the match **Disqualified**.
+- Reverses the rating change it applied to every participant (rating, deviation, volatility, and the games-played count).
+- Records who disqualified it, when, and why.
 
 <Note>
-  A match linked to a booking counts as verified and applies the full rating
-  change. A match recorded without a linked booking still updates ratings, but
-  at a reduced weight, so casual entries have less impact on a player's
-  standing.
+Reverting a rating (on edit or disqualify) subtracts the delta that this specific match applied. If the same players have played later matches in the same sport, those later results are not re-derived end to end, so the correction is close but approximate. This is a deliberate trade-off - moderation events are rare.
 </Note>
 
-## How the skill rating works
+## How ratings work
 
-Each player carries a separate skill rating for each sport they play. You can think of it as two numbers working together:
+Ratings use **Glicko-2** (Glickman, 2013). Each player has one rating per sport, so a strong tennis player who is new to padel carries two independent numbers. Three values describe each rating:
 
-- **Rating** - the estimate of the player's skill. Higher is stronger. Everyone starts at 1000.
-- **Rating deviation** - how confident the system is in that rating. A new or inactive player has a high deviation, so their rating can swing a lot after a single match. As they play more, the deviation shrinks and their rating settles down.
+- **Rating** - The skill estimate. Everyone starts at **1000**.
+- **Rating deviation (RD)** - How uncertain the system is about the rating. New players start at **200**. A high RD means the rating can still move a lot; as a player logs more matches, RD shrinks and the rating settles.
+- **Volatility** - How erratic a player's recent results have been. Starts at **0.06**.
 
-After each ranked match, the system compares the two sides and adjusts each rating. Beating a stronger opponent earns more than beating a weaker one, and a player whose rating the system is still unsure about moves further than an established player. For padel doubles, the two partners are treated as a team, and the change is shared out so the less-established partner moves more than the veteran.
+A player's rating row is created automatically the first time they appear in a match, seeded with those defaults. Every rated match also increments their **games played** count and records the date of their last match.
 
-The rating is per sport, so a member can be highly rated in tennis and still be a beginner in padel. Ratings are tracked independently and never mix across sports.
+### What moves a rating
 
-## Rankings and where ratings appear
+- Only **ranked** matches change ratings. Friendly matches never do.
+- **Beating a stronger opponent** raises your rating more than beating a weaker one; the reverse is true for losses.
+- **New players move fast.** Because their RD starts high, early matches produce large swings (roughly plus or minus 80 points on the first ranked match). After a handful of matches, RD drops and results move the rating in smaller increments.
+- **Verified matches** (linked to a booking) apply the full change; **unverified** matches apply half.
+- A **win** counts as 1, a **loss** as 0, and a **draw** as 0.5 from each player's perspective. The set-based dialog always resolves to a winner, so recording a true draw is a rating-math capability rather than something the standard dialog produces.
 
-Because every player has a comparable per-sport rating, you can rank members against each other within a sport:
+### Singles vs doubles
 
-- **Member list** - when the feature is on, the [member list](/members/member-list) can show each member's per-sport rating alongside their other details.
-- **Member profile** - a member's [profile](/members/member-profiles) gains a **Matches** tab listing every match they have played, with the result, sport, type, and date. Contacts that are not yet linked to a registered user show a note instead, since matches can only be recorded against a user account.
-- **Match detail** - opening a match from the list shows a scoreboard with both rosters, the set scores, and, for ranked matches, each player's rating before and after the match with the exact change.
+- **Singles** (tennis, pickleball) run standard head-to-head Glicko-2 between the two players.
+- **Doubles / teams** (padel) are computed by first averaging each side into a single team rating, running Glicko-2 team-versus-team, then distributing the team's change back to its members. The share each player absorbs is weighted **inversely by their RD**: a less-established player (high RD) moves more, while a seasoned partner (low RD) barely budges. This keeps a strong veteran from swinging wildly because they happened to partner with a beginner.
 
-## Moderating matches
+## Rating settings
 
-Two tools let you correct or remove a match after the fact. Both require the member management permission.
+The rating system is intentionally simple to configure. The only control is the on/off toggle at **Settings > CRM > Matches & Rating** described above. The Glicko-2 constants (starting rating 1000, starting RD 200, starting volatility 0.06) are fixed platform defaults and are not per-organization settings, so results stay comparable across clubs. Managing the toggle requires the **settings.manage.organization** permission.
 
-### Editing a match
+## Where ratings show up
 
-Open a match and choose **Edit** to fix the sport, type, gym, rosters, or set scores. Editing a ranked match reverses the original rating change and re-applies a fresh one from the corrected result. A disqualified match cannot be edited.
+- **Members > Matches** - The full match list for your organization, filterable by sport, type, and status, with a detail page per match.
+- **Member profile > Matches tab** - When 1club Rating is on, each member's profile gains a **Matches** tab listing the matches that member has played. It only appears for members whose contact is linked to a user account.
+- **Member list** - Rows can surface a member's rating per sport (rating, RD, and games played) where their contact is linked to a user.
 
-### Disqualifying a match
+## Worked examples
 
-Choose **Disqualify** to void a match. You must enter a reason. Disqualifying a match:
+### Tennis singles ranked match
 
-- Marks it as **Disqualified**.
-- Reverses the rating change it applied, so participants' ratings return to where they were.
-- Records the reason and the time it was disqualified, both shown on the match detail page.
+Two members play a tennis match on a booked court. In **Add match** you pick **Tennis**, set the type to **Ranked**, choose the **Played at** time and the **Club**, put one player on each side, and enter the sets: `6-4`, `3-6`, `7-5`. Team 1 took two sets to one, so the dialog shows "Winner: Team 1". On save, both players' tennis ratings update head-to-head. If the winner was the lower-rated player, expect a larger jump for them and a larger drop for the favourite.
 
-Disqualification is how you remove a bad or disputed result. Matches are not hard-deleted, so the history and the moderation reason are preserved.
+### Padel doubles ranked match
 
-## Match statuses
+Four members play padel. You pick **Padel**, which gives each side two player slots. Assign both pairs, enter `6-2`, `4-6`, `6-3`, and save. The system averages each pair into a team rating, runs the team-versus-team calculation, then splits the result back to the four players. A beginner paired with a club regular will see their own rating move noticeably more than their partner's, because the change is distributed by rating uncertainty.
 
-Every match is in one of two states:
+### Pickleball club ladder
 
-- **Recorded** - the normal state for a saved match. Ranked recorded matches count toward ratings.
-- **Disqualified** - the match has been voided and its rating impact reversed.
+A club runs an informal pickleball ladder. Staff record each singles game as a **Ranked** pickleball match with the game scores entered as sets. Over a few weeks, players who consistently beat higher-rated opponents climb, and the per-sport rating on each member profile becomes a de facto ladder ranking. To publish a ladder, sort members by their pickleball rating.
 
-You can filter the **Matches** list by sport, type (friendly or ranked), and status.
+### Casual game with no booking
+
+Two members report a friendly tennis result at the front desk with no court reservation on file. If you record it as **Ranked** without linking a booking, it still updates ratings but at half weight, so the informal result nudges the numbers without dominating them. If you would rather it not affect ratings at all, record it as **Friendly**.
+
+### Fixing a mistyped score
+
+You recorded `6-4, 6-4` but the second set was actually `4-6, plus a third set`. Open the match, choose **Edit**, correct the sets, and save. The original rating change is reversed and the corrected result is applied in its place.
+
+## Tips & best practices
+
+- **Link a booking when you can.** Verified matches carry full rating weight and tie the result to a real session, which keeps ratings trustworthy.
+- **Use Friendly for exhibitions and warm-ups.** Anything you do not want to affect standings should be recorded as Friendly, not Ranked.
+- **Link user accounts first.** A contact without a linked account cannot be added to a match. Sort out account linking before a tournament so recording is not blocked mid-event.
+- **Let new players settle.** Expect big swings in a new player's first few ranked matches. That is the system converging, not an error - RD tightens quickly.
+- **Prefer Disqualify over deletion for cheating or disputes.** It reverses the rating impact and keeps an auditable reason on record.
+- **Keep sports honest.** Record tennis as tennis and padel as padel; ratings are per sport, and mixing them produces a meaningless number.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| No **Matches** menu item or profile tab | 1club Rating is not enabled | Turn it on at **Settings > CRM > Matches & Rating**. |
+| A member is missing from the player picker | Their contact is not linked to a user account | Link the account on the [Member profile](/members/member-profiles); only linked contacts can carry a rating. |
+| "Add match" button is not visible | You lack the **members.manage.club** permission | Ask an admin to grant it; read-only staff can view but not record. |
+| Cannot save - "Set scores don't determine a winner" | The sets are tied (equal sets each) or a set is tied | Add a deciding set, or fix a set so the two scores differ. |
+| Cannot save - team size error | Wrong number of players for the sport | Fill exactly one player per side for singles, two per side for padel. |
+| A player's rating did not change after a match | The match was **Friendly**, not **Ranked** | Only ranked matches move ratings; edit the type if it should count. |
+| A ranked result moved ratings less than expected | The match was unverified (no booking) so it applied at half weight | Link the match to a booking for full weight. |
+| The sport you want is not in the list | Only tennis, padel, and pickleball have a scoring schema | Other sports are not currently supported for match recording. |
+| Cannot edit a match | The match is disqualified | Disqualified matches are locked; record a new match instead. |
 
 ## Related
 
-- [Member profiles](/members/member-profiles) - the Matches tab and per-sport rating on each member.
-- [Member list](/members/member-list) - where per-sport ratings surface across your membership.
-- [Schedule](/operations/schedule) - book the court time where matches are played.
-- [Marketplace](/marketing/marketplace) - how sports tags help members find your gym.
+- [Members overview](/members/overview) - how contacts, members, and accounts fit together.
+- [Member profile](/members/member-profiles) - where a member's Matches tab and account linking live.
+- [Member list](/members/member-list) - the contacts grid where per-sport ratings can surface.

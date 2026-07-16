@@ -1,136 +1,89 @@
 ---
 title: WhatsApp
-description: Connect your gym's WhatsApp Business number to send booking notifications, reply to members in the shared inbox, and use WhatsApp as a messaging channel
+description: Connect your own WhatsApp Business number through Meta's embedded signup so members can message you on WhatsApp and staff can reply from the 1Club inbox
+keywords: [whatsapp, whatsapp business, embedded signup, meta, cloud api, inbox, messaging, 24-hour window, waba, business phone number]
 ---
 
-WhatsApp turns your gym's own WhatsApp Business number into a two-way messaging channel inside 1Club. Once connected, you can send booking confirmations, reminders, and other notifications over WhatsApp, receive member replies in the shared inbox alongside email and SMS, and pick WhatsApp as a channel when you compose messages or build automations. Messages send from your gym's verified business number, not a shared 1Club number.
+The WhatsApp integration connects your own WhatsApp Business number to 1Club so members can message you on WhatsApp and your staff can reply from the [inbox](/messaging/message-list). You connect it through Meta's embedded signup - a guided Facebook popup where you pick or create a number and authorize 1Club - so there are no tokens or API keys to copy by hand.
 
-The connection is set up through Meta's embedded signup - a guided popup where you log in with Facebook and pick the WhatsApp Business Account and phone number to link. After that, 1Club keeps the connection alive for you, so you rarely need to touch it again.
+This is separate from the WhatsApp number 1Club uses to deliver one-time codes and phone verification. That runs on a platform number behind the scenes; this integration is your organization's own number for inbox conversations.
+
+## Overview
+
+- Connect your WhatsApp Business account through Meta's embedded signup - no tokens to copy.
+- Members message your WhatsApp Business number, and staff reply from the 1Club inbox.
+- Free-form replies work inside WhatsApp's 24-hour customer service window; outside it you must send an approved template.
+- The connection is per organization and stored securely; 1Club never shows the access token back to you.
+- Reconnect at any time to refresh the connection or move to a different number.
 
 ## Before you start
 
-- You need a **WhatsApp Business Account** with a phone number you can verify during signup. If you do not have one yet, Meta walks you through creating it inside the signup popup.
-- Connecting WhatsApp requires the **settings.manage.organization** permission and a plan that includes integrations. Admins and owners can reach this page; other roles cannot.
-- WhatsApp appears as an option on this page only when 1Club's Meta app is available. If the page shows a "not configured" notice instead of a connect button, the channel is not enabled for your environment yet.
+- WhatsApp connection is a **paid-plan** feature. On the Free plan and during the Grow trial the connect step is blocked until you upgrade.
+- Connecting requires the **settings.manage.organization** permission. Viewing status requires **settings.read.organization**.
+- You need a Facebook Business account and a phone number you can verify for WhatsApp. You can create a new number during the embedded signup flow.
 
 <Note>
-  WhatsApp in 1Club is a member and customer channel. It carries member-facing
-  notifications and inbox conversations - it is not used for internal staff
-  alerts.
+  WhatsApp embedded signup must be enabled on the 1Club server for your deployment. If it is not, the page shows "WhatsApp isn't set up on this server yet" instead of the connect button, and there is nothing to configure until it is enabled. Contact 1Club support if you expect it to be available and it is not.
 </Note>
 
 ## Connect WhatsApp
 
-1. Go to **Settings -> Integrations** and open the **WhatsApp** card.
-2. Click **Connect with WhatsApp**. Meta's embedded signup opens in a popup.
-3. Log in with Facebook, then choose (or create) the **WhatsApp Business Account** and the **phone number** you want to send from.
-4. Complete Meta's verification steps in the popup.
-5. When the popup finishes, 1Club exchanges the signup for a long-lived connection, links your account, and the card switches to a connected state.
-
-Behind the scenes, connecting also subscribes 1Club to your account's WhatsApp events (so inbound messages and delivery updates reach you) and registers your phone number for messaging. You do not configure any of this by hand.
+1. Go to **Settings > Integrations** and open the WhatsApp card, or open the WhatsApp page directly.
+2. Click **Connect with WhatsApp**.
+3. A Facebook popup opens. Sign in to your Facebook Business account and follow Meta's steps to select or create a WhatsApp Business account and phone number, then authorize 1Club.
+4. When you finish the popup, 1Club completes the connection in the background: it exchanges the authorization for a business access token, subscribes to your WhatsApp Business Account so inbound messages reach 1Club, and registers your number for messaging.
+5. The status changes to **WhatsApp connected**.
 
 <Note>
-  If you need to switch to a different WhatsApp Business Account or phone number
-  later, open the WhatsApp page and click **Reconnect** to run embedded signup
-  again.
+  If you close the popup or deny access, the connection is cancelled and nothing changes. Just click **Connect with WhatsApp** again to retry.
 </Note>
 
-## Message templates
+## Connection status
 
-WhatsApp requires a pre-approved template for any message your gym starts outside an active conversation (see [The 24-hour window](#the-24-hour-window) below). 1Club ships a standard set of templates and provisions them into your WhatsApp Business Account automatically when you connect - you do not write or submit templates yourself.
+The status chip on the connect card shows one of:
 
-The template set mirrors 1Club's notification events, so the same moments you already recognise from email have a WhatsApp version:
+- **Not connected** - no WhatsApp connection exists for the organization.
+- **Inactive** - a connection record exists but is not active (for example a previous connection that needs reconnecting).
+- **Active** - your number is connected and can send and receive messages from the inbox.
 
-- Booking confirmation, cancellation, update, and reminder
-- Waitlist spot available
-- Membership expiration reminder
-- Review request
-- A general message template that carries composed and automated text to members
+Once connected, the primary button changes to **Reconnect**, which reruns the embedded signup so you can refresh the connection or switch to a different number.
 
-Each template is provisioned in every supported language (currently English and Bulgarian) and is reviewed by Meta independently. On the WhatsApp page you get a read-only status table showing each template's Meta approval state:
+## How messaging works
 
-| Status                  | Meaning                                  |
-| ----------------------- | ---------------------------------------- |
-| **Approved**            | Ready to send.                           |
-| **Pending Meta review** | Submitted to Meta and awaiting approval. |
-| **Rejected by Meta**    | Meta declined this template.             |
-| **Not set up yet**      | Not provisioned into your account yet.   |
-
-Use **Sync** to pull the latest approval statuses from Meta, and **Set up templates** to re-provision the standard set if anything is missing. 1Club also refreshes template statuses automatically once a day, so a template approved by Meta becomes sendable without any action from you.
-
-<Note>
-  Only **Approved** templates can be used for messages you start. If a template
-  is still pending or was rejected, 1Club skips WhatsApp for that message rather
-  than sending an unapproved template.
-</Note>
-
-## The 24-hour window
-
-WhatsApp treats a reply differently from a message you start:
-
-- **Inside the window** - when a member has messaged you within the last 24 hours, you can reply with free-form text. Inbox replies and automated messages use plain text here.
-- **Outside the window** - once 24 hours pass since the member's last inbound message, WhatsApp only allows a pre-approved template. 1Club automatically switches to the matching template for the notification being sent.
-
-1Club picks free-form text or a template for you based on the conversation, so you do not have to track the window yourself.
-
-## Member consent and opt-out
-
-WhatsApp holds businesses to strict opt-in rules, and messaging members who have not opted in hurts your account's quality rating. 1Club enforces this for every message your gym starts:
-
-- **Opt-in** - when a member messages your WhatsApp number, that counts as consent to receive business-initiated messages. 1Club records the opt-in on their contact.
-- **Opt-out** - when a member replies with a standard stop keyword (for example **STOP**, **UNSUBSCRIBE**, or **CANCEL**), 1Club records the opt-out and blocks all further business-initiated messages to them, even within the 24-hour window.
-- **Re-subscribe** - a member who previously opted out can opt back in by sending a standard start keyword (for example **START** or **RESUME**). An ordinary message does not undo an explicit opt-out.
-
-Business-initiated messages (notifications and automations) go out only to members who are both reachable on WhatsApp and currently opted in. Replies inside an open 24-hour conversation are always allowed, since the member reached out first.
-
-<Note>
-  Being reachable on WhatsApp is separate from having opted in. 1Club confirms a
-  number is a real WhatsApp account when a message is delivered or read, or when
-  the member messages you - but reachability alone is not permission to send.
-  Both must be true for messages you start.
-</Note>
-
-## Receiving replies
-
-Inbound WhatsApp messages arrive in the shared inbox next to your other conversations:
-
-- A member's message creates or matches a contact by phone number and threads onto your existing WhatsApp history with them.
-- Delivery and read receipts flow back to 1Club, so outbound WhatsApp messages show sent, delivered, and read states.
-- If WhatsApp reports that a number is no longer a WhatsApp user, 1Club stops preferring WhatsApp for that contact.
-
-From the inbox you can reply in free-form text while the 24-hour window is open. See [Messaging overview](/messaging/overview) for how the shared inbox works.
-
-## WhatsApp as a notification channel
-
-Once connected, WhatsApp becomes a delivery channel throughout 1Club, alongside in-app, email, SMS, and push. System notifications, [automations](/marketing/automations), and messages you [compose](/messaging/compose) can reach members over WhatsApp when they are eligible.
-
-WhatsApp is not a forced replacement for email or SMS - it is used when the member is reachable and opted in, and 1Club falls back to other channels when a WhatsApp send is not possible (no connection, no consent, or no approved template).
-
-## Test mode
-
-A connection can run in a test mode that simulates sends without contacting WhatsApp. In test mode, messages are recorded as sent so you can exercise the full flow - notifications, automations, and inbox - without a live account, approved templates, or an open conversation window. Explicit opt-outs are still honoured in test mode.
-
-## How the connection stays current
-
-WhatsApp access tokens issued through embedded signup expire after about 60 days. 1Club runs a daily job that renews each connected account's token before it lapses, so your outbound WhatsApp does not silently break. The same job keeps template approval statuses in sync.
-
-If a renewal ever fails - for example because the underlying WhatsApp Business Account access was revoked - the connection can go stale and you will need to reconnect. Open the WhatsApp page and click **Reconnect** to run embedded signup again.
+- Members who message your WhatsApp Business number arrive in the [inbox](/messaging/message-list), where staff can reply.
+- WhatsApp's rules allow free-form replies only within a **24-hour customer service window** that opens each time a member messages you. Outside that window, WhatsApp requires a pre-approved message template.
+- The connection uses a long-lived access token that 1Club renews before it expires, so a live connection does not silently go stale. If the token can no longer be renewed, **Reconnect** to re-authorize.
 
 ## Disconnect
 
-Click the disconnect action on the WhatsApp page to remove the integration. This stops 1Club from sending new WhatsApp messages and from receiving inbound ones. Your member consent and conversation history are kept, so reconnecting later restores the channel without losing that record.
+Use the disconnect action on the WhatsApp page to remove the connection. New inbound messages will no longer route to your inbox and staff can no longer send from your number until you reconnect.
+
+## Worked examples
+
+**Martial-arts gym fielding trial enquiries.** A muay-thai gym adds its WhatsApp Business number and shares it on its social profiles. Prospects message asking about the beginner class; the front desk replies from the inbox within the 24-hour window, no template needed, and books them in.
+
+**Yoga studio confirming a schedule change.** A studio's morning reformer class moves rooms. Because more than 24 hours have passed since most members last messaged, staff send an approved template to notify the affected members, then handle the replies free-form as they come back in.
+
+**Padel club running one number across the team.** A racket-sports club connects a single WhatsApp Business number so several front-desk staff can all pick up member conversations from the shared inbox, rather than messages landing on one person's phone.
+
+## Tips & best practices
+
+- Reply inside the 24-hour window whenever you can - free-form replies are simpler than templates and feel more personal.
+- Use **Reconnect** rather than deleting and re-adding when you switch numbers or refresh access.
+- Share the same WhatsApp Business number you connect here on your website and social profiles so inbound messages land in the inbox.
+- Remember this number is your organization's own line; it is not the number 1Club uses for one-time codes.
 
 ## Troubleshooting
 
-- **No connect button, only a "not configured" notice** - 1Club's Meta app is not enabled for your environment. WhatsApp cannot be connected until it is available.
-- **The signup popup closed without connecting** - the popup was cancelled or closed before finishing. Click **Connect with WhatsApp** and complete every step, including phone number verification.
-- **A template shows "Pending Meta review" for a long time** - Meta approves templates on its own schedule. Click **Sync** to pull the latest status; statuses also refresh automatically each day.
-- **Notifications are not reaching a member over WhatsApp** - confirm the member has messaged your number at least once (opt-in), has not sent a stop keyword (opt-out), and that the relevant template shows **Approved**. If any is missing, 1Club falls back to another channel.
-- **Outbound WhatsApp stopped working after a couple of months** - the access token could not be renewed. Open the WhatsApp page and click **Reconnect** to re-run embedded signup.
+- **"WhatsApp isn't set up on this server yet"** - embedded signup is not enabled for your deployment. There is nothing to configure until it is; contact 1Club support.
+- **The connect button is blocked or asks you to upgrade** - WhatsApp connection is a paid-plan feature. Upgrade from the Free plan or the Grow trial.
+- **"Authorized, but the popup didn't return your WhatsApp account details"** - the Facebook popup finished without sending back the account information. Click **Connect with WhatsApp** and complete the flow again.
+- **Connection cancelled** - you closed or denied the popup. Retry from **Connect with WhatsApp**.
+- **Members message but nothing reaches the inbox** - confirm the status is **Active**. If it shows **Inactive**, use **Reconnect** to re-authorize the number.
 
 ## Related
 
-- [Integrations](/settings/integrations)
-- [Messaging overview](/messaging/overview)
-- [Compose a message](/messaging/compose)
-- [Message templates](/messaging/templates)
+- [Integrations](/settings/integrations) - the full integration catalog and how installs work.
+- [Inbox](/messaging/message-list) - where inbound WhatsApp messages arrive and staff reply.
+- [Compose](/messaging/compose) - sending messages, including on the WhatsApp channel.
+- [Templates](/messaging/templates) - message templates used outside the 24-hour window.

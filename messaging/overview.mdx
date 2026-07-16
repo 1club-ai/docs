@@ -1,43 +1,105 @@
 ---
-title: Messaging
-description: A unified inbox for outbound and inbound conversations with members, leads, and staff. Email, SMS, and push messages live alongside replies in the same threaded view.
+title: Inbox
+description: A unified inbox for outbound and inbound conversations with members, leads, and staff. Email, SMS, and WhatsApp messages live alongside replies in one threaded view, with AI-drafted replies grounded in your club's data.
+keywords: [inbox, messages, messaging, email, SMS, WhatsApp, conversations, replies, AI reply, display sender, send on behalf of, contacts]
 ---
 
-The **Messages** section is a unified inbox: every email and SMS you send, plus every reply or inbound message that lands in 1Club, shows up here in one chronological list. Open a conversation to read the full thread, draft a reply, or generate one with AI.
+The **Inbox** (nav route `/messages`) is a unified conversation surface: every email, SMS, and WhatsApp message you send, plus every reply or inbound message that lands in 1Club, shows up here in one chronological list. Open a conversation to read the full thread, draft a reply, or generate one with AI.
 
-Outbound messages can go to a single contact, a hand-picked group, or every contact matching a filter (type plus tags). Templates speed up repetitive sends, and the AI assistant can suggest a reply grounded in the original message and your organization's context.
+A **message** is human-authored correspondence between a club and a member, addressed and replyable. That is what distinguishes it from a **notification** ("your booking is confirmed"), which is system-generated, one-directional, and not replyable. The Inbox holds only messages. System events live in the notifications surface.
 
-## What you can do here
+## Overview
 
-[Compose a message](/messaging/compose) to one contact, a list of contacts, or everyone matching a contact-type and tag filter. Pick **email** or **SMS** per message; emails use a block editor with templates and variables, SMS is plain text.
+- Read outbound and inbound messages as threaded conversations in one list.
+- Compose to a single contact, a hand-picked group, or everyone matching a contact-type and tag filter.
+- Send over three channels: **email**, **SMS**, and **WhatsApp**.
+- Reply inside a thread, with an optional **Generate with AI** draft grounded in your organization's data.
+- Save drafts, attach files to emails, and reuse custom message templates.
+- Scope access by role: organization-wide for admins and managers, club-scoped for instructors.
 
-[Manage the inbox list](/messaging/message-list) which combines outbound and inbound messages into conversation rows. Each row shows the recipients (single avatar, paired avatars, or a group with a `+N` badge), the latest snippet, the time, and a thread counter when there are replies.
+## Channels
 
-[Maintain templates](/messaging/templates) for common manual messages so you stop retyping welcome notes, reminders, and announcements. Templates are separate from the system templates that drive transactional emails and receipts under **Settings > Communication > Templates**.
+Every message carries a `type` that fixes its channel. The Inbox lists all three side by side.
+
+- **Email** - The default for new manual sends. Uses a block editor (subject plus body), supports templates, variables, and file attachments. Delivered through SendGrid.
+- **SMS** - Plain text, no subject, no formatting. Delivered through Twilio. This is a paid-plan channel because it carries a direct carrier cost.
+- **WhatsApp** - Sent through a per-organization WhatsApp Business connection (WhatsApp Cloud API). Requires a connected WhatsApp number and a paid plan. A `+` badge in the conversation row marks contacts whose WhatsApp number is verified.
+
+A new manual message goes out as **email**. SMS and WhatsApp appear in the Inbox as inbound conversations and as replies: when you reply inside an SMS or WhatsApp thread, the reply stays on that same channel. Automations can also send on any of the three channels.
+
+Push and in-app notifications exist in the platform, but they are emitted by transactional triggers (booking confirmed, waitlist promotion), not composed from the Inbox.
 
 ## How a message becomes a conversation
 
-Sending creates one **message** record per outbound action and one **message_recipient** record per recipient. The inbox lists only top-level messages: replies (anything with a `replyToMessageId`) roll up into the thread of their original.
+Sending creates one **message** record per outbound action and one recipient record per recipient. The Inbox lists only top-level messages: replies (anything with a `replyToMessageId`) roll up into the thread of their original.
 
-Inbound messages, including replies to your outbound sends and submissions from the website's contact form, arrive as new top-level messages tagged with `direction: inbound`. Selecting a draft opens the compose pane; selecting any other message opens the thread view with an inline reply box.
+A message's content is **canonical and channel-neutral**: it is stored as structured blocks (paragraph, heading, button, image), not as rendered HTML. Each channel renders its own projection of that content. The Inbox renders the blocks natively; email renders them through the transactional layout. So the delivered email is a projection of the message, not the message itself.
+
+Inbound messages, including replies to your outbound sends, arrive as new top-level messages tagged `direction: inbound`. Selecting a draft opens the compose pane; selecting any other conversation opens the thread view with an inline reply box.
+
+## Display sender, display recipient, and send on behalf of
+
+The raw record only shows the staff `senderId` and the resolved recipient contacts, which is not always who a message should *appear* to be from or to. Three concepts fix that:
+
+- **Display sender** - Who an outbound message appears to be *from* to the member. By default there is none, so member surfaces fall back to the club and admin surfaces fall back to the sending staff user. When a message is sent *on behalf of* a specific person, that person's name and avatar are persisted as the display sender and drive both the member inbox and the delivered email's `from` name. Today the one send-on-behalf-of path is the "send from the instructor" option on the review-request automation. `senderId` is unchanged: it stays the accountable staff user for audit and billing.
+- **Message target** - Who a member-composed message is addressed to, as the member chose it: the club (the default) or a specific instructor they have a real relationship with. A member never addresses arbitrary contacts.
+- **Display recipient** - The mirror of display sender for member-initiated threads. It fixes who the conversation appears to be *with* (the club's name and logo, or the instructor's name and avatar), so a club-targeted message never leaks which staff member happened to receive it.
 
 ## AI-assisted replies
 
-Inside a thread, the compose pane has a **Generate AI reply** action. It calls `POST /v1/ai-messages/{messageId}/suggest`, which uses LangChain plus pgvector retrieval over your organization's data to draft a response. The suggestion lands in the editor as paragraph blocks (and a subject if the type is email); you can edit before sending. The feature only works for replies, not new sends.
+Inside a thread, the reply composer has a **Generate with AI** action. It calls `POST /v1/ai-messages/{messageId}/suggest`, which uses LangChain plus pgvector retrieval over your organization's data to draft a response. The model grounds the reply in organization and club details, the member's recent bookings and memberships, relevant FAQ/policy content, and the conversation history so far.
+
+The suggestion lands in the editor as paragraph blocks (and a subject for email), and you can edit anything before sending. The action is only available on replies, because it grounds the response in the original message. New sends do not expose it. Generating a suggestion requires the AI assistant to be enabled for your organization.
 
 ## Permissions and access
 
-The inbox respects two scopes. Admins and managers see the organization-wide inbox and can compose new messages and pick from custom templates. Instructors see a club-scoped view: only conversations involving members at their club, no audience filters, no template picker.
+The Inbox respects two scopes:
 
-The relevant permissions are `messages.read.own` for viewing the inbox and `messages.create.own` for composing. Audience filters and templates additionally require the broader org-level access.
+- **Admins and managers** see the organization-wide inbox, compose new messages, use audience filters, and pick from custom templates.
+- **Instructors** see a club-scoped view: only conversations involving members at their club, with no audience filters and no template picker.
+
+The governing permissions are `messages.read.own` / `messages.read.club` for viewing and `messages.create.own` / `messages.create.club` for composing. A holder of only the `.own` scope can message specific contacts they select, but cannot broadcast to an audience segment and can only reply to messages they can already read.
 
 ## Plan limits
 
-Outbound email sends count against your plan's email quota. Hitting the limit returns a `PLAN_LIMIT_EXCEEDED` error and surfaces a dialog rather than a generic toast. The quota check runs through the `requireEmailCapacity` middleware on the server and applies to email only; SMS sends are not gated by this middleware.
+Each channel is gated differently at send time:
+
+- **Email** requires a verified sending domain during trial, and counts against your plan's email quota. Hitting the quota returns `PLAN_LIMIT_EXCEEDED` with the daily and monthly figures, surfaced as a dialog rather than a generic toast.
+- **SMS** is available on paid plans only. On a trial or locked plan the send returns `PLAN_FEATURE_LOCKED` with an upgrade prompt.
+- **WhatsApp** is also paid-only and additionally requires a connected WhatsApp Business number. A missing connection returns `WHATSAPP_NOT_CONNECTED`; a carrier delivery failure returns `WHATSAPP_DELIVERY_FAILED`.
+
+## Worked examples
+
+**Racket sports - court-closure blast.** A padel club needs to warn members that Court 3 is resurfaced this weekend. Compose an email to the `member` contact type, filtered to the "Padel league" tag, write the notice in the block editor, attach the revised weekend schedule as a PDF, and send. Replies from members land back in the Inbox as inbound messages threaded under nothing new, ready for a one-tap reply.
+
+**Martial arts - belt-test reminder over WhatsApp.** A jiu-jitsu gym with a connected WhatsApp number gets an inbound question from a student about the upcoming grading. Open the thread, tap **Generate with AI** to draft a grounded reply (it pulls the student's recent attendance and the club's grading policy), tweak the date, and send. The reply goes out on WhatsApp because the conversation is a WhatsApp thread.
+
+**Pilates/Yoga - lapsed-client win-back.** A reformer studio filters to the `lapsed` contact type and sends a warm email offering a return class. Because the audience is a segment, this requires organization-level compose access, not an instructor's club-scoped inbox.
+
+**Gym/Fitness - event promotion.** From a HIIT open-day event, the **Promote** button opens the composer prefilled with the event cover image, title, date and location, and a "view event" button, addressed to all members. Pick or adjust the audience and send.
+
+## Tips & best practices
+
+- Reserve SMS and WhatsApp for time-sensitive, high-value messages. They cost more and read as more urgent than email.
+- Let AI draft the first pass on routine replies (hours, pricing, policies), then edit for tone. It is grounded in your club's data, but you are accountable for what sends.
+- Segment with tags rather than blasting your whole contact list. Filtered sends keep engagement high and unsubscribes low.
+- Use the "send from the instructor" path for relationship messages so members see a familiar name, not a generic club sender.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| SMS send is blocked with an upgrade prompt | SMS is a paid-plan channel; the org is on trial or a locked plan | Upgrade to a paid plan, or send by email instead |
+| WhatsApp send fails with "not connected" | No active WhatsApp Business number is connected for the org | Connect a WhatsApp number, then retry the send |
+| Email send hits a limit dialog | The plan's email quota (daily or monthly) is exhausted | Wait for the quota to reset or upgrade the plan |
+| "All recipients are unsubscribed or suppressed" | Every selected contact has opted out or is on the suppression list | Adjust the recipient list and resend |
+| Instructor cannot see a conversation | Instructor inboxes are club-scoped to their members only | Have an admin or manager handle org-wide conversations |
+| A member's reply appears on the wrong side of the thread | Reply arrived without sender org-membership context | Reload the thread; the Inbox realigns member vs. staff senders on refetch |
 
 ## Related
 
-- [Compose a message](/messaging/compose) - The send flow, recipient filters, and template usage.
-- [Message list](/messaging/message-list) - The inbox view, conversation rows, and thread management.
-- [Templates](/messaging/templates) - Reusable manual-send templates and the variable picker.
-- [Automations](/marketing/automations) - Scheduled, trigger-based sends that run automatically, instead of manual messaging.
+- [Compose a message](/messaging/compose) - The send flow, recipient filters, channels, and template usage.
+- [Message list](/messaging/message-list) - The Inbox view, conversation rows, and thread management.
+- [Templates](/messaging/templates) - Reusable manual-send message templates and the variable picker.
+- [Automations](/marketing/automations) - Trigger-based and scheduled sends that run automatically, instead of manual messaging.
+- [Contacts](/members/overview) - Tag and segment the contacts you message.

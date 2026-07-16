@@ -5,6 +5,15 @@ description: "Manage your coaching staff, their bookable rates, sports, types, a
 
 Instructors are the coaches, trainers, and class leads who teach classes or take one-on-one bookings. They live under **Staff > Instructors** in the admin, not under Operations - but the schedule page and booking dialog both surface them, so they're documented here next to the rest of the operations stack.
 
+## Overview
+
+- **Profiles with type, sports, and rate** - group instructors by type, tag their sports for marketplace filtering, and set an hourly rate that seeds one-on-one booking prices.
+- **Bookable or class-only** - a bookable instructor takes direct one-on-one bookings and gets a schedule column; a class-only instructor can still lead classes.
+- **Availability from hours or shifts** - drive availability from per-day operating hours, or turn on **shift scheduling** to run rosters and rotations.
+- **Pay-rate policies** - compensate instructors per class or booking, with an option to pay only for paid visits.
+- **Earnings dashboard** - instructors who sign in see their own earnings, classes, attendance, and PT sessions.
+- **Ordering** - drag to set the order instructors appear in on the schedule and in selectors.
+
 ## The instructor list
 
 The list at **Staff > Instructors** shows one row per instructor with these columns: drag handle, name and avatar, instructor type, status (bookable badge, inactive chip), sports (up to three with a `+N` overflow), gym, and hourly rate.
@@ -50,7 +59,7 @@ On the instructor's details page, a read-only **Working hours** block shows the 
 
 ### Rescheduling on the calendar
 
-On the **Operations → Schedule** calendar you can drag a booking or class to a new time. The move keeps the same resource (area, instructor, or class type) and the same duration - only the start and end time shift. Every drop asks you to confirm the old and new time, and for recurring events you choose whether the change applies to just that occurrence or to all future ones.
+On the **Schedule** calendar you can drag a booking or class to a new time. The move keeps the same resource (area, instructor, or class type) and the same duration - only the start and end time shift. Every drop asks you to confirm the old and new time, and for recurring events you choose whether the change applies to just that occurrence or to all future ones.
 
 ## Pay rates and paid-booking gating
 
@@ -84,7 +93,51 @@ The breakdown table lists each class or booking with name, type (class or standa
 
 ## Mixed-role accounts
 
-A user who is both an instructor and an admin or manager has access to two schedule views. The org-wide schedule lives at **Operations > Schedule** (see [Schedule](/operations/schedule)). A personal "My teaching schedule" view, scoped to just their own classes and bookings, is reached through the instructor menu in the sidebar.
+A user who is both an instructor and an admin or manager has access to two schedule views. The org-wide schedule lives under the **Schedule** menu (see [Schedule](/operations/schedule)). A personal "My teaching schedule" view, scoped to just their own classes and bookings, is reached through the instructor menu in the sidebar.
+
+## Worked examples
+
+### Padel coach who takes private lessons
+
+Create the coach, set their **Instructor type** to _Coach_, add padel and tennis to **Sports**, set the **Hourly rate**, turn on **Bookable**, and set **Max concurrent bookings** to 1 for one-on-one lessons. Their operating hours (or shift roster) then gate when members can book them from the portal.
+
+### Class-only martial-arts lead
+
+A visiting black belt leads the Saturday BJJ class but never takes private bookings. Add them, assign them to the class, and leave **Bookable** off. They appear on classes without cluttering the booking selector or the schedule with a bookable column.
+
+### Pilates studio on rotating shifts
+
+A studio with part-time instructors turns on **shift scheduling** org-wide, builds a "Morning 06:00-14:00" shift template with a lunch break, and assigns instructors to a weekly rotation. The generated roster becomes their bookable availability; a one-off swap is edited on the **Roster** tab and sticks as a manual override.
+
+### Pay only for paid drop-ins
+
+A gym that runs paid drop-in classes sets a pay-rate policy with **Only compensate for paid bookings** on, so coaches earn on memberships, fully-paid bookings, and paid-and-checked-in external-program visits - never on no-shows or unpaid seats.
+
+## Tips & best practices
+
+- **Turn Bookable off for guest and class-only leads.** It keeps the booking selector and schedule focused on people members can actually book.
+- **Use shift scheduling when hours vary week to week.** Fixed operating hours are simpler for steady schedules; rosters suit part-time and rotating staff.
+- **Gate pay on payment to avoid overpaying.** The paid-booking toggle stops payouts on unpaid or no-show visits, and each recurring occurrence is gated on its own charge.
+- **Set sports accurately.** They drive marketplace filtering, so a member searching for a padel coach only sees the right people.
+- **Deactivate, don't delete, departing staff.** Inactive instructors drop out of selectors but keep their history on past bookings.
+
+## Troubleshooting
+
+**Issue**: An instructor isn't in the booking dialog's selector.
+
+**Solution**: Only **bookable**, **active** instructors appear. Check the **Bookable** and **Active instructor** toggles on their profile.
+
+**Issue**: An instructor wasn't paid for a booking they delivered.
+
+**Solution**: Their pay-rate policy likely has **Only compensate for paid bookings** on, and the visit is unpaid or a no-show. Pay is recorded once the charge settles; for recurring bookings, each occurrence pays out only when it's charged.
+
+**Issue**: The instructor can't sign in to their dashboard.
+
+**Solution**: Access is only granted when **Give instructor access** was on at invite. Edit the instructor and enable it to send the invitation.
+
+**Issue**: A bookable instructor shows no availability.
+
+**Solution**: If shift scheduling is on org-wide, availability comes from their **roster**, not operating hours. Assign them to a rotation or add roster shifts under **Staff > Shifts**.
 
 ## Related
 

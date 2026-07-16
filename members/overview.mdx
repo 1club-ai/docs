@@ -1,17 +1,18 @@
 ---
 title: Members overview
-description: How contacts, members, memberships, accounts, and credentials fit together in 1Club.
+description: How contacts, members, memberships, accounts, and credentials fit together in 1Club, and where each Members page lives in the admin.
+keywords: [members, contacts, memberships, accounts, households, access cards, credentials, member list]
 ---
 
-Everyone you track lives in one table: **contacts**. A contact becomes a **member** the moment you sell or assign them a membership. The same record may also be a lead, a drop-in, a parent on a household account, or a staff member - the `type` field decides where they show up in the UI.
+Everyone you track lives in one table: **contacts**. A contact becomes a **member** the moment you sell or assign them a membership. The same record may also be a lead, a drop-in, a dependent on a household account, or a staff member - the `type` field decides which bucket they show up in across the UI.
 
-The **Members** section in the admin gives you that table, plus the four things attached to it: memberships, attendance, accounts (households and companies), and access credentials.
+The **Members** section in the admin gives you that table, plus everything attached to it: memberships, accounts (households and companies), access credentials, sport ratings and matches, and document signatures. The day-to-day check-in log and attendance records live under **Schedule**, not here.
 
 ## What's in this section
 
 <CardGroup cols={2}>
   <Card title="Member list" icon="users" href="/members/member-list">
-    The contacts grid. Tabs split it into members, drop-ins, leads, lapsed members, households, and unpaid. Filter by tag, plan, status, or progression level.
+    The contacts grid. Tabs split it into members, drop-ins, leads, lapsed members, accounts, and unpaid. Filter by tag, plan, status, or progression level.
   </Card>
   <Card title="Member profile" icon="id-badge" href="/members/member-profiles">
     A single contact's page: notes, memberships, bookings, check-ins, transactions, messages, documents, credentials, and account links.
@@ -22,39 +23,44 @@ The **Members** section in the admin gives you that table, plus the four things 
   <Card title="Accounts" icon="people-roof" href="/members/accounts">
     Group contacts into households or companies for shared billing and acting-on-behalf-of permissions.
   </Card>
-  <Card title="Attendance" icon="clipboard-check" href="/members/attendance">
-    Check-in log. Add manual check-ins, link them to bookings or memberships, view by date range.
-  </Card>
   <Card title="Access cards" icon="key" href="/members/member-cards">
     QR codes, access cards, and PINs that members tap, scan, or punch in at a reader.
   </Card>
+  <Card title="Attendance" icon="clipboard-check" href="/members/attendance">
+    The check-in log. In the admin this lives under **Schedule > Attendance** and **Schedule > Check-ins**, not Members.
+  </Card>
 </CardGroup>
+
+Two more pages open from the Members header overflow menu (the three-dot button next to **Add member**):
+
+- **Matches** (`/members/matches`) - head-to-head match results that feed sport ratings. Only appears when ratings are enabled for your org.
+- **Document signatures** (`/members/document-signatures`) - the log of waivers and other documents members have signed.
 
 ## Contact vs member
 
 The two terms are not interchangeable in the data model, but the UI uses "member" almost everywhere:
 
-- A **contact** is any person record in your org. Type can be `contact`, `member`, `lead`, `drop_in`, `lapsed`, `staff`, or `archived` (used as the "deleted" disposition).
+- A **contact** is any person record in your org. Type can be `contact`, `member`, `lead`, `drop_in`, `lapsed`, `staff`, or `archived` (the "deleted" disposition - records are soft-deleted, never removed).
 - A **member** is a contact with `type = member`, which typically means they have or had a membership.
-- The page itself is labelled **Members**, but the underlying table is `contacts`. URL paths use `/members/list`, but API calls hit `/contacts`.
+- The page is labelled **Members**, but the underlying table is `contacts`. The admin URL is `/members/list`, while API calls hit `/contacts`.
 
-The Member list `type` column shows the bucket each contact is in. You can change a contact's type from their profile - the change is logged in the type history.
+The Member list `type` column shows which bucket each contact is in. You can change a contact's type from their profile, and the change is recorded in the type history.
 
 ## Plans vs memberships
 
 Plans are templates; memberships are instances:
 
-- A **plan** lives under [Billing > Plans](/billing/plans). It defines price, billing frequency, signup fee, max uses per period, validity window, scope (which classes/areas/instructors it covers), and whether it auto-renews.
+- A **plan** lives under [Revenue > Plans](/billing/plans). It defines price, billing frequency, signup fee, max uses per period, validity window, scope (which classes, areas, or instructors it covers), and whether it auto-renews.
 - A **membership** is what you assign to a specific contact when they sign up. It snapshots the plan's terms at the moment of sale, so editing the plan later does not retroactively change existing memberships.
 
-The same contact can hold more than one active membership at a time.
+The same contact can hold more than one active membership at a time. A padel club, for example, might sell a member both a "Court access" plan and a separate "Group coaching" plan that run in parallel.
 
 ## Accounts roll up billing
 
 [Accounts](/members/accounts) let you group contacts under a shared billing entity:
 
-- **Household** accounts (Owner, Adult, Dependent) keep a family unit together.
-- **Company** accounts (Admin, Employee) bill an employer for its people.
+- **Household** accounts use the roles Owner, Adult, and Dependent to keep a family unit together. A parent enrolling two kids in a jiu-jitsu kids program is a household.
+- **Company** accounts use the roles Admin and Employee to bill an employer for its people, for example a corporate gym membership.
 
 Memberships stay attached to the individual contact. Invoices and transactions roll up to the account, and account roles control who can book or check in on behalf of whom.
 
@@ -66,9 +72,10 @@ How strict the door is depends on your check-in mode. See [Access control](/sett
 
 ## Related
 
-- [Member list](/members/member-list) - find and filter contacts
+- [Member list](/members/member-list) - find, filter, and bulk-act on contacts
+- [Member profile](/members/member-profiles) - the page a row click opens
 - [Memberships](/members/memberships) - the membership grid and lifecycle
 - [Accounts](/members/accounts) - households and companies
-- [Attendance](/members/attendance) - the check-in log
+- [Attendance](/members/attendance) - the check-in log (in-app under Schedule)
 - [Smart tagging](/settings/smart-tagging) - automatic tags driven by rules
-- [Billing > Plans](/billing/plans) - the plan templates memberships are built from
+- [Revenue > Plans](/billing/plans) - the plan templates memberships are built from

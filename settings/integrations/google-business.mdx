@@ -1,42 +1,83 @@
 ---
 title: Google Business Profile
-description: Import verified business locations from Google as gyms in 1Club
+description: Import verified business locations from your Google Business Profile into 1Club as gyms, with name, address, phone, and website pre-filled.
+keywords: ["google business profile", "gbp", "import locations", "verified business", "multi-location", "onboarding", "gym import", "oauth"]
 ---
 
-The Google Business Profile integration pulls verified location data (name, address, phone, website) from your Google Business Profile into 1Club. You connect once and then import any of your verified locations as gyms - useful when onboarding a multi-site operator who already manages locations on Google.
+The Google Business Profile integration pulls verified location data (name, address, phone, website) from your Google Business Profile into 1Club. You connect once, then import any of your verified locations as gyms. It is most useful when onboarding a multi-site operator who already manages their locations on Google and doesn't want to retype every address.
+
+Google Business Profile is a paid-plan integration. Organizations on the Free plan or still in the Grow trial cannot connect it or run imports until they upgrade. Viewing and disconnecting stay available regardless of plan.
+
+## Overview
+
+- **Verified data only** - 1Club reads name, address, phone, and website from locations Google has verified. Unverified locations are not returned by Google's API.
+- **Multi-location import** - Select several locations at once; each becomes a separate gym.
+- **No duplicates** - Locations you have already imported are tracked, so re-running the import doesn't create duplicates.
+- **One-way, on-demand** - Data flows from Google into 1Club only, and only when you run an import.
+- **Secure OAuth** - Connects with Google OAuth 2.0; tokens are stored encrypted.
 
 ## Before you start
 
 - A Google account that owns or manages your Google Business Profile.
-- At least one verified location on your Business Profile. Unverified locations are not returned by Google's API.
+- At least one verified location on your Business Profile.
+- An upgraded plan (Grow trial and Free plans are blocked from connecting and importing).
 
 ## Connect Google Business Profile
 
-1. Go to **Settings → Integrations** and click **Activate** on the Google Business Profile card.
-2. On the integration page, click **Connect Google Business Profile**.
+1. Go to **Settings → Integrations** and open the Google Business Profile integration.
+2. Click **Connect Google Business Profile**.
 3. Sign in to Google and grant 1Club access to your Business Profile.
-4. You are returned to 1Club with the integration marked **Active**.
+4. You return to 1Club with the connection status shown as **Active**.
 
 ## Import locations
 
-After connecting, 1Club fetches your business accounts and the locations on the first account.
+After connecting, 1Club fetches your business accounts and lists the verified locations on the first account.
 
 1. The **Import Multiple Locations** card lists every verified location 1Club can see.
 2. Select the locations you want to import.
-3. Confirm - each selected location becomes a gym in 1Club with name, address, phone, and website pre-filled from Google.
+3. Confirm. Each selected location becomes a gym in 1Club with its name, address, phone, and website pre-filled from Google. A success banner lists the gyms that were created.
 
-You can re-run the import later to bring in newly added locations - already-imported locations will not be duplicated.
+You can re-run the import later to bring in newly added locations; locations you already imported are not duplicated.
+
+If no locations appear, the card shows: "No business locations found in your Google Business Profile. Make sure you have verified business locations set up."
 
 ## What syncs
 
-This is a one-time, one-way import. Google → 1Club, on demand. Changes you make to a gym in 1Club after import do not flow back to Google, and updates you make on Google Business Profile do not automatically update the imported gym - re-run the import only if you want to pull fresh data into 1Club.
+This is a one-time, one-way import: Google into 1Club, on demand. Changes you make to a gym in 1Club after import do not flow back to Google, and updates you make on Google Business Profile do not automatically update the imported gym. Re-run the import only when you want to pull fresh data into 1Club.
 
-## Disconnect
+## Worked examples
 
-Click **Disconnect** on the integration page. This revokes 1Club's access to your Business Profile. Gyms you already imported remain in 1Club untouched.
+### Racket-sports franchise onboarding four clubs
+
+A padel and tennis operator running four clubs already keeps every address, phone number, and site on Google. Instead of creating four gyms by hand, connect Google Business Profile, open **Import Multiple Locations**, tick all four verified locations, and import. Each becomes a gym with the correct address and contact details, ready for you to add areas (courts), operating hours, and pricing.
+
+### Single-studio owner reusing their Google listing
+
+A boutique pilates studio owner has one verified Google listing with the polished business name, address, and website they want customers to see. Connect, import the single location, and the gym record inherits that exact data, so the marketplace listing and portal match Google from day one.
+
+## Tips and best practices
+
+- Verify your locations in [business.google.com](https://business.google.com) before importing. Unverified locations never appear in the list.
+- Import first, then configure. The import fills in identity and contact fields; you still add areas, hours, pricing, and branding per gym afterward.
+- Connect with the Google account that actually manages the Business Profile - a personal account that only has viewer access will return no locations.
+- Re-run the import after adding a new location on Google rather than creating that gym manually, to keep the source data consistent.
 
 ## Troubleshooting
 
-- **"No business locations found"** - your Business Profile has no verified locations on the connected account. Verify locations in [business.google.com](https://business.google.com) and retry.
-- **"OAuth authentication was denied"** - you declined the Google consent screen. Click **Connect Google Business Profile** again.
-- **Wrong account connected** - disconnect, then reconnect with the Google account that manages your Business Profile.
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| "No business locations found" | The connected account has no verified locations on its first business account | Verify locations in [business.google.com](https://business.google.com), then retry |
+| "OAuth authentication was denied" | You declined the Google consent screen | Click **Connect Google Business Profile** again and accept |
+| "Invalid OAuth state" | The authorization round-trip took too long or used a stale tab | Start the flow fresh from the integration page |
+| Connect fails with a plan message | Your organization is on Free or still in the Grow trial | Upgrade the plan, then reconnect |
+| Wrong account connected | You signed in with a Google account that doesn't manage the Business Profile | Disconnect, then reconnect with the correct account |
+
+## Disconnect
+
+Click **Deactivate** on the integration page and confirm. This revokes 1Club's access to your Business Profile and removes the stored connection data. Gyms you already imported stay in 1Club untouched.
+
+## Related
+
+- [Integrations overview](/settings/integrations) - the full integrations catalog.
+- [Areas](/operations/areas) - configure bookable spaces inside each imported gym.
+- [Marketplace](/marketing/marketplace) - where imported gym details help power public listings.

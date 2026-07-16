@@ -1,23 +1,125 @@
 ---
 title: Members analytics
-description: Member dashboards, attendance, progression, engagement, and balance reports
+description: Dashboards and reports for member growth, activity, attendance, progression, engagement, and account balances.
+keywords: [member analytics, retention, active members, member growth, engagement score, progression tracks, balance report, drop-ins]
 ---
 
-**In a nutshell:** Members analytics cover member counts, attendance, progression, engagement, and balance so you can understand retention and usage.
+The **Members** category in **Analytics** groups the dashboards and reports that describe your people: how the base is growing, who is actually showing up, how members progress through skill levels, how engaged they are, and who owes or holds money. Each item is a focused page. Use the dashboard for the headline picture and the reports for member-by-member detail.
 
 ## Overview
 
-Use the **Analytics** hub and open the **Members** category to access:
+Open **Analytics** and pick the **Members** category to reach:
 
-- **Members dashboard** — Overview of member counts and key member metrics.
-- **Attendance** — Check-ins and attendance over time.
-- **Progression report** — Progress along progression tracks (e.g. levels or programs).
-- **Engagement** — Engagement metrics and activity.
-- **Balance report** — Member balances (e.g. credit or dues).
+- **Dashboard** (`/analytics/members/dashboard`) - Member counts, new and active members, growth trends, and top and low-engagement members.
+- **Attendance** (`/analytics/attendance/dashboard`) - Check-in volume, unique members, and peak times.
+- **Progression report** (`/analytics/members/progression-report`) - Every member's current level and history across your progression tracks.
+- **Member engagement** (`/analytics/engagement/dashboard`) - Engagement scoring per member and how scores move over time. Documented in full under [Engagement analytics](/analytics/engagement).
+- **Balance report** (`/analytics/members/balance-report`) - Members with a pending balance, split into amounts owed and credit held.
 
-Filter by club, date range, or segment as available. Use these reports to spot trends and support member success.
+The dashboard and attendance pages carry the standard **club** and **date range** filters (the date range defaults to the last 30 days). The progression and balance reports are org-wide snapshots and have no filter bar.
+
+## Members dashboard
+
+The dashboard opens with a row of KPI cards, a growth chart, and two member lists. Set a club and date range in the filter bar to scope the activity-based metrics.
+
+### KPI cards
+
+- **Total members** - Everyone whose contact type is member, counted across the whole organization. This is a live total, not scoped to the date range.
+- **Drop-ins** - Everyone whose contact type is drop-in, also an organization-wide total.
+- **New members** - Members who joined within the selected date range.
+- **Active members** - Members who had at least one booking or check-in within the range. This is your working retention signal: a member on the books who never appears here is at risk.
+- **Average engagement** - A gauge showing the average engagement score and level (low, medium, high, or rockstar). This card appears only when engagement scoring is turned on.
+
+<Tip>
+Read **total members** against **active members**. If the total holds steady but active members slides month over month, you have a retention problem hiding behind a flat headcount.
+</Tip>
+
+### Member growth trends
+
+A line chart plots **total members**, **drop-ins**, and the **combined total** week by week. The series are reconstructed from recorded type changes, so a contact converting from drop-in to member moves the lines accordingly. Use it to see whether the base is genuinely growing or just churning in place.
+
+### Top members and low engagement alerts
+
+Below the chart, two lists surface individuals:
+
+- **Top members** - The most engaged members by score, for recognition or referrals.
+- **Low engagement alerts** - Members scored as low engagement, each with a **last activity** date so you can prioritize a check-in call.
+
+Both lists depend on engagement scoring being enabled and populated. If scoring is off, the gauge and these lists have nothing to show. See [Engagement analytics](/analytics/engagement) for how scores are calculated.
+
+## Attendance
+
+The **Attendance** page sits in the Members category and tracks who is coming in. Its KPI cards cover **total check-ins**, **unique members**, **average check-ins per member**, and **no-show rate**, and its charts show **attendance trends** over time, **peak times**, attendance **by club**, and **by area type**. Use it to find your busiest hours and to catch a rising no-show rate before it eats into capacity. For the operational side of check-ins, see [Members > Attendance](/members/attendance).
+
+## Progression report
+
+If you run skill progression, this report lists every member's level per track. It shows one tab per **progression track**, and within each track a table with three columns:
+
+- **Member** - Links to the member's profile.
+- **Current level** - The member's current skill and level, shown as a chip.
+- **History** - The chain of level changes over time, oldest to newest, so you can see how far and how fast someone has moved.
+
+Members are ordered by how actively they are progressing. If no tracks are set up, the page shows a "no progression tracks enabled" message. Use the **Export** button (top right) to pull the full report to CSV.
+
+## Balance report
+
+The balance report is a money-owed and money-held snapshot built from pending transactions. It has no date filter because it reflects current outstanding balances, and it offers an **Export** button for the full list.
+
+### Summary cards
+
+- **Members with pending balance** - How many members have any pending transaction.
+- **Members owing** - How many members owe money.
+- **Total due** - The sum owed to you across all members.
+- **Total credit** - The total credit members hold (wallet credit plus any positive account balance).
+- **Total wallet credit** - The portion of that credit held specifically as wallet balance.
+
+<Note>
+Amounts owed and credit held are reported separately and are never netted against each other. A member who owes 100 and also holds 100 in credit still appears as owing 100. This keeps genuine debt visible instead of masking it with unrelated credit.
+</Note>
+
+### Member table
+
+Each row shows the member, a count of their **pending transactions**, the amount **due**, and the **credit** they hold, with the biggest debtors listed first. Expand a row to see the individual pending transactions (date, description, type, and amount); clicking a transaction opens it in [Billing > Transactions](/billing/transactions).
+
+## Worked examples
+
+### Spotting a retention dip
+
+A boxing gym shows 320 total members, steady for three months. On the members dashboard the owner sets the range to the last 30 days and reads **active members** at 190, then reruns it for the previous month and gets 235. The headcount is flat but real activity fell by roughly 20%. The **member growth trends** chart confirms new joins are offsetting quiet churn. The next step is the **low engagement alerts** list to call the at-risk members before they lapse.
+
+### Tracking progression in a jiu-jitsu program
+
+A jiu-jitsu academy runs belt progression as a track. The progression report's track tab lists every student with their current belt and the history of promotions. Coaches sort attention toward students who have not moved in a long time, and export the tab to CSV for the quarterly grading review.
+
+### Chasing outstanding balances at a climbing gym
+
+A climbing gym's front desk opens the balance report at month end. **Members owing** and **total due** quantify the debt; the table puts the largest debtors on top. Expanding a row reveals which specific transactions are unpaid, and each links straight through to the transaction to take payment or follow up.
+
+## Tips and best practices
+
+- **Use active members, not total members, to judge health.** Total members counts anyone on the books; active members counts who actually showed up in the range.
+- **Turn on engagement scoring to unlock the people lists.** The engagement gauge, top members, and low-engagement alerts all need scoring enabled.
+- **Balance and progression reports ignore the date range** because they are current snapshots. Do not expect them to react to the filter bar.
+- **Export for follow-up work.** The progression and balance reports both export to CSV for offline lists, grading reviews, or collections.
+- **Cross-check activity against attendance.** If active members looks off, the attendance page shows the underlying check-in volume and peak times.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| The engagement gauge and member lists are empty | Engagement scoring is off or has not run yet | Enable engagement scoring; see [Engagement analytics](/analytics/engagement) for setup and how scores are produced. |
+| Active members looks lower than expected | Only members with a booking or check-in in the range count as active; the range may be short | Widen the date range, and confirm bookings and check-ins are being recorded for the club. |
+| Total members did not change but the dashboard feels off | Total members is a live organization-wide count and ignores the date range | Read new members and active members for range-scoped figures instead. |
+| Balance report does not respond to the date filter | It is a current snapshot with no date filter by design | Interpret it as "as of now". Use [Billing > Transactions](/billing/transactions) for dated history. |
+| Progression report says no tracks are enabled | No progression tracks are set up for the organization | Set up progression tracks before the report can populate. |
+| A member owes and holds credit but still shows as owing | Due and credit are reported separately and never netted | This is expected. Apply their credit to the balance in billing if you want to clear it. |
 
 ## Related
 
-- [Analytics overview](/analytics/overview) — All analytics categories.
-- [Members](/members/overview) — Member management.
+- [Analytics overview](/analytics/overview) - How every dashboard is laid out and who can see what.
+- [Clubs analytics](/analytics/clubs) - Activity, revenue, and utilization by location.
+- [Engagement analytics](/analytics/engagement) - Full detail on member engagement scoring.
+- [Members > Member list](/members/member-list) - Manage individual members.
+- [Members > Attendance](/members/attendance) - The operational view of check-ins.
+- [Members > Memberships](/members/memberships) - Plans, terms, and membership status.
+- [Billing > Transactions](/billing/transactions) - The dated ledger behind the balance report.

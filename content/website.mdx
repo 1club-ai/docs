@@ -3,15 +3,26 @@ title: Website builder
 description: Design, translate, and publish your gym's public site from inside the admin. Sections pull live data from the platform, edits live in a draft, releases are versioned.
 ---
 
-The Website builder under **Content > Website** runs your gym's public site without leaving the admin. Each organization has one site made of pages, and each page is made of sections you can add, reorder, and configure. Many sections pull live data from the platform (your plans, classes, instructors, locations, reviews) so the site stays accurate as operations change. Edits live in a draft, you publish them as a release, and you can roll back to any previous release.
+The Website builder under **Marketing > Website** runs your gym's public site without leaving the admin. Each organization has one site made of pages, and each page is made of sections you can add, reorder, and configure. Many sections pull live data from the platform (your plans, classes, instructors, locations, reviews) so the site stays accurate as operations change. Edits live in a draft, you publish them as a release, and you can roll back to any previous release.
 
 <Note>
   The public website is a **plan add-on**. It's included on the Grow plan,
   available as a paid add-on on the Run plan, and unavailable on the Free plan.
-  Manage it under **Settings → Account** in your subscription. While the Website
+  Manage it under **Settings > Account** in your subscription. While the Website
   add-on is inactive, your public site is replaced by a simple unbranded holding
   page rather than returning an error.
 </Note>
+
+## Overview
+
+- **One public site per organization**, built and edited entirely inside the admin - no separate CMS to learn.
+- **Pages made of ordered sections.** Add, reorder, duplicate, and configure sections from a catalog of layout, hero, live-data, content, and form types.
+- **Live-data sections** render your plans, classes, events, instructors, areas, locations, products, and reviews straight from the platform, so the site stays accurate as operations change.
+- **Draft and release model.** Every edit stays in a draft until you publish; releases are versioned and you can roll back to any of them.
+- **AI website builder** that can add pages and sections, write copy, pick images, translate, and tune CSS for you - always editing the draft, never publishing on its own.
+- **Multi-language** with one-click AI translation across all your locales.
+- **Branding, custom domain, SEO, analytics, cookie consent, and custom CSS** are all managed from the same editor.
+- **Plan add-on gating** with a graceful, unbranded holding page when the Website add-on is inactive.
 
 ## How the site is structured
 
@@ -83,9 +94,24 @@ These pull from the platform automatically. There is nothing to sync; they alway
 
 - **Contact form** lead-capture form. You choose the fields to show (name and email are always on; phone, date of birth, gender, category, subject, message are optional). It also supports any custom fields you have defined under **Settings > Contacts**. Each submission creates a **lead** contact in your CRM and an inbound message you can reply to from the inbox.
 
+### Section anatomy
+
+Under the hood every section is the same simple shape: a **type**, a **config**, and optional **translations**.
+
+- **Type** decides what the section renders (`hero`, `plans`, `gallery`, and so on) and which fields it exposes.
+- **Config** holds the section's settings - text, numbers, dropdowns, image references, and structured lists.
+- **Translations** store per-locale overrides for the translatable text, keyed by field. Complex lists (nav items, CTA buttons, footer link groups) carry stable per-item IDs, so translations survive when you reorder items.
+
+Two config fields appear on most content sections and are worth knowing:
+
+- **Background tone** (`default`, `muted`, `elevated`, `primary`) sets the section's background. `primary` tints it with a subtle wash of your brand color; use it to make one section stand out without hardcoding colors.
+- **Size** (`content` or `full`) controls width: `content` constrains to a centered max-width, `full` runs edge to edge.
+
+Layout section types (`header`, `footer`) live once at the site level and appear on every page. Content section types live in each page's ordered list. The editor keeps these separate for you - you will not see a hero offered as a header, or a footer offered inside a page. This same config schema drives both the manual property panels and the AI builder, so anything you can set by hand, the assistant can set too.
+
 ## The editor
 
-Open **Content > Website** to launch the editor. It has three regions:
+Open **Marketing > Website** to launch the editor. It has three regions:
 
 - **Section list (left)** every section on the current page, in order. Drag to reorder. Each row has a context menu: **Edit**, **Move up/down**, **Duplicate**, **Translate**, **Delete**.
 - **Live preview (right)** your site renders in an iframe that updates as you edit. Toggle between desktop and mobile widths.
@@ -99,7 +125,30 @@ Behavior you can rely on:
 - **Inline editing.** Click a headline in the preview to edit it in place; click away to commit.
 - **Unsaved-changes indicator.** A banner appears when your draft differs from the published release; that is your cue to publish.
 
-There is also an **AI assistant** mode in the right sidebar. Ask it to add a section, redesign a page, draft body copy, fill in stats, or translate the site; it edits the draft the same way you would.
+There is also an **AI website builder** in the right sidebar. It is covered in full below.
+
+## AI website builder
+
+The AI website builder is an assistant that edits your site by chatting with it. Ask it to "add a pricing page", "make the hero more energetic", "add an FAQ about parking", or "translate the whole site into Spanish", and it makes the changes for you the same way you would in the editor.
+
+What it can do:
+
+- **Build and edit pages and sections.** It adds pages, adds or removes sections at a chosen position, and merges new settings into an existing section.
+- **Write copy grounded in your data.** It reads your real organization facts - name, description, clubs, cities, amenities, sports, plans, branding - and writes headlines and body copy from them rather than inventing awards or history.
+- **Pick images from your library.** It searches your [Media library](/content/media) by name (for example "pool" or "reformer") and sets the match on a hero or CTA. It never uploads on your behalf, so it only uses images you already have.
+- **Manage layout, content, and CSS.** It can update the header and footer, create or edit reusable content items (blocks, FAQs, posts), and adjust custom CSS using theme tokens (never hardcoded colors).
+- **Translate.** It fills missing translations per section across your locales.
+- **Undo.** It keeps a short history of its own changes so you can revert the last one.
+
+What it will not do:
+
+- **It only edits the draft.** Like every edit in the builder, the assistant's changes stay in the draft. Nothing goes live until *you* publish a release.
+- **It cannot publish, reset, or delete the site.** Those actions are yours alone, from the UI.
+- **It respects the layout-versus-content rule.** It will not put a header inside a page or a hero into the site layout, and it always sets required fields (for example, a hero's variant).
+
+### Starter content generation
+
+When you first create a site from a template, the builder seeds it with copy written from your organization's stored facts: a home hero headline, a hero subheadline, and an About-page intro, generated in your default language. If generation is unavailable, the site falls back to sensible default copy. Either way, a brand-new site reads like *your* site from day one instead of showing generic placeholders you have to overwrite.
 
 ## Theming and branding
 
@@ -156,6 +205,10 @@ Built into the site:
 - You can attach a **custom domain** in the site settings; point your DNS to 1Club following the on-screen instructions.
 - HTTPS is provisioned automatically.
 
+### Holding page
+
+The public website is a plan add-on. If the add-on becomes inactive while you still have published content or a custom domain pointed at 1Club, visitors do not see an error or a 404. Instead, 1Club serves a generic, unbranded **holding page** that says the site is temporarily unavailable. It protects your public reputation, avoids leaking 1Club branding, and disappears the moment the add-on is active again - your live site returns exactly as it was, from the last active release. Reactivate the add-on under **Settings > Account** to bring the site back.
+
 ## Publishing and releases
 
 Edits do not go live until you publish.
@@ -164,6 +217,7 @@ Edits do not go live until you publish.
 2. **Publish** opens a dialog with two modes:
    - **Amend** (default) updates the active release in place. Use this for typo fixes, small copy tweaks, or routine content updates. No new version is created.
    - **Snapshot** creates a new versioned release. Use this for bigger changes you may want to roll back from cleanly.
+
 3. **Active release** what the public site is serving right now.
 4. **Releases history** every snapshot is kept. Open the history panel to view, compare, or **roll back** to a previous release; the chosen release becomes the active one.
 5. **Rollback to no release** is the closest thing to an unpublish - use the history panel to roll back to an earlier release, or contact support if you need the site fully offline.
@@ -195,6 +249,17 @@ Publish as Snapshot before big changes. Take a snapshot of the current site firs
 Translate after you stabilize copy. Running AI translation early means redoing it when you keep tweaking the English. Lock the source copy, then translate.
 
 Wire the contact form to a tag. Tag new leads from the website so [automations](/marketing/automations) and [promotions](/marketing/promotions) can find them.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| Edits don't show on the live site | Changes are saved to the draft, not published | Open the publish dialog and publish a release (**Amend** for small tweaks, **Snapshot** for bigger ones) |
+| Publish button is disabled or fails | Publishing and rollback require an active **Website** add-on | Activate or renew the add-on under **Settings > Account**, then publish again |
+| Public site shows a plain "temporarily unavailable" page | The Website add-on is inactive, so the holding page is served | Reactivate the add-on under **Settings > Account**; your last active release returns automatically |
+| A live-data section is empty or missing | There is no data to show yet (no published plans, no live events) | Publish the underlying records; sections like **Events** self-hide until there is something to show |
+| New languages show English text | Translations were not filled after you changed the source copy | Run **AI translate**, review the results, then publish |
+| A plans link points somewhere odd | Plans always link to `/plans`; there is no `/pricing` page | Leave plan CTAs pointing at `/plans` and do not create a `/pricing` route |
 
 ## Related
 

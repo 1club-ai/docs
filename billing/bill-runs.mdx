@@ -1,11 +1,24 @@
 ---
 title: Bill runs
-description: Sweep a period of pending transactions into invoices in one batch.
+description: Sweep a period of unbilled transactions into invoices in one batch, on demand or on a schedule, and understand how automated membership renewals charge and dun separately.
+keywords: [bill run, batch invoicing, recurring billing, scheduled bill run, membership renewal, auto-renew, dunning, failed charge, past due]
 ---
 
-A bill run takes every billable transaction in a period and groups it into invoices. That's the whole job. Bill runs do **not** charge anybody, send anything, or retry failed payments - they generate invoice documents and stop.
+A bill run takes every billable transaction in a period and groups it into invoices. That is the whole job. Bill runs do **not** charge anybody, send anything, or retry failed payments - they generate invoice documents and stop.
 
-If you've been told "the bill run will collect money," that's wrong. Collection happens separately, through the [Payments](/billing/payments) flow or by sending an invoice payment link.
+If you have been told "the bill run will collect money," that is wrong. Collection happens separately, through the [Payments](/billing/payments) flow, by sending an invoice payment link, or - for auto-renewing memberships - through the automated renewal engine described lower on this page.
+
+## Overview
+
+From **Revenue > Bill runs** you can:
+
+- Run a bill run on demand for a chosen period, with optional filters and a live preview before you commit.
+- Group transactions one invoice per contact, or a single combined invoice, based on your organization's billing preference.
+- Schedule recurring bill runs (daily, weekly, or monthly) and trigger any saved schedule with **Run now**.
+- Review every past run and the invoices it produced.
+- Delete a run without deleting the invoices it created.
+
+Automated collection of recurring membership dues is a **separate** system - see [Automated membership renewals and dunning](#automated-membership-renewals-and-dunning). Do not confuse it with bill runs.
 
 ## What counts as billable
 
@@ -13,25 +26,25 @@ A transaction is included in a bill run when all of the following are true:
 
 - It belongs to the organization running the bill run.
 - Its date falls inside the period you select.
-- `isInvoiced` is `false` (it hasn't been swept into an invoice yet).
+- `isInvoiced` is `false` (it has not been swept into an invoice yet).
 - Its `paymentStatus` is not `void`.
-- Its `transactionType` is one of the allowed types (booking, membership, signup fee, product sale, external program entry).
+- Its transaction type is one of the billable types: booking creation, membership creation, membership recurrence, or membership signup fee. Booking-cancellation transactions are excluded because they are settled, not owed.
 
-Already-paid transactions are still billable as long as they aren't on an invoice yet. The bill run produces a receivable record for them, just one that opens as **paid**.
+Already-paid transactions are still billable as long as they are not on an invoice yet. The bill run produces a receivable record for them, just one that opens as **paid**.
 
 ## One invoice per contact, or one for everyone
 
-Your organization's **billing preference** (set under **Settings > Billing**) decides how the bill run groups transactions:
+Your organization's **billing preference** decides how the bill run groups transactions:
 
 - `separate` (default): one invoice per contact, containing all of that contact's transactions in the period.
 - `single`: one combined invoice covering every billable transaction in the period, addressed to the first contact in the set.
 
-For most gyms `separate` is what you want. `single` is for B2B billing where a corporate account is paying for many people in one document.
+For most gyms `separate` is what you want. `single` is for B2B billing where a corporate account pays for many people in one document.
 
 Every created invoice gets:
 
-- A generated **invoice number** following your invoice template.
-- An **invoice date** set to the moment the run executed (in the organization's timezone).
+- A generated **invoice number** following your organization's numbering template (see [Invoices](/billing/invoices#invoice-numbering)).
+- An **invoice date** set to the moment the run executed, in your organization's timezone.
 - A **due date** 30 days after the invoice date.
 - Line items pointing back to the original transactions.
 - A status derived from those transactions (`paid`, `partially_paid`, `pending`, or `overdue` based on the due date).
@@ -40,44 +53,110 @@ After invoices are written, each included transaction is marked `isInvoiced = tr
 
 ## Running a bill run manually
 
-1. Go to **Billing > Bill runs** and click the **Bill run** action.
-2. Give the run a name (defaults to `<month> <year> Bill Run`).
-3. Pick a **Period start** and **Period end**. Defaults to the current month.
-4. Optionally narrow the set with filters: transaction types, specific contacts, specific plans, an amount range.
-5. Click **Preview** to see exactly which transactions will be invoiced. The preview shows transaction count, contact count, total amount, and a per-type breakdown.
-6. Click **Confirm** to generate the invoices.
+1. Go to **Revenue > Bill runs** and click the **Bill run** action (or **Add** from the Invoices page).
+2. Give the run a **Name**. It defaults to `<Month Year> Bill Run`.
+3. Pick a **Period start** and **Period end**. Both default to the current month.
+4. Optionally narrow the set under **Filters**: transaction types, specific contacts, specific plans, and a minimum/maximum amount range.
+5. Click **Preview** to see exactly which transactions will be invoiced.
+6. Review the summary cards - transaction count, contact count, total amount, and the resulting invoice count - plus the per-transaction-type breakdown chips and the full transaction grid.
+7. Click **Confirm** to generate the invoices. You land on the bill run details page listing every invoice it created.
 
-The **Auto-charge invoices** toggle on the form is a UI placeholder; the field is accepted by the API but is not wired to anything in the current backend. Leave it off. Use the [Transactions](/billing/transactions) batch-charge or invoice **Charge** actions to collect on what the run produces.
+The **Auto-charge invoices** toggle on the form is a UI placeholder. The field is accepted by the API but is not wired to anything in the current backend, so leave it off - confirming the run generates invoices only. To collect on what the run produces, use the [Transactions](/billing/transactions) batch-charge action or send payment links from the individual [invoices](/billing/invoices).
 
-When the run finishes you land on the bill run details page with the list of invoices it created. From there you can click into any invoice to send a payment link or record payment.
+### Per-field guide
+
+| Field | When to use it |
+|-------|----------------|
+| **Name** | Label the run so you can find it later (for example "March 2026 memberships"). |
+| **Period start / end** | Bound which transaction dates are swept. Widen to catch a missed period; narrow to bill a single week. |
+| **Transaction types** | Bill only certain revenue, for example membership recurrence but not one-off bookings. |
+| **Contacts** | Bill a specific set of members, for example only a corporate account's staff. |
+| **Plans** | Restrict to memberships on chosen plans - useful when only some plans invoice monthly. |
+| **Amount range** | Exclude trivial or unusually large transactions from an automated sweep. |
 
 ## Scheduled bill runs
 
-To run on a recurring schedule, use **Settings > Billing > Automated bill runs**.
+To run on a recurring schedule, open the **Automated bill runs** area (reached from **Settings > Billing**) and create a schedule.
 
 Each schedule has:
 
-- A **name** and **description**.
-- A **frequency** (daily, weekly, monthly) and **time of day** that compile to a cron expression.
-- Optional **filters** identical to the manual form.
+- A **Schedule name** and **Description** (both required).
+- A **Frequency** - daily, weekly, or monthly - plus a **Time** of day, and a **Day of week** or **Day of month** where relevant. These compile to a cron expression shown in plain language in the list.
+- Optional **Filters** identical to the manual form.
 
-When a schedule fires, it calls the same `executeBillRun` service the manual flow uses, with a default period (current month) and the saved filters. You can also trigger a saved schedule on demand from the **Run now** action; that confirmation dialog spells out which contacts and transaction types will be hit before it runs.
+When a schedule fires, it calls the same bill-run service the manual flow uses, with a default period (the current month) and the saved filters. You can also trigger a saved schedule on demand with **Run now**; that confirmation dialog spells out which contacts and transaction types will be hit before it runs, and then takes you to the invoices the run produced.
 
-A scheduled run executes silently in the background; it does not email members or notify admins on completion. To see results, open the **Bill runs** list (the new run will appear there with its created invoices).
+A scheduled run executes silently in the background. It does not email members or notify admins on completion. To see results, open the **Bill runs** list - the new run appears there with its created invoices.
 
 ## Deleting a bill run
 
-Deleting a bill run from the details page clears the `billRunId` on every invoice in it, then removes the bill run record. The invoices and their line items are kept. The original transactions stay marked `isInvoiced = true`. If you want those transactions to become billable again you have to delete the invoices too.
+Deleting a bill run from its details page clears the `billRunId` on every invoice in it, then removes the bill run record. The invoices and their line items are kept. The original transactions stay marked `isInvoiced = true`. If you want those transactions to become billable again, delete the invoices too (which reverts them).
 
-## Known limits
+## Automated membership renewals and dunning
 
-- No automatic retry. If you mean to run weekly and miss a week, schedule a one-off catch-up run.
-- No row-level dry run beyond the preview. Once you click **Confirm**, the invoices are written.
-- The `autoCharge` field on the create-bill-run API doesn't trigger any charge. Treat bill runs as invoice generation only.
+Recurring membership dues are **not** collected by bill runs. They are collected by a separate hourly engine that renews auto-renewing memberships and charges the member's stored card. Understanding this is the difference between "my members get charged automatically" (renewal engine) and "I generated invoices for the month" (bill run).
+
+### How renewal charging works
+
+Every hour, the renewal engine looks at each active, auto-renewing membership whose renewal is due within its advance window (`renewalDaysInAdvance`, 3 days by default) and:
+
+1. Reconciles the membership's renewal date forward past any period already paid out of band (a manual payment, a sync-paid signup, or a Stripe webhook), so it never re-bills a covered period.
+2. Ensures the upcoming period's recurrence transaction exists, seeding it if missing.
+3. Charges the owed transaction against the contact's **default Stripe payment method** once it enters the advance window, then advances the renewal date to the period end on success.
+
+Charging requires the organization to have active Stripe Connect. If the org is not on Stripe, the engine leaves the transaction owed for manual collection and does not advance the chain. A genuinely zero-amount renewal is settled without a charge so the chain keeps moving.
+
+The same hourly job also marks any `pending` transaction whose date has passed as `overdue`.
+
+### Failed-charge handling (dunning)
+
+When a renewal charge fails - a declined card, no card on file, or a transient Stripe error - the engine:
+
+- Records a `failed` payment row as a per-attempt audit trail (or flips the existing attempt's row to `failed`).
+- Flips the transaction's own `paymentStatus` to `failed`. This surfaces it in admin lists, feeds the automatic **Past Due** member tag, and excludes the row from the next hourly tick, so a failure is attempted once per renewal rather than retried every hour.
+- Emits a payment-failed event, which notifies the member and is available as an [automation](/marketing/automations) trigger for your own follow-up sequences.
+
+Two deliberate behaviors to know:
+
+- **A failed renewal charge never deactivates the membership.** The member stays active and the billing chain still advances so the next period seeds normally. Cancelling a delinquent member is a staff decision, not an automatic one.
+- **Recovery is automatic.** A later successful payment flips the transaction from `failed` back to `paid` (or `partially_paid`), so the failed state is never sticky once the obligation is met.
+
+There is no built-in multi-attempt retry cadence. Dunning here means "notify and tag once, then leave it for staff or an automation" - not an escalating retry schedule.
+
+## Worked examples
+
+**Yoga studio - monthly membership sweep.** Members on monthly plans auto-renew and are charged by the renewal engine as each renewal date arrives. Separately, you schedule a monthly bill run on the 1st so every member has a dated invoice document for their records. The bill run does not double-charge - it only wraps the already-billed transactions into invoices.
+
+**Boxing gym - corporate team billing.** A company sponsors ten fighters. Set the organization billing preference to `single` and filter a bill run to those ten contacts, producing one combined invoice you send to the company. Everyone else continues to invoice `separate`.
+
+**Climbing gym - catch-up run.** You realize last week's scheduled run was misconfigured and skipped a plan. Run a one-off manual bill run for that period, filtered to the affected plan, preview to confirm the count, then confirm. Already-invoiced transactions are skipped automatically.
+
+**Pilates studio - failed card recovery.** A member's card expires and their monthly renewal fails. The engine tags them **Past Due**, records the failed attempt, and fires a payment-failed event that your automation turns into a "please update your card" email. When they add a new card and it charges, the transaction flips back to `paid` and the tag clears on the next tagging pass. The membership was never interrupted.
+
+## Tips & best practices
+
+- Treat bill runs as invoice generation and the renewal engine as collection. If members need to be charged automatically, the lever is membership **auto-renew** plus Stripe Connect, not the bill run's auto-charge toggle.
+- Always **Preview** before **Confirm**. Once you confirm, invoices are written and the transactions are marked invoiced.
+- Filter scheduled runs so they sweep only what you intend - an unfiltered monthly run picks up every billable transaction type in the period.
+- Turn the payment-failed event into an [automation](/marketing/automations) so members with a declined renewal are chased without manual work.
+- If you miss a scheduled period, run a one-off manual catch-up run - there is no automatic backfill.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Bill run confirmed but no money was collected | Bill runs only generate invoices; the auto-charge toggle does nothing. | Collect via [Payments](/billing/payments), invoice payment links, or rely on membership auto-renew. |
+| A transaction you expected isn't in the preview | It is voided, already invoiced, outside the period, or not a billable type. | Check its status and date; delete any invoice already holding it to make it billable again. |
+| Members on auto-renew were never charged | The organization isn't on active Stripe Connect, or the member has no default card. | Complete Stripe Connect setup and confirm the contact has a saved default payment method. |
+| A member's renewal keeps failing every day | It won't - a failed charge flips the transaction to `failed` and is excluded from the next tick. | Fix the card, then the next successful payment clears the failed state; no daily re-charge occurs. |
+| Deleting a bill run didn't make its transactions billable again | Deleting a run keeps its invoices, which still hold the transactions. | Delete the invoices too - that reverts the transactions to billable. |
+| A membership stayed active despite a declined renewal | By design - renewal failures never auto-deactivate. | Follow up manually or via automation, and cancel the membership if you choose to. |
 
 ## Related
 
 - [Invoices](/billing/invoices)
 - [Transactions](/billing/transactions)
 - [Payments](/billing/payments)
-- [Billing overview](/billing/overview)
+- [Memberships](/members/memberships)
+- [Automations](/marketing/automations)
+</content>

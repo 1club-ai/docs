@@ -1,0 +1,156 @@
+---
+title: "Email inboxes"
+description: "Route inbound member emails into the 1Club Inbox by forwarding your club's address to a verified forwarding inbox."
+keywords: [email inbox, inbound email, forwarding, verification, SendGrid, inbox, reply, domain verification, sending domain]
+---
+
+An email inbox connects a club's real email address (for example `hello@yourclub.com`) to the 1Club **Inbox** so that messages members send to that address show up as inbound conversations you can read and reply to in one place. You forward mail from your provider to a 1Club forwarding address, verify the inbox once, and from then on every inbound email threads into the [Inbox](/messaging/overview) alongside your outbound messages.
+
+## Overview
+
+- **One inbox per club** - Each inbox is scoped to a single club and its address.
+- **Forwarding address** - 1Club generates a unique forwarding address per inbox; you point your provider's forwarding at it.
+- **Verification** - An inbox stays inactive until you click the verification link, so mail is never captured from an address you don't control.
+- **Threading into the Inbox** - Inbound mail becomes an inbound message, is matched to a contact (created if new), and is threaded onto the original conversation when it is a reply.
+- **Message count and status** - The list shows how many messages each inbox has captured and whether it is verified.
+- **Sending domain (separate)** - Verifying a sending domain lets outbound mail and replies leave from your own domain rather than a platform default. This is configured under **Settings > Domains**, not here, but it pairs naturally with an inbox.
+
+## Adding a club inbox
+
+Inboxes live under **Settings > Email inboxes** (in the **Communication** category of Settings). Adding one takes three moves: create the inbox, forward your provider's mail to the address 1Club gives you, then verify.
+
+1. Click **Add Inbox** in the top right.
+2. Choose the **Club** this inbox belongs to.
+3. Enter the **Email address** members already write to (for example `frontdesk@yourclub.com`). This is the address you own and want to capture mail from.
+4. Click **Add**. 1Club creates the inbox and shows a green **Inbox created successfully!** panel containing the **forwarding address** to use in the next step.
+
+The forwarding address is generated for you in the form `{organization-slug}_{club-slug}@inbox.1club.ai`. Copy it with the copy button - you will paste it into your email provider.
+
+<Note>
+The email address you enter cannot be changed after the inbox is created (the field is read-only when editing). If you typed it wrong, delete the inbox and add a new one.
+</Note>
+
+### Set up forwarding at your provider
+
+In your email provider (Gmail, Outlook, or similar), set the club address to forward incoming mail to the 1Club forwarding address you just copied. The in-app setup instructions summarize the same three steps:
+
+1. Create an inbox with your email address.
+2. Copy the forwarding address and set up forwarding in your email provider (Gmail, Outlook, etc.).
+3. Click the verification link in the email 1Club sends you to verify your setup.
+
+<Tip>
+Most providers send their own confirmation code to the forwarding address before they will forward. Because that confirmation lands at `inbox.1club.ai` rather than a mailbox you can open, prefer providers or rules that let you enable forwarding without a round-trip code, or use a catch-all/alias rule. If your provider strictly requires a code you cannot retrieve, forward selectively with a filter instead.
+</Tip>
+
+## Domain verification
+
+There are two distinct "verifications" in play. Keep them separate:
+
+- **Inbox verification** activates inbound capture for one inbox. It is a single click on a link 1Club emails to the address you entered. Covered below.
+- **Sending-domain verification** lets 1Club send outbound email and replies *from* your own domain. It is a DNS setup under **Settings > Domains** and is optional but recommended.
+
+### Verify the inbox (activate inbound capture)
+
+When you create an inbox (or resend verification), 1Club emails a verification link to the address you entered. Clicking it marks the inbox **Verified** and activates inbound capture.
+
+- The link carries a one-time token that expires. If it lapses, use **Resend Verification** to get a fresh one.
+- Until an inbox is verified, inbound mail to its forwarding address is dropped - the webhook only accepts mail for a verified inbox.
+- An unverified inbox shows an **Unverified** status chip (amber). A verified inbox shows **Verified** (green).
+
+To resend: open the inbox row's actions menu and choose **Resend Verification**, or open the inbox and click **Resend Verification** in its status panel. Confirm the prompt and a new link is sent to the inbox address.
+
+### Verify your sending domain (optional, recommended)
+
+Verifying the domain your club emails come from means outbound messages and replies leave as `you@yourclub.com` instead of a platform address, which improves deliverability and trust. Without it, 1Club still sends, but falls back to the platform sending address and sets your club address as reply-to.
+
+1. Go to **Settings > Domains** and click **Add**.
+2. Enter your domain (for example `yourclub.com`) and set **Purpose** to **Email**.
+3. 1Club provisions the domain with SendGrid and shows the **DNS records** to add - three CNAME records when automatic security is used.
+4. Add those records at your DNS host, then click **Verify**. The status moves from **Pending** to **Verified** (or **Failed** if the records aren't found yet - propagation can take time, so retry later).
+
+Once the domain is verified for the **Email** purpose, 1Club uses a matching club or organization address as the **From** on outbound mail; otherwise it uses the address only as reply-to. This applies to all mail sent on the organization's behalf, including replies you send from the Inbox.
+
+<Note>
+The inbox forwarding address always uses the platform's `inbox.1club.ai` domain and does not require any DNS setup from you. Sending-domain verification only affects outbound mail, not inbound capture.
+</Note>
+
+## How inbound email threads into the Inbox
+
+When a member emails your club address and your provider forwards it to the 1Club forwarding address, 1Club receives it through a SendGrid Inbound Parse webhook and does the following:
+
+1. **Finds the inbox** by matching the forwarding address back to the organization and club. If no verified inbox matches, the mail is ignored.
+2. **Resolves the sender** by email. If no contact exists yet, a new contact is created from the sender's name and email; if the display name changed, the contact's name is updated.
+3. **Creates an inbound message** with `direction: inbound`, tagged to the inbox, storing the original club address as the recipient.
+4. **Threads replies** when the incoming mail carries `In-Reply-To` / `References` headers that match an existing message, or when the subject is a `Re:` of an earlier inbound message. Otherwise it starts a new conversation.
+
+The result appears in the [Inbox](/messaging/overview) as an inbound conversation you can open and reply to. Replies you send from the Inbox use your verified sending domain when one is set up (see above).
+
+<Note>
+Inbound messages are attributed to a staff user internally (the owner, or the earliest-added admin, manager, front-desk, or instructor). This is a system detail; in the Inbox the conversation is shown against the member contact who wrote in.
+</Note>
+
+## Viewing captured messages
+
+The inbox list shows a **Messages** count per inbox. Day-to-day, you read and answer captured mail in the [Inbox](/messaging/overview) rather than on this settings page - this page is for setting inboxes up and checking their status.
+
+## Worked examples
+
+### Padel club front desk
+
+Your racket-sports club publishes `bookings@acepadel.com` on its website and members reply to booking confirmations there.
+
+- Add an inbox for the **Ace Padel** club with email `bookings@acepadel.com`.
+- Forward `bookings@acepadel.com` to the generated `acepadel_downtown@inbox.1club.ai`.
+- Verify the inbox. Now a member replying "can I move my court to 7pm?" lands in the Inbox threaded under the original confirmation, and the front desk answers without leaving 1Club.
+
+### Multi-location gym chain
+
+Your fitness organization runs three clubs, each with its own address.
+
+- Add one inbox per club (`northside@`, `harbor@`, `airport@`), each scoped to its club.
+- Each gets its own forwarding address, so mail is attributed to the right location automatically.
+- Verify your `yourgym.com` sending domain once under **Settings > Domains** so replies from every club go out branded.
+
+### Martial-arts school with one shared mailbox
+
+Your jiu-jitsu and muay-thai academy runs everything through `info@northgatemma.com`.
+
+- Add a single inbox for the academy's club with that address.
+- Forward `info@` to the forwarding address and verify.
+- New senders who aren't members yet are auto-created as contacts, so first-time enquiries from prospective students still land in the Inbox and can be followed up.
+
+## Tips & best practices
+
+- **Verify before you rely on it.** Inbound mail is silently dropped for unverified inboxes. Send a test email to the club address and confirm it appears in the Inbox before announcing the address.
+- **One inbox per real mailbox.** Don't point two clubs' forwarding at the same source address; capture is keyed on the forwarding address per club.
+- **Pair inbox capture with a verified sending domain.** Members reading a reply from your own domain trust it more, and deliverability is better.
+- **Keep the club address stable.** Because the address can't be edited, choose the mailbox you intend to keep before creating the inbox.
+
+## Troubleshooting
+
+**Issue**: Emails sent to the club address don't appear in the Inbox.
+
+**Cause / fix**: The inbox is not verified, or forwarding isn't actually enabled at your provider. Confirm the status chip reads **Verified**; if not, use **Resend Verification** and click the link. Then re-check that your provider is forwarding to the exact `..._...@inbox.1club.ai` address (copy it again to be sure).
+
+**Issue**: The verification link says it is invalid or expired.
+
+**Cause / fix**: Verification tokens expire. Open the inbox and click **Resend Verification** (or use the row action) to send a fresh link, then click it promptly.
+
+**Issue**: My provider won't enable forwarding without confirming a code sent to the forwarding address.
+
+**Cause / fix**: The forwarding address is a capture endpoint, not a readable mailbox, so provider confirmation codes sent there can't be retrieved. Use a forwarding method that doesn't require a returned code (a filter/rule or catch-all), or contact support.
+
+**Issue**: Replies I send from the Inbox come from a platform address, not my club's.
+
+**Cause / fix**: Your sending domain isn't verified. Add it under **Settings > Domains** with purpose **Email**, add the DNS records, and click **Verify**. Until the domain is verified, your club address is used as reply-to only.
+
+**Issue**: An inbound email created a duplicate-looking contact.
+
+**Cause / fix**: The sender wrote from an email 1Club hadn't seen, so a new contact was created. Merge or update the contact from the member's profile if it duplicates an existing record with a different address.
+
+## Related
+
+- [Inbox](/messaging/overview) - Where captured inbound mail lands and where you reply.
+- [Notifications](/settings/notifications) - Route new-message alerts to the right staff.
+- [Message templates](/messaging/templates) - Reusable content for replies and sends.
+- [Integrations](/settings/integrations) - Other external connections for your organization.

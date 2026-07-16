@@ -1,0 +1,124 @@
+---
+title: "Waitlists"
+description: "Let members join a waitlist when a class is full, then automatically notify and book the next person in line when a spot opens up."
+keywords: ["waitlist", "waiting list", "full class", "class capacity", "notify", "claim offer", "auto-book", "cancellation", "queue position", "claim window", "promote next", "booking policy"]
+---
+
+A waitlist is the ordered queue of members who want a spot in a class that is already full. When a booked member cancels, 1club works down the queue for you: it either books the next person straight away or sends them a time-limited offer to claim the spot. This page walks through the full workflow, from joining a waitlist to the moment an offer turns into a confirmed booking.
+
+## Overview
+
+- **On by default** - Every class supports a waitlist automatically; it only kicks in when the class has a max capacity set and is full.
+- **Ordered queue** - Members join with **Join waiting list**, get a pending entry, and are placed in line by the order they joined.
+- **Self-service and staff** - Members join and track their spot under **Account > Waitlist**; staff can add someone with **Add to waitlist** on a full class.
+- **Automatic when a seat frees** - Cancelling a booking triggers processing, which either auto-books the next member or sends them a time-limited offer to claim.
+- **Claim window** - A notified member has a set time to claim (15 minutes by default), configured per [booking policy](/operations/booking-policies).
+- **One offer at a time** - A freed seat is only ever promised to one person; unclaimed offers expire and cascade to the next member in line.
+- **Tracked statuses** - Each entry moves through pending, notified, converted, expired, or cancelled, with converted entries linked to the booking they created.
+- **Managed on the class** - Staff see and manage waitlist entries from the **Attendance** card on the class detail page.
+
+## When a waitlist applies
+
+Every class supports a waitlist by default, so nothing needs to be switched on for the queue to work. A waitlist only comes into play when both of these are true:
+
+- The class has a **Max capacity** set. Classes with unlimited capacity are never full, so there is nothing to wait for.
+- The class is full - the number of booked seats plus anonymous check-ins has reached the max capacity.
+
+While seats are still open, members book directly and never touch the waitlist. If a member tries to join the waitlist on a class that still has space, 1club blocks it and points them back to the normal booking flow.
+
+A member can only be in one place at a time for a given class occurrence. If someone already has a booking or a check-in for that class on that date, they cannot also join the waitlist for it, and they cannot join the same waitlist twice.
+
+## How members join a full class
+
+When a class is full, the booking control changes from **Book** to **Join waiting list** everywhere the class appears - the class detail page, the [schedule](/operations/schedule) grid, and class cards.
+
+1. The member taps **Join waiting list** and confirms in the dialog.
+2. If they are not signed in, they are asked to log in first, then the join continues automatically.
+3. 1club creates a waitlist entry with the status **pending** and emails the member to confirm they are on the list, including their current position in the queue.
+
+Position is calculated from the order members joined - the earliest to join is first in line. Members can see their entries, their position, and any live offers under **Account > Waitlist** in the member portal.
+
+Staff can also add someone to a waitlist on the member's behalf. On the class detail page, the **Add to waitlist** button in the **Attendance** card is enabled only when the class is full. See [Classes](/operations/classes) for the attendance grid, which lists booked seats, anonymous check-ins, and waitlist entries side by side.
+
+## What happens when a spot opens
+
+The queue is processed automatically whenever a booked member cancels and frees a seat. 1club picks the person at the front of the queue and takes one of two paths, depending on how far away the class is.
+
+<Steps>
+  <Step title="A booking is cancelled">
+    Cancelling a booking frees a seat and triggers waitlist processing for that class occurrence. Only occurrences that have not yet started are processed - a cancellation on a class that has already begun does not generate offers.
+  </Step>
+  <Step title="Auto-book, or offer to claim">
+    1club looks at the first person in line:
+
+    - **Auto-book** - If the class is at least 12 hours away and the cancellation still falls inside the full-refund window of the matching [booking policy](/operations/booking-policies), 1club books the next member straight into the seat. No action is needed from them.
+    - **Offer to claim** - Otherwise, 1club marks the entry **notified**, generates a one-time claim link, and sends a "A spot is now available" notification with a deadline to claim.
+
+  </Step>
+  <Step title="The member claims the spot">
+    The member opens the claim link and confirms. 1club turns their waitlist entry into a confirmed booking and clears the offer.
+  </Step>
+  <Step title="The offer rolls on if unclaimed">
+    If the deadline passes with no claim, the entry expires and the same offer is passed to the next person in line.
+  </Step>
+</Steps>
+
+Only one person is ever offered a spot at a time, so a single freed seat is never promised to two people at once.
+
+### The claim window
+
+The claim window is how long a notified member has to confirm before the offer moves on. It defaults to 15 minutes and is set per policy by the **Waitlist claim window (minutes)** field - see [Booking policies](/operations/booking-policies). The spot-available notification tells the member the exact deadline.
+
+Offers are only sent when the freed seat is realistically claimable, so notifications cluster in the hours before a class rather than days ahead.
+
+### How members claim
+
+A notified member can claim from either place the offer appears:
+
+- **The claim link** in the notification. This opens a claim page showing the class, date, and gym. Confirming books the seat. If the member does not have a password yet - for example, a contact a staff member added to the list - they set one on this page, and 1club creates their account and signs them in as part of the confirmation.
+- **Account > Waitlist** in the portal. A notified entry shows a **Book now** button and the deadline to book before. Confirming books the seat.
+
+Claiming runs the same checks as a normal booking. If the offer has expired, the class has already ended, or the seat was filled in the meantime, the claim is rejected with a clear message and the entry is moved on rather than left in limbo.
+
+A member can also **decline** or **leave** a waitlist. Declining a live offer removes them from the queue and immediately passes the spot to the next person in line. Leaving a pending entry simply takes them off the list.
+
+## Entry statuses
+
+Every waitlist entry moves through these statuses:
+
+| Status        | Meaning                                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------------------- |
+| **Pending**   | The member is in the queue, waiting for a spot. This is the starting status for everyone who joins.     |
+| **Notified**  | A spot opened and this member has an active offer. The claim window is counting down.                   |
+| **Converted** | The member claimed the spot (or was auto-booked) and now has a confirmed booking.                       |
+| **Expired**   | An offer was sent but the claim window passed without a claim. The spot was offered to the next person. |
+| **Cancelled** | The member left the waitlist, or staff removed the entry, before it converted.                          |
+
+A converted entry is linked to the booking it created, so the seat and the queue history stay connected.
+
+## Behind the scenes: expiring offers
+
+A background job runs every few minutes to keep the queue moving without anyone having to watch it. For each offer whose claim window has passed, the job:
+
+1. Marks the entry **expired**.
+2. Notifies the member that their opportunity has expired and the spot went to the next person.
+3. Offers the freed spot to the next pending member in line, starting a fresh claim window.
+
+This is what lets an unclaimed offer cascade down the queue automatically until someone claims it or the class fills.
+
+## Where staff manage waitlists
+
+Waitlists live on the class itself. Open a class from **Operations > Classes** and use the **Attendance** card on the detail page to:
+
+- See who is on the waitlist alongside the booked seats and check-ins.
+- Add a member to the waitlist with **Add to waitlist** (enabled only when the class is full).
+- Convert a waitlist entry into a booking manually, when you want to seat someone directly rather than wait for the automatic flow.
+
+For the full class detail layout and capacity tiles, see [Classes](/operations/classes).
+
+## Related
+
+- [Classes](/operations/classes) - Set capacity, run the attendance grid, and convert waitlist entries.
+- [Booking policies](/operations/booking-policies) - Set the waitlist claim window and the refund tiers that drive auto-booking.
+- [Bookings](/operations/bookings) - Where a claimed or auto-booked seat shows up as a confirmed booking.
+- [Events](/operations/events) - For one-off ticketed happenings, use an event instead of a class.

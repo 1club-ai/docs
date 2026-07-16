@@ -1,0 +1,149 @@
+---
+title: Inventory and stock
+description: Track stock levels per location, record receive, sale, adjustment, and waste movements, and build cafe or bar recipes from ingredients that decrement automatically when a product sells.
+keywords: ["inventory", "stock", "stock levels", "stock movement", "receive stock", "adjustment", "waste", "ingredients", "recipes", "unit of measure", "cafe", "bar", "pro shop", "point of sale"]
+---
+
+Inventory lets your gym track physical stock behind the point of sale: bottled drinks and merchandise in a pro-shop, and the raw ingredients that make up cafe or bar items. When a product sells, stock decrements automatically, so on-hand counts stay accurate without manual bookkeeping.
+
+Inventory is an opt-in feature. Until you turn it on, products sell without any stock tracking.
+
+## Overview
+
+- **Opt-in, organization-wide** - Turn inventory on in settings to reveal stock panels and the **Recipe** action on products; leave it off and products sell without stock tracking.
+- **Products and ingredients** - Track packaged resale items counted in whole units, and raw ingredients weighed, poured, or counted that build cafe and bar recipes.
+- **Per-location stock** - Stock is held separately for each of your gym's locations, so the same item can have a different on-hand quantity at each site.
+- **Units of measure** - Each ingredient has a fixed base unit (`g`, `ml`, or `each`); you enter friendlier units and 1Club converts within the same dimension.
+- **Immutable movements ledger** - Every change is a receive, sale, adjustment, or waste movement with a signed quantity, and manual changes require a reason.
+- **Automatic decrement on sale** - Fulfilling an order consumes stock for each line, exploding recipe products into their ingredients and drawing down direct-stock products by unit.
+- **Recipes and sub-recipes** - Define what an assembled product is made of, and nest ingredient recipes that explode down to leaf ingredients when sold.
+- **Availability** - For recipe products, 1Club computes how many whole units you could sell now from the lowest ingredient on hand at the selected location.
+- **Movements report** - The analytics report lists the full stock ledger newest first, filterable by movement type.
+
+## Turn on inventory
+
+Go to **Settings > Operations > Inventory** (`/settings/operations/inventory`) and toggle inventory on. The setting is organization-wide and controls whether stock panels and the **Recipe** action appear on your products.
+
+<Note>
+  Enabling inventory changes the product detail page: a stock panel appears and,
+  for products you build from ingredients, a **Recipe** action becomes
+  available. With inventory off, neither shows.
+</Note>
+
+Reading stock requires the `inventory.read.club` permission; receiving, adjusting, and editing recipes require `inventory.manage.club`. Turning the feature on or off requires `settings.manage.organization`.
+
+## Two kinds of stock: products and ingredients
+
+Every stock record points at exactly one of two things:
+
+- **Products** - packaged items you buy and resell as-is, like a bottle of water or a branded t-shirt. Products are always counted in whole units (`each`).
+- **Ingredients** - raw or prepped items that go into something you sell, like coffee beans, milk, or a burger patty. Ingredients are used to build cafe and bar recipes.
+
+Stock is held separately for each location (your organization's clubs). The same ingredient can have a different quantity on hand at each site.
+
+## Units of measure
+
+Each ingredient has a base unit of measure that is fixed when you create it and cannot be changed afterwards. There are three base units:
+
+| Base unit | Use for                                   | Dimension |
+| --------- | ----------------------------------------- | --------- |
+| `g`       | Anything weighed (beans, meat, powder)    | Mass      |
+| `ml`      | Anything poured (milk, syrup, spirits)    | Volume    |
+| `each`    | Anything counted (cups, bottles, patties) | Count     |
+
+When you receive or adjust stock you can enter quantities in a friendlier unit and 1Club converts to the base unit for you: grams accept `g` or `kg`, milliliters accept `ml` or `l`, and counted items accept `each`. Products, which are always counted, only accept `each`.
+
+Conversions stay within the same dimension. You cannot convert a weight into a volume or a count - milliliters never become grams. Pick the base unit that matches how you actually measure the ingredient.
+
+## Stock levels
+
+The stock page at **Billing > Products > Stock** (`/billing/products/stock`) lists the current quantity on hand for every product and ingredient, at every location you can access. Each row shows whether it is a product or an ingredient, its name, the location, and the on-hand quantity in its base unit.
+
+Click a row to open the underlying product or ingredient. Click **Add stock** to record a delivery, or use the row action to adjust a count.
+
+## Stock movements
+
+Every change to stock is written to an immutable ledger as a movement. A movement records the item, the location, a signed quantity in the base unit, the type of change, and an optional reason. There are four movement types:
+
+- **Receive** - stock coming in, for example a delivery from a supplier. Quantity is positive and increases what is on hand. A reason is optional.
+- **Sale** - stock going out because an order was fulfilled. Quantity is negative and is recorded automatically (see below). You never enter a sale by hand.
+- **Adjustment** - a manual correction, for example after a stock count finds more or fewer units than expected. The quantity is signed, so you can add or remove, and a reason is required.
+- **Waste** - stock written off, for example a spilled or spoiled item. Recorded through the same flow as an adjustment, with a required reason.
+
+### Receiving stock
+
+Click **Add stock** on the stock page, pick the product or ingredient, choose the location, and enter the quantity and unit. 1Club creates a `receive` movement and increases the on-hand level.
+
+### Adjusting and writing off stock
+
+Use the row action on the stock page to open the adjustment dialog. Enter a signed quantity (positive to add, negative to remove), pick **Adjustment** or **Waste** as the type, and give a reason. The reason is mandatory so the ledger stays auditable.
+
+## How a sale decrements stock
+
+When an order that contains a product is fulfilled, 1Club consumes stock for each line automatically, inside the same transaction that records the order. What gets consumed depends on how the product is set up:
+
+- **A product with a recipe** (a cafe or bar item) is exploded into its ingredients, and each ingredient's stock is decremented by the amount the recipe calls for, multiplied by the quantity sold. A single informational `sale` movement is also recorded against the product itself, so the product's history reads "sold N" rather than a scattered list of ingredient draws.
+- **A product with no recipe but a direct stock level** (packaged resale, like bottled water) has its own count decremented by one per unit sold.
+- **A product that is neither stocked nor recipe-backed** consumes nothing - selling a service or a non-tracked good is a no-op for inventory.
+
+Consumption is idempotent per order line, so re-processing an order never double-counts. If a sale would take stock below zero, it is still recorded and the on-hand level goes negative; 1Club logs a warning rather than blocking the sale, so the point of sale is never held up by a stock discrepancy.
+
+## Recipes and ingredients for cafe and bar
+
+A recipe defines what a sellable product is made of. Build one when a product is not resold as-is but assembled from ingredients - a latte, a cocktail, a protein shake.
+
+On the product detail page, click **Recipe** to add ingredient lines. Each line names an ingredient, a quantity, and a unit, expressed as the amount needed for one unit of the product. For example, a latte recipe might be 18 g of coffee beans and 150 ml of milk.
+
+Ingredients live at **Billing > Products > Ingredients** (`/billing/products/ingredients`). From there you can create ingredients, set each one's base unit, and open an ingredient to manage its stock. An ingredient cannot be deleted while any recipe still uses it.
+
+### Sub-recipes
+
+An ingredient can itself have a recipe, letting you model prepped components. A "house syrup" ingredient can be built from sugar and water, and any drink recipe that calls for house syrup will explode all the way down to sugar and water when it sells. Recipes can nest several levels deep, and 1Club guards against cycles and runaway depth.
+
+## Availability
+
+For a product built from ingredients, 1Club computes how many whole units you could sell right now at each location. It expands the recipe to its leaf ingredients and takes the lowest number the on-hand stock of any single ingredient allows. If you have milk for 40 lattes but beans for only 12, availability is 12.
+
+The product detail page shows this availability alongside the product's recent movements, scoped to the location you have selected. Products with a direct stock level show that count; products that are neither stocked nor recipe-backed show as not tracked.
+
+## Inventory movements report
+
+The analytics report at **Analytics > Inventory > Movements** (`/analytics/inventory/movements`) is the full stock ledger across your organization. It lists every movement newest first, with its date, type, whether it targeted a product or an ingredient, the item name, the location, the signed quantity, a link to the originating order for sales, and the reason for manual changes.
+
+Filter by movement type to focus on one kind of change - for example show only **waste** to review write-offs, or only **receive** to check deliveries.
+
+## A typical pro-shop and cafe workflow
+
+<Steps>
+  <Step title="Turn on inventory">
+    Enable the feature in **Settings > Operations > Inventory**.
+  </Step>
+  <Step title="Set up what you stock">
+    Create ingredients for cafe and bar items (beans, milk, syrup) with the
+    right base unit, and make sure resale products like bottled water exist as
+    products.
+  </Step>
+  <Step title="Build recipes">
+    For each cafe or bar product, open it and add a recipe listing the
+    ingredients and quantities it consumes per unit.
+  </Step>
+  <Step title="Receive opening stock">
+    On the stock page, click **Add stock** to record what you have on hand at
+    each location.
+  </Step>
+  <Step title="Sell as normal">
+    Ring up products at the point of sale. Sales decrement ingredient or product
+    stock automatically.
+  </Step>
+  <Step title="Keep counts honest">
+    Record waste as it happens, and use adjustments after a physical count to
+    reconcile on-hand levels. Review the movements report to audit the ledger.
+  </Step>
+</Steps>
+
+## Related
+
+- [Products](/billing/products) - the catalog items you sell and attach recipes to
+- [Point of sale](/pos/point-of-sale) - where sales that decrement stock are rung up
+- [Billing overview](/billing/overview) - how products, orders, and revenue fit together
+- [Analytics overview](/analytics/overview) - where the inventory movements report lives

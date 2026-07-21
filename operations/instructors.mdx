@@ -9,7 +9,7 @@ Instructors are the coaches, trainers, and class leads who teach classes or take
 
 - **Profiles with type, sports, and rate** - group instructors by type, tag their sports for marketplace filtering, and set an hourly rate that seeds one-on-one booking prices.
 - **Bookable or class-only** - a bookable instructor takes direct one-on-one bookings and gets a schedule column; a class-only instructor can still lead classes.
-- **Availability from hours or shifts** - drive availability from per-day operating hours, or turn on **shift scheduling** to run rosters and rotations.
+- **Availability from hours or shifts** - drive availability from per-day operating hours, or put an instructor on a **shift roster** driven by rotations.
 - **Pay-rate policies** - compensate instructors per class or booking, with an option to pay only for paid visits.
 - **Earnings dashboard** - instructors who sign in see their own earnings, classes, attendance, and PT sessions.
 - **Ordering** - drag to set the order instructors appear in on the schedule and in selectors.
@@ -46,18 +46,70 @@ Instructor time off (managed via the same calendar - right-click an instructor s
 
 ## Shift scheduling
 
-Instead of fixed operating hours, you can drive instructor availability from **shifts**. Shift scheduling is an organization-level option; when it's on, an instructor's shift roster becomes the source of truth for when they can be booked. Instructors without a roster keep using their operating hours.
+For staff whose hours change week to week, you can drive an instructor's availability from a **shift roster** instead of fixed operating hours. There's no global on/off switch: an instructor uses their roster on any date they're rostered - a date covered by a rotation assignment, or one with a shift placed directly on it - and falls back to their operating hours on every other date. A rostered day with no shift reads as a day off.
 
-Shifts are managed under the **Staff** section:
+Everything lives under **Staff > Roster**. The page has two parts: the **Scheduled shifts** grid at the top (one row per instructor, one column per day) and the **Shifts & rotations** panel below it, where you build the reusable pieces.
 
-- **Shifts** tab - build reusable **shift templates** (a named time window like "Morning 06:00-14:00", with standard breaks such as lunch) and **rotations** (a multi-week weekly pattern that picks a template for each day, with a configurable cycle length). You also assign instructors to a rotation here, with a cycle start date, a starting week, and effective-from/until dates.
-- **Roster** tab - the generated, editable roster of individual shifts over a rolling window. Editing a single shift marks it as a manual override so it won't be changed when the rotation regenerates.
+### The building blocks
 
-Standard breaks (for example, lunch) block bookings during their window, just like any other booking blocker.
+- **Shifts** - reusable named time windows like "Morning 06:00-14:00", each with a color and optional standard **breaks** (e.g. lunch). Managed in the **Shifts** card.
+- **Rotations** - a weekly pattern that picks a shift for each day, repeating over a cycle of 1-12 weeks. Managed in the **Rotations** card.
+- **Assignments** - attach an instructor to a rotation for a date range; this is what generates their roster.
+- **Roster** - the generated list of individual shifts over a rolling 8-week window, shown in the Scheduled shifts grid and editable shift by shift.
 
-On the instructor's details page, a read-only **Working hours** block shows the hours derived from their shift roster, with a **Manage shifts** link to jump to the Staff shifts area.
+### Set up a rotating schedule
 
-### Rescheduling on the calendar
+<Steps>
+  <Step title="Create your shifts">
+    In the **Shifts** card, choose **Add shift**. Give it a name, a start and
+    end time, and a color, then add any standard **breaks** (name, start, end) -
+    for example a 12:00-13:00 lunch. Breaks must fall inside the shift window.
+    Repeat for each distinct pattern you run (e.g. "Morning", "Evening").
+  </Step>
+  <Step title="Build a rotation">
+    In the **Rotations** card, choose **Add rotation**. Set a **Cycle length**
+    (1-12 weeks) and a **Cycle start date** (the date week 1 begins). Then, for
+    each day of each week, pick one of your shifts or leave it **Off**. A
+    two-week cycle that alternates mornings and evenings, for instance, captures
+    a typical part-time pattern.
+  </Step>
+  <Step title="Assign an instructor">
+    In the **Scheduled shifts** grid, on the instructor's row, click their
+    rotation cell (**Set regular shifts**). Pick the rotation, the **Starting
+    week** (which week of the cycle they begin on), and the **Effective from** /
+    **Effective until** dates - leave the end open for an **Ongoing**
+    assignment. Their roster generates immediately.
+  </Step>
+  <Step title="Adjust the roster">
+    The grid now shows each instructor's generated shifts with their breaks.
+    Click any day cell to add a one-off shift or edit an existing one. Editing a
+    generated shift marks it as a **manual override**, so rotation regeneration
+    leaves it untouched; use **Cancel shift** to drop a single occurrence.
+  </Step>
+</Steps>
+
+<Note>
+  The roster is generated for a rolling 8-week window and refreshed
+  automatically. Manual overrides and one-off shifts survive regeneration;
+  unedited rotation shifts are replaced when you change the rotation.
+</Note>
+
+### Breaks
+
+Breaks are the unavailable windows inside a working shift - most commonly lunch. Define them on a shift (in the **Shifts** card) as a name plus a start and end time within the shift window.
+
+Once a shift is on the roster, its breaks:
+
+- **Block bookings** during their window, so nobody can book the instructor over lunch.
+- **Show on the roster grid** under each shift, as a `Break 12:00-13:00` line.
+- **Show on the Schedule calendar** as a muted, non-interactive card in the instructor's column, labeled with the break name.
+- **Are editable per shift** - open any shift from the roster grid to add, edit, or remove its breaks. One-off shifts can carry their own breaks too.
+
+### Working hours on the instructor profile
+
+On an instructor's details page, a read-only **Working hours** block shows the hours derived from their roster, with a **Manage shifts** link back to **Staff > Roster**.
+
+## Rescheduling on the calendar
 
 On the **Schedule** calendar you can drag a booking or class to a new time. The move keeps the same resource (area, instructor, or class type) and the same duration - only the start and end time shift. Every drop asks you to confirm the old and new time, and for recurring events you choose whether the change applies to just that occurrence or to all future ones.
 
@@ -107,7 +159,7 @@ A visiting black belt leads the Saturday BJJ class but never takes private booki
 
 ### Pilates studio on rotating shifts
 
-A studio with part-time instructors turns on **shift scheduling** org-wide, builds a "Morning 06:00-14:00" shift template with a lunch break, and assigns instructors to a weekly rotation. The generated roster becomes their bookable availability; a one-off swap is edited on the **Roster** tab and sticks as a manual override.
+A studio with part-time instructors puts them on rotating shifts: it builds a "Morning 06:00-14:00" shift with a lunch break and assigns each instructor to a weekly rotation. The generated roster becomes their bookable availability; a one-off swap is edited directly on the roster and sticks as a manual override.
 
 ### Pay only for paid drop-ins
 
@@ -116,7 +168,7 @@ A gym that runs paid drop-in classes sets a pay-rate policy with **Only compensa
 ## Tips & best practices
 
 - **Turn Bookable off for guest and class-only leads.** It keeps the booking selector and schedule focused on people members can actually book.
-- **Use shift scheduling when hours vary week to week.** Fixed operating hours are simpler for steady schedules; rosters suit part-time and rotating staff.
+- **Use a shift roster when hours vary week to week.** Fixed operating hours are simpler for steady schedules; rosters suit part-time and rotating staff.
 - **Gate pay on payment to avoid overpaying.** The paid-booking toggle stops payouts on unpaid or no-show visits, and each recurring occurrence is gated on its own charge.
 - **Set sports accurately.** They drive marketplace filtering, so a member searching for a padel coach only sees the right people.
 - **Deactivate, don't delete, departing staff.** Inactive instructors drop out of selectors but keep their history on past bookings.
@@ -137,7 +189,7 @@ A gym that runs paid drop-in classes sets a pay-rate policy with **Only compensa
 
 **Issue**: A bookable instructor shows no availability.
 
-**Solution**: If shift scheduling is on org-wide, availability comes from their **roster**, not operating hours. Assign them to a rotation or add roster shifts under **Staff > Shifts**.
+**Solution**: If the instructor is rostered for that date, availability comes from their **roster**, not their operating hours - and a rostered day with no shift is a day off. Assign them to a rotation or add roster shifts under **Staff > Roster**.
 
 ## Related
 

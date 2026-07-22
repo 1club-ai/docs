@@ -1,0 +1,161 @@
+---
+title: Cash registry and expenses
+description: Two things in one module - track the cash each location holds, and manage all your gym's expenses (cash and non-cash) against categories with receipts. Capture cash payments automatically and count the drawer to reconcile any over or short.
+keywords:
+  [
+    "cash",
+    "cash registry",
+    "cash drawer",
+    "cash on hand",
+    "expenses",
+    "expense categories",
+    "petty cash",
+    "float",
+    "deposit",
+    "pay-out",
+    "reconciliation",
+    "cash count",
+    "over short",
+    "receipt",
+    "point of sale",
+  ]
+---
+
+This module does two related jobs, so you can retire the spreadsheet your gym keeps for both:
+
+- **Cash registry** - each location gets a cash drawer that always knows how much cash it should hold. Cash payments you take are added automatically, and you record floats, deposits, and pay-outs as they happen.
+- **Expense management** - record everything your gym spends, whether or not it is paid in cash. Every expense is filed against a category with an optional receipt, so you get complete expense reporting alongside the cash view.
+
+The two work together: a cash expense both reduces the drawer and counts toward your expense totals, while a card or bank-transfer expense counts toward expense totals without touching the drawer.
+
+The module is opt-in. Until you turn it on, 1Club tracks neither a drawer balance nor expenses.
+
+## Overview
+
+- **Opt-in, organization-wide** - Turn the cash module on in settings to reveal the **Cash** section; leave it off and nothing is tracked.
+- **A drawer per location** - Each of your gym's clubs has its own cash-on-hand balance, so takings and expenses never mix across sites.
+- **Automatic cash capture** - Cash payments for classes, memberships, and products are added to the drawer as they happen, with no double entry.
+- **Expenses with categories** - Record what you spend against editable categories, with an optional receipt photo. Non-cash expenses are tracked for reporting without moving the drawer.
+- **Cash in and cash out** - Add or remove cash for anything else: opening floats, bank deposits, and pay-outs.
+- **Optional counts** - Count the drawer whenever you like and 1Club records any over or short so the books match the cash on hand.
+- **Immutable ledger** - Every entry is permanent; corrections are made with a reversing entry, never by editing history, so the trail stays auditable.
+- **Overview dashboard** - See cash on hand per location, cash in vs out over time, and expenses by category.
+
+## Turn on the cash module
+
+Go to **Settings > Operations > Cash registry** (`/settings/operations/cash-registry`) and toggle the module on. The setting is organization-wide and controls whether the **Cash** section appears in the main navigation.
+
+The first time you enable it, 1Club stamps an activation moment and seeds a starter set of expense categories. Only cash taken from that moment on counts toward the drawer, so turning the feature on never sweeps historical sales into today's balance.
+
+<Note>
+  Viewing the drawer and ledger requires the `cash.read.club` permission.
+  Recording expenses, cash movements, and counts requires `cash.create.club`.
+  Reversing entries and managing categories requires `cash.manage.club`. Turning
+  the module on or off requires `settings.manage.organization`.
+</Note>
+
+Front desk staff can read the drawer and record cash day to day; reversing entries and editing categories stay with managers, a light segregation-of-duties boundary.
+
+## The cash drawer
+
+The drawer balance for a location is simple to reason about:
+
+```
+cash on hand = cash sales + cash in (floats, deposits) - cash out (expenses, pay-outs)
+```
+
+Only physical cash moves the drawer. A card or bank-transfer expense is recorded for reporting but leaves cash on hand untouched. You can see the current balance for each location on the **Cash > Overview** page.
+
+## Automatic cash capture
+
+When you take a cash payment for a class, membership, or product, 1Club adds it to that location's drawer automatically. You never re-enter a cash sale in the registry, so the money the drawer holds and the payments you recorded always agree.
+
+Cash sales appear in the ledger as read-only rows alongside the entries you record by hand. A cash refund reduces the drawer only when you record handing the cash back as a cash-out entry; the original sale stays in the record.
+
+## Expense management
+
+The **Cash > Expenses** page is your gym's full expense record, not just the cash that left the till. Record every cost here - rent, instructor pay, supplies, utilities, a water delivery - regardless of how it was paid, and each one is filed against a category with an optional receipt for complete expense reporting.
+
+Click **Add expense**, choose the location, enter the amount, pick a category, and optionally attach a receipt photo and a note.
+
+- **Payment method** decides whether the drawer moves, so non-cash spend is a first-class part of the record. A **cash** expense (petty cash for supplies, a water delivery paid from the till) reduces cash on hand. A **card**, **bank transfer**, or **other** expense counts toward your expense totals but does not touch the drawer.
+- **Category** groups the expense for reporting - rent, instructor pay, supplies, utilities, and so on. Categories are editable (see below).
+- **Receipt** lets you keep a photo of the receipt against the entry.
+
+Because both cash and non-cash costs live here, your expense reporting is complete regardless of how each one was paid, and the **Expenses by category** breakdown on the overview reflects all of them.
+
+## Move cash in and out
+
+Use **Cash in** and **Cash out** for movements that are not sales or expenses:
+
+- **Cash in** - an opening float at the start of the day, or topping up the drawer.
+- **Cash out** - a bank deposit, or paying cash out of the till for something you are not categorizing as an expense.
+
+Both adjust the drawer immediately.
+
+## Expense categories
+
+Categories are editable per organization. Manage them from **Cash > Expenses** with the **Categories** action:
+
+- Add, rename, and reorder categories to match how your gym thinks about spending.
+- A category that is still used by past expenses is **archived** rather than deleted, so historical reporting keeps its label. It disappears from the picker but its name survives on old entries.
+- Re-creating a category with the same name restores the archived one instead of failing, so you can bring a category back.
+
+## Count and reconcile the drawer
+
+Counting is optional. When you want to check the till, open **Cash > Overview**, click **Count cash**, choose the location, and enter the amount you physically counted.
+
+1Club compares your count to the expected balance and, if they differ, records a reconciliation entry for the over or short so the book balance matches reality. If the count matches, nothing is posted. Recent counts and their variances show on the overview.
+
+## The ledger
+
+**Cash > Ledger** is the full history for a location: cash sales captured automatically and every entry you recorded, newest first. It is append-only - entries are never edited or deleted.
+
+To correct a mistake, reverse the entry. 1Club posts an equal and opposite **reversing entry** that points back at the original, which keeps the drawer correct while preserving the original record for audit. An entry can only be reversed once.
+
+## The overview dashboard
+
+**Cash > Overview** is the at-a-glance dashboard:
+
+- **Cash on hand** for the selected location, or every location when you pick all clubs from the top bar.
+- **Cash in vs cash out** over a chosen period (last 7, 30, or 90 days).
+- **Expenses by category** for the period, so you can see where the money goes.
+- **Recent reconciliations** with their over/short variance.
+
+## How corrections keep the books honest
+
+Nothing in the cash registry is edited in place. Cash sales are read from the payments that produced them, manual entries are append-only, and every correction is a reversing entry. That means the ledger is always a faithful, auditable record of what happened, and the drawer balance is always the sum of that record.
+
+## A typical daily workflow
+
+<Steps>
+  <Step title="Turn on the cash module">
+    Enable it once in **Settings > Operations > Cash registry**.
+  </Step>
+  <Step title="Set an opening float">
+    Record a **Cash in** entry for the cash you put in the drawer at the start
+    of the day.
+  </Step>
+  <Step title="Take payments as normal">
+    Ring up classes, memberships, and products. Cash payments are added to the
+    drawer automatically.
+  </Step>
+  <Step title="Record expenses as they happen">
+    Add expenses for supplies, deliveries, and instructor pay, choosing the
+    payment method and a category, and attach receipts.
+  </Step>
+  <Step title="Count the drawer">
+    At close, count the cash and enter it. 1Club records any over or short so
+    the books match the till.
+  </Step>
+  <Step title="Review the overview">
+    Check cash on hand, cash flow, and expenses by category over the period.
+  </Step>
+</Steps>
+
+## Related
+
+- [Point of sale](/pos/point-of-sale) - where the cash sales that fill the drawer are rung up
+- [Payments](/billing/payments) - how cash and other payments are recorded
+- [Inventory and stock](/pos/inventory) - another opt-in module you turn on the same way
+- [Analytics overview](/analytics/overview) - organization-wide reporting

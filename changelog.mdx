@@ -7,44 +7,50 @@ mode: "center"
 {/* This page is generated from content/releases/*.yaml in the 1club repo. */}
 {/* Do not edit by hand - run `npm run release-notes:build`. */}
 
-<Update label="2026-07-24" description="Anonymous check-ins and bookings now work for managers and front desk" tags={["Fixed","Operations"]}>
-  ## Anonymous check-ins and bookings now work for managers and front desk
+<Update label="2026-07-23" description="Import your product catalog from a spreadsheet" tags={["New","Billing"]}>
+  ## Import your product catalog from a spreadsheet
 
-  When a booking policy allows anonymous check-ins or anonymous bookings, managers and front-desk staff can now use them from the admin dashboard. Previously the check-in and booking dialogs still required selecting a contact for everyone except admins.
+  You can now bulk-import products from a CSV, including price, VAT rate, barcode, category, cost, and opening stock for a chosen location.
 
-  Booking policies can allow anonymous check-ins and anonymous bookings — entries
-  recorded without picking a member. Until now, only admins could actually use
-  them: for managers and front-desk staff the check-in and booking dialogs kept
-  the contact field required even when the active policy allowed going without
-  one.
+  The data import tool now supports products. Export your existing product list
+  to CSV and upload it the same way you import members or memberships - the
+  importer detects the columns (including Bulgarian headers like "Име артикул",
+  "Продажна цена", "ДДС %" and "Количество") and maps them for you.
 
-  The dialogs now correctly recognize the policy for any staff member who can
-  create check-ins or bookings, so managers and front desk get the same
-  anonymous and walk-in options admins see. No configuration change is needed —
-  existing booking policies apply as-is.
+  Each imported product can carry its own VAT rate. That rate is created once and
+  then used at the point of sale, so a product is always taxed at the correct rate
+  regardless of its revenue account. Products also gained a cost price (for margin
+  reporting) and a product code (SKU) alongside the existing barcode.
 
-  [Learn more](/schedule)
+  If your file has a quantity column, choose a location during the import and those
+  quantities are recorded as opening stock for that location. Products without a
+  quantity are imported without stock. Duplicate products (matched by barcode, then
+  name) are skipped so you can safely re-run an import.
 </Update>
 
-<Update label="2026-07-21" description="Override booking policy with &quot;Book anyway&quot;" tags={["Improved","Bookings"]}>
-  ## Override booking policy with "Book anyway"
+<Update label="2026-07-22" description="Cash registry & expense management" tags={["New","Highlight","Billing"]}>
+  ## Cash registry & expense management
 
-  Managers can now override booking policy when creating a booking — an instructor's availability, and the min/max duration and advance-notice limits — with a single "Book anyway" step.
+  Track the cash in your drawer, record expenses, and see where the money goes — cash payments are captured automatically.
 
-  When you create a booking and it's blocked by policy, you can now choose
-  "Book anyway" to place it regardless. This covers an instructor being outside
-  their working hours or shift, on a break, or on time off — and now the
-  booking-policy limits too: a duration shorter than the minimum or longer than
-  the maximum, a date further ahead than the policy allows, and bookings made
-  with less than the required notice.
+  You can now manage cash and expenses right inside 1club. Turn on the new
+  Cash module in Settings and each club gets a cash drawer that always knows
+  how much cash it should hold.
 
-  The override is available to staff who can manage bookings, and each forced
-  booking records who overrode it and which rules were bypassed for the audit
-  trail. Hard rules are never overridden — the duration step/alignment rule, a
-  class that has already ended, and genuine conflicts such as the instructor
-  already teaching a class, running an event, or being fully booked.
+  - Cash payments you take for classes, memberships, and products are added to
+    the drawer automatically — no double entry.
+  - Record expenses (rent, instructor pay, supplies, water delivery, and more)
+    against editable categories, with an optional receipt photo. Non-cash
+    expenses like card or bank transfer are tracked for reporting without
+    touching the drawer.
+  - Add or remove cash for anything else (floats, deposits, pay-outs).
+  - Optionally count the drawer at any time — 1club compares your count to the
+    expected balance and records any over/short so the books match reality.
+  - An overview dashboard shows cash on hand per club, cash in vs out over time,
+    and expenses by category.
 
-  [Learn more](/schedule/bookings)
+  Every entry is kept as a permanent record; corrections are made with a
+  reversing entry rather than editing history, so the trail is always auditable.
 </Update>
 
 <Update label="2026-07-20" description="Social booking links" tags={["New","Marketing"]}>
@@ -61,6 +67,84 @@ mode: "center"
   actually bring members in.
 
   [Learn more](/settings/integrations/social-booking)
+</Update>
+
+<Update label="2026-07-15" description="Buy packages and products through the signup form" tags={["New","Portal"]}>
+  ## Buy packages and products through the signup form
+
+  Signup/purchase forms can now sell packages and add-on products end to end — the buyer checks out and pays through the standard flow and gets an order confirmation email.
+
+  Purchase forms that include packages or add-on products now complete the
+  sale: after signing up, the buyer is taken through the standard order
+  checkout and pays the same way as anywhere else on the platform (card or
+  myPOS), and free/zero-cost orders complete instantly. When the order is
+  paid, they receive an itemized order confirmation email. Previously a
+  package/product selection created an order that was never charged and sent
+  no confirmation. Plan purchases are unchanged.
+</Update>
+
+<Update label="2026-07-14" description="WhatsApp as a messaging & notification channel" tags={["New","Highlight","Marketing"]}>
+  ## WhatsApp as a messaging & notification channel
+
+  Send and receive on WhatsApp across the inbox, automations, and system notifications like booking confirmations.
+
+  WhatsApp is now a first-class channel everywhere you message members. Reply to
+  and start conversations from the inbox, add WhatsApp alongside email, SMS and
+  in-app in your automations, and let members receive system notifications — such
+  as booking confirmations and cancellations — on WhatsApp.
+
+  Connect your WhatsApp Business number, then map each notification and automation
+  to one of your Meta-approved templates so messages still reach members outside
+  WhatsApp's 24-hour reply window. Members are messaged on WhatsApp only when they
+  are reachable and have opted in, and staff can turn WhatsApp on for their own
+  alerts.
+</Update>
+
+<Update label="2026-07-10" description="Real-time availability and webhooks for channel partners" tags={["New","Highlight","Platform"]}>
+  ## Real-time availability and webhooks for channel partners
+
+  Partner platforms can now read a whole club's open slots in one call and receive webhooks the moment a court's availability changes, so their calendars stay live.
+
+  Partners selling your courts through the channel integration can now keep a
+  truly live calendar.
+
+  The availability API returns ready-made open slots — with remaining capacity
+  and the club's timezone — for a single court or a whole club in one request,
+  so partners no longer have to stitch together operating hours and busy
+  intervals themselves.
+
+  New availability webhooks push a signed event within seconds whenever a court
+  is booked, freed, or blocked on any channel — your own tools, another partner,
+  a class, or an event. Partners register an endpoint under Settings → APIs and
+  MCP, verify the signature, and re-pull the affected slots. A reconciliation
+  feed lets them catch up exactly after any missed delivery, so availability
+  never drifts and double-bookings are still impossible.
+</Update>
+
+<Update label="2026-07-10" description="Self-service Check-in App" tags={["New","Highlight","Operations"]}>
+  ## Self-service Check-in App
+
+  Members can now check themselves into classes or the gym from a dedicated self-service screen at the club.
+
+  A new touch-first Check-in App runs on a tablet or screen at your club, next to
+  the existing kiosk. Members find themselves by name (or with their PIN, when
+  enabled) and are checked in instantly - a green screen confirms the check-in,
+  an amber screen means they are in but a payment is still due, and a red screen
+  sends them to the front desk.
+
+  - Members with an upcoming booking are checked in the moment they identify
+    themselves.
+  - Without a booking, members pick from the classes starting in the next hour;
+    the club's booking policy decides whether their membership covers it or an
+    unpaid payment is recorded for the front desk.
+  - Choose the journey per club: identify first, or pick a class first and tap
+    your name on the class list.
+  - Open Gym mode checks members in on their general membership with no class
+    list at all.
+
+  Configure everything under Settings, Member Experience, Check-in App: enable it
+  per club, copy the device link, toggle PIN identification and Open Gym mode,
+  and drag to reorder the user journey.
 </Update>
 
 <Update label="2026-07-09" description="Events and ticketing" tags={["New","Highlight","Bookings"]}>

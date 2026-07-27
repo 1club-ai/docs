@@ -1,0 +1,82 @@
+---
+title: "MCP troubleshooting"
+sidebarTitle: "Troubleshooting"
+description: "Fixes for the common failures when connecting an AI assistant to 1Club over MCP: rejected tokens, missing scopes, unexpected tool lists, and clients that cannot send a header."
+keywords:
+  [
+    mcp troubleshooting,
+    connection failed,
+    api key required,
+    403,
+    scopes,
+    request headers,
+    bearer token,
+    tool list,
+  ]
+---
+
+Work through the symptom that matches what you are seeing. If none of them do, contact [support@1club.ai](mailto:support@1club.ai) with the client you are using and the exact error text.
+
+## The assistant says a tool needs an API key
+
+The token is not reaching 1Club. The tool list still appears in this case, because the server advertises its tools before checking anything, so a visible tool list is not proof that authentication worked.
+
+Check, in order:
+
+1. **The address includes `/admin`.** `https://mcp.1club.ai` on its own is not a connectable server, and `https://mcp.1club.ai/discovery` never accepts a token.
+2. **The header value starts with `Bearer `.** Clients send the value exactly as you typed it. `1club_sk_live_...` on its own is rejected; it must be `Bearer 1club_sk_live_...`, with the space.
+3. **The header name is `authorization`.** Not `api-key`, not `x-api-key`.
+4. **The token was pasted whole.** Copying from the success banner catches the full value; retyping usually does not.
+
+Ask the assistant to run `get_account`. It needs no scope, so if it returns your organization name, the token is arriving correctly and the problem is elsewhere.
+
+## The connection fails, or Claude asks me to sign in
+
+If Claude web or desktop starts an OAuth sign-in flow instead of using your header, your account either does not have request-header authentication yet, or the connector was created before you added the header.
+
+Request-header authentication for custom connectors is a beta feature that Anthropic is rolling out gradually, and 1Club does not offer OAuth for MCP. Options:
+
+- **Remove and re-add the connector**, setting the header in the same dialog where you enter the URL rather than editing it afterwards.
+- **Use [Claude Code](/mcp/connect#claude-code)** instead, where the header is passed on the command line and always sent.
+- **Run a [local server](/mcp/connect#local-server-stdio)**, where the token comes from the environment and no header is involved.
+
+## A tool fails with a permission error
+
+The token is valid but does not carry that tool's scope. Ask the assistant to run `get_account`, which lists the exact scopes on your token, and compare against the [tools reference](/mcp/tools).
+
+To fix it, open the token in **Settings > APIs and MCP**, edit its scopes, and save. There is no need to reconnect the assistant, and no need to reissue the token.
+
+<Warning>
+  Editing a token without picking an expiry clears its expiry. Set the expiry
+  deliberately every time you edit.
+</Warning>
+
+## I see a mix of marketplace and organization tools
+
+You are connected to an outdated address. The two servers were separated so that an assistant never sees a mixed list: `/admin` offers 13 organization tools, `/discovery` offers 4 marketplace tools, and neither offers the other's.
+
+Remove the connector and re-add it with the correct address from [Connect an assistant](/mcp/connect).
+
+## The tool list is missing tools I expect
+
+Compare what the assistant lists against the [tools reference](/mcp/tools). If tools are genuinely absent from the list rather than failing when called, re-add the connector; most clients cache the tool list from when the connection was first made and do not refresh it on their own.
+
+## The Add button is disabled in Settings
+
+API access is a paid feature. On the Free plan or during a trial you can view and revoke existing tokens but cannot create one, and a banner at the top of the page explains this. Upgrade the plan, or connect the [discovery server](/mcp/connect#discovery-server-no-token), which needs no token.
+
+Note that existing tokens also stop working if an organization downgrades.
+
+## Everything worked, then stopped
+
+Check these in order:
+
+- **The token expired.** The list in **Settings > APIs and MCP** shows **Expired** once a token lapses. Create a new one and update your client.
+- **The token was revoked.** Revocation is immediate and permanent, including mid-conversation.
+- **You hit the rate limit.** MCP calls share the Platform API's limit of 100 requests per minute per organization. An assistant working through a long list of items can reach it; wait a minute and retry.
+
+The **Last used** column on the token list tells you whether requests are arriving at all.
+
+## The assistant invents data instead of calling a tool
+
+The assistant is answering from memory rather than from 1Club. Ask it explicitly to use the 1Club tools, or name the tool. Also confirm the connector is enabled for that specific conversation, which in Claude is done with the **+** button.

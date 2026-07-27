@@ -1,0 +1,70 @@
+---
+title: "Tools reference"
+sidebarTitle: "Tools reference"
+description: "Every tool the 1Club admin and discovery MCP servers expose, what it returns, and the API token scope each one requires."
+keywords:
+  [
+    mcp tools,
+    scopes,
+    get_account,
+    list_classes,
+    create_booking,
+    search_clubs,
+    availability,
+    platform api,
+  ]
+---
+
+This is the complete tool list for both 1Club MCP servers. An assistant sees only the tools of the server it is connected to.
+
+## Admin server
+
+`https://mcp.1club.ai/admin` - requires an API token. Every tool is scoped to the organization the token belongs to, and needs the listed scope on that token. A call whose scope is missing fails with a permission error, not with empty data.
+
+| Tool                             | What it does                                                             | Scope required      |
+| -------------------------------- | ------------------------------------------------------------------------ | ------------------- |
+| `get_account`                    | Names the organization the token belongs to and lists its granted scopes | None                |
+| `list_classes`                   | Lists your classes                                                       | `classes:read`      |
+| `get_class`                      | Opens one class by id                                                    | `classes:read`      |
+| `list_areas`                     | Lists your bookable areas                                                | `areas:read`        |
+| `get_platform_area_availability` | Checks when an area is free, for a date or a date range                  | `areas:read`        |
+| `get_booking`                    | Opens one booking by id                                                  | `bookings:read`     |
+| `create_booking`                 | Creates a booking                                                        | `bookings:write`    |
+| `cancel_booking`                 | Cancels a booking                                                        | `bookings:write`    |
+| `get_club`                       | Opens one of your gyms by slug, with amenities and rating                | `clubs:read`        |
+| `list_content`                   | Lists published website and CMS content                                  | `content:read`      |
+| `get_content`                    | Opens one published content item by slug                                 | `content:read`      |
+| `list_transactions`              | Lists billing transactions, newest first                                 | `transactions:read` |
+| `get_transaction`                | Opens one transaction by id                                              | `transactions:read` |
+
+<Note>
+  `get_account` needs no scope, so it always works with a valid token. That
+  makes it the right first call when an assistant is behaving as if it has no
+  access: if `get_account` succeeds, the token arrived and the problem is
+  scopes.
+</Note>
+
+### Reading the scope table
+
+Scopes follow the `resource:action` format used across the [Platform API](/api-reference/introduction). A token carrying `bookings:write` does not automatically carry `bookings:read`; grant both if the assistant should look a booking up as well as create one. The wildcard scope satisfies everything, and should be reserved for a fully trusted internal connection.
+
+Each admin tool is a thin wrapper over the documented Platform API, so the request limits, error shapes, and field meanings are the same as the [API reference](/api-reference/introduction).
+
+## Discovery server
+
+`https://mcp.1club.ai/discovery` - no token, no scopes. These search the public 1club.me marketplace across every listed gym and read only published information.
+
+| Tool                          | What it does                                                                   |
+| ----------------------------- | ------------------------------------------------------------------------------ |
+| `search_clubs`                | Searches gyms by sport, location, distance, price, rating, amenities, and date |
+| `get_class_availability`      | Returns a class with its availability status, current bookings, and capacity   |
+| `get_area_availability`       | Checks a public area's availability for a date or a date range                 |
+| `get_instructor_availability` | Checks a public instructor's availability for a date or a date range           |
+
+These tools take marketplace ids, which are not the same as the ids an assistant sees on the admin server. Do not mix ids between the two servers.
+
+## What is not exposed
+
+The admin server is built strictly on the documented Platform API, so anything that API does not cover is unreachable through MCP today. That currently includes members and memberships, messaging and the inbox, automations and promotions, invoices and payments, access control, and reporting.
+
+If you need one of these, the [Platform API](/api-reference/introduction) is where coverage grows first, and MCP follows it.

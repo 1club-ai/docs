@@ -94,8 +94,15 @@ Revoking is immediate and permanent. Any integration using that token stops work
 
 The API tokens page also surfaces two related integration points:
 
-- **MCP endpoint** - An informational panel shows your Model Context Protocol endpoint (`mcp.1club.ai`), which lets AI assistants connect to your organization using an API token.
+- **MCP endpoint** - A panel shows the address of the 1Club admin MCP server, `https://mcp.1club.ai/admin`, and the header an AI assistant must send with it. Connecting Claude, ChatGPT, or another Model Context Protocol client lets it answer questions and take actions against your own data, limited to the scopes on the token you give it. The panel has copy buttons for both values. See the [MCP overview](/mcp/overview) for what an assistant can do, and [Connect an assistant](/mcp/connect) for step-by-step setup per client.
 - **Webhooks** - A separate section on the same page lets you register endpoint URLs that 1Club calls when events happen, each with its own signing secret. The secret, like a token, is shown only once when created. See the [Webhooks reference](/api-reference/channel-integration/webhooks).
+
+### Which token to use for MCP
+
+An MCP token is an ordinary API token, so everything above about scopes, expiry, and revocation applies unchanged. Two habits are worth keeping:
+
+- **Give each assistant its own token.** Naming it "Claude assistant" rather than sharing one token with your website means you can see its last-used date and revoke it without breaking anything else.
+- **Start read-only.** Grant **Bookings: Write** only once you are satisfied with what the assistant does with read access. An assistant reads content that other people wrote, and that content can try to influence it.
 
 ## Worked examples
 

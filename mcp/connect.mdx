@@ -1,0 +1,163 @@
+---
+title: "Connect an assistant"
+sidebarTitle: "Connect an assistant"
+description: "Step-by-step setup for connecting Claude, ChatGPT, Claude Code, and local MCP clients to the 1Club admin and discovery servers, including where the API token goes."
+keywords:
+  [
+    mcp setup,
+    connect claude,
+    chatgpt connector,
+    claude code,
+    api token,
+    bearer token,
+    request header,
+    remote mcp,
+    stdio,
+  ]
+---
+
+This page walks through connecting an AI assistant to 1Club. The admin server needs an API token; the discovery server needs nothing.
+
+## Step 1: Create an API token
+
+Skip this step if you are only connecting the [discovery server](#discovery-server-no-token).
+
+1. Go to **Settings > APIs and MCP** in the admin dashboard.
+2. Click **Add**.
+3. Give the token a name that says where it is used, for example "Claude assistant".
+4. Choose the scopes the assistant needs. Start with read-only:
+   - **Classes: Read**, **Areas: Read**, **Clubs: Read** cover schedule and availability questions.
+   - Add **Bookings: Read** and **Bookings: Write** only if the assistant should create or cancel bookings.
+   - Add **Transactions: Read** only if it should see revenue.
+5. Set an expiry if this is a trial. **No expiry** is fine for a connection you actively manage.
+6. Click **Save**, then copy the token immediately. It is shown once and never again.
+
+The token looks like `1club_sk_live_...`. Full detail on scopes and expiry is on the [API tokens](/settings/api-tokens) page.
+
+## Step 2: Point your client at the right address
+
+| You want to                            | Address                          | Token |
+| -------------------------------------- | -------------------------------- | ----- |
+| Work with your own gym's data          | `https://mcp.1club.ai/admin`     | Yes   |
+| Search the public 1club.me marketplace | `https://mcp.1club.ai/discovery` | No    |
+
+The token is always sent as an HTTP header, on every request:
+
+```
+Authorization: Bearer 1club_sk_live_your_token_here
+```
+
+Where you type that varies by client. The rest of this page covers each one.
+
+## Claude (web and desktop)
+
+Claude connects to remote MCP servers as a **custom connector**.
+
+<Note>
+  Authenticating a custom connector with a request header is a beta feature that
+  Anthropic is rolling out gradually. If you do not see a **Request headers**
+  section in the dialog, your account does not have it yet, and you cannot
+  connect the admin server from Claude web or desktop. Use [Claude
+  Code](#claude-code) or a [local server](#local-server-stdio) instead, and see
+  [Troubleshooting](/mcp/troubleshooting).
+</Note>
+
+1. Go to **Settings > Connectors** and click **Add custom connector**. On Team and Enterprise plans this is done once by an owner under **Admin settings > Connectors**.
+2. Enter the remote MCP server URL: `https://mcp.1club.ai/admin`
+3. Open the **Request headers** section.
+4. Choose the header name `authorization`.
+5. For the value, enter `Bearer ` followed by your token, **including the space**:
+
+   ```
+   Bearer 1club_sk_live_your_token_here
+   ```
+
+   Claude sends the value exactly as typed and adds no prefix of its own. Entering the bare token without `Bearer ` will be rejected by 1Club.
+
+6. Mark the header **Required**, so a missing value fails loudly instead of connecting with no access.
+7. Click **Add**, then enable the connector in a conversation with the **+** button.
+
+Ask "which 1Club organization am I connected to?" as a first test. The assistant should call `get_account` and name your organization.
+
+## Claude Code
+
+One command, no dialog:
+
+```bash
+claude mcp add --transport http 1club-admin https://mcp.1club.ai/admin --header "Authorization: Bearer 1club_sk_live_your_token_here"
+```
+
+Then check it is live:
+
+```bash
+claude mcp list
+```
+
+For the anonymous marketplace server, drop the header:
+
+```bash
+claude mcp add --transport http 1club-discovery https://mcp.1club.ai/discovery
+```
+
+## ChatGPT
+
+ChatGPT reaches remote MCP servers through **developer mode** connectors.
+
+1. Enable developer mode under **Settings > Connectors**.
+2. Add a custom connector with the URL `https://mcp.1club.ai/admin`.
+3. Choose the **API key** authentication option and paste your token. ChatGPT sends it as `Authorization: Bearer <token>`, which is what 1Club expects.
+
+If your ChatGPT plan offers only **No authentication** and **OAuth**, the admin server cannot be connected from ChatGPT yet. 1Club does not support OAuth for MCP at this time. Connect the discovery server with **No authentication** instead, or use Claude Code.
+
+## Local server (stdio)
+
+Clients that run MCP servers as a local process, including Claude Desktop's config file, can run the 1Club server directly. This avoids every remote-header limitation, because the token comes from the environment instead of a header.
+
+This route is aimed at developers: the server is not published to a package registry yet, so you build it from the `mcp-server` directory of the 1Club repository with `npm install && npm run build`, then point your client at the built entry point.
+
+```json
+{
+  "mcpServers": {
+    "1club-admin": {
+      "command": "node",
+      "args": ["/path/to/1club/mcp-server/dist/index.js"],
+      "env": {
+        "BASE_URL": "https://api.1club.ai",
+        "ONECLUB_API_KEY": "1club_sk_live_your_token_here"
+      }
+    }
+  }
+}
+```
+
+The local server picks its surface automatically: with `ONECLUB_API_KEY` set it serves the admin tools, and without it, the discovery tools. To be explicit, set `ONECLUB_MCP_SURFACE` to `admin` or `discovery`.
+
+## Discovery server, no token
+
+The marketplace server needs no setup beyond the address. Add `https://mcp.1club.ai/discovery` as a custom connector with no authentication, or:
+
+```bash
+claude mcp add --transport http 1club-discovery https://mcp.1club.ai/discovery
+```
+
+It exposes marketplace search and public availability only. It cannot see any organization's private data, so there is nothing to scope.
+
+## Verify the connection
+
+Whichever client you used, confirm three things:
+
+1. **The tool list looks right.** The admin server offers 13 tools, all prefixed with your organization's data. The discovery server offers 4 search and availability tools. Seeing a mix of both means you are on an outdated address.
+2. **`get_account` works.** Ask the assistant to check the account. It should return your organization's name and the exact scopes on your token. This is the fastest way to confirm the token arrived.
+3. **A scoped call works.** Ask for next week's classes. If `get_account` succeeds but this fails with a permission error, the token is missing `classes:read`.
+
+If any step fails, see [Troubleshooting](/mcp/troubleshooting).
+
+## Rotating or revoking
+
+- **Rotate**: create a new token, update the header or environment variable in your client, confirm the assistant still works, then revoke the old token.
+- **Revoke**: open the token's actions menu in **Settings > APIs and MCP** and choose **Revoke**. The assistant loses access immediately, mid-conversation.
+
+<Warning>
+  Editing a token in the admin dashboard without picking an expiry clears its
+  expiry. Set the expiry deliberately each time you edit.
+</Warning>

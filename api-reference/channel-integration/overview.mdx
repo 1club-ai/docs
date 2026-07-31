@@ -38,9 +38,9 @@ to three things it holds in 1Club:
     See [Areas and availability](/api-reference/channel-integration/areas-and-availability).
   </Step>
   <Step title="Create a booking">
-    Send the slot and the `customer`. 1Club matches (or creates) a **contact** by
-    email and records the booking and its revenue.
-    See [How contacts sync](/api-reference/channel-integration/bookings#how-contacts-sync).
+    Send the slot and a `contactId` (or an inline `customer`, matched to a contact
+    by email). 1Club records the booking and its revenue.
+    See [Contacts](/api-reference/channel-integration/contacts).
   </Step>
   <Step title="Stay in sync">
     Any change on **any** channel emits a signed `availability.changed` webhook;
@@ -52,8 +52,9 @@ to three things it holds in 1Club:
 
 ## What syncs
 
-- **Bookings** - the partner creates and cancels bookings through the API.
-- **Contacts** - each customer is matched to a contact in your gym's CRM by email, and created if new. Contact sync happens automatically as a by-product of booking sync - see [How contacts sync](/api-reference/channel-integration/bookings#how-contacts-sync) for matching rules, guarantees, and the full flow diagram.
+- **Bookings** - the partner creates, cancels, and lists bookings through the API, optionally with a coach attached and extra players on them.
+- **Contacts** - the customer on each booking. Resolve them yourself by name, email, or phone through [Contacts](/api-reference/channel-integration/contacts) and book against a `contactId`, or send an inline `customer` and let 1Club match by email as a by-product of booking sync - see [How contacts sync](/api-reference/channel-integration/bookings#how-contacts-sync) for matching rules, guarantees, and the full flow diagram.
+- **Instructors** - read-only. Look up the gym's coaches to attach one to a coached session. See [Instructors](/api-reference/channel-integration/instructors).
 
 ## How money is recorded
 
@@ -62,14 +63,14 @@ You collect payment on your side; 1Club records the booking so it counts for rev
 - **`paid`** - 1Club records a paid booking transaction, settled against a dedicated **External / API** payment method (on the `manual` channel, so no card is charged). It shows in revenue as paid.
 - **`unpaid`** - 1Club records the transaction as outstanding. It shows in revenue as accrued, with nothing paid yet.
 
-`amount` is optional and defaults to the area's price for the slot. Refund handling and collection stay on your side - cancelling a booking releases the area and issues no refund from 1Club.
+`amount` is optional and defaults to the computed price for the slot: the area's price, plus the coach's hourly rate when the booking names one. A booking that carries no charge at all comes back as `no_charge` rather than `paid` or `unpaid`. Refund handling and collection stay on your side - cancelling a booking releases the area and issues no refund from 1Club.
 
 ## How it works
 
-1. **Create an API key** under **Settings - API Tokens** with the `areas:read`, `bookings:read`, and `bookings:write` scopes. See [Authentication](/api-reference/channel-integration/authentication).
+1. **Create an API key** under **Settings - API Tokens** with the `areas:read`, `bookings:read`, and `bookings:write` scopes, adding `contacts:read`, `contacts:write`, and `instructors:read` if you resolve customers or coaches by name. See [Authentication](/api-reference/channel-integration/authentication).
 2. **Discover areas** (your courts) and read their availability - per court or as a club-wide grid of computed slots. See [Areas and availability](/api-reference/channel-integration/areas-and-availability).
-3. **Create bookings** with a payment status and optional amount. See [Bookings](/api-reference/channel-integration/bookings).
-4. **Cancel or look up** a booking by the 1Club booking id returned on create.
+3. **Create bookings** with a payment status and optional amount, optionally naming the coach leading the session. Send an `Idempotency-Key` so a retry is safe. See [Bookings](/api-reference/channel-integration/bookings) and [Idempotency](/api-reference/channel-integration/idempotency).
+4. **Cancel or look up** a booking by the 1Club booking id returned on create, or **list** a window to reconcile against every channel.
 5. **Stay in sync** by registering a webhook endpoint under **Settings - APIs and MCP** and reconciling with the change feed. See [Webhooks](/api-reference/channel-integration/webhooks).
 
 ## Staying in sync

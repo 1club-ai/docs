@@ -1,0 +1,148 @@
+---
+title: "Contacts"
+description: "Search, open, and create the customers your bookings belong to."
+keywords: [contacts, customers, crm, search, contactId, platform api]
+---
+
+Every booking belongs to a **contact** in the gym's 1Club CRM. Use these endpoints to
+resolve a customer you only know by name into the `contactId` you pass when
+[creating a booking](/api-reference/channel-integration/bookings#create-a-booking),
+and to create the customer when they are new.
+
+<Note>
+  You can still create a booking without touching these endpoints by sending an
+  inline `customer` object, which is matched to a contact by email. That path is
+  unchanged and remains supported. Prefer `contactId` whenever you can resolve
+  it, because it is explicit about which person the booking is for.
+</Note>
+
+## Search contacts
+
+Requires the `contacts:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/contacts?search=ivan&limit=10" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Query parameters:
+
+- `search` (optional) - matches on name, email, or phone. An empty value is treated as no search.
+- `limit` (optional) - 1 to 100, defaults to 25
+- `offset` (optional) - defaults to 0
+
+Response:
+
+```json
+{
+  "data": [
+    {
+      "id": 300,
+      "name": "Ivan Petrov",
+      "firstName": "Ivan",
+      "lastName": "Petrov",
+      "email": "ivan@example.com",
+      "phone": "+359888123456",
+      "type": "member",
+      "createdAt": "2026-07-01T09:12:00.000Z"
+    }
+  ],
+  "total": 1,
+  "limit": 25,
+  "offset": 0
+}
+```
+
+`total` counts every contact matching the filters, ignoring pagination, so you can
+tell whether more pages exist.
+
+### Matching is case-insensitive and cross-script
+
+Search normalizes the query and also matches transliterated forms, so `ivan` finds
+`Иван` and `Иван` finds `Ivan`. Accents are stripped too, so `pena` matches `Peña`.
+This is the same matching the gym's staff see in the admin CRM, so an integration
+resolving a name lands on the same people a staff member would.
+
+Archived contacts are never returned.
+
+<Warning>
+  A single name often matches several people. Treat more than one result as a
+  question for a human rather than picking the first row - a booking made for
+  the wrong customer is not visible to them until they turn up.
+</Warning>
+
+## Open a contact
+
+Requires the `contacts:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/contacts/300" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Returns the same object as one row of the search response. A `404` means no contact
+with that id exists in your organization.
+
+## Create a contact
+
+Requires the `contacts:write` scope.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/contacts" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: contact-ivan-2026-07-20" \
+  -d '{
+    "firstName": "Ivan",
+    "lastName": "Petrov",
+    "email": "ivan@example.com",
+    "phone": "+359888123456"
+  }'
+```
+
+Body fields:
+
+- `firstName` (required)
+- `lastName` (optional)
+- `email` (optional)
+- `phone` (optional)
+
+At least one of `email` or `phone` is required, so the person stays reachable and
+findable. Email is normalized to lower case.
+
+Response (`201 Created`) is the created contact.
+
+<Warning>
+  Search before you create. Creating a contact whose email already exists
+  returns `409`, and duplicate people are awkward to merge afterwards. The
+  recommended flow is search, then create only when there is no match.
+</Warning>
+
+Creating a contact accepts an `Idempotency-Key`, so a retry after a timeout cannot
+produce a second record. See [Idempotency](/api-reference/channel-integration/idempotency).
+
+## Resolving a customer before booking
+
+<Steps>
+  <Step title="Search by what you know">
+    Call **Search contacts** with the customer's name, email, or phone.
+  </Step>
+  <Step title="Decide">
+    One match is your customer. Several matches need a human to choose. No match
+    means they are new.
+  </Step>
+  <Step title="Create when new">
+    Call **Create a contact** with at least an email or a phone.
+  </Step>
+  <Step title="Book with the id">
+    Pass the resolved `contactId` on [Create a
+    booking](/api-reference/channel-integration/bookings#create-a-booking).
+  </Step>
+</Steps>
+
+## What this API does not do
+
+- **No contact updates or deletes.** Profile fields are edited by the gym in 1Club. This keeps the CRM record authoritative on the gym's side.
+- **No merging.** If duplicates appear, they are resolved inside 1Club.
+- **One-way sync.** 1Club never pushes contact changes back to you.
+- **Archived contacts cannot be booked.** Archiving is how a gym retires a contact. An archived contact is hidden from search and rejected as the person a booking is for, or as a player on one.

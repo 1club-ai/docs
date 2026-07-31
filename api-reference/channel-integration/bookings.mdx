@@ -13,17 +13,14 @@ Requires the `bookings:write` scope.
 curl -X POST "https://api.1club.ai/v1/platform/bookings" \
   -H "Authorization: Bearer 1club_sk_live_..." \
   -H "Content-Type: application/json" \
+  -H "Idempotency-Key: booking-8f2c1a" \
   -d '{
     "areaId": 51,
     "startTime": "2026-07-20T17:00:00Z",
     "endTime": "2026-07-20T18:00:00Z",
-    "customer": {
-      "email": "alex@example.com",
-      "firstName": "Alex",
-      "lastName": "Rivera",
-      "phone": "+34600111222"
-    },
-    "payment": { "status": "paid", "amount": 24 },
+    "contactId": 300,
+    "instructorId": 42,
+    "payment": { "status": "paid", "amount": 54 },
     "channel": "Padel Community",
     "notes": "Booked via Padel Community"
   }'
@@ -33,12 +30,16 @@ Body fields:
 
 - `areaId` (required) - the area id from [List areas](/api-reference/channel-integration/areas-and-availability#list-areas)
 - `startTime`, `endTime` (required) - ISO date-times, `endTime` after `startTime`
-- `customer.email` (required) - matches an existing contact or creates a new one
-- `customer.firstName`, `customer.lastName`, `customer.phone` (optional) - used when creating a new contact
+- `contactId` - the customer, resolved through [Contacts](/api-reference/channel-integration/contacts)
+- `customer` - an inline customer matched to a contact by email, instead of `contactId`
+- `instructorId` (optional) - the coach leading the session, from [Instructors](/api-reference/channel-integration/instructors)
 - `payment.status` (required) - `paid` (you collected the money) or `unpaid` (outstanding)
-- `payment.amount` (optional) - amount collected; defaults to the area's price for the slot (max 1,000,000)
+- `payment.amount` (optional) - amount collected; defaults to the computed price for the slot (max 1,000,000)
 - `channel` (optional) - a label stored for attribution
 - `notes` (optional)
+- `notifyCustomer` (optional) - send the customer a 1Club confirmation email; defaults to `false`
+
+Send **exactly one** of `contactId` or `customer`. Sending both, or neither, is a `400`.
 
 Response (`201 Created`):
 
@@ -47,26 +48,65 @@ Response (`201 Created`):
   "bookingId": 48213,
   "status": "confirmed",
   "areaId": 51,
+  "instructorId": 42,
+  "contactId": 300,
   "startTime": "2026-07-20T17:00:00.000Z",
   "endTime": "2026-07-20T18:00:00.000Z",
-  "payment": { "status": "paid", "amount": 24 }
+  "payment": { "status": "paid", "amount": 54 }
 }
 ```
 
+Creating a booking accepts an `Idempotency-Key`, so a timeout cannot become two bookings. See [Idempotency](/api-reference/channel-integration/idempotency).
+
+### Identifying the customer
+
+`contactId` is the recommended path: resolve the customer with [Search contacts](/api-reference/channel-integration/contacts#search-contacts), create them if new, then book against the id. It is explicit about which person the booking is for, and it works for customers you only know by name.
+
+The inline `customer` object remains supported for integrations that never hold 1Club ids. It is matched to a contact by email, and a contact is created when there is no match - see [How contacts sync](#how-contacts-sync).
+
+### Adding a coach
+
+Pass `instructorId` when the session is coached rather than a bare court hire. The coach must take one-on-one bookings (`isBookable`), and their own calendar is respected, so a booking that would double-book them is rejected. Attaching a coach also feeds the gym's instructor pay records automatically.
+
+### How the amount is calculated
+
+`payment.amount` is optional. When you omit it, 1Club prices the slot itself: the **area price per hour plus the instructor hourly rate, times the duration**. A one hour court at 24 with a coach at 30 is priced at 54. Without an instructor it is just the area price. Send `payment.amount` explicitly whenever your side is the authority on what the customer paid.
+
 ### How payment is recorded
 
-- `paid` → 1Club records a paid booking transaction, settled against a dedicated **External / API** payment method (manual channel, no card charged). Counts as revenue and paid.
-- `unpaid` → 1Club records the transaction as outstanding. Counts as accrued revenue with nothing paid.
+- `paid` - 1Club records a paid booking transaction, settled against a dedicated **External / API** payment method (manual channel, no card charged). Counts as revenue and paid.
+- `unpaid` - 1Club records the transaction as outstanding. Counts as accrued revenue with nothing paid.
+
+The `payment.status` you get **back** can also be `no_charge`, which means nothing was ever owed - a free area, or an explicit amount of `0`. There is no transaction to settle in that case, so it is reported as `no_charge` rather than as whichever of `paid` or `unpaid` you sent.
 
 You keep ownership of collection and refunds. 1Club never charges a card for these bookings.
 
+### Booking policy is not applied to this API
+
+1Club has member-facing booking rules a gym can configure: a minimum notice period, a maximum number of days in advance, an opening-hours envelope, and a block on slots that have already ended. **None of them are enforced for this API**, because the system calling it runs its own booking rules.
+
+That is what lets you record a schedule as it stands, including sessions in the past when you are migrating an existing calendar into 1Club.
+
+<Warning>
+  Physical constraints always apply and are never overridden: a genuine
+  double-booking, the area's concurrency capacity, whether an instructor takes
+  one-on-one bookings, and the slot alignment the area requires. A booking that
+  breaks one of these is rejected.
+</Warning>
+
 ## How contacts sync
 
-Every booking belongs to a **contact** in the club's 1Club CRM. You never create or
-manage contacts directly - there is no contacts endpoint. Instead, the `customer`
-object you send with each booking is resolved to a contact automatically, as a
-by-product of booking sync. This is deliberately one-way: **partner → 1Club**. 1Club
-never pushes contact changes back to you.
+Every booking belongs to a **contact** in the gym's 1Club CRM. When you send an
+inline `customer` object instead of a `contactId`, that customer is resolved to a
+contact automatically, as a by-product of booking sync. Sync is one-way:
+**partner to 1Club**. 1Club never pushes contact changes back to you.
+
+<Note>
+  This section describes the inline `customer` path. To resolve a customer yourself
+  before booking - by name, email, or phone - use
+  [Contacts](/api-reference/channel-integration/contacts) and pass the resulting
+  `contactId` instead.
+</Note>
 
 ### Matching and creation
 
@@ -100,7 +140,13 @@ never pushes contact changes back to you.
   <Step title="Resolve the contact">
     Normalize `customer.email` (trim + lower-case), then **match** an existing
     contact in the organization or **create** one from the `customer` fields. An
-    existing contact is reused as-is (name/phone not overwritten).
+    existing contact is reused as-is (name/phone not overwritten). When you send a
+    `contactId` instead, it is checked against your organization and must not be
+    archived.
+  </Step>
+  <Step title="Validate the instructor">
+    When `instructorId` is present, the coach must be active in your organization
+    and must take one-on-one bookings.
   </Step>
   <Step title="Create the booking">
     Link the resolved `contactId` and write the booking, re-checking availability
@@ -122,10 +168,12 @@ never pushes contact changes back to you.
 
 ### Common errors
 
-- `409` - the area is not available for the selected time.
-- `400` - the time is outside operating hours, the booking breaks a club booking policy, or the area is not bookable through this API.
+- `409` - the area is not available for the selected time, the instructor is already busy, or an `Idempotency-Key` was reused with a different body.
+- `400` - the area is not bookable through this API, the contact or instructor was not found in your organization, the contact is archived, the instructor does not take one-on-one bookings, or you sent both `contactId` and `customer` (or neither).
 - `403` - the API key is missing the `bookings:write` scope.
 - `429` - rate limit exceeded (booking writes are throttled in addition to the standard per-org limit).
+
+Opening hours, minimum notice, and how far ahead you may book are **not** enforced for this API - see [Booking policy is not applied to this API](#booking-policy-is-not-applied-to-this-api).
 
 ## Cancel a booking
 
@@ -158,10 +206,107 @@ curl "https://api.1club.ai/v1/platform/bookings/48213" \
   "bookingId": 48213,
   "status": "confirmed",
   "areaId": 51,
+  "instructorId": 42,
+  "contactId": 300,
   "startTime": "2026-07-20T17:00:00.000Z",
   "endTime": "2026-07-20T18:00:00.000Z",
-  "payment": { "status": "paid", "amount": 24 }
+  "payment": { "status": "paid", "amount": 54 }
 }
 ```
 
 A `404` means no booking with that id exists in your organization.
+
+<Note>
+  Look-up and cancel only reach bookings **this API created**. That is deliberate:
+  cancelling issues no refund, so a key must not be able to cancel a booking a
+  member made in the gym's own app. To see bookings from every channel, use
+  [List bookings](#list-bookings).
+</Note>
+
+## List bookings
+
+Requires the `bookings:read` scope. Returns bookings whose start time falls in a window, so you can verify what you created and reconcile against what else is on the calendar.
+
+```bash
+curl "https://api.1club.ai/v1/platform/bookings?from=2026-07-20T00:00:00Z&to=2026-07-21T00:00:00Z&areaId=51" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Query parameters:
+
+- `from`, `to` (optional) - ISO date-times bounding the booking start time. The window may span at most 92 days. Omit both for the next 7 days; pass one and the other is derived from it.
+- `clubId`, `areaId`, `instructorId`, `contactId` (optional) - narrow to one gym, court, coach, or customer
+- `status` (optional) - for example `confirmed`, `pending`, `cancelled`
+- `limit` (optional) - 1 to 100, defaults to 50
+- `offset` (optional) - defaults to 0
+
+Response:
+
+```json
+{
+  "data": [
+    {
+      "bookingId": 48213,
+      "status": "confirmed",
+      "areaId": 51,
+      "instructorId": 42,
+      "contactId": 300,
+      "clubId": 5,
+      "source": "api",
+      "notes": null,
+      "createdAt": "2026-07-18T08:30:00.000Z",
+      "startTime": "2026-07-20T17:00:00.000Z",
+      "endTime": "2026-07-20T18:00:00.000Z",
+      "payment": { "status": "paid", "amount": 54 }
+    }
+  ],
+  "total": 1,
+  "limit": 50,
+  "offset": 0
+}
+```
+
+Unlike look-up by id, this returns bookings from **every** channel, each tagged with `source` (`api` for yours, plus `admin`, `portal`, `app`, and others). That is what makes reconciliation possible: a caller that cannot see member and staff bookings cannot tell that a slot it thinks is free was taken in the gym's own tools.
+
+## Players on a booking
+
+A doubles court is booked by one person but played by several. The customer the booking is for stays on the booking itself as `contactId`; the others are **players** on it.
+
+### List players
+
+Requires the `bookings:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/bookings/48213/participants" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+```json
+[{ "contactId": 301, "name": "Max Ivanov", "status": "confirmed" }]
+```
+
+### Add a player
+
+Requires the `bookings:write` scope. The contact must already exist - create it through [Contacts](/api-reference/channel-integration/contacts#create-a-contact) first.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/bookings/48213/participants" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "contactId": 301 }'
+```
+
+### Remove a player
+
+Requires the `bookings:write` scope. Returns `204` and does not affect the person the booking is for.
+
+```bash
+curl -X DELETE "https://api.1club.ai/v1/platform/bookings/48213/participants/301" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+### Limits
+
+The total, counting the person the booking is for, is capped by the area type's maximum players. Adding beyond it returns `400`. On an area that allows only one player, no additional players can be added at all.
+
+Adding someone who is already the booking's customer, or already a player, returns `409`. Archived contacts cannot be added.

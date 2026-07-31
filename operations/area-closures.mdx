@@ -1,0 +1,97 @@
+---
+title: "Area closures"
+description: "Close a court, or a whole gym, for a set period so nothing new can be booked in it - without taking the area off your schedule permanently."
+keywords:
+  [
+    "area closure",
+    "closure",
+    "close court",
+    "maintenance",
+    "resurfacing",
+    "public holiday",
+    "camp",
+    "unavailable",
+    "block court",
+    "court out of action",
+  ]
+---
+
+A closure takes an area off the bookable schedule for a specific period. Use it for anything with a start and an end: resurfacing a court, a holiday, a camp taking over the gym, a burst pipe.
+
+You create closures from **Schedule**, on the area lanes. A closure is the area equivalent of an instructor's time off.
+
+## Overview
+
+- **Time-ranged** - A closure has a start and an end, so the area reopens on its own. You don't have to remember to undo it.
+- **One area or the whole gym** - Closing every area in a gym is a single entry, not one per court.
+- **Respected everywhere** - The closed period stops new bookings on the admin schedule, the member portal and app, the marketplace, and the API.
+- **Existing bookings are untouched** - A closure blocks new bookings. Bookings already in the period stay, so you decide who to move or cancel.
+- **Overridable by staff** - Someone with permission to manage areas can still record a booking inside a closed period, which is what you need when entering a session that already happened.
+
+## Closure or maintenance status?
+
+Both take an area out of the booking flow, but they answer different questions.
+
+| Use a closure                                               | Use **Maintenance** status                           |
+| ----------------------------------------------------------- | ---------------------------------------------------- |
+| The area reopens on a known date                            | The area is out of action indefinitely               |
+| You want the reason visible on the schedule for that period | You want the area off the schedule entirely          |
+| Members should see the area again afterwards                | The area should stay hidden until you change it back |
+
+Set **Maintenance** on the area itself (**Resources > Areas**) when a space is out of action with no end in sight. Reach for a closure whenever the period is known, which is most of the time.
+
+<Note>
+  Do not block a period by creating a placeholder booking. A booking is a
+  financial record and will show up in your revenue reports. A closure is not.
+</Note>
+
+## Creating a closure
+
+Two routes, both on **Schedule**:
+
+- Click **Add** in the header, then **Closure**.
+- Drag out the hours you want on an area's lane, then choose **Add closure**. The area and the times come pre-filled from what you selected.
+
+The dialog asks for:
+
+- **Gym** - which gym the closure belongs to.
+- **What is closed** - either a single area, or **Whole club (all areas)** to close every area in that gym with one entry.
+- **Start** and **End** - the period. These default to that day's opening and closing hours, so closing for a full day needs no editing. Change either one and your times are kept from then on.
+- **Reason** - free text, shown as the label on the schedule. "Resurfacing", "Camp", "Public holiday".
+
+### Closing a whole gym
+
+Choose **Whole club (all areas)** rather than creating one closure per court. One entry is easier to remove afterwards, and areas you add later are covered by it automatically - useful when a camp or holiday closure is created weeks ahead.
+
+## What a closure looks like on the schedule
+
+The closed period appears as a grey, dashed block on the area's lane, labelled with your reason. It sits behind the day's real bookings rather than replacing them, so you can still see who is booked in the period you just closed.
+
+A gym-wide closure shows on every one of that gym's area lanes in the day view. In the week and 3-day views, where all resources share one column per day, it shows as a single block so it can't crowd out the day's bookings.
+
+Click the block to edit it, or use its menu to delete it. Deleting a closure reopens the period immediately.
+
+## Booking into a closed period
+
+Members cannot book a closed period. The slots are simply not offered.
+
+Staff who can manage areas get a different result: the booking is refused with **This area is closed during this slot**, alongside a **Book anyway** option. That override exists for backfilling - recording a session that really happened before the closure was entered.
+
+The override does not extend to a full area. If the closed period is also at capacity, the booking is refused outright with no override, because letting it through would double-book the space.
+
+## Recurring closures
+
+Closures do not repeat. A closure is one concrete period.
+
+For a pattern that repeats every week - closed every Monday morning, or a shorter Sunday - set the area's **Operating hours** instead (**Resources > Areas**). Operating hours are the recurring schedule; closures are the exceptions to it.
+
+## Permissions
+
+Reading closures needs the same access as reading the schedule. Creating, editing, and deleting them needs permission to manage areas, which is the same permission that governs the areas themselves. Admins and managers have it by default; see [Roles and permissions](/reference/roles-permissions).
+
+## Related
+
+- [Areas](/operations/areas) - area setup, status, and operating hours
+- [Schedule](/operations/schedule) - the calendar closures appear on
+- [Instructors](/operations/instructors) - time off, the staff equivalent of a closure
+- [Areas and availability](/api-reference/channel-integration/areas-and-availability) - reading and writing closures over the API

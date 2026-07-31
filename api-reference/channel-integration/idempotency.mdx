@@ -1,0 +1,69 @@
+---
+title: "Idempotency"
+description: "Retry any write safely with an Idempotency-Key, so a timeout never becomes a duplicate booking."
+keywords: [idempotency, Idempotency-Key, retries, duplicates, platform api]
+---
+
+A request that times out leaves you with a real problem: the booking may or may not
+exist, and retrying blind risks creating it twice. Send an `Idempotency-Key` on any
+write and 1Club replays the original response instead, so a retry is always safe.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/bookings" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Idempotency-Key: booking-8f2c1a-2026-07-20T17" \
+  -H "Content-Type: application/json" \
+  -d '{ "areaId": 51, "startTime": "2026-07-20T17:00:00Z", "endTime": "2026-07-20T18:00:00Z", "contactId": 300, "payment": { "status": "paid" } }'
+```
+
+The header is optional. Without it, every request executes normally, so existing
+integrations are unaffected.
+
+## Choosing a key
+
+Use a value that identifies **the operation**, not the attempt - a UUID you generate
+once and reuse across retries, or something derived from your own booking id. Keys
+are scoped to your organization and can be up to 255 characters.
+
+Do not reuse a key for a different operation. The key is remembered together with a
+fingerprint of the request, so reusing it with a different body is treated as a
+mistake rather than a new write.
+
+## What each outcome means
+
+| Situation                                | Response                                              |
+| ---------------------------------------- | ----------------------------------------------------- |
+| First request with this key              | Executes normally                                     |
+| Same key, same request, already finished | The original response, with `Idempotent-Replay: true` |
+| Same key, still in flight                | `409` - retry shortly                                 |
+| Same key, different request body         | `409` - the key was already used for something else   |
+| Previous attempt failed                  | Executes normally; a failed attempt frees the key     |
+
+A replayed response carries the original status code and body, including the
+original `bookingId`. Field order in your JSON body does not matter - a reordered
+but otherwise identical body still replays.
+
+## Failed attempts free the key
+
+If a write fails, the key is released, so you can retry it - including with a
+corrected body after a validation error. This is what makes an interrupted bulk sync
+resumable: rerun the whole batch with the same keys, and the writes that already
+succeeded replay while the ones that failed are attempted again.
+
+## When a connection drops
+
+If the connection is lost before the response is written, 1Club deliberately keeps
+the key claimed, because the write itself may have committed. A retry then returns
+`409` rather than risking a duplicate. Confirm what actually landed with
+[List bookings](/api-reference/channel-integration/bookings#list-bookings) before
+deciding what to do.
+
+## Retention
+
+Stored responses are kept for 24 hours. After that a reused key is treated as a new
+request, so retries should happen well inside that window.
+
+<Note>
+  Cancelling a booking is already idempotent without a key: cancelling an
+  already-cancelled booking succeeds and returns the same response.
+</Note>

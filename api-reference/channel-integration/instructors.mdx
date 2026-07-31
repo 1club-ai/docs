@@ -1,0 +1,115 @@
+---
+title: "Instructors"
+description: "Find the coach leading a session and get the instructorId a booking needs."
+keywords: [instructors, coaches, instructorId, bookable, platform api]
+---
+
+An **instructor** is a coach on the gym's staff. Attach one to a booking when the
+session is coached rather than a bare court hire - a lesson, a personal training
+slot, a padel clinic.
+
+These endpoints are read-only. Instructors are staff records created and managed by
+the gym in 1Club, so this API never creates or edits them.
+
+## Search instructors
+
+Requires the `instructors:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/instructors?search=maya&bookableOnly=true" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Query parameters:
+
+- `search` (optional) - matches on the instructor's name
+- `clubId` (optional) - only instructors assigned to that gym
+- `sport` (optional) - only instructors who list that sport, for example `padel`
+- `bookableOnly` (optional) - `true` or `false`; when `true`, only instructors who take one-on-one bookings
+- `limit` (optional) - 1 to 100, defaults to 25
+- `offset` (optional) - defaults to 0
+
+Response:
+
+```json
+{
+  "data": [
+    {
+      "id": 42,
+      "name": "Maya Ivanova",
+      "clubId": 5,
+      "sports": ["padel"],
+      "hourlyRate": 30,
+      "isBookable": true,
+      "maxConcurrentBookings": 1,
+      "operatingHours": {}
+    }
+  ],
+  "total": 1,
+  "limit": 25,
+  "offset": 0
+}
+```
+
+Name matching works the same way as
+[contact search](/api-reference/channel-integration/contacts#matching-is-case-insensitive-and-cross-script):
+case-insensitive and cross-script, so `maya` finds `Мая`. Only active instructors
+are returned.
+
+## Open an instructor
+
+Requires the `instructors:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/instructors/42" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Returns the same object as one row of the search response. A `404` means no active
+instructor with that id exists in your organization.
+
+## Fields that affect booking
+
+<Note>
+  **`isBookable`** decides whether the coach can be attached to a booking at
+  all. An instructor with `isBookable: false` does not take one-on-one bookings,
+  and a booking naming them is always rejected. Nothing overrides this, so
+  filter on it before offering a coach for sale.
+</Note>
+
+**`hourlyRate`** is added to the area's price when 1Club prices the booking. A one
+hour court at 24 with a coach at 30 is priced at 54 unless you send an explicit
+`payment.amount`. See
+[How the amount is calculated](/api-reference/channel-integration/bookings#how-the-amount-is-calculated).
+
+**`clubId`** is the gym the instructor belongs to, or `null` when they work across
+the whole organization.
+
+**`maxConcurrentBookings`** is how many sessions the coach can run at once. Booking
+beyond it is a genuine conflict and is rejected.
+
+## Booking a coached session
+
+<Steps>
+  <Step title="Find the coach">
+    Search by name with `bookableOnly=true`, so unbookable staff never reach
+    your booking flow.
+  </Step>
+  <Step title="Check the slot">
+    Read the area's availability as usual. See [Areas and
+    availability](/api-reference/channel-integration/areas-and-availability).
+  </Step>
+  <Step title="Book with instructorId">
+    Pass `instructorId` alongside `areaId` on [Create a
+    booking](/api-reference/channel-integration/bookings#create-a-booking).
+  </Step>
+</Steps>
+
+The coach's own calendar is respected: a booking that would double-book them, or
+exceed `maxConcurrentBookings`, is rejected with a `409`.
+
+<Note>
+  Attaching an instructor also feeds the gym's instructor pay records
+  automatically, so a coached booking you create is compensated the same way one
+  booked in 1Club is. You do not need to report anything extra.
+</Note>

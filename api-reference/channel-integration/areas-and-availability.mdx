@@ -187,3 +187,105 @@ Keep paging while `hasMore` is `true`.
   rejection gracefully - and use [webhooks](/api-reference/channel-integration/webhooks)
   plus this feed to keep the snapshot fresh.
 </Note>
+
+## Area closures
+
+A **closure** takes an area off the bookable schedule for a period: resurfacing, a holiday, a camp. Availability already reflects closures, so a closed slot simply won't appear in `slots`. Read closures directly when you want the *reason* and the period to show in your own calendar, or when migrating a schedule into 1Club.
+
+A closure with `areaId: null` is gym-wide: it closes every area in its `clubId`. If you key your calendar by court, expand it against that gym's areas.
+
+### List closures
+
+Requires the `areas:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/area-closures?from=2026-08-01T00:00:00Z&to=2026-08-08T00:00:00Z" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Query parameters:
+
+- `from` (required) - window start, ISO date-time
+- `to` (required) - window end, at most 31 days after `from`
+- `clubId` (optional) - only closures for this club
+- `areaId` (optional) - only closures affecting this area, gym-wide ones included
+
+Any closure that *overlaps* the window is returned, so a week-long closure still appears when you ask about one day inside it.
+
+Response:
+
+```json
+[
+  {
+    "id": 12,
+    "clubId": 8,
+    "areaId": 51,
+    "areaName": "Court 1",
+    "startTime": "2026-08-03T07:00:00.000Z",
+    "endTime": "2026-08-03T19:00:00.000Z",
+    "note": "Resurfacing",
+    "createdAt": "2026-07-28T09:12:44.001Z"
+  },
+  {
+    "id": 13,
+    "clubId": 8,
+    "areaId": null,
+    "areaName": null,
+    "startTime": "2026-08-05T00:00:00.000Z",
+    "endTime": "2026-08-06T00:00:00.000Z",
+    "note": "Public holiday",
+    "createdAt": "2026-07-28T09:14:02.884Z"
+  }
+]
+```
+
+### Create a closure
+
+Requires the `areas:write` scope.
+
+Send `areaId` to close one court, and its gym is derived for you. To close a whole gym, send `clubId` and leave `areaId` out - one record rather than one per court, and areas added later are covered too.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/area-closures" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "areaId": 51,
+    "startTime": "2026-08-03T07:00:00Z",
+    "endTime": "2026-08-03T19:00:00Z",
+    "note": "Resurfacing"
+  }'
+```
+
+Body:
+
+- `startTime`, `endTime` (required) - ISO date-times with offset. `endTime` must be after `startTime`.
+- `areaId` (optional) - the court to close. Omit or send `null` for a gym-wide closure.
+- `clubId` - required when `areaId` is omitted or `null`; otherwise derived from the area.
+- `note` (optional) - up to 500 characters, shown on the gym's schedule.
+
+Returns `201` with the created closure.
+
+<Note>
+  A closure blocks **new** bookings. Bookings already inside the period are not
+  cancelled, so migrate or cancel those separately if you need the period clear.
+</Note>
+
+### Delete a closure
+
+Requires the `areas:write` scope. Deleting a closure reopens the period for booking.
+
+```bash
+curl -X DELETE "https://api.1club.ai/v1/platform/area-closures/12" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Returns `{ "success": true }`. A second delete of the same id returns `404`.
+
+<Note>
+  Creating or deleting a closure emits an availability change for every affected
+  area, so the
+  [changes feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed)
+  and [webhooks](/api-reference/channel-integration/webhooks) will tell you to
+  re-pull those courts. A gym-wide closure emits one change per area in the gym.
+</Note>

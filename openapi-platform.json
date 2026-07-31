@@ -878,6 +878,175 @@
             "type": "integer"
           }
         }
+      },
+      "PlatformMembership": {
+        "type": "object",
+        "description": "A customer's membership on a plan. The plan is snapshotted onto it at creation, so allowance and coverage behave exactly as they do for a membership sold in 1Club.",
+        "properties": {
+          "membershipId": {
+            "type": "integer"
+          },
+          "contactId": {
+            "type": "integer",
+            "description": "Customer the membership belongs to"
+          },
+          "planId": {
+            "type": "integer"
+          },
+          "planName": {
+            "type": "string",
+            "nullable": true
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Club the membership is limited to; null when it applies organization-wide."
+          },
+          "status": {
+            "type": "string",
+            "description": "active, paused, cancelled, expired, used, pending, or pending_payment"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "renewalDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "autoRenew": {
+            "type": "boolean"
+          },
+          "price": {
+            "type": "number",
+            "nullable": true
+          },
+          "billingFrequency": {
+            "type": "string"
+          },
+          "maxUses": {
+            "type": "number",
+            "nullable": true,
+            "description": "Session allowance snapshotted from the plan; null when unlimited."
+          },
+          "usesRemaining": {
+            "type": "number",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PlatformMembershipPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformMembership"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total memberships matching the filters, ignoring pagination"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
+      },
+      "PlatformPlan": {
+        "type": "object",
+        "description": "A membership plan. It carries its own price, joining fee, billing frequency and session allowance, so creating a membership only has to name the plan and the customer.",
+        "properties": {
+          "planId": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Club the plan is limited to; null when organization-wide."
+          },
+          "price": {
+            "type": "number",
+            "description": "Charged each billing period."
+          },
+          "signupFee": {
+            "type": "number",
+            "description": "Charged once when the membership starts, on top of the price."
+          },
+          "billingFrequency": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "False for a retired plan that is no longer sold."
+          },
+          "maxUses": {
+            "type": "number",
+            "nullable": true,
+            "description": "Session allowance a membership gets; null when unlimited."
+          },
+          "sessionUnit": {
+            "type": "string",
+            "nullable": true,
+            "description": "What a use is counted in - a booking or an hour."
+          },
+          "validityPeriod": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Days the membership stays valid, when time-limited."
+          },
+          "autoRenews": {
+            "type": "boolean",
+            "description": "Whether a membership on this plan renews by default."
+          },
+          "sports": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PlatformPlanPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformPlan"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total plans matching the filters, ignoring pagination"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
       }
     },
     "responses": {
@@ -3130,6 +3299,464 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/v1/platform/memberships": {
+      "get": {
+        "summary": "List memberships",
+        "description": "Returns the organization's memberships, most recently started first. Filter by customer, plan, or status to find the one you need.\n",
+        "tags": [
+          "Memberships"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "contactId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only memberships belonging to this customer"
+          },
+          {
+            "in": "query",
+            "name": "planId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only memberships on this plan"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "active",
+                "expired",
+                "cancelled",
+                "used",
+                "paused",
+                "pending_payment"
+              ]
+            },
+            "description": "Only memberships with this status"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of memberships",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformMembershipPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `memberships:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a membership",
+        "description": "Puts a customer on a plan. The plan is snapshotted onto the membership exactly as it is when sold in 1Club - club, session allowance, coverage, billing frequency and renewal window - so the membership draws down booking allowance identically.\n\n`paid` records a payment against the External / API method with no gateway call; `unpaid` leaves the membership's transactions outstanding. The total charged is the period amount plus any joining fee, both taken from the plan unless overridden. Collection and refunds stay with you.\n\nWhen nothing is owed at all - a free plan with no joining fee, or an `amount` of 0 on such a plan - the membership is created active straight away rather than awaiting a payment that will never come.\n\nSupports the `Idempotency-Key` header.\n",
+        "tags": [
+          "Memberships"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "contactId",
+                  "planId",
+                  "payment"
+                ],
+                "properties": {
+                  "contactId": {
+                    "type": "integer",
+                    "description": "Customer to give the membership to (from GET /v1/platform/contacts)"
+                  },
+                  "planId": {
+                    "type": "integer",
+                    "description": "Plan to put them on"
+                  },
+                  "startDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Defaults to now"
+                  },
+                  "endDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Omit to let the plan's billing frequency decide"
+                  },
+                  "autoRenew": {
+                    "type": "boolean",
+                    "description": "Defaults to the plan's setting"
+                  },
+                  "overrides": {
+                    "type": "object",
+                    "description": "The membership's own snapshot of the plan. Omit any field to take the plan's value; the admin Add membership dialog works the same way, so a negotiated sale is a normal case. Look the plan up first with GET /v1/platform/plans to see what you are overriding.\n",
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "maximum": 1000000,
+                        "description": "Charged each period; defaults to the plan's price"
+                      },
+                      "signupFee": {
+                        "type": "number",
+                        "maximum": 1000000,
+                        "description": "Charged once on top of `amount`; defaults to the plan's joining fee, 0 waives it"
+                      },
+                      "maxUses": {
+                        "type": "number",
+                        "nullable": true,
+                        "description": "Session allowance; defaults to the plan's, null for unlimited"
+                      },
+                      "usesRemaining": {
+                        "type": "number",
+                        "nullable": true,
+                        "description": "Sessions left now; defaults to the full allowance. Set it lower when migrating a partly-used package."
+                      },
+                      "sessionUnit": {
+                        "type": "string",
+                        "enum": [
+                          "booking",
+                          "hour"
+                        ],
+                        "description": "Whether a use is a booking or an hour; defaults to the plan's"
+                      }
+                    }
+                  },
+                  "payment": {
+                    "type": "object",
+                    "required": [
+                      "status"
+                    ],
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "paid",
+                          "unpaid"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Membership created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformMembership"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Contact or plan not found in this organization, or the contact is archived",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `memberships:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "$ref": "#/components/responses/PlatformConflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/memberships/{id}": {
+      "get": {
+        "summary": "Get a membership",
+        "description": "Returns a single membership by its 1Club id, including its remaining session allowance.",
+        "tags": [
+          "Memberships"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The membership",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformMembership"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `memberships:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/plans": {
+      "get": {
+        "summary": "List and search membership plans",
+        "description": "Returns the organization's membership plans. Resolve a plan here, then pass its `planId` to POST /v1/platform/memberships - the plan carries its own price, joining fee, billing frequency and session allowance, so the sale does not restate any of it.\n\nOnly plans the gym still sells are returned - a retired plan is not something an integration should surface or sell. Plans are configured in the admin portal and cannot be created or edited through this API.\n",
+        "tags": [
+          "Plans"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "description": "Match on plan name or description"
+          },
+          {
+            "in": "query",
+            "name": "clubId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only plans limited to this club"
+          },
+          {
+            "in": "query",
+            "name": "sport",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only plans listing this sport (e.g. \"padel\")"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of plans",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformPlanPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `plans:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/plans/{id}": {
+      "get": {
+        "summary": "Get a membership plan",
+        "description": "Returns a single plan the gym still sells, including what a membership on it costs and what it grants. A retired plan is a `404`; a membership already on one carries its own `planName`, so it can still be explained.\n",
+        "tags": [
+          "Plans"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The plan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `plans:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
           }
         }
       }

@@ -1,0 +1,100 @@
+---
+title: "Plans"
+description: "Find a membership plan and see what it costs before selling it."
+keywords: [plans, membership plans, planId, price, signup fee, platform api]
+---
+
+A **plan** is what a membership is sold on. It carries its own price, joining fee,
+billing frequency and session allowance, so creating a membership only has to name
+the plan and the customer - the plan supplies the rest.
+
+These endpoints are read-only. Plans are configured by the gym in 1Club.
+
+## Search plans
+
+Requires the `plans:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/plans?search=unlimited" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Query parameters:
+
+- `search` (optional) - matches on plan name or description
+- `clubId` (optional) - only plans limited to that gym
+- `sport` (optional) - only plans listing that sport, for example `padel`
+- `limit` (optional) - 1 to 100, defaults to 25
+- `offset` (optional) - defaults to 0
+
+Response:
+
+```json
+{
+  "data": [
+    {
+      "planId": 9,
+      "name": "Unlimited",
+      "description": "All courts, all week",
+      "clubId": 5,
+      "price": 49,
+      "signupFee": 20,
+      "billingFrequency": "monthly",
+      "isActive": true,
+      "maxUses": null,
+      "sessionUnit": null,
+      "validityPeriod": null,
+      "autoRenews": true,
+      "sports": ["padel"]
+    }
+  ],
+  "total": 1,
+  "limit": 25,
+  "offset": 0
+}
+```
+
+Only plans the gym still sells are returned, so everything here can be sold. Name
+matching works like
+[contact search](/api-reference/channel-integration/contacts#matching-is-case-insensitive-and-cross-script):
+case-insensitive and cross-script.
+
+## Open a plan
+
+Requires the `plans:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/plans/9" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Returns the same object as one row of the search response.
+
+<Note>
+  A retired plan is a `404` here too. When a membership sits on a plan the gym no
+  longer sells, the membership itself reports its `planName`, so you can still say
+  what it is without the plan being reachable.
+</Note>
+
+## What the fields mean for a sale
+
+| Field              | Why it matters                                                                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `price`            | Charged each billing period.                                                                                                                     |
+| `signupFee`        | Charged **once** when the membership starts, on top of `price`. A plan can charge one even when `price` is 0, so the total can exceed the price. |
+| `billingFrequency` | How often `price` recurs, and what the membership's end date is computed from when you do not set one.                                           |
+| `maxUses`          | Session allowance a membership gets. `null` means unlimited.                                                                                     |
+| `sessionUnit`      | What a use is counted in - a booking or an hour.                                                                                                 |
+| `validityPeriod`   | Days the membership stays valid, when the plan is time-limited.                                                                                  |
+| `autoRenews`       | Whether a membership on this plan renews by default.                                                                                             |
+
+<Tip>
+  Read the plan before selling it and you can show the customer the real total -
+  `price` plus `signupFee` - rather than discovering the joining fee after the
+  charge lands.
+</Tip>
+
+## Next step
+
+Pass the `planId` to
+[Create a membership](/api-reference/channel-integration/memberships#create-a-membership).

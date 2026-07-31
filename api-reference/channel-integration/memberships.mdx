@@ -1,0 +1,190 @@
+---
+title: "Memberships"
+description: "Put a customer on a plan, then pause, resume, or cancel it."
+keywords:
+  [memberships, plans, pause, resume, cancel, usesRemaining, platform api]
+---
+
+A **membership** puts a customer on a [plan](/api-reference/channel-integration/plans).
+The plan supplies the price, joining fee, billing frequency and session allowance, so
+a normal sale sends only the customer, the plan, and whether you collected the money.
+
+## Create a membership
+
+Requires the `memberships:write` scope.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/memberships" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: membership-ivan-2026-08" \
+  -d '{
+    "contactId": 300,
+    "planId": 9,
+    "payment": { "status": "paid" }
+  }'
+```
+
+Body fields:
+
+- `contactId` (required) - the customer, from [Contacts](/api-reference/channel-integration/contacts)
+- `planId` (required) - the plan, from [Plans](/api-reference/channel-integration/plans)
+- `startDate` (optional) - ISO date-time; defaults to now
+- `endDate` (optional) - omit to let the plan's billing frequency decide
+- `autoRenew` (optional) - defaults to the plan's setting
+- `payment.status` (required) - `paid` (you collected the money) or `unpaid` (outstanding)
+- `overrides` (optional) - see [Overriding the plan](#overriding-the-plan)
+
+Response (`201 Created`):
+
+```json
+{
+  "membershipId": 7412,
+  "contactId": 300,
+  "planId": 9,
+  "planName": "Unlimited",
+  "clubId": 5,
+  "status": "active",
+  "startDate": "2026-08-01T00:00:00.000Z",
+  "endDate": "2026-09-01T00:00:00.000Z",
+  "renewalDate": "2026-09-01T00:00:00.000Z",
+  "autoRenew": true,
+  "price": 49,
+  "billingFrequency": "monthly",
+  "maxUses": null,
+  "usesRemaining": null,
+  "createdAt": "2026-08-01T09:12:00.000Z"
+}
+```
+
+Creating a membership accepts an `Idempotency-Key`, so a timeout cannot produce two.
+See [Idempotency](/api-reference/channel-integration/idempotency).
+
+### How payment decides the status
+
+The membership starts life according to what is owed, not according to what you
+declare:
+
+- **`paid`** - 1Club records a payment against the **External / API** payment method (no card is charged) and the membership becomes `active`, or `pending` when it starts in the future.
+- **`unpaid`** - the charge is left outstanding and the membership sits at `pending_payment`. It grants no access until the money is settled in 1Club.
+- **Nothing owed** - a free plan with no joining fee is `active` straight away. There is no payment to wait for.
+
+<Warning>
+  An `unpaid` membership does not give the customer access. If they are already
+  training, either send `paid` or settle the charge in 1Club. This differs from
+  bookings, where an unpaid booking still stands - a membership grants ongoing
+  access, so it waits for the money.
+</Warning>
+
+Collection and refunds stay with you. 1Club never charges a card for these
+memberships.
+
+### Overriding the plan
+
+A membership keeps its own copy of the plan's commercial terms, so a negotiated sale
+is a normal case. Send only what differs; anything omitted takes the plan's value.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/memberships" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "contactId": 300,
+    "planId": 9,
+    "payment": { "status": "paid" },
+    "overrides": {
+      "amount": 35,
+      "signupFee": 0,
+      "maxUses": 12,
+      "usesRemaining": 4,
+      "sessionUnit": "hour"
+    }
+  }'
+```
+
+- `amount` - charged each period, instead of the plan's price
+- `signupFee` - the joining fee; `0` waives it
+- `maxUses` - session allowance; `null` for unlimited
+- `usesRemaining` - sessions left right now, which is how you migrate a package the customer has already partly used
+- `sessionUnit` - `booking` or `hour`
+
+`usesRemaining` can never exceed the allowance it draws from, whether that is a
+`maxUses` you sent or the plan's own. The same holds on update, against the state the
+membership will be left in - so you cannot lower `maxUses` below a balance already on
+it. This is the same set of fields the gym's
+staff can change in the **Add membership** dialog, so an API sale and a front-desk
+sale can express the same deal.
+
+<Tip>
+  Read the plan first. Overriding blindly is how a membership ends up cheaper -
+  or more generous - than anyone intended.
+</Tip>
+
+## List memberships
+
+Requires the `memberships:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/memberships?contactId=300&status=active" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Query parameters:
+
+- `contactId` (optional) - only this customer's memberships
+- `planId` (optional) - only memberships on this plan
+- `status` (optional) - one of `pending`, `active`, `expired`, `cancelled`, `used`, `paused`, `pending_payment`
+- `limit` (optional) - 1 to 100, defaults to 25
+- `offset` (optional) - defaults to 0
+
+Returns a page in the usual shape, newest start date first. An unrecognised `status`
+is a `400`, not an empty list.
+
+## Get a membership
+
+Requires the `memberships:read` scope. Returns one membership by its 1Club id,
+including `usesRemaining` - the sessions the customer has left.
+
+```bash
+curl "https://api.1club.ai/v1/platform/memberships/7412" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+## Update a membership
+
+Requires the `memberships:write` scope.
+
+```bash
+curl -X PATCH "https://api.1club.ai/v1/platform/memberships/7412" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "status": "cancelled", "cancelMode": "end_of_period" }'
+```
+
+Two kinds of change, and they cannot be combined:
+
+**A status transition** - `status` on its own, optionally with the field that
+configures it:
+
+| `status`    | Companion field | What happens                                                                                                            |
+| ----------- | --------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `cancelled` | `cancelMode`    | `end_of_period` (default) keeps access until the paid period ends and stops the renewal. `immediate` ends access today. |
+| `paused`    | `resumeAt`      | Pauses the membership. `resumeAt` must be in the future; the pause lifts by itself then.                                |
+| `active`    | -               | Resumes a paused membership. Only valid from `paused`.                                                                  |
+
+**A detail change** - any of `endDate`, `autoRenew`, `maxUses`, `usesRemaining`. Use
+`usesRemaining` to correct a balance after a migration.
+
+`cancelMode` only applies to a cancellation and `resumeAt` only to a pause; sending
+either with the wrong status is a `400` rather than being quietly ignored.
+
+<Note>
+  Statuses 1Club works out for itself - `expired`, `used`, `pending_payment` -
+  cannot be set here. They follow from dates, usage, and payment.
+</Note>
+
+## What this API does not do
+
+- **No plan changes.** Moving a customer to a different plan is a priced change needing proration, invoicing, and possibly a refund. Do it in 1Club.
+- **No refunds.** Cancelling releases the membership; it never returns money.
+- **No deletes.** Cancel it instead, so the history stays intact.

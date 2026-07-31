@@ -94,8 +94,11 @@ Generate the message content with AI at send time, using a rule and tone you pro
 Send a post-booking review request with a one-tap link.
 
 - **Instructor chat bubble** - Optionally include a personal message from the instructor in a casual, professional, or motivational tone.
-- **Frequency limit** - Cap how often a single contact receives review requests (for example, at most once every 30 days).
+- **Sessions between requests** - Ask again only after the member attends this many sessions, counted across every club in your organization since their last request. Set it to 1 to ask after every session. **Also ask after the member's first session** lets a brand new member hear from you right away instead of waiting out a full interval.
+- **Frequency limit** - Cap how often a single contact receives review requests (for example, at most once every 30 days). This is a ceiling on top of the session interval, and a request goes out only when both allow it.
 - **External review CTA** - After a positive in-app rating, optionally surface a Google review link.
+
+The two throttles cover opposite cases. The session interval paces the ask by how much a member actually trains, which is what protects infrequent visitors: someone who comes once a month never fills a 7-day window, so a time cap alone would ask them after every single visit. The frequency limit caps the member who trains daily and clears the session interval faster than you want to be asking.
 
 ### Wait
 
@@ -176,7 +179,7 @@ The catalog of suggested blueprints:
 | Blueprint | Trigger | What it does | Prerequisites |
 | --- | --- | --- | --- |
 | **New-member onboarding drip** | Contact created | A three-touch welcome series over the first week (welcome, wait 2 days, tips, wait 3 days, "book your first session"), then tags the member as onboarded. | Onboarded tag (created for you) |
-| **Review request** | Booking checked in | Waits 2 hours after the session ends, then sends a review request (capped at one every 7 days). | Gym runs bookings |
+| **Review request** | Booking checked in | Waits 2 hours after the session ends, then sends a review request (every 10 sessions, and never more than one a week). | Gym runs bookings |
 | **No-show win-back** | Booking no-show | Branches on whether the member still has an active membership, then sends a tailored nudge to each path. | Gym runs bookings |
 | **Membership win-back** | Membership cancelled | Tags the member as at-risk, waits 3 days, then sends a win-back message. | Membership plans exist, At risk tag (created for you) |
 | **Birthday celebration** | Contact birthday | Generates a warm, personalized birthday message with AI (saved as a draft for staff to review, never auto-sent). | None |
@@ -253,8 +256,9 @@ You want reviews from players who actually showed up, without nagging regulars.
 
 1. Accept the **Review request** blueprint. It fires on **Booking checked in**.
 2. The first step is a **Wait** anchored to **booking end** (2 hours after the match), so the ask arrives once they've left the court.
-3. The **Send review request** step carries a frequency limit of one request per contact every 7 days, so a member who plays four times a week isn't asked four times.
-4. Turn on the **External review CTA** so a happy in-app rating offers a Google review link.
+3. The **Send review request** step is set to ask every 10 sessions, with **Also ask after the member's first session** left on. A regular who plays four times a week hears from you about once a month; a player who books once a month is asked once after their first match and then not again for the better part of a year.
+4. The step also carries a frequency limit of one request per contact every 7 days, which caps the handful of players who train daily and would otherwise clear the 10-session interval every fortnight.
+5. Turn on the **External review CTA** so a happy in-app rating offers a Google review link.
 
 ### Birthday message for a yoga studio
 
@@ -275,7 +279,7 @@ You want reviews from players who actually showed up, without nagging regulars.
 - **Use entry conditions to avoid overlap.** If two automations react to the same trigger, scope each one with a membership type or tag so a contact doesn't get two messages at once.
 - **Anchor waits deliberately.** A reminder should measure from the booking start; a review request should measure from the booking end. The wrong anchor sends at the wrong moment.
 - **Prefer Draft mode for AI messages** until you've seen a few generated examples for your gym's voice.
-- **Set frequency limits on review requests** so frequent visitors aren't asked after every session.
+- **Pace review requests by sessions, not just by time.** A time cap alone never fills up for an infrequent visitor, so they get asked after every single visit. Set **Sessions between requests** and keep the frequency limit as the ceiling.
 - **Notify staff, don't just message members,** on high-stakes triggers like failed payments - the sooner a human follows up, the more you recover.
 
 ## Troubleshooting

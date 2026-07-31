@@ -105,15 +105,23 @@ curl -X POST "https://api.1club.ai/v1/platform/memberships" \
 - `amount` - charged each period, instead of the plan's price
 - `signupFee` - the joining fee; `0` waives it
 - `maxUses` - session allowance; `null` for unlimited
-- `usesRemaining` - sessions left right now, which is how you migrate a package the customer has already partly used
+- `usesRemaining` - sessions left right now, which is how you migrate a package the customer has already partly used. `null` means unlimited usage, so it is only valid when the allowance is unlimited too.
 - `sessionUnit` - `booking` or `hour`
 
 `usesRemaining` can never exceed the allowance it draws from, whether that is a
 `maxUses` you sent or the plan's own. The same holds on update, against the state the
 membership will be left in - so you cannot lower `maxUses` below a balance already on
-it. This is the same set of fields the gym's
-staff can change in the **Add membership** dialog, so an API sale and a front-desk
-sale can express the same deal.
+it, and you cannot leave the balance unlimited under a finite allowance.
+
+<Note>
+  The two nulls are not the same. `maxUses: null` is an unlimited allowance, which
+  nothing can exceed. `usesRemaining: null` is unlimited **usage**, so a ten-session
+  allowance rejects it - otherwise the allowance would mean nothing. Send both as
+  `null` for a genuinely unlimited membership.
+</Note>
+
+This is the same set of fields the gym's staff can change in the **Add membership**
+dialog, so an API sale and a front-desk sale can express the same deal.
 
 <Tip>
   Read the plan first. Overriding blindly is how a membership ends up cheaper -

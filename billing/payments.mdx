@@ -1,6 +1,6 @@
 ---
 title: Payments
-description: Track, record, and refund payments in 1Club - see payment status and method, record manual and split payments against transactions, apply wallet credit, and issue full or partial refunds.
+description: Track, record, and refund payments in 1Club - payment status and method, split a booking's bill across its players, apply wallet credit, and refund to the card, the wallet, or cash.
 keywords:
   [
     payments,
@@ -8,10 +8,14 @@ keywords:
     payment method,
     refund,
     partial refund,
-    split payment,
+    refund to card,
     wallet credit,
+    split payment,
+    split the bill,
+    payer share,
     payment status,
     payment links,
+    delete payment,
   ]
 ---
 
@@ -19,13 +23,13 @@ The **Payments** tab is the record of every payment your organization has taken 
 
 ## Overview
 
-Use **Revenue > Payments** to review payments, filter by status, drill into a single payment, and refund it. Payments are created when a member pays online, when a scheduled bill run charges a card, or when a staff member records a manual payment at the front desk.
+Use **Revenue > Payments** to review payments, filter by status, and drill into a single payment. Payments are created when a member pays online, when a scheduled bill run charges a card, or when a staff member records a manual payment at the front desk.
 
 - **Payment list** - Every payment with its status, method, amount, and the admin who recorded it.
 - **Payment details** - Open a payment to see amount, method, status, the linked transactions, the **Created by** admin, and any provider references (for example a Stripe payment intent).
 - **Record payments** - Log a manual payment (cash, card terminal, bank transfer) against a transaction or invoice.
-- **Split and partial payments** - Take part of a balance now, or split a charge across a primary method and wallet credit.
-- **Refunds** - Reverse a payment in full or in part.
+- **Partial and split payments** - Take part of a balance now, split a charge across a primary method and wallet credit, or give each player on a booking their own share.
+- **Refunds** - Return money to the card, the member's wallet, or by hand. Issued from the transaction, in full or in part.
 
 ## The payment list
 
@@ -43,7 +47,10 @@ Tabs across the top filter by status: **All**, **Succeeded**, **Pending**, and *
 The **Created by** column shows the admin who recorded the payment. For payments captured automatically by a provider (online checkout, scheduled bill runs), the column is empty - those are system-recorded. For manually recorded payments (front desk, phone, bank transfer logged by staff), it shows the admin's name.
 
 <Note>
-  The standalone **Transactions** column has been removed from the payments grid. To see the transactions linked to a payment, open the payment details. The full transaction history is still available on [Transactions](/billing/transactions).
+  The standalone **Transactions** column has been removed from the payments
+  grid. To see the transactions linked to a payment, open the payment details.
+  The full transaction history is still available on
+  [Transactions](/billing/transactions).
 </Note>
 
 ## Payment status
@@ -69,7 +76,10 @@ Most manual payments are recorded as part of a flow rather than from a blank for
 For example, completing a draft order opens the **Complete order** dialog, where you pick a payment method; 1Club then records a payment against each of the order's unpaid transactions with that method. See [Orders](/billing/orders).
 
 <Note>
-  Payments handled entirely by a provider's own checkout (for example an online card payment via the hosted flow) are captured by that provider and cannot be re-recorded as manual payments. Log manual payments for money you collect yourself - cash, a card terminal, or a bank transfer.
+  Payments handled entirely by a provider's own checkout (for example an online
+  card payment via the hosted flow) are captured by that provider and cannot be
+  re-recorded as manual payments. Log manual payments for money you collect
+  yourself - cash, a card terminal, or a bank transfer.
 </Note>
 
 ### Payment methods used
@@ -79,7 +89,7 @@ Each payment records the **method** it came in on. Methods belong to a channel:
 - **Manual** - Methods you take and log yourself, such as cash, an in-person card terminal, or a bank transfer. You define these under [Payment methods](/settings/payment-methods).
 - **Card provider** - Online card payments captured through the connected provider's checkout.
 - **myPOS** - Payments taken through a myPOS terminal or link. See [myPOS](/settings/integrations/mypos).
-- **Wallet** - The member's stored wallet balance, applied as credit (see [Wallet credit](#wallet-credit)).
+- **Wallet** - The member's stored wallet balance, applied as credit (see [Wallet](/billing/wallet)).
 
 The method shown on a payment tells you where the money physically came from, which matters when you reconcile the till or a bank statement.
 
@@ -89,7 +99,43 @@ You do not have to settle a balance in one payment.
 
 - **Partial payment (one transaction)** - Record less than the full amount against a single transaction. The transaction moves to **partially paid** and keeps an outstanding balance you can collect later.
 - **Settling several transactions at once** - You can record one payment against multiple transactions, but only when the payment covers all of them in full. A single lump sum cannot be split partially across several transactions, so a multi-transaction payment must equal the sum of their outstanding balances.
-- **Paying someone else's share** - A payment can be recorded against a different payer than the transaction owner (for example a member paying their share of a group booking). This payer override is only allowed when the payment settles a single transaction.
+- **Dividing a booking between its players** - Give each player on a booking their own share and their own way of paying it. See [Splitting a booking across its players](#splitting-a-booking-across-its-players).
+
+### Splitting a booking across its players
+
+Four people book a padel court and each want to pay their own quarter. Rather than one person paying and chasing the others, split the bill so each player owns their own charge.
+
+On the booking's detail page, use **Split payment** (or **Edit split** if one already exists). The dialog explains:
+
+> Divide {total} between the players. Each one can pay their own way. Shares are shown before tax.
+
+For each player you set:
+
+- **Share** - their slice of the price, before tax.
+- **Pays with** - how they are covering it: paying directly, a membership, or an external program. Until they choose, the row reads **Not chosen yet**.
+
+A player covered by a membership or program shows as **Covered** and is charged nothing - their entitlement is used instead, exactly as it would be on a booking of their own.
+
+#### Even and custom splits
+
+- An **even** split divides the price equally and re-divides it whenever the roster changes. Add a fifth player and all five shares rebalance, rather than leaving a gap.
+- A **custom** split takes the amounts you enter. Because the shares **are** the price in that case, changing them reprices the booking, and 1Club tells you so before you save: "This changes the booking price from {from} to {to}." That is intended - charging the four players more or less than the court's list rate is a legitimate thing to do at the desk.
+
+Two rules are enforced on save: no share may be negative, and everyone holding a share needs a payment method.
+
+#### Collecting each share
+
+Each player's share becomes their own charge, so you collect them independently from the players list on the booking, or from [Transactions](/billing/transactions) like any other charge. A player who has settled is marked as such even while others still owe.
+
+This also drives entry: the check-in gate asks whether **this player** has paid their own share, so three players who have paid are admitted while the fourth is still outstanding.
+
+#### Re-splitting after money has changed hands
+
+You can edit a split after players have paid. Anything already collected is returned as wallet credit, not discarded:
+
+> Anything already paid goes back to that player's wallet, so they can settle their new share from it.
+
+Memberships and program entries consumed by the old split are given back before the new one is applied, so re-splitting twice never quietly drains a member's allowance.
 
 ### Splitting across a method and wallet credit
 
@@ -102,27 +148,76 @@ The amount drawn from a wallet is always capped at the member's balance and the 
 
 ## Refunds
 
-There are two distinct refund paths in 1Club, and it helps to know which one you are using.
+Refunds are issued from the **transaction**, not from the payment, and you choose where the money goes. Open the charge in [Transactions](/billing/transactions) and use **Refund**.
 
-### Refunding a payment
+### Issuing a refund
 
-You can reverse a specific payment from its record:
+1. Open the transaction from **Revenue > Transactions**.
+2. Click **Refund**. The **Refund transaction** dialog opens.
+3. Answer **Where should the money go?** (see the destinations below). Each option shows its own ceiling, because they differ.
+4. Set **Amount to refund**. It defaults to everything still refundable, and cannot exceed the ceiling for the destination you picked.
+5. Optionally add a **Reason**.
+6. Click **Issue refund**.
 
-1. Open the payment from **Revenue > Payments**.
-2. Choose to refund it. Leave the amount empty for a **full refund**, or enter an amount for a **partial refund**.
-3. Confirm.
+Refunds require the **billing manage** permission at the organization level.
 
-The payment status changes to **refunded** (full) or **partially refunded** (partial). Only a **succeeded** payment can be refunded - attempting to refund a pending, failed, or already-refunded payment is rejected. Issuing a payment refund requires the **billing manage** permission at the organization level.
+### Choosing a destination
+
+| Destination          | What it does                                                                                                         |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Back to the card** | A real reversal through the payment provider, back to the card the member paid with. Drawn from your Stripe balance. |
+| **Wallet credit**    | Added to the member's wallet to spend with you later. No money leaves your account.                                  |
+| **Cash**             | Handed back at the desk. Records the reversal against the payment.                                                   |
+| **Manual**           | Settled outside the platform, for example a bank transfer you make yourself.                                         |
+
+Only options the original payment supports are offered. **Back to the card** appears only for payments taken through Stripe: money collected through myPOS, DatecsPay, or Hype cannot be reversed through those providers from 1Club yet, so return it as **Wallet credit** or by hand at the till.
+
+The ceilings differ per destination because they are calculated per payment. A transaction settled partly by card and partly from the wallet can return only the card portion to the card.
+
+### Card refunds are not instant
+
+When you refund to the card, 1Club tells you:
+
+> The refund is sent to Stripe now and usually reaches the member's statement within 5-10 days. It is drawn from your Stripe balance.
+
+Some card refunds settle asynchronously, so you may see a refund reported as **awaiting confirmation**:
+
+> Refund sent to Stripe - awaiting confirmation. It is not back with the member yet.
+
+That is a normal intermediate state, not a failure. The amount is confirmed once the provider settles it, and the transaction's status updates then. A partial confirmation reads as "X refunded, Y sent to Stripe and awaiting confirmation" - treat only the confirmed part as money the member has back.
 
 <Note>
-  Refunding a payment records the reversal against that payment. For a card payment, returning money to the original card is handled through the connected provider. For cash, the operator hands the money back at reception and the payment record reflects the refund.
+  Refunding to **Wallet credit** is immediate and never has a pending state,
+  because no money leaves your account. It is the right choice when the member
+  is standing in front of you and will book again.
 </Note>
+
+### Partial refunds
+
+Enter any amount up to the ceiling. Each refund is recorded individually with its amount, destination, reason, and who issued it, so a charge refunded in three instalments has three records rather than one status flag. You can keep refunding until the refundable balance is exhausted.
+
+### Nothing to refund
+
+If no money was ever collected on the transaction, **Refund** tells you so:
+
+> Nothing was collected on this transaction, so there is nothing to refund. Void it instead if it should never have been charged.
+
+See [Voiding a transaction](/billing/transactions#row-actions) for that path.
 
 ### Automatic wallet-credit refunds
 
-Some flows refund a member automatically by crediting their **wallet** rather than reversing the original tender. This happens, for example, when a booking is cancelled under a cancellation policy, when an order is cancelled, or when a member's entrance method changes at check-in (they paid directly, then a membership or program is used to admit them instead). In that last case, 1Club both marks the original payment as refunded and credits the refunded amount to the member's wallet, so they can spend it on a future booking or purchase.
+Some flows refund a member automatically by crediting their **wallet** rather than reversing the original tender, without asking you to pick a destination:
 
-Cancellation refunds follow the tiered rules on the matching booking policy - see [Booking policies](/operations/booking-policies).
+- A booking is **cancelled** under a cancellation policy. The refund follows the tiered rules on the matching policy - see [Booking policies](/operations/booking-policies).
+- An **order** is cancelled.
+- A member's **entrance method changes** at check-in (they paid directly, then a membership or program is used to admit them instead). 1Club marks the original payment refunded and credits the amount to their wallet.
+- A booking's **split is edited**. Anything already paid goes back to each player's wallet so they can settle their new share from it - see [Splitting a booking across its players](#splitting-a-booking-across-its-players).
+
+<Note>
+  Cancellation refunds always go to wallet credit. To return that money to the
+  member's card instead, refund the transaction from the billing page and choose
+  **Back to the card**.
+</Note>
 
 ## Payment links
 
@@ -138,12 +233,33 @@ The launcher also reflects the link's state, for example:
 - "Payment cancelled"
 
 <Note>
-  Payment links for transactions (such as a booking or membership charge) show the transaction's reference. Only genuine invoices are labelled "Invoice #".
+  Payment links for transactions (such as a booking or membership charge) show
+  the transaction's reference. Only genuine invoices are labelled "Invoice #".
 </Note>
 
 ## Deleting a payment
 
-A payment can be deleted only when all of the following hold: it did not come from a card provider (no provider references and not a provider method) and it is linked to a single transaction. Deleting recalculates the affected transaction's status back to paid, partially paid, or pending based on what remains. Provider-captured payments and payments spanning multiple transactions cannot be deleted - refund them instead. Deletion requires the **billing delete** permission at the organization level.
+**Only manually recorded payments can be deleted.** That means every method on the **manual** channel - Cash, an in-person card terminal, a bank transfer, or whatever else you have defined. Those rows are just a record of money taken at the counter, so removing the record is the whole correction.
+
+Everything else must be refunded instead, because the money sits somewhere a deleted row cannot reach:
+
+- **Card provider, myPOS, DatecsPay, Hype** - the provider is holding the funds.
+- **Wallet** - the member's wallet was debited.
+
+Attempting it tells you:
+
+> Only manually recorded payments can be deleted. This one was collected through a payment provider or the wallet, so refund it instead.
+
+A manual payment may settle **several** transactions at once - a multi-line invoice, a booking split across a court and an instructor, a point-of-sale order. Deleting it recalculates every affected transaction back to paid, partially paid, or pending based on what remains, so you do not have to unpick them yourself.
+
+Deletion requires the **billing delete** permission at the organization level.
+
+<Note>
+  A payment recorded on a manual method that nonetheless carries a provider
+  reference is also refused. This catches a Cash or Terminal row that actually
+  went through a provider, where the funds genuinely are with that provider
+  despite the method chosen.
+</Note>
 
 ## Worked examples
 
@@ -172,26 +288,58 @@ A climber cancels a booked session within the free-cancellation window.
 
 Staff logged a cash payment against the wrong member.
 
-- If it is a single-transaction, non-provider payment, **delete** it - the transaction status recalculates automatically.
-- If it cannot be deleted, **refund** it in full instead, then record the correct payment.
+- Cash is a **manual** method, so **delete** the payment. Every transaction it touched recalculates automatically, even if it settled several at once.
+- Record the payment again against the right member.
+- Had it been a card payment, deletion would be refused - **refund** it and re-take it instead.
+
+### Padel four-ball, each player paying their own quarter
+
+Four members book a court for 60.00 and each wants to pay separately.
+
+- On the booking, click **Split payment**. An even split gives each player 15.00.
+- One player is on a membership: set their **Pays with** to that membership. They show as **Covered** and are charged nothing, and the other three still owe 15.00 each.
+- Collect each share from the players list as they pay. The two who have paid can check in while the third is still outstanding.
+
+### Cancelled tournament entry returned to the card
+
+A member paid 40.00 by card for a tournament that you then cancel outright.
+
+- Open the entry charge in **Revenue > Transactions** and click **Refund**.
+- Choose **Back to the card**, leave the amount at the full 40.00, and add a reason.
+- The refund is sent to Stripe and may read as awaiting confirmation for a few days. Tell the member it typically lands on their statement within 5-10 days.
+- Had you wanted to keep the money with the gym, **Wallet credit** would have returned it instantly as credit instead.
 
 ## Tips & best practices
 
-- **Refund, do not delete, provider payments.** Card-provider and multi-transaction payments cannot be deleted. Use a full refund to reverse them so the audit trail stays intact.
+- **Refund, do not delete, anything a provider or the wallet touched.** Only manual-channel payments can be deleted. Refund the rest so the money actually goes back and the audit trail stays intact.
+- **Pick the refund destination deliberately.** **Wallet credit** is instant and keeps the money with you; **Back to the card** is the right answer when the member is not coming back. Do not use wallet credit to avoid a card refund the member asked for.
 - **Read Created by to tell manual from automatic.** A blank **Created by** means the provider captured it; a name means a staff member logged it. This is your first check when reconciling the till.
 - **Match the method to the money.** Record the payment on the method it actually came in on (cash, terminal, transfer) so your Payments tab reconciles against your bank and till.
 - **Use partial payments for deposits.** Take a deposit as a partial payment and collect the balance later rather than forcing payment in full up front.
+- **Split the bill rather than nominating a payer.** On a group booking, give each player their own share so each is collected and admitted independently.
 - **Send a payment link for outstanding balances.** Rather than chasing a member for card details, send the branded payment link and let them pay on your own site.
 
 ## Troubleshooting
 
-**Issue**: I cannot refund a payment.
+**Issue**: I cannot find a **Refund** action on the payment.
 
-**Solution**: Only **succeeded** payments can be refunded. If the payment is pending, failed, cancelled, or already refunded, there is nothing to reverse. Check the status chip on the payment. You also need the **billing manage** permission at the organization level.
+**Solution**: Refunds are issued from the transaction, not the payment. Open the charge in **Revenue > Transactions** and use **Refund** there. You also need the **billing manage** permission at the organization level.
 
-**Issue**: The **Delete** action is disabled on a payment.
+**Issue**: **Back to the card** is not offered as a destination.
 
-**Solution**: Deletion is only allowed for non-provider payments linked to a single transaction. Card-provider payments and payments spanning multiple transactions cannot be deleted - refund them instead.
+**Solution**: The payment was not taken through Stripe. Money collected through myPOS, DatecsPay, or Hype cannot be reversed through those providers from 1Club yet - return it as **Wallet credit**, or hand it back at the till and record it as **Cash**.
+
+**Issue**: A refund says it is awaiting confirmation and the member says they have not received it.
+
+**Solution**: That is expected. Card refunds can settle asynchronously and typically reach the statement in 5-10 days. The amount is not back with the member until it is confirmed. Do not issue a second refund for the same money.
+
+**Issue**: **Refund** says there is nothing to refund.
+
+**Solution**: No money was ever collected on that transaction. If it should never have been charged, void it instead - see [Transactions](/billing/transactions).
+
+**Issue**: The **Delete** action is refused on a payment.
+
+**Solution**: Only manually recorded payments (the **manual** channel: cash, terminal, bank transfer) can be deleted. Provider-collected and wallet payments must be refunded. A manual payment carrying a provider reference is also refused.
 
 **Issue**: A multi-transaction payment is rejected.
 
@@ -201,9 +349,9 @@ Staff logged a cash payment against the wrong member.
 
 **Solution**: The wallet already covers the full amount due, so the secondary-tender toggle is hidden - you can pay entirely from the wallet. It reappears when the wallet only partly covers the balance.
 
-**Issue**: A payment shows the wrong payer.
+**Issue**: One player on a split booking cannot check in although the booking is paid.
 
-**Solution**: A payment can be recorded against a payer other than the transaction owner only for a single transaction (for example a group-booking participant paying their share). For multi-transaction settlements, the payment is recorded against the transaction owner.
+**Solution**: Entry is judged per player, not per booking. Check that player's own share on the booking's players list - the others having paid does not settle theirs.
 
 ## Related
 

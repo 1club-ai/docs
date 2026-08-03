@@ -1,39 +1,63 @@
 ---
 title: Invoices
-description: Create, send, download, and settle invoice documents that group a contact's outstanding transactions under one number, due date, and PDF.
-keywords: [invoice, invoice number, due date, overdue, PDF, mark paid, payment link, charge, batch delete, receivable]
+description: Create, send, download, and settle invoice documents that group a contact's outstanding transactions under one number, due date, and PDF - including pro-formas and converting them to invoices.
+keywords:
+  [
+    invoice,
+    pro-forma,
+    proforma,
+    document type,
+    issue invoice,
+    invoice number,
+    due date,
+    overdue,
+    PDF,
+    payment link,
+    charge,
+    batch delete,
+    receivable,
+  ]
 ---
 
 An invoice in 1Club is a receivable document that groups one or more [transactions](/billing/transactions) under a single number, with an issue date, a due date, line items, and a downloadable PDF. It is the artifact you send to a member or a corporate account when you want a formal record of what is owed.
 
 Invoices do not move money on their own. Money moves through [payments](/billing/payments), which the invoice flow can trigger but does not replace. Deleting or editing an invoice never touches a settled payment.
 
+**Revenue > Invoices** holds two kinds of document, chosen by **Document type**:
+
+- An **Invoice** is the tax document. It counts towards your revenue and fiscal reporting.
+- A **Pro-forma** is a request for payment issued before the invoice exists. It is not a tax document, it is excluded from fiscal reporting, and it numbers in its own series. See [Pro-formas](#pro-formas).
+
 ## Overview
 
 From **Revenue > Invoices** you can:
 
-- Create invoices manually, one line at a time, or in bulk with a [bill run](/billing/bill-runs).
-- Track every invoice across the **All**, **Pending**, **Paid**, and **Overdue** tabs, with server-side search and per-tab counts.
-- Collect on an invoice by recording a payment or emailing a hosted Stripe payment link.
-- Download a branded PDF for any invoice.
-- Edit invoice fields and line items, or delete an invoice and revert its transactions so they can be re-invoiced.
+- Create invoices and pro-formas manually, one line at a time, or invoices in bulk with a [bill run](/billing/bill-runs).
+- Switch the grid between invoices and pro-formas with the **Document type** control in the toolbar.
+- Track every document across the **All**, **Pending**, **Paid**, and **Overdue** tabs, with server-side search and per-tab counts.
+- Collect by recording a payment or emailing the document with a payment link.
+- Email any document with its PDF attached, whether or not you use Stripe.
+- Issue an invoice from a pro-forma once the customer commits.
+- Download a branded PDF for any document.
+- Edit fields and line items, or delete a document and revert its transactions so they can be re-invoiced.
 - Multi-select rows for batch delete.
 
-Invoice numbers, currency, and the PDF layout all follow your organization's billing settings, so every document you send looks consistent.
+Numbering, currency, and the PDF layout all follow your organization's billing settings, so every document you send looks consistent.
 
 ## How invoices get created
 
-Three paths:
+Four paths:
 
 1. **Manual single invoice.** Open a [transaction](/billing/transactions) and use its invoice action. The transaction is wrapped in a one-line invoice and marked `isInvoiced = true` so a bill run won't sweep it again.
-2. **Manual full-page create.** From **Revenue > Invoices** click **Add**, pick a contact, optionally attach a billing account, and add line items.
-3. **Bill run.** A [bill run](/billing/bill-runs) sweeps every billable transaction in a period and groups it into invoices by contact. This is the right tool when you have many transactions to invoice at once.
+2. **Manual full-page create.** From **Revenue > Invoices** click **Add** and choose **Invoice**, then pick a contact, optionally attach a billing account, and add line items.
+3. **From a pro-forma.** Choose **Pro-forma** from the **Add** menu instead, then use **Issue invoice** on it later. See [Pro-formas](#pro-formas).
+4. **Bill run.** A [bill run](/billing/bill-runs) sweeps every billable transaction in a period and groups it into invoices by contact. This is the right tool when you have many transactions to invoice at once. Bill runs only produce invoices, never pro-formas.
 
-A new invoice gets a generated `invoiceNumber` from your organization's numbering template, a `currency` inherited from the organization, and (for bill runs) a due date 30 days out. Manual invoices use the invoice date and due date you enter.
+A new document gets a generated number from the template for its **own** document type, a `currency` inherited from the organization, and (for bill runs) a due date 30 days out. Manual documents use the invoice date and due date you enter.
 
 ### Creating a manual invoice
 
-1. Go to **Revenue > Invoices** and click **Add**.
+1. Go to **Revenue > Invoices** and click **Add**, then choose **Invoice** as the document type.
 2. Choose the **Contact** the invoice is billed to.
 3. Optionally choose a billing **Account** (a household or company). The account must belong to your organization, and the contact you picked must be the account's primary contact or one of its members, otherwise the save is rejected.
 4. Set the **Invoice date** and **Due date**.
@@ -68,21 +92,30 @@ The details page shows:
 The header carries these actions, conditional on status:
 
 - **Add payment** (pending only): record a payment against the invoice. Uses the same dialog as the [Payments](/billing/payments) flow.
-- **Send** (any status except paid or cancelled): open the **Send payment link** dialog, which emails the contact a hosted Stripe Payment Element scoped to this invoice.
+- **Send** (any status except paid or cancelled): emails the document to the contact with its PDF attached, optionally including a payment link. See [Sending a document](#sending-a-document).
+- **Issue invoice** (pro-formas only, and only once): creates the tax invoice from this pro-forma. See [Pro-formas](#pro-formas).
 - **Download**: fetch the invoice PDF.
 - **Edit**: change invoice fields or line items.
 - **Delete**: same behavior as the grid action.
 
 ## Invoice operations reference
 
-| Operation | Where | What it does |
-|-----------|-------|--------------|
-| **Add payment** | Invoice header / grid **Pay** | Records a payment (cash, transfer, terminal, or Stripe) against the invoice's transactions and recalculates status. |
-| **Send payment link** | Invoice header **Send** | Emails the contact a hosted Stripe Payment Element scoped to the invoice. |
-| **Download** | Invoice header **Download** | Streams a branded PDF named `invoice-<number>.pdf`. |
-| **Charge stored card** | API (`POST /v1/invoices/:id/charge`) | Charges a saved Stripe payment method for the invoice's outstanding balance. Not a button on the invoice page. |
-| **Mark paid** | API / data import | Flags the invoice and its transactions `paid` and confirms pending bookings, without recording a Stripe payment. |
-| **Delete / batch delete** | Grid and header | Removes the invoice(s) and reverts linked transactions to billable. |
+| Operation                 | Where                                | What it does                                                                                                        |
+| ------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| **Add payment**           | Invoice header / grid **Pay**        | Records a payment (cash, transfer, terminal, or Stripe) against the invoice's transactions and recalculates status. |
+| **Send**                  | Invoice header **Send**              | Emails the document with its PDF attached, optionally including a payment link.                                     |
+| **Issue invoice**         | Pro-forma header                     | Issues a new invoice from a pro-forma, taking the next number in the invoice series.                                |
+| **Download**              | Invoice header **Download**          | Streams a branded PDF named `invoice-<number>.pdf`.                                                                 |
+| **Charge stored card**    | API (`POST /v1/invoices/:id/charge`) | Charges a saved Stripe payment method for the invoice's outstanding balance. Not a button on the invoice page.      |
+| **Delete / batch delete** | Grid and header                      | Removes the document(s) and reverts linked transactions to billable.                                                |
+
+<Note>
+  There is no status-only **Mark as paid**. Closing a document goes through the
+  payment flow, so every settled invoice has a real payment record behind it
+  that you can reconcile and refund. For invoices already settled outside 1Club
+  (a historical migration, for example), record a payment on a **manual** method
+  such as Cash or Bank transfer, dated when the money actually arrived.
+</Note>
 
 ### Charging a stored payment method
 
@@ -90,33 +123,46 @@ There is no "Charge stored card" button on the invoice details page. In the admi
 
 When a stored card is charged, the amount is capped to the sum of the invoice's unpaid, non-void line items, not the raw invoice total. So if a future-period line was voided (for example after a membership pause), the charge collects only what is genuinely outstanding. On success, the linked transactions flip to `paid`, any pending bookings on them become `confirmed`, and the invoice's Stripe integration data is updated.
 
-### Marking an invoice paid
+### Sending a document
 
-**Mark paid** is a shortcut that sets the invoice to `paid`, flips all its linked transactions to `paid`, and promotes any `pending` bookings on those transactions to `confirmed`. It does not create a Stripe charge or a payment record, so use it only for invoices already settled outside 1Club (for example historical invoices brought in through data import). For day-to-day collection, prefer **Add payment**, which writes a payment row you can reconcile.
+**Send** emails the document to the contact with its PDF attached. The dialog offers:
+
+- **Send to** - the billing email on file. If the contact has none, the dialog says **No billing email on file** and the send is blocked.
+- **Message** - an optional personal note added to the email.
+- **Include the payment link** - attaches a hosted payment link so the customer can pay from the email.
+
+Sending does not depend on Stripe. You can email an invoice or a pro-forma with its PDF whether or not a payment provider is connected, and whether or not you include a link - useful when the customer pays by bank transfer. The document records when it was last sent; if the send fails, that stamp is left untouched so you can retry safely.
 
 ### Downloading the PDF
 
 **Download** renders the invoice as a PDF on demand. The document includes your organization's logo and address, the bill-to party (the billing account's legal name and VAT number when an account is attached, otherwise the contact), the invoice number and status, the line items with a tax column, the subtotal/tax/total breakdown, any notes, and a payment link when one exists. Nothing is stored; the PDF is generated fresh each time from the current invoice data.
 
-### Invoice numbering
+### Document numbering
 
-Invoice numbers are generated from your organization's template, set at **Settings > Billing** in the **Invoice Numbering Template** field. The default template is `INV-[id]`.
+Each document type has its **own** template and its **own** counter, both at **Settings > Billing**:
 
-- `[id]` inserts the per-organization sequential invoice counter (1, 2, 3, ...). This is the placeholder the UI documents.
+- **Invoice Numbering Template** - default `INV-[id]`.
+- **Pro-forma Numbering Template** - for example `PRO-[id]`.
+
+Placeholders are the same in both:
+
+- `[id]` inserts the sequential counter for that series (1, 2, 3, ...). This is the placeholder the UI documents.
 - `[year]`, `[month]`, and `[orgId]` are also supported, so a template like `INV-[year]-[id]` produces `INV-2026-42`.
 
-The counter is per organization and assigned inside a locking transaction, with automatic retry if two invoices race for the same number, so numbers stay unique and gapless within your organization.
+The two series are independent, so a pro-forma never takes a number out of the invoice series. Issuing invoice 42 and pro-forma 7 on the same day is normal, and converting a pro-forma consumes the next **invoice** number, leaving the pro-forma series untouched.
+
+Each counter is per organization and assigned under a lock scoped to that series, so numbers stay unique and gapless within your organization even when two staff members create documents at the same moment.
 
 ## Invoice statuses
 
 Invoice status is normally derived from the linked transactions:
 
-| Linked transactions | Invoice status |
-|---------------------|----------------|
-| All `paid` | `paid` |
-| Some `paid` or `partially_paid` | `partially_paid` |
-| Otherwise, due date in the future (or none) | `pending` |
-| Otherwise, due date in the past | `overdue` |
+| Linked transactions                         | Invoice status   |
+| ------------------------------------------- | ---------------- |
+| All `paid`                                  | `paid`           |
+| Some `paid` or `partially_paid`             | `partially_paid` |
+| Otherwise, due date in the future (or none) | `pending`        |
+| Otherwise, due date in the past             | `overdue`        |
 
 Transactions in the `overdue` state count as pending for this derivation. `cancelled` is sticky - once an invoice is cancelled it stays that way. Some Stripe webhook paths set `failed` directly when a charge fails, so you may briefly see `failed` before the next status recalculation.
 
@@ -129,20 +175,76 @@ Two dedicated lookups back reminders and dashboards:
 
 Both are stricter than the grid's **Overdue** tab, which simply filters on the stored `overdue` status. An invoice only lands in the grid's Overdue tab after status recalculation flips it; the overdue lookup catches pending invoices the moment their due date passes.
 
+## Pro-formas
+
+A pro-forma is a request for payment you issue **before** the tax invoice exists. Use one when the customer needs a document to pay against but you should not book the revenue yet: a corporate client whose finance team pays on a document, a deposit against a tournament, or a quote the customer has not committed to.
+
+A pro-forma looks and behaves like an invoice - same line items, same contact and billing account, same branded PDF, same **Send** - with three deliberate differences:
+
+- It is **not a tax document**, so it is excluded from fiscal reporting.
+- It **numbers in its own series**, so it never takes a number out of the invoice series. See [Document numbering](#document-numbering).
+- It can be **converted** to an invoice, once, with **Issue invoice**.
+
+### Creating a pro-forma
+
+1. Go to **Revenue > Invoices** and click **Add**.
+2. Choose **Pro-forma** as the document type.
+3. Fill in the contact, dates, and line items exactly as you would for an invoice.
+4. Save. The number comes from your pro-forma template.
+
+To see existing pro-formas, switch the **Document type** control in the grid toolbar. The grid shows one type at a time, so invoices and pro-formas never mix in the same list or in the tab counts.
+
+### Issuing an invoice from a pro-forma
+
+When the customer commits, open the pro-forma and click **Issue invoice**. 1Club confirms:
+
+> This issues a new invoice from this pro-forma, taking the next number in the invoice series. The pro-forma is kept as sent.
+
+What happens:
+
+- A **new invoice** is created, copying the pro-forma's contact, amounts, line items, and notes, and taking the next number in the invoice series.
+- The pro-forma is **kept**, linked to the invoice it produced. It is not deleted, so the document you already sent the customer stays valid and auditable.
+- The link is one-way and permanent. A pro-forma can be converted **once**; the action is not offered again afterwards.
+
+<Note>
+  Neither side of a conversion can be deleted. Once a pro-forma has produced an
+  invoice, deleting either document is refused - the pair is the audit trail for
+  how the revenue came to be recognised. If the whole thing was a mistake, void
+  or credit the invoice through the normal flow instead.
+</Note>
+
+### When to use which
+
+| Situation                                               | Document                                                 |
+| ------------------------------------------------------- | -------------------------------------------------------- |
+| Member owes you for a booking or membership             | Invoice                                                  |
+| Corporate client's finance team needs a document to pay | Pro-forma, then **Issue invoice** when payment is agreed |
+| Deposit or advance before a tournament                  | Pro-forma                                                |
+| Quote the customer has not committed to                 | Pro-forma                                                |
+| Bulk monthly billing across many members                | Invoice, via a [bill run](/billing/bill-runs)            |
+
 ## Collecting on an invoice
 
 You have two options from the invoice detail page:
 
-- **Send a payment link** to the contact. They pay through a hosted Stripe Payment Element. On success, the linked transactions flip to `paid`, any pending bookings on those transactions become `confirmed`, and the invoice's Stripe integration data is updated with the payment ID.
-- **Add payment** to record what you collected outside Stripe (cash, bank transfer, manual card terminal). This creates a payment row, links it to the invoice's transactions, and updates status.
+- **Send** the document with a payment link included. The contact pays through a hosted payment page. On success, the linked transactions flip to `paid`, any pending bookings on those transactions become `confirmed`, and the invoice's payment data is updated.
+- **Add payment** to record what you collected outside the provider (cash, bank transfer, manual card terminal). This creates a payment row, links it to the invoice's transactions, and updates status.
 
 The invoice's totals are derived from its line items, which point at transaction IDs. Editing the underlying transaction prices after issuing the invoice will not retroactively change the invoice total.
+
+### You cannot collect more than the document owes
+
+A payment is checked against what is **still** owed, not against the document total, so a second payment cannot overshoot. If a colleague has already taken 400 on a 1,000 invoice, the most you can add is 600.
+
+This also holds when two staff members collect at the same moment. The balance is claimed the instant one of them starts, so the second attempt is refused with the balance that is genuinely left rather than both succeeding and putting 2,000 against a 1,000 document. An attempt that is started and abandoned (the browser is closed mid-payment, for example) releases its claim after a few minutes, so a stalled attempt never locks a document permanently.
 
 ## Worked examples
 
 **Padel club - corporate account, one document.** A local employer books a weekly padel court for its staff league. You attach every court transaction to the company's billing **Account**, then send one invoice per month. Because the invoice is billed to the account, the PDF shows the company's legal name and VAT number as the bill-to party, and the staff member's name appears as a subline.
 
-**Jiu-jitsu gym - historical migration.** You are moving off a spreadsheet and importing last year's already-collected membership dues. Create the invoices, then **Mark paid** so they land in the **Paid** tab without generating phantom Stripe charges. New invoices going forward use **Add payment** or **Send** so each has a real payment record.
+**Jiu-jitsu gym - historical migration.** You are moving off a spreadsheet and importing last year's already-collected membership dues. Create the invoices, then record a payment on each with a **manual** method (Cash or Bank transfer) dated when the money actually arrived. They land in the **Paid** tab with a real payment record behind them, and no phantom card charges are created.
+
+**Padel club - corporate deposit up front.** A company wants to reserve four courts for a summer league and their finance team needs a document before releasing funds. Issue a **Pro-forma** for the deposit and **Send** it with the PDF attached. When the transfer lands, record the payment, then use **Issue invoice** to produce the tax invoice for their books. The pro-forma stays on file as the document they originally paid against.
 
 **Pilates studio - reformer package sold on account.** A member buys a 10-class reformer package but wants to pay by bank transfer. Create a single manual invoice with one line item for the package, email it with **Send** or hand them the **Download** PDF, and when the transfer clears use **Add payment** to record it. The package transaction flips to `paid` and the invoice moves to the **Paid** tab.
 
@@ -150,22 +252,28 @@ The invoice's totals are derived from its line items, which point at transaction
 
 ## Tips & best practices
 
-- Prefer **Add payment** over **Mark paid** for live collection - it leaves an auditable payment row, where mark-paid only stamps the status.
+- Every settled invoice needs a payment record. There is no status-only shortcut, so for money collected outside 1Club record it on a manual method rather than looking for a **Mark as paid** button.
 - Attach a billing **Account** whenever a company or household is the payer, so the PDF bills the right legal entity and VAT number.
-- Set your **Invoice Numbering Template** before you issue your first invoice. Including `[year]` keeps numbering readable across financial years.
+- Set both numbering templates before you issue your first document. Including `[year]` keeps numbering readable across financial years, and the two series are independent so you can format them differently.
+- Reach for a **pro-forma** when the customer needs a document but the revenue is not yours yet. Converting later is one click and keeps both documents.
 - To re-invoice an obligation, delete the invoice rather than editing it. Deletion reverts the linked transactions to billable; editing prices does not change what the transaction owes.
 - Use the **Refresh payment status** button on the invoice details page if a member says they paid a Stripe link but the invoice still reads `pending`.
 
 ## Troubleshooting
 
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Invoice save rejected with "Invoice contact must belong to the selected account" | The chosen contact is neither the account's primary contact nor a member. | Pick a contact tied to that account, or leave the account blank. |
-| A transaction won't appear in a new bill run | It is already on an invoice (`isInvoiced = true`). | Delete the invoice holding it to revert it to billable. |
-| Invoice still shows `pending` after the member paid a link | Status recalculation or the Stripe webhook hasn't landed yet. | Open the invoice and click **Refresh payment status**. |
-| Editing transaction prices didn't change the invoice total | Totals are frozen from the line items at issue time. | Delete and re-create the invoice, or edit the invoice line items directly. |
-| A pending invoice isn't in the **Overdue** tab yet, though its due date passed | The tab filters on the stored `overdue` status, which flips on recalculation. | Use the overdue lookup, which catches pending invoices with a past due date immediately. |
-| Two invoices almost got the same number | Concurrent creation. | No action needed - numbering retries on collision and stays unique per organization. |
+| Symptom                                                                          | Cause                                                                         | Fix                                                                                          |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Invoice save rejected with "Invoice contact must belong to the selected account" | The chosen contact is neither the account's primary contact nor a member.     | Pick a contact tied to that account, or leave the account blank.                             |
+| A transaction won't appear in a new bill run                                     | It is already on an invoice (`isInvoiced = true`).                            | Delete the invoice holding it to revert it to billable.                                      |
+| Invoice still shows `pending` after the member paid a link                       | Status recalculation or the Stripe webhook hasn't landed yet.                 | Open the invoice and click **Refresh payment status**.                                       |
+| Editing transaction prices didn't change the invoice total                       | Totals are frozen from the line items at issue time.                          | Delete and re-create the invoice, or edit the invoice line items directly.                   |
+| A pending invoice isn't in the **Overdue** tab yet, though its due date passed   | The tab filters on the stored `overdue` status, which flips on recalculation. | Use the overdue lookup, which catches pending invoices with a past due date immediately.     |
+| Two invoices almost got the same number                                          | Concurrent creation.                                                          | No action needed - numbering retries on collision and stays unique per organization.         |
+| I can't find a pro-forma I created                                               | The grid shows one document type at a time.                                   | Switch the **Document type** control in the toolbar to **Pro-forma**.                        |
+| **Issue invoice** is missing on a pro-forma                                      | It has already been converted. A pro-forma converts once.                     | Open the invoice it produced; the two are linked.                                            |
+| Deleting a pro-forma or invoice is refused                                       | The document is one side of a conversion, which cannot be broken.             | Leave both on file. To reverse the revenue, credit or void the invoice instead.              |
+| I'm looking for **Mark as paid** and it isn't there                              | It was removed - settling goes through the payment flow.                      | Record a payment on a manual method (Cash, Bank transfer) for money taken outside 1Club.     |
+| A pro-forma appears in a revenue figure                                          | It should not. Pro-formas are excluded from fiscal reporting.                 | Check whether the number you are reading is the converted invoice rather than the pro-forma. |
 
 ## Related
 

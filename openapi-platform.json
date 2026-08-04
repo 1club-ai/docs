@@ -566,7 +566,18 @@
             "items": {
               "type": "string"
             },
-            "description": "Scopes granted to the API key (e.g. \"classes:read\")."
+            "description": "Scopes granted to the API key exactly as held (e.g. \"classes:read\"). A full-access key holds the single wildcard scope \"*\"; read `effectiveScopes` to see what that resolves to."
+          },
+          "fullAccess": {
+            "type": "boolean",
+            "description": "True when the key holds the wildcard scope \"*\", granting every scope including ones added after the key was issued."
+          },
+          "effectiveScopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The scopes this key can actually use — identical to `scopes` for a narrow key, and the full expansion of \"*\" for a full-access one. Check a capability against this list, not `scopes`."
           },
           "resources": {
             "type": "array",
@@ -1114,6 +1125,341 @@
     }
   ],
   "paths": {
+    "/v1/platform/area-blocks": {
+      "get": {
+        "summary": "List area blocks",
+        "description": "Returns the blocks overlapping a window — the time-ranged unavailability of a court, the counterpart of instructor time off. A block with `areaId: null` is club-wide and closes every area in `clubId`; expand it against the club's areas the same way availability does. Filtering by `areaId` includes the club-wide blocks covering that area, so the result is everything that closes it.\n",
+        "tags": [
+          "Area Blocks"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Window start (ISO date-time)"
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Window end (ISO date-time). At most 31 days after `from`."
+          },
+          {
+            "in": "query",
+            "name": "clubId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only return blocks for this club"
+          },
+          {
+            "in": "query",
+            "name": "areaId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only return blocks affecting this area (club-wide ones included)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of area blocks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "clubId": {
+                        "type": "integer"
+                      },
+                      "areaId": {
+                        "type": "integer",
+                        "nullable": true,
+                        "description": "Null means every area in the club"
+                      },
+                      "areaName": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "startTime": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "endTime": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "note": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `areas:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an area block",
+        "description": "Closes a court, or a whole club, for a time range. Send `areaId` to close one court (its club is derived), or `clubId` with `areaId` omitted/null to close every court in that club with a single record. Existing bookings in the window are left alone — a block stops NEW bookings; cancel or move the affected bookings separately.\n",
+        "tags": [
+          "Area Blocks"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "startTime",
+                  "endTime"
+                ],
+                "properties": {
+                  "areaId": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "The court to close. Omit or send null for a club-wide block."
+                  },
+                  "clubId": {
+                    "type": "integer",
+                    "description": "Required when `areaId` is omitted or null; otherwise derived from the area."
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "endTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "note": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Block created"
+          },
+          "400": {
+            "description": "Invalid body, or `clubId` missing for a club-wide block",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `areas:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Club or area not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/area-blocks/{blockId}": {
+      "delete": {
+        "summary": "Delete an area block",
+        "description": "Removes a block, reopening the court(s) it covered for booking. Idempotent from the caller's perspective only in the sense that a second delete returns 404 — the first one already reopened the slot.\n",
+        "tags": [
+          "Area Blocks"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "blockId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Block deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid block id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `areas:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Block not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/platform/areas": {
       "get": {
         "summary": "List bookable areas",
@@ -1920,7 +2266,7 @@
       },
       "get": {
         "summary": "List bookings",
-        "description": "Returns bookings whose start time falls in the requested window, ordered by start time. The window may span at most 92 days; when `from`/`to` are omitted it defaults to the next 7 days, and passing one derives the other.\n\nUnlike GET and cancel by id — which only act on bookings this API created — this returns bookings from every channel, each tagged with `source`. That is deliberate: a caller reconciling its own writes has to be able to see member- and staff-created bookings to know whether a slot was already taken.\n",
+        "description": "Returns bookings whose start time falls in the requested window, ordered by start time. Each bound is an ISO date-time, or a bare `YYYY-MM-DD` read as midnight UTC. When `from`/`to` are omitted the window defaults to the next 7 days, and passing one derives the other.\n\nA single request may span at most 93 days. To cover a longer range, walk it in consecutive windows of 93 days or less, paging each window with `limit`/`offset` against the `total` it reports. Ordering is stable (`startTime`, then id), so paging is well defined for a window that is not being written to; bookings created or cancelled mid-walk can still shift rows across page boundaries.\n\nUnlike GET and cancel by id — which only act on bookings this API created — this returns bookings from every channel, each tagged with `source`. That is deliberate: a caller reconciling its own writes has to be able to see member- and staff-created bookings to know whether a slot was already taken.\n",
         "tags": [
           "Bookings"
         ],
@@ -1934,19 +2280,17 @@
             "in": "query",
             "name": "from",
             "schema": {
-              "type": "string",
-              "format": "date-time"
+              "type": "string"
             },
-            "description": "Inclusive lower bound on booking start time. Defaults to `to - 7d`, or now."
+            "description": "Inclusive lower bound on booking start time, as an ISO date-time or `YYYY-MM-DD`. Defaults to `to - 7d`, or now."
           },
           {
             "in": "query",
             "name": "to",
             "schema": {
-              "type": "string",
-              "format": "date-time"
+              "type": "string"
             },
-            "description": "Exclusive upper bound on booking start time. Defaults to `from + 7d`."
+            "description": "Exclusive upper bound on booking start time, as an ISO date-time or `YYYY-MM-DD`. Defaults to `from + 7d`."
           },
           {
             "in": "query",
@@ -3246,7 +3590,7 @@
     "/v1/platform/me": {
       "get": {
         "summary": "Describe the API key's organization and granted scopes",
-        "description": "Returns the organization the API key belongs to, the scopes granted to the key, and the catalog of resources/actions the platform API exposes. Requires a valid API key but no specific scope — use it to verify a key and discover what it can access.\n",
+        "description": "Returns the organization the API key belongs to, the scopes granted to the key, and the catalog of resources/actions the platform API exposes. Requires a valid API key but no specific scope — use it to verify a key and discover what it can access.\n\nA full-access key holds the single wildcard scope `*`. Test a capability against `effectiveScopes`, which expands the wildcard, rather than against `scopes`, which reports the grant verbatim.\n",
         "tags": [
           "Account"
         ],
@@ -3760,7 +4104,7 @@
     "/v1/platform/transactions": {
       "get": {
         "summary": "List transactions for the organization",
-        "description": "Returns transactions for the organization associated with the API token, filtered by transaction creation time to a window of at most 24 hours and ordered by `createdAt` descending. When `startDate` and `endDate` are omitted, the window defaults to the last 24 hours (`endDate = now`, `startDate = now - 24h`). When only one of the two is provided, the other is derived from the 24-hour window.\n",
+        "description": "Returns transactions for the organization associated with the API token, filtered by transaction creation time and ordered by `createdAt` descending, then by id. Each bound is an ISO date-time, or a bare `YYYY-MM-DD` read as midnight UTC. `startDate` is inclusive and `endDate` is exclusive. When both are omitted, the window defaults to the last 24 hours (`endDate = now`, `startDate = now - 24h`); when only one is given, the other is derived from that same 24-hour span.\n\nA single request may span at most 93 days. Cover a longer range in consecutive windows, passing the previous window's `endDate` as the next one's `startDate` — because the upper bound is exclusive, that chains without counting a boundary transaction twice.\n\nNote that this endpoint returns a bare array with no total — a full page (`limit` rows) means there are probably more, so keep advancing `offset` until a short page comes back.\n\nOrdering is total (`createdAt` descending, then id), so `offset` paging is well defined for a fixed set of rows. It is not stable against concurrent writes: rows are ordered newest first, so a transaction created part-way through a walk lands on the first page and shifts every later row down by one, which can push an unread row past an `offset` already passed. Pass an explicit `endDate` in the past rather than relying on the `now` default — anything written after it falls outside the window and cannot shift the pages underneath you.\n",
         "tags": [
           "Transactions"
         ],
@@ -3774,19 +4118,17 @@
             "in": "query",
             "name": "startDate",
             "schema": {
-              "type": "string",
-              "format": "date-time"
+              "type": "string"
             },
-            "description": "Inclusive lower bound on transaction `createdAt`. Defaults to `endDate - 24h`."
+            "description": "Inclusive lower bound on transaction `createdAt`, as an ISO date-time or `YYYY-MM-DD`. Defaults to `endDate - 24h`."
           },
           {
             "in": "query",
             "name": "endDate",
             "schema": {
-              "type": "string",
-              "format": "date-time"
+              "type": "string"
             },
-            "description": "Inclusive upper bound on transaction `createdAt`. Defaults to `now`."
+            "description": "Exclusive upper bound on transaction `createdAt`, as an ISO date-time or `YYYY-MM-DD`. Defaults to `now`."
           },
           {
             "in": "query",
@@ -3844,7 +4186,7 @@
             }
           },
           "400": {
-            "description": "Invalid query parameters (e.g. malformed date, window > 24h)",
+            "description": "Invalid query parameters (e.g. malformed date, window > 93 days)",
             "content": {
               "application/json": {
                 "schema": {

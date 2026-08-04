@@ -19,7 +19,7 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
 
 ## Admin server
 
-`https://mcp.1club.ai/admin` - requires 1Club OAuth. Every tool is scoped to the organization selected during authorization and needs the listed scope. A call whose scope is missing fails with a permission error, not with empty data.
+`https://mcp.1club.ai/admin` - authenticated, normally with 1Club OAuth. Every tool is scoped to one organization and needs the listed scope. A call whose scope is missing fails with a permission error, not with empty data.
 
 | Tool                             | What it does                                                             | Scope required      |
 | -------------------------------- | ------------------------------------------------------------------------ | ------------------- |
@@ -79,6 +79,26 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
 ### Reading the scope table
 
 Scopes follow the `resource:action` format used across the [Platform API](/api-reference/introduction). A connection carrying `bookings:write` does not automatically carry `bookings:read`; authorize both if the assistant should look a booking up as well as create one.
+
+### How a connection gets its scopes
+
+The MCP client asks for a scope set, and you decide how much of that request to grant:
+
+- **A client that requests nothing gets a read-only connection.** Every read scope in the table above, and nothing that writes.
+- **Requested read scopes are granted when you approve.** They are listed under "This assistant will be able to" on the authorization page.
+- **Requested write scopes are opt-in, one at a time.** Each appears under "Also allow it to make changes?" as a checkbox that starts unchecked. Approving the page without ticking any of them produces a read-only connection, even if the client asked for everything.
+- **The set is fixed once approved.** To add or remove a scope, revoke the connection and authorize it again - see [Disconnect or revoke](/mcp/connect#disconnect-or-revoke).
+
+An assistant that authenticates with a [Platform API key](/settings/api-tokens) instead of OAuth uses that key's scopes, which you edit on the token itself.
+
+<Note>
+  The wildcard scope `*` is an API-key feature: on a Platform API key it satisfies
+  every current and future scope. MCP OAuth rejects it - a client that asks for
+  `*` gets an `invalid_scope` error and has to name the scopes it wants. Even for
+  a key, [explicit scopes are the better
+  choice](/settings/api-tokens#token-scopes) unless the integration is fully
+  trusted and internally managed.
+</Note>
 
 Each admin tool is a thin wrapper over the documented Platform API, so the request limits, error shapes, and field meanings are the same as the [API reference](/api-reference/introduction).
 

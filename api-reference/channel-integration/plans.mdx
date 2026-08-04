@@ -24,6 +24,7 @@ Query parameters:
 - `search` (optional) - matches on plan name or description
 - `clubId` (optional) - only plans limited to that gym
 - `sport` (optional) - only plans listing that sport, for example `padel`
+- `includeInactive` (optional) - `true` to include retired plans, which are hidden by default
 - `limit` (optional) - 1 to 100, defaults to 25
 - `offset` (optional) - defaults to 0
 
@@ -54,7 +55,9 @@ Response:
 }
 ```
 
-Only plans the gym still sells are returned, so everything here can be sold. Name
+By default only plans the gym still sells are returned, so everything here can be
+sold. Add `includeInactive=true` when you need retired plans as well - to find one
+you retired and want back, for example. Name
 matching works like
 [contact search](/api-reference/channel-integration/contacts#matching-is-case-insensitive-and-cross-script):
 case-insensitive and cross-script.
@@ -71,9 +74,10 @@ curl "https://api.1club.ai/v1/platform/plans/9" \
 Returns the same object as one row of the search response.
 
 <Note>
-  A retired plan is a `404` here too. When a membership sits on a plan the gym no
-  longer sells, the membership itself reports its `planName`, so you can still say
-  what it is without the plan being reachable.
+  Get-by-id returns retired plans too. Resolving an id you already hold is not the
+  same as offering a plan for sale, so a plan you retired stays readable here - and
+  reachable for a `PATCH` that un-retires it. Only [plan search](#search-plans)
+  hides retired plans, and only until you pass `includeInactive=true`.
 </Note>
 
 ## Create a plan
@@ -118,7 +122,13 @@ curl -X PATCH "https://api.1club.ai/v1/platform/plans/9" \
   -d '{ "isActive": false }'
 ```
 
-Set `isActive` to `false` to retire a plan. Existing memberships keep their snapshotted plan details, but the plan no longer appears in plan search or new sales.
+Set `isActive` to `false` to retire a plan. Existing memberships keep their snapshotted plan details, but the plan is no longer something the gym sells.
+
+A retired plan drops out of [plan search](#search-plans), so an integration that lists plans stops offering it. It does not disappear:
+
+- `GET /v1/platform/plans/{id}` still returns it, with `isActive: false`.
+- `GET /v1/platform/plans?includeInactive=true` lists it again alongside the active ones.
+- `PATCH` with `{ "isActive": true }` puts it back on sale.
 
 ## Delete a plan
 

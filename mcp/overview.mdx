@@ -28,7 +28,7 @@ You connect once, and from then on you can ask an assistant things like "which c
 | **Admin**     | `https://mcp.1club.ai/admin`     | Your gym's staff and internal systems            | 1Club OAuth sign-in        |
 | **Discovery** | `https://mcp.1club.ai/discovery` | Anyone searching the public 1club.me marketplace | None                       |
 
-- The **admin server** reads and writes one organization's own data. You sign in to 1Club, choose the organization, and approve the requested scopes. Every response is limited to that organization. This is the one you want for running your gym.
+- The **admin server** reads and writes one organization's own data. You sign in to 1Club, choose the organization, and approve the requested access. Every response is limited to that organization. This is the one you want for running your gym. A developer-managed client that cannot sign in interactively can send a [Platform API key](/settings/api-tokens) as a bearer token instead; OAuth is the recommended path for everyone else.
 - The **discovery server** searches the public marketplace across all listed gyms and checks published availability. It is anonymous by design and can never reach a single organization's private data.
 
 Pick the one that matches what you are trying to do, then follow [Connect an assistant](/mcp/connect).
@@ -67,16 +67,17 @@ The discovery server covers marketplace search and public availability for class
 ## Security model
 
 - **OAuth keeps credentials out of setup.** You sign in directly on 1Club's authorization page. You do not paste a password or API token into the assistant.
-- **Scopes are the limit.** An assistant can only use tools approved during authorization. A connection with `classes:read` cannot create or update a class.
-- **Revocation is instant.** Revoking a connection under **Settings > Artificial Intelligence > Connect AI assistants (MCP)** cuts the assistant off immediately.
-- **Assistants can be talked into things.** Content the assistant reads, such as a member note or a website page, can contain text that tries to steer it. This is why read-only scopes are safer, and why write scopes belong only on connections you supervise.
+- **Read-only is the default.** A client that requests no scopes gets a read-only connection, and every write capability a client does request is a checkbox on the authorization page that starts unchecked. Approving without ticking anything leaves the assistant able to look things up and nothing more.
+- **Write access is a deliberate opt-in, per capability.** Tick only the writes the assistant actually needs. Content it reads - a member note, a website page - can contain text that tries to steer it, so a write scope belongs only on a connection you supervise.
+- **Scopes are the limit.** An assistant can only use tools its granted scopes allow. A connection with `classes:read` cannot create or update a class. The set cannot be changed after approval: revoke the connection and authorize it again with different boxes ticked.
+- **Revocation is instant.** Revoking a connection under **Settings > Artificial Intelligence > AI assistants (MCP)** cuts the assistant off immediately.
 - **Rate limits apply.** MCP calls count against the Platform API's limit of 100 requests per minute per organization.
 
 ## Before you start
 
 - API and MCP access are **paid features**. The discovery server remains public and needs no sign-in.
 - Authorizing a connection requires the **settings.manage.organization** permission. In practice that means admins and owners.
-- Your MCP client must support remote HTTP MCP servers and OAuth. [Connect an assistant](/mcp/connect) covers the setup.
+- Your MCP client must support remote HTTP MCP servers, and OAuth for the recommended setup. A client that can only send a fixed `Authorization` header can use a [Platform API key](/settings/api-tokens) instead. [Connect an assistant](/mcp/connect) covers both.
 
 ## Next steps
 

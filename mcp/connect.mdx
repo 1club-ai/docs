@@ -1,11 +1,11 @@
 ---
 title: "Connect an assistant"
 sidebarTitle: "Connect an assistant"
-description: "Connect Claude, ChatGPT, or another remote MCP client to 1Club with OAuth. No API token is required."
-keywords: [mcp setup, connect claude, chatgpt app, oauth, remote mcp]
+description: "Connect Claude, ChatGPT, or another remote MCP client to 1Club with OAuth, and keep an existing API-key connection working."
+keywords: [mcp setup, connect claude, claude code, chatgpt app, oauth, api key, remote mcp]
 ---
 
-Connect your assistant directly to 1Club with OAuth. You do not need to create, copy, or store an API token.
+Connect your assistant directly to 1Club with OAuth. You do not need to create, copy, or store an API token. If you already connected an assistant with an API key, that connection keeps working - see [Existing API-key connections](#existing-api-key-connections).
 
 ## Before you start
 
@@ -40,7 +40,7 @@ The public discovery server is `https://mcp.1club.ai/discovery`. It searches pub
   </Step>
 
   <Step title="Review and authorize access">
-    Review the requested scopes, then authorize the connection. Read scopes let the assistant inspect data. Write scopes let it create or change records, including plans, classes, bookings, memberships, and check-ins.
+    The authorization page lists the read access the client asked for, and shows every write capability it requested as its own checkbox, unchecked. Approve without ticking anything and the assistant gets read-only access, even if the client asked for everything. Tick only the write permissions you actually want it to have - plans, classes, bookings, memberships, contacts, or check-ins - then authorize.
   </Step>
 
   <Step title="Test the connection">
@@ -66,6 +66,16 @@ Claude and Claude Desktop support OAuth-based remote MCP connectors.
 
 Team and Enterprise workspace owners may need to add the connector for the organization before individual users can connect it. See [Anthropic's remote MCP connector guide](https://support.anthropic.com/en/articles/11175166-about-custom-integrations-using-remote-mcp).
 
+## Claude Code
+
+Claude Code speaks OAuth over HTTP MCP, so one command is enough and no header is needed:
+
+```bash
+claude mcp add --transport http 1club-admin https://mcp.1club.ai/admin
+```
+
+The sign-in and authorization pages open when you first use the server. Run `claude mcp list` to confirm it is connected. For the anonymous marketplace server, use the same command with `https://mcp.1club.ai/discovery`.
+
 ## ChatGPT
 
 ChatGPT exposes custom MCP connections as apps. Availability and write-action support depend on your ChatGPT plan and workspace settings.
@@ -89,6 +99,34 @@ https://mcp.1club.ai/admin
 
 1Club supports dynamic client registration, authorization code flow with PKCE, access-token refresh, and revocation. A compatible client should discover these details without manual URLs or secrets.
 
+## Existing API-key connections
+
+OAuth is the recommended path and the one to use for a new connection. An assistant that was connected with a [Platform API key](/settings/api-tokens) before OAuth existed keeps working: the admin server accepts any bearer credential the Platform API accepts, so a `1club_sk_live_...` key sent on `Authorization` still authenticates. This path stays available for developer-managed clients that cannot complete an interactive sign-in.
+
+The remote configuration is the same endpoint with a request header:
+
+```text
+Authorization: Bearer 1club_sk_live_your_token_here
+```
+
+The key's own scopes decide what the assistant can do, exactly as they do for a direct API call, and revoking the key under **Settings > Organization > APIs & webhooks** cuts the assistant off.
+
+To move an existing connection to OAuth:
+
+<Steps>
+  <Step title="Remove the header-based connection">
+    Delete the custom connector, app, or MCP entry in the client. Clients cache server metadata, so re-adding it is more reliable than editing it in place.
+  </Step>
+
+  <Step title="Add it again with OAuth">
+    Follow [Connect the admin server](#connect-the-admin-server) above. Choose OAuth when the client asks how to authenticate, and do not enter any header.
+  </Step>
+
+  <Step title="Revoke the old API key">
+    Once `get_account` returns the right organization over the new connection, revoke the API key that assistant was using, so the credential stops working everywhere.
+  </Step>
+</Steps>
+
 ## Legacy developer setup
 
 The hosted MCP connection is the recommended setup. A developer can still run the repository's MCP server over stdio with `ONECLUB_API_KEY`, but that path needs a manually created API token and is intended for local development only.
@@ -102,12 +140,13 @@ Confirm these checks after connecting:
 3. Ask the assistant to list recent check-ins. This confirms `checkins:read` access.
 4. Before testing a write, use a disposable record and review the tool confirmation.
 
-You can review and revoke connected assistants under **Settings > Artificial Intelligence > Connect AI assistants (MCP)** in 1Club.
+You can review and revoke connected assistants under **Settings > Artificial Intelligence > AI assistants (MCP)** in 1Club.
 
 ## Disconnect or revoke
 
 - Disconnecting in the MCP client removes the connection from that client.
 - Revoking it in 1Club ends access immediately. The client must complete OAuth again to reconnect.
-- You do not rotate MCP API tokens because OAuth access and refresh credentials are managed by the client and 1Club.
+- There is nothing to rotate on an OAuth connection - the access and refresh credentials are managed by the client and 1Club, and never handled by you.
+- **An approved scope set cannot be edited afterwards.** To give an assistant a write permission you did not tick, or to take one back, revoke the connection and authorize it again with the boxes you want.
 
 If setup fails, see [MCP troubleshooting](/mcp/troubleshooting).

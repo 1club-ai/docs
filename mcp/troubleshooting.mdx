@@ -33,11 +33,13 @@ The discovery server at `https://mcp.1club.ai/discovery` remains public and does
 
 Ask the assistant to call `get_account`. It returns the authorized organization and exact scopes on the connection. Compare those scopes with the [tools reference](/mcp/tools).
 
-Disconnect and reconnect the assistant to approve a different scope set. OAuth grants cannot be expanded by editing an API token because MCP does not use one.
+An OAuth grant's scopes are fixed once you approve them - there is no way to widen or narrow a live connection. To change them, revoke the connection under **Settings > Artificial Intelligence > AI assistants (MCP)**, disconnect it in the client, and authorize it again, ticking the write permissions you need this time.
+
+If the assistant authenticates with a [Platform API key](/settings/api-tokens) rather than OAuth - which the admin MCP server also accepts, for developer-managed clients - then it is that key's scopes that apply, and you edit them under **Settings > Organization > APIs & webhooks**.
 
 ## The assistant is connected to the wrong organization
 
-1. Revoke the connection under **Settings > Artificial Intelligence > Connect AI assistants (MCP)**.
+1. Revoke the connection under **Settings > Artificial Intelligence > AI assistants (MCP)**.
 2. Disconnect it in the MCP client.
 3. Connect again and choose the correct organization on the 1Club authorization page.
 
@@ -75,11 +77,13 @@ The **Last used** column on the MCP page shows whether recent requests reached 1
 
 Read and write scopes are separate. For example, `classes:read` does not satisfy `classes:write`.
 
+The usual cause is that no write box was ticked on the authorization page. Every write capability is offered there as an individual checkbox that starts unchecked, so approving the page without touching it produces a read-only connection - which is the intended default, not a bug. Call `get_account` to see the granted scopes, then revoke and reconnect if the assistant genuinely needs to write.
+
 The operation can also fail a business rule after authorization:
 
 - A plan cannot be deleted while memberships reference it. Retire it by setting `isActive` to `false`.
 - A class cannot be deleted while affected future occurrences have active bookings or waitlist entries.
-- A booking cannot be checked in outside its configured window, when required payment is outstanding, or after it was already checked in.
+- A booking cannot be checked in outside its configured window, when required payment is outstanding, or after it was already checked in. Only a `confirmed` or `pending` booking can be checked in - a cancelled or no-show booking is rejected.
 
 Read the error returned by the tool before retrying. Do not repeatedly retry a validation or conflict error with a new idempotency key.
 

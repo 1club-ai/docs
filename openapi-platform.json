@@ -3052,13 +3052,24 @@
       },
       "post": {
         "summary": "Check in an existing booking",
-        "description": "Records attendance for a booking during its configured check-in window. The booking's payment and duplicate-attendance rules still apply.",
+        "description": "Records attendance for a booking during its configured check-in window. The booking must be `confirmed` or `pending`, and its payment and duplicate-attendance rules still apply. Supports the `Idempotency-Key` header.\n",
         "tags": [
           "Check-ins"
         ],
         "security": [
           {
             "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
           }
         ],
         "requestBody": {
@@ -3076,7 +3087,7 @@
                   },
                   "clubId": {
                     "type": "integer",
-                    "description": "Required only for a clubless event booking when no club can otherwise be derived"
+                    "description": "Required only for a clubless event booking when no club can otherwise be derived. Must belong to the authorized organization."
                   }
                 }
               }
@@ -3093,6 +3104,11 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "The booking is not `confirmed` or `pending`",
+            "has an unpaid balance": null,
+            "or `clubId` is missing or not in this organization": null
           },
           "403": {
             "description": "Missing `checkins:write` scope or check-in is outside the allowed window"
@@ -3115,6 +3131,16 @@
         "security": [
           {
             "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {
@@ -3235,13 +3261,24 @@
       },
       "post": {
         "summary": "Create a class",
-        "description": "Creates one class occurrence. Times must be ISO 8601 instants with an explicit offset.",
+        "description": "Creates one class occurrence. Times must be ISO 8601 instants with an explicit offset. Supports the `Idempotency-Key` header.",
         "tags": [
           "Classes"
         ],
         "security": [
           {
             "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
           }
         ],
         "requestBody": {
@@ -3367,12 +3404,36 @@
       },
       "patch": {
         "summary": "Update a class",
+        "description": "Updates one occurrence, or this and all future occurrences when `scope=all_future`. A recurring class defaults to `this_instance`, so a series-wide edit must ask for it explicitly.\n",
         "tags": [
           "Classes"
         ],
         "security": [
           {
             "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scope",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "this_instance",
+                "all_future"
+              ],
+              "default": "this_instance"
+            },
+            "description": "Whether the update applies to this occurrence only or to this and every later one in the series"
           }
         ],
         "requestBody": {
@@ -3401,6 +3462,9 @@
           },
           "404": {
             "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "description": "The new time double-books the area"
           }
         }
       },
@@ -3415,9 +3479,38 @@
             "customerApiAuth": []
           }
         ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scope",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "this_instance",
+                "all_future"
+              ],
+              "default": "this_instance"
+            },
+            "description": "Whether the delete applies to this occurrence only or to this and every later one in the series"
+          }
+        ],
         "responses": {
           "204": {
             "description": "Class deleted"
+          },
+          "403": {
+            "description": "Missing `classes:write` scope"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
           },
           "409": {
             "description": "Class has active bookings or waitlist entries"
@@ -4561,7 +4654,7 @@
     "/v1/platform/plans": {
       "get": {
         "summary": "List and search membership plans",
-        "description": "Returns the organization's membership plans. Resolve a plan here, then pass its `planId` to POST /v1/platform/memberships - the plan carries its own price, joining fee, billing frequency and session allowance, so the sale does not restate any of it.\n\nOnly plans the gym still sells are returned - a retired plan is not something an integration should surface or sell. Use the write endpoints below to create, update, retire, or delete plans.\n",
+        "description": "Returns the organization's membership plans. Resolve a plan here, then pass its `planId` to POST /v1/platform/memberships - the plan carries its own price, joining fee, billing frequency and session allowance, so the sale does not restate any of it.\n\nOnly plans the gym still sells are returned by default - a retired plan is not something an integration should surface or sell. Pass `includeInactive=true` to see retired plans as well, which is how you find a plan again after retiring it. Use the write endpoints below to create, update, retire, or delete plans.\n",
         "tags": [
           "Plans"
         ],
@@ -4595,6 +4688,19 @@
               "type": "string"
             },
             "description": "Only plans listing this sport (e.g. \"padel\")"
+          },
+          {
+            "in": "query",
+            "name": "includeInactive",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
+            },
+            "description": "Include retired plans, which are hidden by default. Retired means `isActive` is false.\n"
           },
           {
             "in": "query",
@@ -4650,12 +4756,24 @@
       },
       "post": {
         "summary": "Create a membership plan",
+        "description": "Creates a membership plan for the organization. Supports the `Idempotency-Key` header.",
         "tags": [
           "Plans"
         ],
         "security": [
           {
             "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
           }
         ],
         "requestBody": {
@@ -4688,7 +4806,7 @@
     "/v1/platform/plans/{id}": {
       "get": {
         "summary": "Get a membership plan",
-        "description": "Returns a single plan the gym still sells, including what a membership on it costs and what it grants. A retired plan is a `404`; a membership already on one carries its own `planName`, so it can still be explained.\n",
+        "description": "Returns a single plan, including what a membership on it costs and what it grants. Retired plans resolve here too - hiding them is the list's job, and a caller that just retired a plan still needs to read it back or undo it.\n",
         "tags": [
           "Plans"
         ],
@@ -4752,6 +4870,16 @@
             "customerApiAuth": []
           }
         ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -4783,13 +4911,23 @@
       },
       "delete": {
         "summary": "Delete a membership plan",
-        "description": "Delete a plan with no dependent records. Set `isActive` to false to retire a plan that is already in use.",
+        "description": "Delete a plan with no dependent records. Set `isActive` to false to retire a plan that is already in use — a retired plan is still readable by id, and `includeInactive=true` brings it back into the list.\n",
         "tags": [
           "Plans"
         ],
         "security": [
           {
             "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {

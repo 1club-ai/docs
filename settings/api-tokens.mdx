@@ -1,14 +1,14 @@
 ---
 title: API tokens
-description: Create, scope, edit, and revoke API tokens for programmatic access to your organization's data, from Settings > API tokens.
-keywords: [api tokens, api keys, scopes, programmatic access, integrations, mcp, webhooks, revoke token]
+description: Create, scope, edit, and revoke API tokens for programmatic integrations, from Settings > Organization > APIs & webhooks.
+keywords: [api tokens, api keys, scopes, programmatic access, integrations, webhooks, revoke token]
 ---
 
 API tokens are keys that external systems - your website, an integration, or a script - use to read and write your organization's data through the public API, without anyone sharing an admin login. Each token carries its own set of scopes and its own optional expiry, so you can grant exactly the access an integration needs and revoke it independently.
 
 ## Overview
 
-From **Settings > API tokens** you can:
+From **Settings > Organization > APIs & webhooks** you can:
 
 - **Create tokens** with a name, optional description, scopes, and an optional expiry.
 - **Scope each token** to specific resources and actions (read, write) so it can only touch what it needs.
@@ -16,7 +16,7 @@ From **Settings > API tokens** you can:
 - **Revoke** a token instantly when it is no longer needed or may be compromised.
 - **See at a glance** each token's prefix, scopes, expiry, last-used date, and created date.
 
-The same page also hosts your **MCP endpoint** and **Webhooks** (see [MCP and webhooks](#mcp-and-webhooks)).
+The same page also hosts **Webhooks**. MCP connections now have a separate page under **Settings > Artificial Intelligence** and use OAuth instead of API tokens.
 
 <Note>
 Programmatic API access is a paid feature. On a free or trial plan you can view and revoke existing tokens, but the **Add** button is disabled until you upgrade. A banner at the top of the page explains this when it applies.
@@ -48,15 +48,20 @@ Scopes use the format `resource:action`. Each token is a set of these strings. T
 
 | Resource         | Available actions |
 | ---------------- | ----------------- |
-| **Classes**      | Read              |
+| **Classes**      | Read, Write       |
 | **Content**      | Read              |
 | **Clubs**        | Read              |
 | **Transactions** | Read              |
 | **Areas**        | Read              |
 | **Bookings**     | Read, Write       |
+| **Contacts**     | Read, Write       |
+| **Instructors**  | Read              |
+| **Plans**        | Read, Write       |
+| **Memberships**  | Read, Write       |
+| **Check-ins**    | Read, Write       |
 
 - **Read** allows fetching data (GET requests).
-- **Write** allows creating and updating data.
+- **Write** allows creating, updating, and deleting data where that resource exposes those operations.
 
 Write actions are highlighted in the interface so you can spot them at a glance. Grant only the scopes an integration needs, and avoid write access unless the external system genuinely has to create or change data. The available resources and actions can grow over time; the dialog always reflects the current list.
 
@@ -90,19 +95,10 @@ Choosing an expiry in the edit dialog sets a fresh countdown from now. If you ed
 
 Revoking is immediate and permanent. Any integration using that token stops working at once. Create a new token if the integration needs to continue.
 
-## MCP and webhooks
+## Webhooks and MCP
 
-The API tokens page also surfaces two related integration points:
-
-- **MCP endpoint** - A panel shows the address of the 1Club admin MCP server, `https://mcp.1club.ai/admin`, and the header an AI assistant must send with it. Connecting Claude, ChatGPT, or another Model Context Protocol client lets it answer questions and take actions against your own data, limited to the scopes on the token you give it. The panel has copy buttons for both values. See the [MCP overview](/mcp/overview) for what an assistant can do, and [Connect an assistant](/mcp/connect) for step-by-step setup per client.
-- **Webhooks** - A separate section on the same page lets you register endpoint URLs that 1Club calls when events happen, each with its own signing secret. The secret, like a token, is shown only once when created. See the [Webhooks reference](/api-reference/channel-integration/webhooks).
-
-### Which token to use for MCP
-
-An MCP token is an ordinary API token, so everything above about scopes, expiry, and revocation applies unchanged. Two habits are worth keeping:
-
-- **Give each assistant its own token.** Naming it "Claude assistant" rather than sharing one token with your website means you can see its last-used date and revoke it without breaking anything else.
-- **Start read-only.** Grant **Bookings: Write** only once you are satisfied with what the assistant does with read access. An assistant reads content that other people wrote, and that content can try to influence it.
+- **Webhooks** remain on this page. Register endpoint URLs that 1Club calls when availability changes, each with its own signing secret. See the [Webhooks reference](/api-reference/channel-integration/webhooks).
+- **MCP** is separate from API tokens. Open **Settings > Artificial Intelligence > Connect AI assistants (MCP)** to copy the endpoint, review connected assistants, and revoke OAuth grants. See [Connect an assistant](/mcp/connect).
 
 ## Worked examples
 

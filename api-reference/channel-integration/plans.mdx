@@ -1,14 +1,14 @@
 ---
 title: "Plans"
-description: "Find a membership plan and see what it costs before selling it."
-keywords: [plans, membership plans, planId, price, signup fee, platform api]
+description: "Find, create, update, retire, and delete membership plans."
+keywords: [plans, membership plans, planId, price, signup fee, plans write, platform api]
 ---
 
 A **plan** is what a membership is sold on. It carries its own price, joining fee,
 billing frequency and session allowance, so creating a membership only has to name
 the plan and the customer - the plan supplies the rest.
 
-These endpoints are read-only. Plans are configured by the gym in 1Club.
+Read operations require `plans:read`. Create, update, retire, and delete operations require `plans:write`.
 
 ## Search plans
 
@@ -75,6 +75,62 @@ Returns the same object as one row of the search response.
   longer sells, the membership itself reports its `planName`, so you can still say
   what it is without the plan being reachable.
 </Note>
+
+## Create a plan
+
+Requires `plans:write`. Send an `Idempotency-Key` so a retry cannot create a duplicate.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/plans" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: plan-unlimited-2026-08" \
+  -d '{
+    "name": "Unlimited",
+    "description": "All classes and courts",
+    "price": 49,
+    "signupFee": 20,
+    "billingFrequency": "monthly",
+    "autoRenews": true,
+    "maxUses": null,
+    "validFor": {
+      "scopes": ["classes", "areas"]
+    },
+    "visibility": "Public"
+  }'
+```
+
+`validFor.scopes` controls which booking resources the plan can cover. Omit a type list to cover every type in that scope. For example, `scopes: ["classes"]` covers every class type. Add `classTypes: [3, 7]` to limit it to those class type IDs.
+
+An empty `validFor` creates a generic plan for direct gym entry. It does not make class, area, or instructor bookings free.
+
+For a custom billing frequency, send both `customPeriod` and `customPeriodUnit`.
+
+## Update or retire a plan
+
+Requires `plans:write`. Send only fields that should change.
+
+```bash
+curl -X PATCH "https://api.1club.ai/v1/platform/plans/9" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: retire-plan-9" \
+  -d '{ "isActive": false }'
+```
+
+Set `isActive` to `false` to retire a plan. Existing memberships keep their snapshotted plan details, but the plan no longer appears in plan search or new sales.
+
+## Delete a plan
+
+Requires `plans:write`.
+
+```bash
+curl -X DELETE "https://api.1club.ai/v1/platform/plans/9" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Idempotency-Key: delete-plan-9"
+```
+
+Deletion returns `204 No Content`. If memberships or other records still reference the plan, the API returns `409 Conflict`. Retire an in-use plan instead of deleting it.
 
 ## What the fields mean for a sale
 

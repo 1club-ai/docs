@@ -1,0 +1,77 @@
+---
+title: "Classes"
+description: "List, create, update, and delete class occurrences through the Platform API."
+keywords: [classes, schedule, classes read, classes write, platform api]
+---
+
+Class reads require `classes:read`. Class management requires `classes:write`.
+
+## List classes
+
+```bash
+curl "https://api.1club.ai/v1/platform/classes?startDate=2026-08-01T00:00:00%2B03:00&endDate=2026-09-01T00:00:00%2B03:00" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Use `startDate`, `endDate`, and `locale` to filter and translate the response. The endpoint returns class schedule, price, capacity, gym, area, instructors, and status fields.
+
+## Get a class
+
+```bash
+curl "https://api.1club.ai/v1/platform/classes/312" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+The class must belong to the API key's organization.
+
+## Create a class
+
+Send one class occurrence. Recurrence creation remains in the 1Club dashboard.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/classes" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: morning-yoga-2026-08-12" \
+  -d '{
+    "clubId": 5,
+    "areaId": 18,
+    "instructorIds": [42],
+    "name": "Morning yoga",
+    "startTime": "2026-08-12T08:00:00+03:00",
+    "endTime": "2026-08-12T09:00:00+03:00",
+    "maxCapacity": 16,
+    "price": 15,
+    "visibility": "Public"
+  }'
+```
+
+Times must include `Z` or an explicit UTC offset. All referenced gyms, areas, class types, and instructors must belong to the authorized organization. An area must belong to the selected gym.
+
+## Update a class
+
+Send only fields that should change:
+
+```bash
+curl -X PATCH "https://api.1club.ai/v1/platform/classes/312" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: class-312-capacity-20" \
+  -d '{ "maxCapacity": 20 }'
+```
+
+Changing the area, instructors, or time updates the related schedule reservations. Conflicting reservations return `409 Conflict`.
+
+## Delete a class
+
+Delete one occurrence:
+
+```bash
+curl -X DELETE "https://api.1club.ai/v1/platform/classes/312" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Idempotency-Key: delete-class-312"
+```
+
+For a recurring class, add `?scope=all_future` to delete this and later occurrences. The default is `this_instance`.
+
+Deletion returns `409 Conflict` when affected future classes have active customer bookings or waitlist entries. Cancel or move those records before retrying.

@@ -11,10 +11,6 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8000",
-      "description": "Development server"
-    },
-    {
       "url": "https://api.1club.ai",
       "description": "Production API"
     }
@@ -24,10 +20,440 @@
       "customerApiAuth": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Customer API key obtained from the admin portal (e.g. 1club_sk_live_...)"
+        "description": "Organization-scoped bearer credential: a customer API key (1club_sk_live_...) or an MCP OAuth access token."
       }
     },
     "schemas": {
+      "PlatformClassCreate": {
+        "type": "object",
+        "required": [
+          "clubId",
+          "name",
+          "startTime",
+          "endTime"
+        ],
+        "properties": {
+          "clubId": {
+            "type": "integer"
+          },
+          "areaId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "classTypeId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "instructorIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 20
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 5000
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "isFree": {
+            "type": "boolean"
+          },
+          "maxCapacity": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 instant with an explicit offset."
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 instant with an explicit offset."
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Private",
+              "Member_only",
+              "Public"
+            ]
+          },
+          "sport": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 60
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          }
+        }
+      },
+      "PlatformClassUpdate": {
+        "type": "object",
+        "properties": {
+          "clubId": {
+            "type": "integer"
+          },
+          "areaId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "classTypeId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "instructorIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 20
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 5000
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "isFree": {
+            "type": "boolean"
+          },
+          "maxCapacity": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 instant with an explicit offset."
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 instant with an explicit offset."
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Private",
+              "Member_only",
+              "Public"
+            ]
+          },
+          "sport": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 60
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          }
+        }
+      },
+      "PlatformPlanCreate": {
+        "type": "object",
+        "required": [
+          "name",
+          "price"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 5000
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "signupFee": {
+            "type": "number",
+            "minimum": 0
+          },
+          "billingFrequency": {
+            "type": "string",
+            "enum": [
+              "one_time",
+              "weekly",
+              "monthly",
+              "quarterly",
+              "annually",
+              "custom"
+            ]
+          },
+          "customPeriod": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1
+          },
+          "customPeriodUnit": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "days",
+              "weeks",
+              "months"
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "maxUses": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0
+          },
+          "sessionUnit": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "booking",
+              "hour"
+            ]
+          },
+          "validityPeriod": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1
+          },
+          "autoRenews": {
+            "type": "boolean"
+          },
+          "renewalDaysInAdvance": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 60
+          },
+          "requirePaymentUpfront": {
+            "type": "boolean"
+          },
+          "sports": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Private",
+              "Member_only",
+              "Public"
+            ]
+          },
+          "validFor": {
+            "type": "object",
+            "properties": {
+              "scopes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "classes",
+                    "areas",
+                    "instructors"
+                  ]
+                }
+              },
+              "classTypes": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "areaTypes": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "instructorTypes": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "PlatformPlanUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 5000
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "signupFee": {
+            "type": "number",
+            "minimum": 0
+          },
+          "billingFrequency": {
+            "type": "string",
+            "enum": [
+              "one_time",
+              "weekly",
+              "monthly",
+              "quarterly",
+              "annually",
+              "custom"
+            ]
+          },
+          "customPeriod": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1
+          },
+          "customPeriodUnit": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "days",
+              "weeks",
+              "months"
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "maxUses": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0
+          },
+          "sessionUnit": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "booking",
+              "hour"
+            ]
+          },
+          "validityPeriod": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1
+          },
+          "autoRenews": {
+            "type": "boolean"
+          },
+          "renewalDaysInAdvance": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 60
+          },
+          "requirePaymentUpfront": {
+            "type": "boolean"
+          },
+          "sports": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Private",
+              "Member_only",
+              "Public"
+            ]
+          },
+          "validFor": {
+            "type": "object",
+            "properties": {
+              "scopes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "classes",
+                    "areas",
+                    "instructors"
+                  ]
+                }
+              },
+              "classTypes": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "areaTypes": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "instructorTypes": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
       "PlatformInstructor": {
         "type": "object",
         "description": "Public instructor shape returned alongside classes.",
@@ -549,7 +975,7 @@
       },
       "PlatformIdentity": {
         "type": "object",
-        "description": "Describes the organization an API key belongs to, the scopes granted to the key, and the catalog of available platform resources.",
+        "description": "Describes the authorized organization, the scopes granted to the bearer credential, and the catalog of available platform resources.",
         "properties": {
           "organization": {
             "type": "object",
@@ -570,7 +996,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Scopes granted to the API key (e.g. \"classes:read\")."
+            "description": "Scopes granted to the bearer credential (e.g. \"classes:read\")."
           },
           "resources": {
             "type": "array",
@@ -1019,6 +1445,39 @@
             "type": "boolean",
             "description": "Whether a membership on this plan renews by default."
           },
+          "renewalDaysInAdvance": {
+            "type": "integer"
+          },
+          "requirePaymentUpfront": {
+            "type": "boolean"
+          },
+          "customPeriod": {
+            "type": "integer",
+            "nullable": true
+          },
+          "customPeriodUnit": {
+            "type": "string",
+            "nullable": true
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Private",
+              "Member_only",
+              "Public"
+            ]
+          },
+          "validFor": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Booking resource scopes and optional type filters covered by the plan."
+          },
           "sports": {
             "type": "array",
             "items": {
@@ -1039,6 +1498,100 @@
           "total": {
             "type": "integer",
             "description": "Total plans matching the filters, ignoring pagination"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
+      },
+      "PlatformCheckin": {
+        "type": "object",
+        "description": "An attendance record for a booking, class, membership, or direct gym visit.",
+        "properties": {
+          "checkinId": {
+            "type": "integer"
+          },
+          "contactId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "clubId": {
+            "type": "integer"
+          },
+          "classId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "bookingId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "membershipId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "externalProgramId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "entranceMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "contact": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "club": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "class": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "booking": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "membership": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "externalProgram": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          }
+        }
+      },
+      "PlatformCheckinPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformCheckin"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total check-ins matching the filters, ignoring pagination"
           },
           "limit": {
             "type": "integer"
@@ -2404,6 +2957,186 @@
         }
       }
     },
+    "/v1/platform/checkins": {
+      "get": {
+        "summary": "List check-ins",
+        "description": "Lists attendance records for the organization, newest first.",
+        "tags": [
+          "Check-ins"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "contactId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "clubId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "classId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "bookingId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "startDate",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "endDate",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of check-ins",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCheckinPage"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing `checkins:read` scope"
+          }
+        }
+      },
+      "post": {
+        "summary": "Check in an existing booking",
+        "description": "Records attendance for a booking during its configured check-in window. The booking's payment and duplicate-attendance rules still apply.",
+        "tags": [
+          "Check-ins"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "bookingId"
+                ],
+                "properties": {
+                  "bookingId": {
+                    "type": "integer"
+                  },
+                  "clubId": {
+                    "type": "integer",
+                    "description": "Required only for a clubless event booking when no club can otherwise be derived"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Check-in created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCheckin"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing `checkins:write` scope or check-in is outside the allowed window"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "description": "Booking is already checked in"
+          }
+        }
+      }
+    },
+    "/v1/platform/checkins/{id}": {
+      "get": {
+        "summary": "Get a check-in",
+        "tags": [
+          "Check-ins"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Check-in details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCheckin"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing `checkins:read` scope"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          }
+        }
+      }
+    },
     "/v1/platform/classes": {
       "get": {
         "summary": "List classes for the organization",
@@ -2499,6 +3232,43 @@
             }
           }
         }
+      },
+      "post": {
+        "summary": "Create a class",
+        "description": "Creates one class occurrence. Times must be ISO 8601 instants with an explicit offset.",
+        "tags": [
+          "Classes"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformClassCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Class created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformClass"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing `classes:write` scope"
+          }
+        }
       }
     },
     "/v1/platform/classes/{id}": {
@@ -2592,6 +3362,65 @@
                 }
               }
             }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a class",
+        "tags": [
+          "Classes"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformClassUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Class updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformClass"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing `classes:write` scope"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a class",
+        "description": "Deletes one occurrence, or this and all future occurrences when `scope=all_future`.",
+        "tags": [
+          "Classes"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Class deleted"
+          },
+          "409": {
+            "description": "Class has active bookings or waitlist entries"
           }
         }
       }
@@ -3249,8 +4078,8 @@
     },
     "/v1/platform/me": {
       "get": {
-        "summary": "Describe the API key's organization and granted scopes",
-        "description": "Returns the organization the API key belongs to, the scopes granted to the key, and the catalog of resources/actions the platform API exposes. Requires a valid API key but no specific scope — use it to verify a key and discover what it can access.\n",
+        "summary": "Describe the authorized organization and granted scopes",
+        "description": "Returns the organization authorized by the API key or MCP OAuth connection, its granted scopes, and the catalog of resources/actions the platform API exposes. Requires authentication but no resource scope.\n",
         "tags": [
           "Account"
         ],
@@ -3261,7 +4090,7 @@
         ],
         "responses": {
           "200": {
-            "description": "API key identity and granted scopes",
+            "description": "Authorized identity and granted scopes",
             "content": {
               "application/json": {
                 "schema": {
@@ -3271,7 +4100,7 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key",
+            "description": "Invalid or missing bearer token",
             "content": {
               "application/json": {
                 "schema": {
@@ -3610,12 +4439,129 @@
             "$ref": "#/components/responses/PlatformRateLimited"
           }
         }
+      },
+      "patch": {
+        "summary": "Update a membership",
+        "description": "Changes whether the membership renews, when it ends, and whether it is active, paused, or cancelled. Cancelling stamps the cancellation date, as cancelling in 1Club does.\n\nChanging the plan is not supported: that is a priced change needing proration, invoicing and possibly a refund. Move the customer to another plan in 1Club instead.\n",
+        "tags": [
+          "Memberships"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "paused",
+                      "cancelled"
+                    ],
+                    "description": "Statuses the platform derives itself (expired, used, pending_payment) cannot be set here. Send `status` on its own - `endDate` and `autoRenew` cannot be combined with it, because a status transition sets them itself. `active` only applies to a paused membership.\n"
+                  },
+                  "cancelMode": {
+                    "type": "string",
+                    "enum": [
+                      "immediate",
+                      "end_of_period"
+                    ],
+                    "default": "end_of_period",
+                    "description": "Only valid with `status: cancelled`. Keep access until the paid period ends, or end it today.\n"
+                  },
+                  "resumeAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true,
+                    "description": "Only valid with `status: paused`. When the pause lifts by itself; must be in the future.\n"
+                  },
+                  "endDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true
+                  },
+                  "autoRenew": {
+                    "type": "boolean"
+                  },
+                  "maxUses": {
+                    "type": "number",
+                    "nullable": true,
+                    "description": "Session allowance; null for unlimited"
+                  },
+                  "usesRemaining": {
+                    "type": "number",
+                    "nullable": true,
+                    "description": "Sessions left, for correcting a balance after a migration"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated membership",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformMembership"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body, or no fields to change",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `memberships:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
       }
     },
     "/v1/platform/plans": {
       "get": {
         "summary": "List and search membership plans",
-        "description": "Returns the organization's membership plans. Resolve a plan here, then pass its `planId` to POST /v1/platform/memberships - the plan carries its own price, joining fee, billing frequency and session allowance, so the sale does not restate any of it.\n\nOnly plans the gym still sells are returned - a retired plan is not something an integration should surface or sell. Plans are configured in the admin portal and cannot be created or edited through this API.\n",
+        "description": "Returns the organization's membership plans. Resolve a plan here, then pass its `planId` to POST /v1/platform/memberships - the plan carries its own price, joining fee, billing frequency and session allowance, so the sale does not restate any of it.\n\nOnly plans the gym still sells are returned - a retired plan is not something an integration should surface or sell. Use the write endpoints below to create, update, retire, or delete plans.\n",
         "tags": [
           "Plans"
         ],
@@ -3701,6 +4647,42 @@
             "$ref": "#/components/responses/PlatformRateLimited"
           }
         }
+      },
+      "post": {
+        "summary": "Create a membership plan",
+        "tags": [
+          "Plans"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformPlanCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Plan created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformPlan"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing `plans:write` scope"
+          }
+        }
       }
     },
     "/v1/platform/plans/{id}": {
@@ -3757,6 +4739,68 @@
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a membership plan",
+        "tags": [
+          "Plans"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformPlanUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Plan updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformPlan"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing `plans:write` scope"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a membership plan",
+        "description": "Delete a plan with no dependent records. Set `isActive` to false to retire a plan that is already in use.",
+        "tags": [
+          "Plans"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Plan deleted"
+          },
+          "403": {
+            "description": "Missing `plans:write` scope"
+          },
+          "409": {
+            "description": "Plan is still referenced"
           }
         }
       }

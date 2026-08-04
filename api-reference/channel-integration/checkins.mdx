@@ -1,0 +1,60 @@
+---
+title: "Check-ins"
+description: "List attendance records and check in an existing booking through the Platform API."
+keywords: [check-ins, attendance, booking check-in, checkins read, checkins write]
+---
+
+Reading attendance requires `checkins:read`. Recording attendance requires `checkins:write`.
+
+## List check-ins
+
+```bash
+curl "https://api.1club.ai/v1/platform/checkins?classId=312&limit=25" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Optional filters:
+
+- `contactId`
+- `clubId`
+- `classId`
+- `bookingId`
+- `startDate` and `endDate` as ISO 8601 date-times
+- `limit` from 1 to 100 and `offset`
+
+When both dates are present, the range cannot exceed 92 days. Results are ordered by attendance date, newest first.
+
+Each record includes its customer, gym, class, booking, membership, and external program summaries when they exist.
+
+## Get a check-in
+
+```bash
+curl "https://api.1club.ai/v1/platform/checkins/8841" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+## Check in a booking
+
+Resolve the booking with the bookings endpoint, then send its ID:
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/checkins" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: checkin-booking-9102" \
+  -d '{ "bookingId": 9102 }'
+```
+
+1Club applies the same rules as a dashboard check-in:
+
+- The booking must belong to the authorized organization.
+- Check-in must be inside the configured window.
+- Required payment must already be settled.
+- The booking cannot already have a check-in.
+
+A successful request returns `201 Created` with the attendance record and changes the booking status to `checked_in` atomically.
+
+<Note>
+  This endpoint checks in an existing booking. Use the 1Club dashboard for
+  walk-ins, direct membership entry, payment collection, and anonymous entry.
+</Note>

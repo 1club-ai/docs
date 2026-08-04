@@ -10,7 +10,7 @@ keywords:
     claude,
     chatgpt,
     connector,
-    api token,
+    oauth,
     remote mcp server,
   ]
 ---
@@ -25,10 +25,10 @@ You connect once, and from then on you can ask an assistant things like "which c
 
 | Server        | Address                          | Who it is for                                    | Authentication             |
 | ------------- | -------------------------------- | ------------------------------------------------ | -------------------------- |
-| **Admin**     | `https://mcp.1club.ai/admin`     | Your gym's staff and internal systems            | 1Club API token (required) |
+| **Admin**     | `https://mcp.1club.ai/admin`     | Your gym's staff and internal systems            | 1Club OAuth sign-in        |
 | **Discovery** | `https://mcp.1club.ai/discovery` | Anyone searching the public 1club.me marketplace | None                       |
 
-- The **admin server** reads and writes one organization's own data. Every tool requires an API token, and every response is limited to the organization that token belongs to. This is the one you want for running your gym.
+- The **admin server** reads and writes one organization's own data. You sign in to 1Club, choose the organization, and approve the requested scopes. Every response is limited to that organization. This is the one you want for running your gym.
 - The **discovery server** searches the public marketplace across all listed gyms and checks published availability. It is anonymous by design and can never reach a single organization's private data.
 
 Pick the one that matches what you are trying to do, then follow [Connect an assistant](/mcp/connect).
@@ -41,48 +41,52 @@ Pick the one that matches what you are trying to do, then follow [Connect an ass
 
 ## What an assistant can do
 
-The admin server currently covers reads across your schedule, content, gyms, and revenue, plus booking actions:
+The admin server covers operational reads and writes:
 
-- **Classes** - list your classes and open a single one.
+- **Classes** - list, create, update, and delete class occurrences.
 - **Areas and availability** - list bookable areas and check when they are free.
-- **Bookings** - create a booking, cancel a booking, and look one up.
+- **Plans** - find, create, update, retire, and delete membership plans.
+- **Memberships** - create and update customer memberships.
+- **Bookings** - create, cancel, and inspect bookings and their participants.
+- **Check-ins** - list attendance and check in an existing booking.
+- **Contacts and instructors** - resolve customers and coaches, and create contacts.
 - **Gyms** - read a gym's details, amenities, and rating.
 - **Content** - read published website and CMS content.
 - **Transactions** - list and open billing transactions.
 
-The full list, with the token scope each one needs, is on the [Tools reference](/mcp/tools) page.
+The full list, with the OAuth scope each tool needs, is on the [Tools reference](/mcp/tools) page.
 
 The discovery server covers marketplace search and public availability for classes, areas, and instructors.
 
-## What it cannot do yet
+## Current boundaries
 
-- **There is no member-facing server.** An API token represents your organization, not a person, so an assistant cannot currently act "as" a specific member in the portal or the marketplace. That needs per-user sign-in and is planned separately.
-- **Coverage is deliberately narrow.** The admin server is built strictly on the documented [Platform API](/api-reference/introduction), so an assistant can only reach what that API exposes. Anything outside it, such as members, memberships, messaging, or automations, is not reachable through MCP yet.
-- **Writes are limited to bookings.** Everything else is read-only.
+- **There is no member-facing server.** The admin connection acts on an organization. It does not sign in as a member or expose a member's private portal session.
+- **MCP follows the Platform API.** Messaging, automations, staff administration, and other resources not listed in the [Tools reference](/mcp/tools) are not exposed.
+- **Check-in creation is booking-based.** The assistant can check in an existing booking. Front-desk walk-ins and payment collection remain in 1Club.
 
 ## Security model
 
-- **A token is a key to your organization.** Anyone holding it can do what its scopes allow. Treat it like a password and store it in your assistant's credential field, never in a shared document or a chat message.
-- **Scopes are the limit.** An assistant can only use tools whose scope is on the token. A token with `classes:read` cannot create a booking, no matter what the assistant is asked to do. Grant the narrowest set that does the job, and prefer read-only tokens unless the assistant genuinely needs to book.
-- **Revocation is instant.** Revoking the token in **Settings > APIs and MCP** cuts the assistant off immediately.
-- **Assistants can be talked into things.** Content the assistant reads, such as a member note or a website page, can contain text that tries to steer it. This is why a read-only token is the safe default, and why write scopes belong only on connections you supervise.
+- **OAuth keeps credentials out of setup.** You sign in directly on 1Club's authorization page. You do not paste a password or API token into the assistant.
+- **Scopes are the limit.** An assistant can only use tools approved during authorization. A connection with `classes:read` cannot create or update a class.
+- **Revocation is instant.** Revoking a connection under **Settings > Artificial Intelligence > Connect AI assistants (MCP)** cuts the assistant off immediately.
+- **Assistants can be talked into things.** Content the assistant reads, such as a member note or a website page, can contain text that tries to steer it. This is why read-only scopes are safer, and why write scopes belong only on connections you supervise.
 - **Rate limits apply.** MCP calls count against the Platform API's limit of 100 requests per minute per organization.
 
 ## Before you start
 
-- API access is a **paid feature**. On the Free plan or during a trial you can view and revoke existing tokens, but you cannot create one, so the admin server cannot be connected. The discovery server needs no token and works for anyone.
-- Creating a token requires the **settings.manage.organization** permission. In practice that means admins and owners.
-- Your MCP client must support **remote (HTTP) MCP servers** with a bearer token, or be able to run a local server. [Connect an assistant](/mcp/connect) covers the clients that do.
+- API and MCP access are **paid features**. The discovery server remains public and needs no sign-in.
+- Authorizing a connection requires the **settings.manage.organization** permission. In practice that means admins and owners.
+- Your MCP client must support remote HTTP MCP servers and OAuth. [Connect an assistant](/mcp/connect) covers the setup.
 
 ## Next steps
 
 <Columns cols={2}>
   <Card title="Connect an assistant" icon="plug" href="/mcp/connect">
-    Step-by-step setup for Claude, ChatGPT, Claude Code, and local clients.
+    Step-by-step OAuth setup for Claude, ChatGPT, and other remote MCP clients.
   </Card>
 
 <Card title="Tools reference" icon="wrench" href="/mcp/tools">
-  Every tool on both servers, and the token scope it needs.
+  Every tool on both servers, and the OAuth scope it needs.
 </Card>
 
 <Card
@@ -93,7 +97,7 @@ The discovery server covers marketplace search and public availability for class
   What to do when the connection or a tool call fails.
 </Card>
 
-  <Card title="API tokens" icon="key" href="/settings/api-tokens">
-    Create, scope, and revoke the token your assistant uses.
+  <Card title="Manage connections" icon="link" href="/mcp/connect#disconnect-or-revoke">
+    Review how OAuth connections are authorized and revoked.
   </Card>
 </Columns>

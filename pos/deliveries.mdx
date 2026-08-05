@@ -1,0 +1,137 @@
+---
+title: Deliveries and invoice scanning
+description: Book incoming stock as a supplier delivery. Attach the invoice, let 1Club read the line items, review them, and post once so stock rises and the expense is recorded with the invoice attached.
+keywords:
+  [
+    "delivery",
+    "deliveries",
+    "goods receipt",
+    "supplier",
+    "invoice",
+    "invoice scanning",
+    "receive stock",
+    "stock intake",
+    "expense",
+    "pack size",
+    "VAT",
+    "void",
+    "inventory",
+  ]
+---
+
+A delivery records stock arriving from a supplier. You attach the supplier invoice, 1Club reads the supplier, the invoice number, the date and every line item off it, and you review the result before anything is committed. Posting the delivery does both halves of the job at once: stock rises at the location, and an expense lands in the cash ledger with the invoice attached to it.
+
+Deliveries are part of [Inventory](/pos/inventory), so they appear only when inventory is turned on for your organization.
+
+## Overview
+
+- **One document per delivery** - Supplier, invoice number, date and every line live on a single record rather than being entered stock item by stock item.
+- **Scan the invoice** - Attach a photo or a PDF and 1Club fills the lines in for you. You review and correct them; nothing is committed by scanning.
+- **Manual entry uses the same grid** - Adding a delivery by hand works exactly the same way, just starting from an empty table.
+- **Matching that learns** - Lines are matched to your catalogue by barcode, article number or name, and any match you make by hand is remembered for that supplier.
+- **Pack sizes** - Tell 1Club how many items are in a billed pack and it books the individual units, not the boxes.
+- **Post once** - Stock movements and the expense are written together, so the two can never disagree.
+- **Void, never edit** - A posted delivery is a permanent record. Correct a mistake by voiding it, which reverses both sides.
+
+## Create a delivery
+
+Go to **Revenue > Products > Deliveries** and select **New delivery**. Deliveries require the `inventory.manage.club` permission; reading them requires `inventory.read.club`.
+
+The delivery opens as a **draft**. Nothing you do to a draft affects stock or money, so you can leave it half-finished and come back to it.
+
+## Scan a supplier invoice
+
+Drop the invoice onto the panel at the top of the delivery, or select the panel to pick a file. Photos and PDFs are both accepted, up to 15 MB.
+
+1Club reads the document and fills in:
+
+- the supplier, the invoice number and the invoice date
+- every line item, with its quantity, unit, unit cost and VAT rate
+- the invoice totals, which are checked against the sum of the lines
+
+Scanning only ever fills in a draft. If the read fails or the document is unreadable, the delivery is left exactly as it was and you can type the lines in yourself.
+
+<Note>
+  Check every line against the document before posting. Scanning is an
+  assistant, not an authority - a smudged or unusual invoice can be misread, and
+  what you post is what your stock and books will say.
+</Note>
+
+If the line totals do not add up to the invoice total, 1Club tells you so rather than silently trusting either figure.
+
+## Review the lines
+
+Each line has an item name as printed on the invoice, an optional supplier code, the catalogue item it is matched to, a type, and the quantities and costs.
+
+### Matching
+
+1Club matches each line to a product or ingredient in this order:
+
+1. **Barcode** - an exact match on the product barcode.
+2. **Article number** - an exact match on the product SKU.
+3. **A mapping this supplier taught us** - how you matched the same item on a previous invoice.
+4. **Name** - a close match on the item name.
+
+A weak name match is deliberately left unmatched. A wrong automatic match would book stock against the wrong product without anyone noticing, which is worse than an empty cell.
+
+Whenever you match a line by hand, 1Club remembers it against that supplier's item code and printed name. The next invoice from the same supplier arrives already matched.
+
+### Lines you cannot match
+
+If an item is not in your catalogue yet, select the plus beside the line to create the product from it. The name and cost are carried over from the invoice, and you set the sale price. The new product is attached to the line straight away.
+
+If a line is not stock at all - a delivery charge, a service fee - change its type to **Expense only**. It stays on the delivery and counts towards the expense, but no stock is booked for it.
+
+Every stock line must be matched, created or marked expense only before the delivery can post. This is deliberate: a line left unmatched would otherwise post an expense while quietly adding no stock.
+
+### Pack sizes
+
+**Per pack** is how many individual items are in one billed unit. A case of 24 bottles billed as one case is quantity 1, per pack 24, and 1Club books 24 bottles into stock.
+
+Leave it at 1 when the invoice bills individual items.
+
+### Costs and VAT
+
+**Unit cost** is the net price per billed unit, excluding VAT, and **VAT %** is the rate on that line.
+
+The two sides of the delivery use different figures, which is intentional:
+
+- The **expense** is the gross total, VAT included, because that is what you paid.
+- The **stock cost** is the net cost per individual unit, because that is what the goods cost you.
+
+## Post the delivery
+
+Select **Execute**. In a single step 1Club:
+
+- writes a receive movement for every stock line at the delivery's location
+- updates each product's cost price from what you just paid
+- records one expense in the [cash registry](/pos/cash-registry) for the gross total, with the invoice attached and filed under the chosen category
+
+If the cash registry is turned off for your organization, the stock is still booked and 1Club tells you no expense was recorded.
+
+Once posted, the delivery becomes a read-only record. Its lines, costs and totals cannot be edited.
+
+## Void a delivery
+
+Select **Void** on a posted delivery. 1Club writes reversing stock movements and reverses the linked expense, leaving the original record intact for the audit trail.
+
+Voiding is how you correct a posted delivery. Fix whatever was wrong on a new delivery rather than trying to edit the old one.
+
+## Suppliers
+
+Suppliers are created from the delivery itself: open the supplier picker and choose **Add supplier**. A supplier holds its VAT number, company ID, contact details, and the payment method and expense category to default new deliveries to.
+
+Scanning an invoice from an unknown supplier creates that supplier automatically from the name printed on the document.
+
+Suppliers are archived rather than deleted, so posted deliveries keep pointing at whoever supplied them.
+
+## Permissions
+
+| Action                        | Permission                     |
+| ----------------------------- | ------------------------------ |
+| View deliveries and suppliers | `inventory.read.club`          |
+| Create, scan, post and void   | `inventory.manage.club`        |
+| Choose an expense category    | `cash.read.club`               |
+| Turn inventory on or off      | `settings.manage.organization` |
+
+Deliveries write into the cash ledger, so the endpoints behind them are unavailable entirely while inventory is turned off, not merely hidden.

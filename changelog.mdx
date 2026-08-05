@@ -7,6 +7,28 @@ mode: "center"
 {/* This page is generated from content/releases/*.yaml in the 1club repo. */}
 {/* Do not edit by hand - run `npm run release-notes:build`. */}
 
+<Update label="2026-08-05" description="Staying signed in through brief service interruptions" tags={["Fixed","Settings"]}>
+  ## Staying signed in through brief service interruptions
+
+  Short-lived server or connection problems no longer end your session — you stay signed in and the page keeps working.
+
+  Some staff were being returned to the sign-in screen while they were still
+  working, sometimes repeatedly through the day, with the message that their
+  session had expired.
+
+  Sessions renew quietly in the background every few minutes. If that renewal
+  couldn't complete — a brief database or connectivity problem, or a routine
+  deployment — it was treated the same as a session that had genuinely ended, and
+  you were signed out. Now a renewal that simply didn't finish is retried, your
+  session is kept, and only a session that has really ended sends you back to
+  sign-in.
+
+  Two related causes are fixed alongside it: a browser that had an out-of-date
+  copy of its session could get stuck in the same loop after every sign-in, and
+  staff working across several tabs no longer lose their session when the tabs
+  renew at the same moment.
+</Update>
+
 <Update label="2026-08-03" description="Build and edit your website with Claude" tags={["New","Highlight","Content"]}>
   ## Build and edit your website with Claude
 
@@ -121,12 +143,20 @@ mode: "center"
 <Update label="2026-07-29" description="Connect ChatGPT and Claude with one secure sign-in" tags={["New","Platform"]}>
   ## Connect ChatGPT and Claude with one secure sign-in
 
-  Staff can connect supported AI assistants to 1Club, choose an organization, and approve access without copying API tokens.
+  Staff can connect supported AI assistants to 1Club, choose an organization, and decide exactly what the assistant may change - without copying API tokens.
 
   1Club's MCP connection now supports the standard OAuth sign-in flow used by
   ChatGPT, Claude, and compatible assistants. Sign in with your 1Club account,
   select the organization to connect, review the requested access, and approve.
-  Connections remain organization-scoped and can be revoked.
+
+  You control what the assistant can do. Approving a connection grants read
+  access only. Anything that changes your data - creating classes, editing
+  plans, cancelling bookings, recording attendance - is a separate tick box on
+  the approval screen, off by default, so an assistant only gets the permissions
+  you deliberately hand it.
+
+  Connections stay organization-scoped, and you can revoke one at any time from
+  Settings > Artificial Intelligence > AI assistants (MCP).
 </Update>
 
 <Update label="2026-07-28" description="Multiple websites per organization" tags={["New","Highlight","Content"]}>
@@ -161,10 +191,11 @@ mode: "center"
   Thursday at 18:00" and get an answer from your live data.
 
   There are two servers, each with its own address. The admin server works with
-  one organization's own data and needs an API token, which you create in
-  Settings > APIs and MCP. The discovery server searches the public marketplace
-  and needs nothing at all. An assistant connected to one never sees the other's
-  tools.
+  one organization's own data. Add its endpoint as a custom connector in your
+  assistant, sign in to 1club when prompted, choose your organization and
+  authorize the connection - there is no API token to create or copy. The
+  discovery server searches the public marketplace and needs nothing at all. An
+  assistant connected to one never sees the other's tools.
 
   What an assistant can reach today: your classes, your bookable areas and when
   they are free, your gyms, your published website content, and your billing
@@ -175,10 +206,12 @@ mode: "center"
   names back — including when two groups run at the same hour, which an assistant
   can now tell apart.
 
-  You stay in control of how much it can do. The token you give an assistant
-  carries scopes, and the assistant can only use tools those scopes allow, so a
-  read-only token can answer questions but can never book. Revoking the token
-  cuts access off immediately.
+  You stay in control of who has access and how much it can do. Approving a
+  connection grants read access only; anything that changes your data is a
+  separate tick box on the approval screen. Settings > Artificial Intelligence >
+  AI assistants (MCP) lists every connected assistant, who authorized it, what it
+  is allowed to do, and when it was last used. Revoking one there cuts its access
+  off immediately.
 
   [Learn more](/mcp/overview)
 </Update>

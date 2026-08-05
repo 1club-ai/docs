@@ -1,7 +1,7 @@
 ---
 title: "Tools reference"
 sidebarTitle: "Tools reference"
-description: "Every tool the 1Club admin and discovery MCP servers expose, what it returns, and the API token scope each one requires."
+description: "Every tool the 1Club admin and discovery MCP servers expose, what it returns, and the OAuth scope each one requires."
 keywords:
   [
     mcp tools,
@@ -19,13 +19,16 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
 
 ## Admin server
 
-`https://mcp.1club.ai/admin` - requires an API token. Every tool is scoped to the organization the token belongs to, and needs the listed scope on that token. A call whose scope is missing fails with a permission error, not with empty data.
+`https://mcp.1club.ai/admin` - authenticated, normally with 1Club OAuth. Every tool is scoped to one organization and needs the listed scope. A call whose scope is missing fails with a permission error, not with empty data.
 
 | Tool                             | What it does                                                             | Scope required      |
 | -------------------------------- | ------------------------------------------------------------------------ | ------------------- |
-| `get_account`                    | Names the organization the token belongs to and lists its granted scopes | None                |
+| `get_account`                    | Names the authorized organization and lists its granted scopes           | None                |
 | `list_classes`                   | Lists your classes                                                       | `classes:read`      |
 | `get_class`                      | Opens one class by id                                                    | `classes:read`      |
+| `create_class`                   | Creates one class occurrence                                             | `classes:write`     |
+| `update_class`                   | Updates one class occurrence                                             | `classes:write`     |
+| `delete_class`                   | Deletes one class or this and future recurring occurrences               | `classes:write`     |
 | `list_areas`                     | Lists your bookable areas                                                | `areas:read`        |
 | `get_platform_area_availability` | Checks when an area is free, for a date or a date range                  | `areas:read`        |
 | `search_contacts`                | Finds customers by name, email, or phone                                 | `contacts:read`     |
@@ -35,10 +38,16 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
 | `get_instructor`                 | Opens one coach by id, with hourly rate and bookability                  | `instructors:read`  |
 | `search_plans`                   | Finds membership plans the gym sells, with price and joining fee         | `plans:read`        |
 | `get_plan`                       | Opens one plan by id                                                     | `plans:read`        |
+| `create_plan`                    | Creates a membership plan                                                | `plans:write`       |
+| `update_plan`                    | Updates or retires a membership plan                                     | `plans:write`       |
+| `delete_plan`                    | Deletes an unused membership plan                                        | `plans:write`       |
 | `list_memberships`               | Lists memberships, with sessions remaining                               | `memberships:read`  |
 | `get_membership`                 | Opens one membership by id                                               | `memberships:read`  |
 | `create_membership`              | Puts a customer on a plan                                                | `memberships:write` |
 | `update_membership`              | Pauses, resumes, or cancels a membership, or adjusts its allowance       | `memberships:write` |
+| `list_checkins`                  | Lists attendance records with filters                                    | `checkins:read`     |
+| `get_checkin`                    | Opens one attendance record                                              | `checkins:read`     |
+| `create_checkin`                 | Checks in an existing booking                                            | `checkins:write`    |
 | `get_booking`                    | Opens one booking by id                                                  | `bookings:read`     |
 | `list_bookings`                  | Lists bookings in a date window, across every channel                    | `bookings:read`     |
 | `create_booking`                 | Creates a booking, optionally with a coach                               | `bookings:write`    |
@@ -53,10 +62,10 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
 | `get_transaction`                | Opens one transaction by id                                              | `transactions:read` |
 
 <Note>
-  `get_account` needs no scope, so it always works with a valid token. That
+  `get_account` needs no resource scope, so it works with any valid connection. That
   makes it the right first call when an assistant is behaving as if it has no
-  access: if `get_account` succeeds, the token arrived and the problem is
-  scopes.
+  access: if `get_account` succeeds, authentication worked and the problem is
+  usually the granted scopes.
 </Note>
 
 <Note>
@@ -69,7 +78,30 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
 
 ### Reading the scope table
 
-Scopes follow the `resource:action` format used across the [Platform API](/api-reference/introduction). A token carrying `bookings:write` does not automatically carry `bookings:read`; grant both if the assistant should look a booking up as well as create one. The wildcard scope satisfies everything, and should be reserved for a fully trusted internal connection.
+Scopes follow the `resource:action` format used across the [Platform API](/api-reference/introduction). A connection carrying `bookings:write` does not automatically carry `bookings:read`; authorize both if the assistant should look a booking up as well as create one.
+
+### How a connection gets its scopes
+
+The MCP client asks for a scope set, and you decide how much of that request to grant:
+
+- **A client that requests nothing gets a read-only connection.** Every read scope in the table above, and nothing that changes data.
+- **Requested read scopes are granted when you approve.** They are listed under "This assistant will be able to" on the authorization page.
+- **Everything that is not a read is opt-in, one at a time.** Each appears under "Also allow it to make changes?" as a checkbox that starts unchecked - the writes, and also `media:delete` and `website:publish`, which delete a file for good and make draft edits public. Approving the page without ticking any of them produces a read-only connection, even if the client asked for everything.
+- **The set is fixed once approved.** To add or remove a scope, revoke the connection and authorize it again - see [Disconnect or revoke](/mcp/connect#disconnect-or-revoke).
+
+An assistant that authenticates with a [Platform API key](/settings/api-tokens) instead of OAuth uses that key's scopes, which you edit on the token itself.
+
+<Note>
+  The wildcard scope `*` means "everything", and the two credential types treat it
+  differently. On a Platform API key it is stored as-is and satisfies every current
+  and future scope. MCP OAuth accepts a request for `*` but never stores it: the
+  wildcard is expanded into the concrete scopes that exist at that moment, so the
+  authorization page can list each one and you can leave the destructive ones
+  unticked. A connection therefore does not silently gain new powers as 1Club adds
+  scopes - reconnect when you want the newer ones. For a key, [explicit scopes are
+  the better choice](/settings/api-tokens#token-scopes) unless the integration is
+  fully trusted and internally managed.
+</Note>
 
 Each admin tool is a thin wrapper over the documented Platform API, so the request limits, error shapes, and field meanings are the same as the [API reference](/api-reference/introduction).
 
@@ -90,6 +122,6 @@ These tools take marketplace ids, which are not the same as the ids an assistant
 
 The admin server is built strictly on the documented Platform API, so anything that API does not cover is unreachable through MCP today. That currently includes messaging and the inbox, automations and promotions, invoices and payments, access control, and reporting.
 
-Contacts and memberships are readable and creatable, but not deletable, and plans and coaches are read-only - those are configured in 1Club.
+Contacts and memberships are readable and creatable but not deletable. Instructors are read-only and are configured in 1Club. Plans and individual class occurrences can be managed through their write tools; recurring-series creation remains in the 1Club dashboard.
 
 If you need one of these, the [Platform API](/api-reference/introduction) is where coverage grows first, and MCP follows it.

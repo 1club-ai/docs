@@ -35,7 +35,7 @@ The key is tied to your organization, and all responses are scoped to your organ
 API tokens are created from the admin dashboard at [admin.1club.ai](https://admin.1club.ai).
 
 1. Sign in to the admin dashboard
-2. Open **Settings → API Tokens**
+2. Open **Settings > Organization > APIs & webhooks**
 3. Click **Create Token**
 4. Fill in the token details:
    - **Name** - a label to identify where this token is used (e.g. "Website Integration")
@@ -74,7 +74,7 @@ To sync bookings from a partner booking platform, see [Channel integration](/api
 
 ### Revoking a token
 
-If a token is leaked or no longer needed, revoke it from **Settings → API Tokens**. Revocation is immediate - any integration using that token will stop working on its next request.
+If a token is leaked or no longer needed, revoke it from **Settings > Organization > APIs & webhooks**. Revocation is immediate - any integration using that token will stop working on its next request.
 
 ## Quick start
 
@@ -129,7 +129,7 @@ curl "https://api.1club.ai/v1/platform/classes?startDate=2026-05-01" \
 
 ## Using this API from an AI assistant
 
-The same Platform API is exposed over the Model Context Protocol at `https://mcp.1club.ai/admin`, so Claude, ChatGPT, and other MCP clients can call it directly using the API token you created above. The MCP tools are thin wrappers over these endpoints, with the same scopes, rate limits, and error shapes.
+The same Platform API is exposed over the Model Context Protocol at `https://mcp.1club.ai/admin`. The normal way to connect a remote MCP client is 1Club OAuth: you sign in on 1Club's authorization page and nothing is pasted into the assistant. An API key created above is still accepted on the same endpoint when the client sends it as `Authorization: Bearer 1club_sk_live_...`, which is how developer-managed clients that cannot complete an interactive sign-in connect. The MCP tools are thin wrappers over these endpoints, with the same scopes, rate limits, and error shapes. See [Connect an assistant](/mcp/connect).
 
 See the [MCP overview](/mcp/overview) for the two servers 1Club runs, and [Connect an assistant](/mcp/connect) for setup.
 

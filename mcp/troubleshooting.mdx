@@ -1,82 +1,92 @@
 ---
 title: "MCP troubleshooting"
 sidebarTitle: "Troubleshooting"
-description: "Fixes for the common failures when connecting an AI assistant to 1Club over MCP: rejected tokens, missing scopes, unexpected tool lists, and clients that cannot send a header."
-keywords:
-  [
-    mcp troubleshooting,
-    connection failed,
-    api key required,
-    403,
-    scopes,
-    request headers,
-    bearer token,
-    tool list,
-  ]
+description: "Fix common OAuth, scope, tool-list, and connection problems when using the 1Club MCP server."
+keywords: [mcp troubleshooting, oauth, connection failed, 403, scopes, tool list]
 ---
 
-Work through the symptom that matches what you are seeing. If none of them do, contact [support@1club.ai](mailto:support@1club.ai) with the client you are using and the exact error text.
+Work through the symptom that matches what you see. If it still fails, contact [support@1club.ai](mailto:support@1club.ai) with the MCP client name, the endpoint, and the exact error text.
 
-## The assistant says a tool needs an API key
+## The client does not open 1Club sign-in
 
-The token is not reaching 1Club. The tool list still appears in this case, because the server advertises its tools before checking anything, so a visible tool list is not proof that authentication worked.
+Check these items:
 
-Check, in order:
+1. The endpoint is exactly `https://mcp.1club.ai/admin`.
+2. The client supports remote MCP servers with OAuth.
+3. OAuth is selected as the authentication method, if the client asks.
+4. Pop-ups are allowed for the client and `auth.1club.ai`.
+5. A workspace administrator has enabled custom MCP apps or connectors when the client requires it.
 
-1. **The address includes `/admin`.** `https://mcp.1club.ai` on its own is not a connectable server, and `https://mcp.1club.ai/discovery` never accepts a token.
-2. **The header value starts with `Bearer `.** Clients send the value exactly as you typed it. `1club_sk_live_...` on its own is rejected; it must be `Bearer 1club_sk_live_...`, with the space.
-3. **The header name is `authorization`.** Not `api-key`, not `x-api-key`.
-4. **The token was pasted whole.** Copying from the success banner catches the full value; retyping usually does not.
+Remove and re-add the connection after changing its authentication settings. MCP clients often cache the server metadata from the first setup attempt.
 
-Ask the assistant to run `get_account`. It needs no scope, so if it returns your organization name, the token is arriving correctly and the problem is elsewhere.
+## Sign-in succeeds but authorization is denied
 
-## The connection fails, or Claude asks me to sign in
+Authorizing an MCP connection requires organization settings management permission.
 
-If Claude web or desktop starts an OAuth sign-in flow instead of using your header, your account either does not have request-header authentication yet, or the connector was created before you added the header.
+- Confirm you selected an organization where you are an admin or owner.
+- Ask an owner to grant the required permission if you can use the dashboard but cannot authorize MCP.
+- If the organization is on a free plan or trial, upgrade before connecting the admin MCP server.
 
-Request-header authentication for custom connectors is a beta feature that Anthropic is rolling out gradually, and 1Club does not offer OAuth for MCP. Options:
-
-- **Remove and re-add the connector**, setting the header in the same dialog where you enter the URL rather than editing it afterwards.
-- **Use [Claude Code](/mcp/connect#claude-code)** instead, where the header is passed on the command line and always sent.
-- **Run a [local server](/mcp/connect#local-server-stdio)**, where the token comes from the environment and no header is involved.
+The discovery server at `https://mcp.1club.ai/discovery` remains public and does not require authorization.
 
 ## A tool fails with a permission error
 
-The token is valid but does not carry that tool's scope. Ask the assistant to run `get_account`, which lists the exact scopes on your token, and compare against the [tools reference](/mcp/tools).
+Ask the assistant to call `get_account`. It returns the authorized organization and exact scopes on the connection. Compare those scopes with the [tools reference](/mcp/tools).
 
-To fix it, open the token in **Settings > APIs and MCP**, edit its scopes, and save. There is no need to reconnect the assistant, and no need to reissue the token.
+An OAuth grant's scopes are fixed once you approve them - there is no way to widen or narrow a live connection. To change them, revoke the connection under **Settings > Artificial Intelligence > AI assistants (MCP)**, disconnect it in the client, and authorize it again, ticking the write permissions you need this time.
 
-<Warning>
-  Editing a token without picking an expiry clears its expiry. Set the expiry
-  deliberately every time you edit.
-</Warning>
+If the assistant authenticates with a [Platform API key](/settings/api-tokens) rather than OAuth - which the admin MCP server also accepts, for developer-managed clients - then it is that key's scopes that apply, and you edit them under **Settings > Organization > APIs & webhooks**.
+
+## The assistant is connected to the wrong organization
+
+1. Revoke the connection under **Settings > Artificial Intelligence > AI assistants (MCP)**.
+2. Disconnect it in the MCP client.
+3. Connect again and choose the correct organization on the 1Club authorization page.
+
+Every MCP connection is bound to one organization. It cannot switch organizations during a conversation.
 
 ## I see a mix of marketplace and organization tools
 
-You are connected to an outdated address. The two servers were separated so that an assistant never sees a mixed list: `/admin` offers 13 organization tools, `/discovery` offers 4 marketplace tools, and neither offers the other's.
+The client is using an old or incorrect endpoint. Remove the connection and add the correct address:
 
-Remove the connector and re-add it with the correct address from [Connect an assistant](/mcp/connect).
+| Purpose | Endpoint |
+| --- | --- |
+| Manage one organization | `https://mcp.1club.ai/admin` |
+| Search public marketplace data | `https://mcp.1club.ai/discovery` |
 
-## The tool list is missing tools I expect
+The admin and discovery servers never expose each other's tools.
 
-Compare what the assistant lists against the [tools reference](/mcp/tools). If tools are genuinely absent from the list rather than failing when called, re-add the connector; most clients cache the tool list from when the connection was first made and do not refresh it on their own.
+## The tool list is missing new tools
 
-## The Add button is disabled in Settings
+Compare the client's list with the [tools reference](/mcp/tools). Re-scan tools or remove and re-add the connection. Many clients cache the tool catalog.
 
-API access is a paid feature. On the Free plan or during a trial you can view and revoke existing tokens but cannot create one, and a banner at the top of the page explains this. Upgrade the plan, or connect the [discovery server](/mcp/connect#discovery-server-no-token), which needs no token.
-
-Note that existing tokens also stop working if an organization downgrades.
+The admin server includes plan, class, booking, membership, contact, and check-in actions. A missing OAuth scope causes a permission error when a tool runs. It does not normally remove the tool from the list.
 
 ## Everything worked, then stopped
 
-Check these in order:
+Check these items:
 
-- **The token expired.** The list in **Settings > APIs and MCP** shows **Expired** once a token lapses. Create a new one and update your client.
-- **The token was revoked.** Revocation is immediate and permanent, including mid-conversation.
-- **You hit the rate limit.** MCP calls share the Platform API's limit of 100 requests per minute per organization. An assistant working through a long list of items can reach it; wait a minute and retry.
+- **The connection was revoked.** Review connected assistants in 1Club.
+- **The organization downgraded.** API and MCP access stop when the paid feature is no longer available.
+- **The client lost its refresh credentials.** Disconnect and complete OAuth again.
+- **The rate limit was reached.** MCP shares the Platform API limit of 100 requests per minute per organization. Wait a minute and retry.
 
-The **Last used** column on the token list tells you whether requests are arriving at all.
+The **Last used** column on the MCP page shows whether recent requests reached 1Club.
+
+## A write fails even though reading works
+
+Read and write scopes are separate. For example, `classes:read` does not satisfy `classes:write`.
+
+The usual cause is that no write box was ticked on the authorization page. Every write capability is offered there as an individual checkbox that starts unchecked, so approving the page without touching it produces a read-only connection - which is the intended default, not a bug. Call `get_account` to see the granted scopes, then revoke and reconnect if the assistant genuinely needs to write.
+
+The operation can also fail a business rule after authorization:
+
+- A plan cannot be deleted while memberships reference it. Retire it by setting `isActive` to `false`.
+- A class cannot be deleted while affected future occurrences have active bookings or waitlist entries.
+- A booking cannot be checked in outside its configured window, when required payment is outstanding, or after it was already checked in. Only a `confirmed` or `pending` booking can be checked in - a cancelled or no-show booking is rejected.
+
+Read the error returned by the tool before retrying. Do not repeatedly retry a validation or conflict error with a new idempotency key.
 
 ## The assistant invents data instead of calling a tool
 
-The assistant is answering from memory rather than from 1Club. Ask it explicitly to use the 1Club tools, or name the tool. Also confirm the connector is enabled for that specific conversation, which in Claude is done with the **+** button.
+Confirm the 1Club app or connector is enabled for that conversation. Ask the assistant explicitly to use the 1Club tools, or name the tool you expect, such as `list_classes` or `list_checkins`.

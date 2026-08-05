@@ -2290,7 +2290,7 @@
       },
       "PlatformProductCreate": {
         "type": "object",
-        "description": "Fields accepted when creating a product. Only `name` and `price` are required.",
+        "description": "Fields accepted when creating a product. Only `name` and `price` are required; the defaults shown are what an omitted field becomes.",
         "required": [
           "name",
           "price"
@@ -2379,7 +2379,8 @@
       },
       "PlatformProductUpdate": {
         "type": "object",
-        "description": "Fields accepted when updating a product. Send only what changes; `null` clears a nullable field, and an omitted field is left alone.",
+        "description": "Fields accepted when updating a product. Send only what changes; `null` clears a nullable field, and an omitted field is left alone. At least one field is required.",
+        "minProperties": 1,
         "properties": {
           "name": {
             "type": "string",
@@ -2425,8 +2426,7 @@
             "description": "Must be unused by any other product, package, plan or access card in the organization."
           },
           "isActive": {
-            "type": "boolean",
-            "default": true
+            "type": "boolean"
           },
           "visibility": {
             "type": "string",
@@ -2434,8 +2434,7 @@
               "Public",
               "Member_only",
               "Private"
-            ],
-            "default": "Public"
+            ]
           },
           "taxRateId": {
             "type": "integer",
@@ -9446,6 +9445,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "minProperties": 1,
                 "properties": {
                   "name": {
                     "type": "string",

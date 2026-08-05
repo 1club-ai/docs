@@ -2260,9 +2260,37 @@
           }
         }
       },
-      "PlatformProductWrite": {
+      "PlatformProductCategory": {
         "type": "object",
-        "description": "Fields accepted when creating or updating a product. Required on create: `name` and `price`. On update, send only what changes; `null` clears a nullable field.",
+        "description": "How products are grouped - the tabs on the till and the sections of a shop page.",
+        "properties": {
+          "categoryId": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "description": "Ascending display order; ties fall back to name."
+          },
+          "productCount": {
+            "type": "integer",
+            "description": "Products currently in this category, active and inactive."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PlatformProductCreate": {
+        "type": "object",
+        "description": "Fields accepted when creating a product. Only `name` and `price` are required.",
         "required": [
           "name",
           "price"
@@ -2302,7 +2330,8 @@
           "sku": {
             "type": "string",
             "maxLength": 64,
-            "nullable": true
+            "nullable": true,
+            "description": "Stock-keeping code. Scannable at the till, so it must be unused by any other product, package, plan or access card in the organization."
           },
           "barcode": {
             "type": "string",
@@ -2348,31 +2377,88 @@
           }
         }
       },
-      "PlatformProductCategory": {
+      "PlatformProductUpdate": {
         "type": "object",
-        "description": "How products are grouped - the tabs on the till and the sections of a shop page.",
+        "description": "Fields accepted when updating a product. Send only what changes; `null` clears a nullable field, and an omitted field is left alone.",
         "properties": {
-          "categoryId": {
-            "type": "integer"
-          },
           "name": {
-            "type": "string"
-          },
-          "sortOrder": {
-            "type": "integer",
-            "description": "Ascending display order; ties fall back to name."
-          },
-          "productCount": {
-            "type": "integer",
-            "description": "Products currently in this category, active and inactive."
-          },
-          "createdAt": {
             "type": "string",
-            "format": "date-time"
+            "maxLength": 255
           },
-          "updatedAt": {
+          "description": {
             "type": "string",
-            "format": "date-time"
+            "maxLength": 5000
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "costPrice": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Limit the product to one club; null sells it everywhere."
+          },
+          "categoryId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "From GET /v1/platform/product-categories"
+          },
+          "brandId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "sku": {
+            "type": "string",
+            "maxLength": 64,
+            "nullable": true,
+            "description": "Stock-keeping code. Scannable at the till, so it must be unused by any other product, package, plan or access card in the organization."
+          },
+          "barcode": {
+            "type": "string",
+            "maxLength": 64,
+            "nullable": true,
+            "description": "Must be unused by any other product, package, plan or access card in the organization."
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Public",
+              "Member_only",
+              "Private"
+            ],
+            "default": "Public"
+          },
+          "taxRateId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "revenueAccountId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "description": "Replaces the whole list. Use already-hosted URLs."
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Replaces the whole list."
           }
         }
       }
@@ -8876,7 +8962,7 @@
       },
       "post": {
         "summary": "Create a product",
-        "description": "Adds a product to the catalogue. `name` and `price` are all that is required; everything else refines how it behaves at the till and on customer-facing surfaces.\n\n`clubId`, `categoryId`, `brandId`, `taxRateId` and `revenueAccountId` must reference rows in this organization - a `400` names the first one that does not. A `barcode` already claimed by another product, package, plan or access card is a `409`: a scanned code has to mean exactly one thing.\n\nCreating a product does not give it stock - putting units on the shelf is done in the admin portal. Supports the `Idempotency-Key` header.\n",
+        "description": "Adds a product to the catalogue. `name` and `price` are all that is required; everything else refines how it behaves at the till and on customer-facing surfaces.\n\n`clubId`, `categoryId`, `brandId`, `taxRateId` and `revenueAccountId` must reference rows in this organization - a `400` names the first one that does not. A `barcode` **or `sku`** already claimed by another product, package, plan or access card is a `409`: both are scannable at the till, so a scanned code has to mean exactly one thing.\n\nCreating a product does not give it stock - putting units on the shelf is done in the admin portal. Supports the `Idempotency-Key` header.\n",
         "tags": [
           "Products"
         ],
@@ -8901,7 +8987,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PlatformProductWrite"
+                "$ref": "#/components/schemas/PlatformProductCreate"
               }
             }
           }
@@ -9001,7 +9087,7 @@
       },
       "patch": {
         "summary": "Update a product",
-        "description": "Changes the fields you send and leaves the rest alone. Send `null` to clear a nullable field (`categoryId`, `barcode`, `costPrice`, ...); omit it to keep what is there. `images` and `features` are arrays and replace wholesale, so read the product first if you are adding to one.\n\nSet `isActive: false` to retire a product rather than deleting it - that keeps its sales history intact and takes it off the till.\n",
+        "description": "Changes the fields you send and leaves the rest alone - nothing is required. Send `null` to clear a nullable field (`categoryId`, `barcode`, `costPrice`, ...); omit it to keep what is there. `images` and `features` are arrays and replace wholesale, so read the product first if you are adding to one.\n\nA `barcode` or `sku` is only checked for collisions when you actually send it, so re-saving a product without touching its codes never conflicts with itself.\n\nSet `isActive: false` to retire a product rather than deleting it - that keeps its sales history intact and takes it off the till.\n",
         "tags": [
           "Products"
         ],
@@ -9025,7 +9111,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PlatformProductWrite"
+                "$ref": "#/components/schemas/PlatformProductUpdate"
               }
             }
           }

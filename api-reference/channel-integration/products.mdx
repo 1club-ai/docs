@@ -132,11 +132,13 @@ a misspelled `costPrice` tells you instead of leaving the margin unset.
 reference rows in your own organization. A `400` names the first one that does not.
 
 <Warning>
-  A `barcode` already used by another product, package, pass, or enrolled access
-  card is a `409`. A scanned code has to mean exactly one thing, so 1Club
-  refuses the write rather than letting the new code shadow the old one at the
-  till. The error names what kind of thing holds it, not which one - that record
-  may sit behind a scope your key does not have.
+  A `barcode` **or `sku`** already used by another product, package, pass, or
+  enrolled access card is a `409`. Both are scannable: the till matches a
+  scanned code against every barcode first and then against product SKUs,
+  because retail imports print the SKU on the shelf label. A scanned code has to
+  mean exactly one thing, so 1Club refuses the write rather than letting the new
+  code shadow the old one at the till. The error names what kind of thing holds
+  it, not which one - that record may sit behind a scope your key does not have.
 </Warning>
 
 Creating a product does not give it stock. Putting units on the shelf is done in
@@ -153,9 +155,12 @@ curl -X PATCH "https://api.1club.ai/v1/platform/products/12" \
   -d '{ "price": 3.9 }'
 ```
 
-Send `null` to clear a nullable field, and omit it to leave it alone. `images` and
-`features` are arrays and replace the whole list, so read the product first if you
-are adding to one.
+Nothing is required. Send `null` to clear a nullable field, and omit it to leave it
+alone. `images` and `features` are arrays and replace the whole list, so read the
+product first if you are adding to one.
+
+A `barcode` or `sku` is only checked for collisions when you actually send it, so
+re-saving a product without touching its codes never conflicts with itself.
 
 ## Retire a product
 
@@ -274,7 +279,7 @@ whether one is still in use.
 | `price`      | What the customer pays, in the organization's currency.                                               |
 | `costPrice`  | What the gym pays for it, for margin reporting. Never shown to customers.                             |
 | `barcode`    | Scanned at the till. Unique across every product, package, pass, and access card in the organization. |
-| `sku`        | Stock-keeping code. Also matched by `search`, exactly.                                                |
+| `sku`        | Stock-keeping code. Scannable at the till after every barcode, so it is unique on the same terms.     |
 | `taxRateId`  | Per-product VAT rate. Takes precedence over the revenue account's default at the point of sale.       |
 | `visibility` | Who sees it on customer-facing surfaces: `Public`, `Member_only`, or `Private`.                       |
 | `clubId`     | Limits the product to one gym. `null` sells it at every gym.                                          |

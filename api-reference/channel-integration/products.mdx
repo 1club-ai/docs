@@ -1,0 +1,292 @@
+---
+title: "Products"
+description: "Search, create, and update the products a gym sells over the counter, and read how many are left to sell."
+keywords:
+  [
+    products,
+    product categories,
+    catalogue,
+    productId,
+    categoryId,
+    sku,
+    barcode,
+    availability,
+    products write,
+    platform api,
+  ]
+---
+
+A **product** is something the gym sells over the counter: a bottle of water, a
+tube of grips, a towel. Products are grouped into **product categories**, which are
+the tabs on the till and the sections of a shop page.
+
+Read operations require `products:read`. Create and update operations require `products:write`.
+
+<Note>
+  Scopes carry no hierarchy. A key holding `products:write` cannot read the
+  catalogue - grant both if the integration needs to look a product up before
+  changing it.
+</Note>
+
+## Search products
+
+Requires the `products:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/products?search=isotonic" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Query parameters:
+
+- `search` (optional) - part of a name or description, or a whole SKU or barcode
+- `clubId` (optional) - only products limited to that gym
+- `categoryId` (optional) - only products in that category
+- `brandId` (optional) - only products of that brand
+- `isActive` (optional) - `true` for what is currently on sale, `false` for what has been retired
+- `limit` (optional) - 1 to 100, defaults to 25
+- `offset` (optional) - defaults to 0
+
+Response:
+
+```json
+{
+  "data": [
+    {
+      "productId": 12,
+      "name": "Isotonic drink",
+      "description": "500ml",
+      "clubId": 3,
+      "categoryId": 4,
+      "brandId": null,
+      "sku": "ISO-500",
+      "barcode": "3800123456789",
+      "price": 3.5,
+      "costPrice": 1.2,
+      "isActive": true,
+      "visibility": "Public",
+      "images": [],
+      "features": [],
+      "taxRateId": null,
+      "revenueAccountId": null,
+      "createdAt": "2026-01-01T09:00:00.000Z",
+      "updatedAt": "2026-01-02T11:30:00.000Z"
+    }
+  ],
+  "total": 1,
+  "limit": 25,
+  "offset": 0
+}
+```
+
+`search` matches `name` and `description` as a substring, and `sku` and `barcode`
+**exactly**. Half a barcode finds nothing, because a scan code is only useful whole.
+Name matching works like
+[contact search](/api-reference/channel-integration/contacts#matching-is-case-insensitive-and-cross-script):
+case-insensitive and cross-script.
+
+<Note>
+  Unlike [plans](/api-reference/channel-integration/plans), retired products are
+  returned too. An integration that manages a catalogue has to be able to find
+  what it switched off in order to reprice it or bring it back. Filter with
+  `isActive=true` for what the till currently sells.
+</Note>
+
+## Open a product
+
+Requires the `products:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/products/12" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Returns the same object as one row of the search response.
+
+## Create a product
+
+Requires `products:write`. Only `name` and `price` are required. Send an
+`Idempotency-Key` so a retry cannot create a duplicate.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/products" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: product-iso-500-2026-08" \
+  -d '{
+    "name": "Isotonic drink",
+    "description": "500ml",
+    "price": 3.5,
+    "costPrice": 1.2,
+    "categoryId": 4,
+    "sku": "ISO-500",
+    "barcode": "3800123456789",
+    "visibility": "Public"
+  }'
+```
+
+Write bodies are strict: an unknown field is a `400` rather than a silent drop, so
+a misspelled `costPrice` tells you instead of leaving the margin unset.
+
+`clubId`, `categoryId`, `brandId`, `taxRateId`, and `revenueAccountId` must
+reference rows in your own organization. A `400` names the first one that does not.
+
+<Warning>
+  A `barcode` **or `sku`** already used by another product, package, pass, or
+  enrolled access card is a `409`. Both are scannable: the till matches a
+  scanned code against every barcode first and then against product SKUs,
+  because retail imports print the SKU on the shelf label. A scanned code has to
+  mean exactly one thing, so 1Club refuses the write rather than letting the new
+  code shadow the old one at the till. The error names what kind of thing holds
+  it, not which one - that record may sit behind a scope your key does not have.
+</Warning>
+
+Creating a product does not give it stock. Putting units on the shelf is done in
+the 1Club dashboard - see [Stock is not writable here](#stock-is-not-writable-here).
+
+## Update a product
+
+Requires `products:write`. Send only the fields that should change.
+
+```bash
+curl -X PATCH "https://api.1club.ai/v1/platform/products/12" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "price": 3.9 }'
+```
+
+Nothing is required. Send `null` to clear a nullable field, and omit it to leave it
+alone. `images` and `features` are arrays and replace the whole list, so read the
+product first if you are adding to one.
+
+A `barcode` or `sku` is only checked for collisions when you actually send it, so
+re-saving a product without touching its codes never conflicts with itself.
+
+## Retire a product
+
+Set `isActive` to `false`. The product comes off the till and keeps its sales
+history.
+
+```bash
+curl -X PATCH "https://api.1club.ai/v1/platform/products/12" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "isActive": false }'
+```
+
+<Note>
+  There is no delete. Removing a product destroys its sales history, and a
+  product that still holds stock or sits in a package cannot be removed at all.
+  Retiring is what an integration should do; deleting outright stays in the
+  dashboard, where you can see what you are about to lose - see
+  [Products](/billing/products).
+</Note>
+
+## How many are left to sell
+
+Requires the `products:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/products/12/availability" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Response:
+
+```json
+{
+  "productId": 12,
+  "data": [
+    { "clubId": 3, "available": 7 },
+    { "clubId": 5, "available": null }
+  ]
+}
+```
+
+This is not simply a shelf count. A product assembled from a recipe has no shelf,
+and its figure is the limit its scarcest ingredient imposes, floored to whole units.
+
+<Warning>
+  `available: null` means the product is not stock-tracked at that gym, so the
+  till will sell it freely. It does **not** mean the product has run out. Treat
+  `null` as unlimited, not as zero.
+</Warning>
+
+### Stock is not writable here
+
+Availability is the only view of stock on this API. Booking a delivery in,
+correcting a count after a stocktake, and writing off damaged stock all stay in the
+dashboard - see [Inventory and stock](/pos/inventory). Stock held as ingredients
+that recipes draw down is not exposed here at all.
+
+## Product categories
+
+Categories are how products are grouped. They are small and flat, so there is no
+paging and no search - the list endpoint returns all of them, in display order.
+
+### List categories
+
+Requires the `products:read` scope.
+
+```bash
+curl "https://api.1club.ai/v1/platform/product-categories" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Response:
+
+```json
+{
+  "data": [
+    {
+      "categoryId": 4,
+      "name": "Drinks",
+      "sortOrder": 1,
+      "productCount": 6,
+      "createdAt": "2026-01-01T09:00:00.000Z",
+      "updatedAt": "2026-01-01T09:00:00.000Z"
+    }
+  ]
+}
+```
+
+`GET /v1/platform/product-categories/{id}` opens one category and returns the same
+object.
+
+### Create or update a category
+
+Requires `products:write`.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/product-categories" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: category-snacks-2026-08" \
+  -d '{ "name": "Snacks" }'
+```
+
+Omit `sortOrder` and the category goes to the end of the list, which is what you
+want unless you are rebuilding the whole ordering. `PATCH` renames a category or
+moves it in the order; products in it are unaffected.
+
+Categories cannot be deleted through the API either. `productCount` tells you
+whether one is still in use.
+
+## What the fields mean at the till
+
+| Field        | Why it matters                                                                                        |
+| ------------ | ----------------------------------------------------------------------------------------------------- |
+| `price`      | What the customer pays, in the organization's currency.                                               |
+| `costPrice`  | What the gym pays for it, for margin reporting. Never shown to customers.                             |
+| `barcode`    | Scanned at the till. Unique across every product, package, pass, and access card in the organization. |
+| `sku`        | Stock-keeping code. Scannable at the till after every barcode, so it is unique on the same terms.     |
+| `taxRateId`  | Per-product VAT rate. Takes precedence over the revenue account's default at the point of sale.       |
+| `visibility` | Who sees it on customer-facing surfaces: `Public`, `Member_only`, or `Private`.                       |
+| `clubId`     | Limits the product to one gym. `null` sells it at every gym.                                          |
+| `isActive`   | `false` takes it off the till without deleting its sales history.                                     |
+
+<Tip>
+  Read the category list before creating products in bulk. Nothing stops you
+  from creating two categories with the same name, and a duplicate is easier to
+  avoid than to merge afterwards.
+</Tip>

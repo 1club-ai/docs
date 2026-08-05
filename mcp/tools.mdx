@@ -21,59 +21,68 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
 
 `https://mcp.1club.ai/admin` - authenticated, normally with 1Club OAuth. Every tool is scoped to one organization and needs the listed scope. A call whose scope is missing fails with a permission error, not with empty data.
 
-| Tool                             | What it does                                                             | Scope required      |
-| -------------------------------- | ------------------------------------------------------------------------ | ------------------- |
-| `get_account`                    | Names the authorized organization and lists its granted scopes           | None                |
-| `list_classes`                   | Lists your classes                                                       | `classes:read`      |
-| `get_class`                      | Opens one class by id                                                    | `classes:read`      |
-| `create_class`                   | Creates one class occurrence                                             | `classes:write`     |
-| `update_class`                   | Updates one class occurrence                                             | `classes:write`     |
-| `delete_class`                   | Deletes one class or this and future recurring occurrences               | `classes:write`     |
-| `list_areas`                     | Lists your bookable areas                                                | `areas:read`        |
-| `get_platform_area_availability` | Checks when an area is free, for a date or a date range                  | `areas:read`        |
-| `search_contacts`                | Finds customers by name, email, or phone                                 | `contacts:read`     |
-| `get_contact`                    | Opens one customer by id                                                 | `contacts:read`     |
-| `create_contact`                 | Creates a customer                                                       | `contacts:write`    |
-| `search_instructors`             | Finds coaches by name, gym, or sport                                     | `instructors:read`  |
-| `get_instructor`                 | Opens one coach by id, with hourly rate and bookability                  | `instructors:read`  |
-| `search_plans`                   | Finds membership plans the gym sells, with price and joining fee         | `plans:read`        |
-| `get_plan`                       | Opens one plan by id                                                     | `plans:read`        |
-| `create_plan`                    | Creates a membership plan                                                | `plans:write`       |
-| `update_plan`                    | Updates or retires a membership plan                                     | `plans:write`       |
-| `delete_plan`                    | Deletes an unused membership plan                                        | `plans:write`       |
-| `list_memberships`               | Lists memberships, with sessions remaining                               | `memberships:read`  |
-| `get_membership`                 | Opens one membership by id                                               | `memberships:read`  |
-| `create_membership`              | Puts a customer on a plan                                                | `memberships:write` |
-| `update_membership`              | Pauses, resumes, or cancels a membership, or adjusts its allowance       | `memberships:write` |
-| `list_checkins`                  | Lists attendance records with filters                                    | `checkins:read`     |
-| `get_checkin`                    | Opens one attendance record                                              | `checkins:read`     |
-| `create_checkin`                 | Checks in an existing booking                                            | `checkins:write`    |
-| `get_booking`                    | Opens one booking by id                                                  | `bookings:read`     |
-| `list_bookings`                  | Lists bookings in a date window, across every channel                    | `bookings:read`     |
-| `create_booking`                 | Creates a booking, optionally with a coach                               | `bookings:write`    |
-| `cancel_booking`                 | Cancels a booking                                                        | `bookings:write`    |
-| `list_booking_participants`      | Lists the extra players on a booking                                     | `bookings:read`     |
-| `add_booking_participant`        | Adds a player to a booking                                               | `bookings:write`    |
-| `remove_booking_participant`     | Removes a player from a booking                                          | `bookings:write`    |
-| `get_club`                       | Opens one of your gyms by slug, with amenities and rating                | `clubs:read`        |
-| `list_content`                   | Lists published website and CMS content                                  | `content:read`      |
-| `get_content`                    | Opens one published content item by slug                                 | `content:read`      |
-| `list_transactions`              | Lists billing transactions, newest first                                 | `transactions:read` |
-| `get_transaction`                | Opens one transaction by id                                              | `transactions:read` |
+| Tool                             | What it does                                                       | Scope required      |
+| -------------------------------- | ------------------------------------------------------------------ | ------------------- |
+| `get_account`                    | Names the authorized organization and lists its granted scopes     | None                |
+| `list_classes`                   | Lists your classes                                                 | `classes:read`      |
+| `get_class`                      | Opens one class by id                                              | `classes:read`      |
+| `create_class`                   | Creates one class occurrence                                       | `classes:write`     |
+| `update_class`                   | Updates one class occurrence                                       | `classes:write`     |
+| `delete_class`                   | Deletes one class or this and future recurring occurrences         | `classes:write`     |
+| `list_areas`                     | Lists your bookable areas                                          | `areas:read`        |
+| `get_platform_area_availability` | Checks when an area is free, for a date or a date range            | `areas:read`        |
+| `search_contacts`                | Finds customers by name, email, or phone                           | `contacts:read`     |
+| `get_contact`                    | Opens one customer by id                                           | `contacts:read`     |
+| `create_contact`                 | Creates a customer                                                 | `contacts:write`    |
+| `search_instructors`             | Finds coaches by name, gym, or sport                               | `instructors:read`  |
+| `get_instructor`                 | Opens one coach by id, with hourly rate and bookability            | `instructors:read`  |
+| `search_plans`                   | Finds membership plans the gym sells, with price and joining fee   | `plans:read`        |
+| `get_plan`                       | Opens one plan by id                                               | `plans:read`        |
+| `create_plan`                    | Creates a membership plan                                          | `plans:write`       |
+| `update_plan`                    | Updates or retires a membership plan                               | `plans:write`       |
+| `delete_plan`                    | Deletes an unused membership plan                                  | `plans:write`       |
+| `list_memberships`               | Lists memberships, with sessions remaining                         | `memberships:read`  |
+| `get_membership`                 | Opens one membership by id                                         | `memberships:read`  |
+| `create_membership`              | Puts a customer on a plan                                          | `memberships:write` |
+| `update_membership`              | Pauses, resumes, or cancels a membership, or adjusts its allowance | `memberships:write` |
+| `search_products`                | Finds products by name, description, SKU, or barcode               | `products:read`     |
+| `get_product`                    | Opens one product by id                                            | `products:read`     |
+| `create_product`                 | Adds a product to the catalogue                                    | `products:write`    |
+| `update_product`                 | Reprices, recategorises, or retires a product                      | `products:write`    |
+| `get_product_availability`       | Reports how many of a product are left to sell, per gym            | `products:read`     |
+| `list_product_categories`        | Lists the product categories, in display order                     | `products:read`     |
+| `create_product_category`        | Adds a product category                                            | `products:write`    |
+| `update_product_category`        | Renames a category or moves it in the display order                | `products:write`    |
+| `list_checkins`                  | Lists attendance records with filters                              | `checkins:read`     |
+| `get_checkin`                    | Opens one attendance record                                        | `checkins:read`     |
+| `create_checkin`                 | Checks in an existing booking                                      | `checkins:write`    |
+| `get_booking`                    | Opens one booking by id                                            | `bookings:read`     |
+| `list_bookings`                  | Lists bookings in a date window, across every channel              | `bookings:read`     |
+| `create_booking`                 | Creates a booking, optionally with a coach                         | `bookings:write`    |
+| `cancel_booking`                 | Cancels a booking                                                  | `bookings:write`    |
+| `list_booking_participants`      | Lists the extra players on a booking                               | `bookings:read`     |
+| `add_booking_participant`        | Adds a player to a booking                                         | `bookings:write`    |
+| `remove_booking_participant`     | Removes a player from a booking                                    | `bookings:write`    |
+| `get_club`                       | Opens one of your gyms by slug, with amenities and rating          | `clubs:read`        |
+| `list_content`                   | Lists published website and CMS content                            | `content:read`      |
+| `get_content`                    | Opens one published content item by slug                           | `content:read`      |
+| `list_transactions`              | Lists billing transactions, newest first                           | `transactions:read` |
+| `get_transaction`                | Opens one transaction by id                                        | `transactions:read` |
 
 <Note>
-  `get_account` needs no resource scope, so it works with any valid connection. That
-  makes it the right first call when an assistant is behaving as if it has no
-  access: if `get_account` succeeds, authentication worked and the problem is
+  `get_account` needs no resource scope, so it works with any valid connection.
+  That makes it the right first call when an assistant is behaving as if it has
+  no access: if `get_account` succeeds, authentication worked and the problem is
   usually the granted scopes.
 </Note>
 
 <Note>
-  Anything sold by name takes two steps. Booking someone is `search_contacts` then
-  `create_booking`; selling a membership is `search_contacts`, `search_plans`, then
-  `create_membership`. Read the plan first and you know the real total, since a plan
-  can charge a joining fee on top of its price. When a name matches more than one
-  person or plan, the assistant should ask which you mean rather than guessing.
+  Anything sold by name takes two steps. Booking someone is `search_contacts`
+  then `create_booking`; selling a membership is `search_contacts`,
+  `search_plans`, then `create_membership`. Read the plan first and you know the
+  real total, since a plan can charge a joining fee on top of its price. When a
+  name matches more than one person or plan, the assistant should ask which you
+  mean rather than guessing.
 </Note>
 
 ### Reading the scope table
@@ -92,15 +101,16 @@ The MCP client asks for a scope set, and you decide how much of that request to 
 An assistant that authenticates with a [Platform API key](/settings/api-tokens) instead of OAuth uses that key's scopes, which you edit on the token itself.
 
 <Note>
-  The wildcard scope `*` means "everything", and the two credential types treat it
-  differently. On a Platform API key it is stored as-is and satisfies every current
-  and future scope. MCP OAuth accepts a request for `*` but never stores it: the
-  wildcard is expanded into the concrete scopes that exist at that moment, so the
-  authorization page can list each one and you can leave the destructive ones
-  unticked. A connection therefore does not silently gain new powers as 1Club adds
-  scopes - reconnect when you want the newer ones. For a key, [explicit scopes are
-  the better choice](/settings/api-tokens#token-scopes) unless the integration is
-  fully trusted and internally managed.
+  The wildcard scope `*` means "everything", and the two credential types treat
+  it differently. On a Platform API key it is stored as-is and satisfies every
+  current and future scope. MCP OAuth accepts a request for `*` but never stores
+  it: the wildcard is expanded into the concrete scopes that exist at that
+  moment, so the authorization page can list each one and you can leave the
+  destructive ones unticked. A connection therefore does not silently gain new
+  powers as 1Club adds scopes - reconnect when you want the newer ones. For a
+  key, [explicit scopes are the better
+  choice](/settings/api-tokens#token-scopes) unless the integration is fully
+  trusted and internally managed.
 </Note>
 
 Each admin tool is a thin wrapper over the documented Platform API, so the request limits, error shapes, and field meanings are the same as the [API reference](/api-reference/introduction).
@@ -123,5 +133,7 @@ These tools take marketplace ids, which are not the same as the ids an assistant
 The admin server is built strictly on the documented Platform API, so anything that API does not cover is unreachable through MCP today. That currently includes messaging and the inbox, automations and promotions, invoices and payments, access control, and reporting.
 
 Contacts and memberships are readable and creatable but not deletable. Instructors are read-only and are configured in 1Club. Plans and individual class occurrences can be managed through their write tools; recurring-series creation remains in the 1Club dashboard.
+
+Products and product categories can be created, edited, and retired, but not deleted - deleting a product destroys its sales history. Stock is read-only: `get_product_availability` reports how many are left to sell, while booking a delivery in, correcting a count after a stocktake, and writing off damaged stock stay in the 1Club dashboard. See [Products](/api-reference/channel-integration/products).
 
 If you need one of these, the [Platform API](/api-reference/introduction) is where coverage grows first, and MCP follows it.

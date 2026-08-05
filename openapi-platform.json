@@ -2147,6 +2147,234 @@
             "type": "integer"
           }
         }
+      },
+      "PlatformProduct": {
+        "type": "object",
+        "description": "A product the organization sells over the counter.",
+        "properties": {
+          "productId": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Club the product is sold at; null when available organization-wide."
+          },
+          "categoryId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Product category it is grouped under."
+          },
+          "brandId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "sku": {
+            "type": "string",
+            "nullable": true,
+            "description": "Stock-keeping code, if the gym uses one."
+          },
+          "barcode": {
+            "type": "string",
+            "nullable": true,
+            "description": "Scanned at the till. Unique across everything scannable in the organization."
+          },
+          "price": {
+            "type": "number",
+            "description": "What a customer pays, in the organization currency."
+          },
+          "costPrice": {
+            "type": "number",
+            "nullable": true,
+            "description": "What the gym pays for it; null when not tracked. Never shown to customers."
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "False for a product taken off the till without deleting its history."
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Public",
+              "Member_only",
+              "Private"
+            ],
+            "description": "Who may see it on customer-facing surfaces."
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "taxRateId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Per-product VAT rate; takes precedence over the revenue account default at the till."
+          },
+          "revenueAccountId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PlatformProductPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformProduct"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total products matching the filters, ignoring pagination"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
+      },
+      "PlatformProductWrite": {
+        "type": "object",
+        "description": "Fields accepted when creating or updating a product. Required on create: `name` and `price`. On update, send only what changes; `null` clears a nullable field.",
+        "required": [
+          "name",
+          "price"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "costPrice": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Limit the product to one club; null sells it everywhere."
+          },
+          "categoryId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "From GET /v1/platform/product-categories"
+          },
+          "brandId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "sku": {
+            "type": "string",
+            "maxLength": 64,
+            "nullable": true
+          },
+          "barcode": {
+            "type": "string",
+            "maxLength": 64,
+            "nullable": true,
+            "description": "Must be unused by any other product, package, plan or access card in the organization."
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Public",
+              "Member_only",
+              "Private"
+            ],
+            "default": "Public"
+          },
+          "taxRateId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "revenueAccountId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "description": "Replaces the whole list. Use already-hosted URLs."
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Replaces the whole list."
+          }
+        }
+      },
+      "PlatformProductCategory": {
+        "type": "object",
+        "description": "How products are grouped - the tabs on the till and the sections of a shop page.",
+        "properties": {
+          "categoryId": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "description": "Ascending display order; ties fall back to name."
+          },
+          "productCount": {
+            "type": "integer",
+            "description": "Products currently in this category, active and inactive."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
       }
     },
     "responses": {
@@ -8533,6 +8761,648 @@
                 }
               }
             }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/products": {
+      "get": {
+        "summary": "List and search products",
+        "description": "Returns the organization's products - everything it sells over the counter, from drinks to racket grips. `search` matches name and description as a substring, and `sku` and `barcode` exactly - a partial code matches nothing, since a scan code is only useful whole.\n\nUnlike plans, deactivated products are returned too: an integration managing a catalogue has to be able to find what it switched off in order to reprice or restore it. Filter with `isActive=true` for what is currently on sale.\n",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "description": "Substring of the name or description, or an exact SKU or barcode"
+          },
+          {
+            "in": "query",
+            "name": "clubId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only products limited to this club"
+          },
+          {
+            "in": "query",
+            "name": "categoryId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only products in this product category"
+          },
+          {
+            "in": "query",
+            "name": "brandId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only products of this brand"
+          },
+          {
+            "in": "query",
+            "name": "isActive",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Only products that are (or are not) on sale"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProductPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `products:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a product",
+        "description": "Adds a product to the catalogue. `name` and `price` are all that is required; everything else refines how it behaves at the till and on customer-facing surfaces.\n\n`clubId`, `categoryId`, `brandId`, `taxRateId` and `revenueAccountId` must reference rows in this organization - a `400` names the first one that does not. A `barcode` already claimed by another product, package, plan or access card is a `409`: a scanned code has to mean exactly one thing.\n\nCreating a product does not give it stock - putting units on the shelf is done in the admin portal. Supports the `Idempotency-Key` header.\n",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformProductWrite"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProduct"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `products:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "$ref": "#/components/responses/PlatformConflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/products/{id}": {
+      "get": {
+        "summary": "Get a product",
+        "description": "Returns a single product, including its price, cost price, category, and stock-keeping codes.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The product",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProduct"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `products:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a product",
+        "description": "Changes the fields you send and leaves the rest alone. Send `null` to clear a nullable field (`categoryId`, `barcode`, `costPrice`, ...); omit it to keep what is there. `images` and `features` are arrays and replace wholesale, so read the product first if you are adding to one.\n\nSet `isActive: false` to retire a product rather than deleting it - that keeps its sales history intact and takes it off the till.\n",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformProductWrite"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated product",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProduct"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `products:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PlatformConflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/products/{id}/availability": {
+      "get": {
+        "summary": "Get how many are left to sell",
+        "description": "Returns the number of units of a product that can be sold right now at each club.\n\nThis is the only view of stock on this API - receiving deliveries, corrections and the ledger behind them stay in the admin portal. It is also not simply the shelf count: a product assembled from a recipe has no shelf, and its figure is the limit its scarcest ingredient imposes, floored to whole units.\n\n`available: null` means the product is not stock-tracked at that club, so the till will sell it freely - it does not mean the product has run out.\n",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Per-club availability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "productId": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "clubId": {
+                            "type": "integer"
+                          },
+                          "available": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Units sellable now; null when the product is not stock-tracked at this club."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `products:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/product-categories": {
+      "get": {
+        "summary": "List product categories",
+        "description": "Returns every product category in the organization, in display order - the tabs on the till and the sections of a shop page. Resolve a category here, then pass its `categoryId` when creating a product or filtering the catalogue.\n\nThere is no paging: an organization has a handful of these, and a caller composing a menu wants all of them.\n",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Every product category, in display order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformProductCategory"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `products:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a product category",
+        "description": "Adds a product category. Omit `sortOrder` and it goes to the end of the list, which is what you want unless you are rebuilding the whole ordering. Supports the `Idempotency-Key` header.\n",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "sortOrder": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Display position; defaults to the end of the list"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product category created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProductCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `products:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/product-categories/{id}": {
+      "get": {
+        "summary": "Get a product category",
+        "description": "Returns a single product category and how many products sit in it.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The product category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProductCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `products:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a product category",
+        "description": "Renames a category or moves it in the display order. Products in it are unaffected.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "sortOrder": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated product category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProductCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `products:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"

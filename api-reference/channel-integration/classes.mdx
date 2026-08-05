@@ -41,12 +41,22 @@ curl -X POST "https://api.1club.ai/v1/platform/classes" \
     "startTime": "2026-08-12T08:00:00+03:00",
     "endTime": "2026-08-12T09:00:00+03:00",
     "maxCapacity": 16,
-    "price": 15,
+    "priceBeforeTax": 15,
     "visibility": "Public"
   }'
 ```
 
 Times must include `Z` or an explicit UTC offset. All referenced gyms, areas, class types, and instructors must belong to the authorized organization. An area must belong to the selected gym.
+
+<Warning>
+  Write `priceBeforeTax`, not `price`. A class reads back with both: `price`
+  includes your organization's tax and is what a member is charged, while
+  `priceBeforeTax` is the figure actually stored. Sending `price` back is
+  rejected with a `400` naming the right field - if it were accepted, reading a
+  class and posting it straight back would re-apply tax every time (20 becomes
+  24, then 28.80 at 20% exclusive tax). Read `priceBeforeTax`, send
+  `priceBeforeTax`, and a round trip changes nothing.
+</Warning>
 
 ## Update a class
 

@@ -68,7 +68,7 @@ The discovery server covers marketplace search and public availability for class
 
 - **OAuth keeps credentials out of setup.** You sign in directly on 1Club's authorization page. You do not paste a password or API token into the assistant.
 - **Read-only is the default.** A client that requests no scopes gets a read-only connection, and every write capability a client does request is a checkbox on the authorization page that starts unchecked. Approving without ticking anything leaves the assistant able to look things up and nothing more.
-- **Write access is a deliberate opt-in, per capability.** Tick only the writes the assistant actually needs. Content it reads - a member note, a website page - can contain text that tries to steer it, so a write scope belongs only on a connection you supervise.
+- **Anything beyond reading is a deliberate opt-in, per capability.** Tick only what the assistant actually needs. That covers the writes and the two that go further - `media:delete` removes a file permanently, `website:publish` makes draft edits public. Content the assistant reads - a member note, a website page - can contain text that tries to steer it, so these belong only on a connection you supervise.
 - **Scopes are the limit.** An assistant can only use tools its granted scopes allow. A connection with `classes:read` cannot create or update a class. The set cannot be changed after approval: revoke the connection and authorize it again with different boxes ticked.
 - **Revocation is instant.** Revoking a connection under **Settings > Artificial Intelligence > AI assistants (MCP)** cuts the assistant off immediately.
 - **Rate limits apply.** MCP calls count against the Platform API's limit of 100 requests per minute per organization.

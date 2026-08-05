@@ -1,12 +1,28 @@
 ---
 title: Transactions
-description: The per-obligation ledger behind every booking, membership, signup fee, and product sale - batch charge, record manual payments, send myPOS links, and void erroneous charges.
-keywords: [transaction, ledger, batch charge, record manual payment, void, outstanding balance, myPOS payment link, overdue, payment status]
+description: The per-obligation ledger behind every booking, membership, signup fee, and product sale - batch charge, record manual payments, send myPOS links, refund what was paid, and void what was not.
+keywords:
+  [
+    transaction,
+    ledger,
+    batch charge,
+    record manual payment,
+    void,
+    bulk void,
+    void tab,
+    refund,
+    outstanding balance,
+    myPOS payment link,
+    overdue,
+    payment status,
+  ]
 ---
 
 A transaction is a single line of "X owes Y for Z." It is the financial obligation record - what is owed. Every chargeable event in 1Club (a booking, a membership creation, a recurring membership period, a signup fee, a product sale, an external program entry) writes exactly one transaction. Settlement happens separately through [payments](/billing/payments), linked to transactions over a join table. Keeping the two apart means one transaction can be settled by several payments (a deposit then a balance), and one payment can clear several transactions at once.
 
-Open the page at **Revenue > Transactions**. The grid pages on the server and is tab-filtered into **All**, **Pending**, **Overdue**, and **Paid**, with a live count badge on each tab.
+Open the page at **Revenue > Transactions**. The grid pages on the server and is tab-filtered into **All**, **Pending**, **Overdue**, **Paid**, and **Void**, with a live count badge on each tab.
+
+**Void has its own tab, and voided rows are excluded from All.** Voided charges are not owed and not revenue, so leaving them in the default view inflated every count and total you read off the page. They are still there for audit whenever you need them - just one tab across.
 
 ## Overview
 
@@ -70,15 +86,38 @@ To record an ad-hoc charge that doesn't correspond to a booking or membership:
 
 Open a row's action menu (or use the details page) for the following. Which actions appear depends on the transaction's status:
 
-- **Add payment** - available when the status isn't `paid` or `void`. Opens the payment dialog, where you pick a payment method (manual or Stripe) and record the settlement. The default amount is the row's remaining balance.
+- **Add payment** - available while the transaction is still collectible: `pending`, `overdue`, `partially_paid`, or `failed`. Opens the payment dialog, where you pick a payment method (manual or Stripe) and record the settlement. The default amount is the row's remaining balance.
+- **Refund** - available once money has been collected. Returns it to the card, the member's wallet, or by hand. See [Refunds](/billing/payments#refunds).
 - **Send myPOS payment link** - available when myPOS is connected for the organization AND the status is `pending`, `overdue`, or `partially_paid`. Emails the customer a secure link. See [Sending a myPOS payment link](#sending-a-mypos-payment-link).
 - **Add invoice** - available when the transaction hasn't been invoiced yet, has a contact, and isn't `void`. Wraps the single transaction into a new one-line invoice and navigates to the invoice page.
-- **Void** - available for any transaction not already `void`. Marks the transaction `void` so it stops showing as owed and stops being picked up by bill runs. Voiding is a soft delete - the row remains for audit.
+- **Void** - available only while **nothing has been collected**: `pending`, `overdue`, or `failed`. Marks the transaction `void` so it stops showing as owed and stops being picked up by bill runs. Voiding is a soft delete - the row remains for audit.
 - **View** - opens the details page.
+
+### Which action applies at which status
+
+Collect and void are governed by two deliberately different lists. Void is the narrower one, because voiding a charge that took money would erase a real sale and strand the customer's funds.
+
+| Status           | Add payment | Void | Refund |
+| ---------------- | ----------- | ---- | ------ |
+| `pending`        | yes         | yes  | no     |
+| `overdue`        | yes         | yes  | no     |
+| `failed`         | yes         | yes  | no     |
+| `partially_paid` | yes         | no   | yes    |
+| `paid`           | no          | no   | yes    |
+| `refunded`       | no          | no   | no     |
+| `settled`        | no          | no   | no     |
+| `cancelled`      | no          | no   | no     |
+| `void`           | no          | no   | no     |
+
+`failed` stays collectible on purpose: a charge attempt that failed leaves the balance owed, and retrying it or taking cash instead is exactly what you do next.
+
+`settled` rows are closed and reconciled. Some of them are credit notes carrying a negative amount, so they are kept out of the collectible list to stop anyone recording a payment against a credit.
 
 ## Batch actions
 
-Select rows with the checkboxes in the grid to unlock the header batch actions. Both are best-effort: a per-row failure is reported in the results and does not block the other rows.
+Select rows with the checkboxes in the grid to unlock the header batch actions. All three are best-effort: a per-row failure is reported in the results and does not block the other rows.
+
+Every batch action reports why each skipped row was skipped, using a consistent set of reasons: **Transaction not found**, **Belongs to another organization**, **Already paid**, **Void**, **No remaining balance**, **Already voided**, **Paid - refund it instead of voiding**, and **Closed - nothing owed**.
 
 ### Charge (Stripe)
 
@@ -86,14 +125,16 @@ Select rows with the checkboxes in the grid to unlock the header batch actions. 
 
 For each selected row the batch:
 
-- **Skips** rows already `paid` or `void`, rows with no contact, rows that already have a `pending`/`processing` payment in flight, and rows where the contact has no default payment method on file.
-- **Charges** the total amount against the contact's default card for the rest.
+- **Skips** rows that are not collectible, rows with no contact, rows that already have a `pending`/`processing` payment in flight, and rows where the contact has no default payment method on file.
+- **Charges the outstanding balance**, not the gross amount. A partially paid transaction is charged only what remains, so a member who has already paid half is not billed the full amount again.
 - Uses an idempotency key built from the transaction ID and the current date (`batch-charge-txn-<id>-<date>`), so rerunning the batch on the same day won't double-charge.
 
 When it finishes, a **Batch Payment Results** dialog summarizes how many succeeded, failed, and were skipped, with the reason for each failure (no payment method, charge declined, and so on).
 
 <Note>
-  Batch **Charge** only works for customers who have a saved Stripe card. For customers without one, use **Send myPOS payment link** (so they pay on their own device) or collect at the desk and use **Record manual payment**.
+  Batch **Charge** only works for customers who have a saved Stripe card. For
+  customers without one, use **Send myPOS payment link** (so they pay on their
+  own device) or collect at the desk and use **Record manual payment**.
 </Note>
 
 ### Record manual payment
@@ -105,7 +146,19 @@ When it finishes, a **Batch Payment Results** dialog summarizes how many succeed
 3. Pick the **Payment method** (only methods configured as manual channel appear) and the **Payment date**.
 4. Click **Record payment**.
 
-Rows are skipped and counted in the result when the transaction is not found, belongs to another organization, is already paid, is void, or has no remaining balance. Only manual payment methods are accepted here - card charging goes through **Charge**.
+Rows are skipped and counted in the result when the transaction is not found, belongs to another organization, is already paid, is void or otherwise closed, or has no remaining balance. Only manual payment methods are accepted here - card charging goes through **Charge**.
+
+### Void
+
+**Void** closes out every selected transaction that has taken no money. The confirmation is explicit about the consequences:
+
+> Void {count} selected transactions? Voided transactions are excluded from revenue and bill runs, and this cannot be undone.
+
+Rows that have been paid are **skipped, not voided**, and the dialog tells you before you confirm:
+
+> {count} selected transactions will be skipped: they have been paid, so they need a refund instead of a void.
+
+A **Void results** dialog then lists what happened per row. Use this for a batch of charges that should never have existed - a duplicated import, a clinic that was cancelled before anyone paid. For anything already collected, refund it instead.
 
 ## Sending a myPOS payment link
 
@@ -135,13 +188,13 @@ Beyond the same fields shown in the grid, the details page exposes:
 
 When a payment is recorded, its outcome determines the transaction's new status:
 
-| Payment outcome | Transaction status |
-|-----------------|--------------------|
-| `succeeded` | `paid` |
-| `failed` | `pending` |
-| `cancelled` | `pending` |
-| `refunded` | `refunded` |
-| `partially_refunded` | `partially_paid` |
+| Payment outcome      | Transaction status |
+| -------------------- | ------------------ |
+| `succeeded`          | `paid`             |
+| `failed`             | `pending`          |
+| `cancelled`          | `pending`          |
+| `refunded`           | `refunded`         |
+| `partially_refunded` | `partially_paid`   |
 
 A successful payment also flips any pending booking on that transaction to `confirmed`.
 
@@ -182,9 +235,17 @@ A member started a Pilates/Yoga plan over the phone but has no card on file. The
 
 A front-desk error created a duplicate signup fee for a new climbing member.
 
-1. Confirm no money was actually collected: open the transaction and check its linked **payments**. If a payment succeeded, refund that payment first (see the caveat below).
-2. From the row action menu, choose **Void** and confirm.
-3. The transaction moves to `void`: it stops counting as owed, is excluded from bill runs, and drops out of the outstanding view. The row stays in the ledger for audit.
+1. Open the transaction. If nothing was collected, **Void** is offered in the row action menu; if money was taken, it is not, and **Refund** is the correct action instead.
+2. Choose **Void** and confirm.
+3. The transaction moves to `void`: it stops counting as owed, is excluded from bill runs and revenue, and drops out of the **All** tab. Find it later under the **Void** tab - the row stays in the ledger for audit.
+
+### Clearing a batch of charges nobody paid
+
+A rained-off tournament left thirty unpaid entry charges on the ledger.
+
+1. Filter to the **Pending** tab and select the affected rows.
+2. Click **Void** in the header and read the confirmation: any row that has been paid is listed as skipped, needing a refund instead.
+3. Confirm. The **Void results** dialog shows what was voided and what was skipped, so you can refund the handful of members who had already paid.
 
 ## Tips & best practices
 
@@ -192,7 +253,8 @@ A front-desk error created a duplicate signup fee for a new climbing member.
 - **Pick the right collection tool.** Card on file -> **Charge**. Customer not present, no card -> **Send myPOS payment link**. Paid in person -> **Record manual payment**.
 - **Trust the remaining balance column.** It already nets out succeeded payments and mid-flight membership discounts, so it is the true figure to collect - not the gross total.
 - **Retry failures the same day freely.** The batch charge idempotency key is scoped to the transaction and the date, so a same-day rerun only charges rows that haven't succeeded yet.
-- **Void, don't delete.** Voiding preserves the audit trail. Reserve it for obligations that should never have existed, and handle any real money through a refund on the payment.
+- **Void what was never paid, refund what was.** Voiding preserves the audit trail and is only offered while nothing has been collected. The moment money has moved, **Refund** is the only correct action - and 1Club will not let you void your way around it.
+- **Read totals off a tab, not off All.** Void rows are excluded from **All** so the counts and totals you see are real. If a figure looks short, check whether you are expecting voided charges to be in it.
 - **Reconcile through invoices when a customer needs a document.** Use **Add invoice** on a single row, or a [bill run](/billing/bill-runs) to sweep many pending transactions at once.
 
 ## Troubleshooting
@@ -227,11 +289,29 @@ A front-desk error created a duplicate signup fee for a new climbing member.
 
 **Fix**: Configure a manual payment method in settings, then retry.
 
-**Issue**: I voided a transaction but the customer's money wasn't returned.
+**Issue**: **Void** isn't offered on a transaction I want to write off.
 
-**Cause**: Voiding only closes the obligation. It never refunds a payment that was already collected.
+**Cause**: Money has been collected against it. Voiding a charge that took money would erase a real sale and leave the customer's funds stranded, so it is blocked once the status is `partially_paid` or `paid`.
 
-**Fix**: Refund the linked [payment](/billing/payments) first, then void the transaction if the obligation itself should disappear.
+**Fix**: Use **Refund** instead and choose where the money goes. See [Refunds](/billing/payments#refunds).
+
+**Issue**: A bulk void skipped some of my selected rows.
+
+**Cause**: Those rows have been paid. The confirmation dialog lists them before you commit: "they have been paid, so they need a refund instead of a void."
+
+**Fix**: Void the unpaid rows, then refund the paid ones individually.
+
+**Issue**: My **All** tab total is lower than I expected.
+
+**Cause**: Voided transactions are deliberately excluded from **All**, because they are neither owed nor revenue.
+
+**Fix**: Check the **Void** tab if you need to see them. If a figure genuinely looks wrong, confirm you are not expecting voided charges to be counted.
+
+**Issue**: **Add payment** isn't available on a `settled` transaction.
+
+**Cause**: `settled` rows are closed and reconciled, and some are credit notes with a negative amount. They are kept out of the collectible list so nobody can record a payment against a credit.
+
+**Fix**: If money is genuinely owed, raise the charge as a new transaction.
 
 **Issue**: A `cancelled` transaction still appears to be owed somewhere.
 

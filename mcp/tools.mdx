@@ -84,20 +84,23 @@ Scopes follow the `resource:action` format used across the [Platform API](/api-r
 
 The MCP client asks for a scope set, and you decide how much of that request to grant:
 
-- **A client that requests nothing gets a read-only connection.** Every read scope in the table above, and nothing that writes.
+- **A client that requests nothing gets a read-only connection.** Every read scope in the table above, and nothing that changes data.
 - **Requested read scopes are granted when you approve.** They are listed under "This assistant will be able to" on the authorization page.
-- **Requested write scopes are opt-in, one at a time.** Each appears under "Also allow it to make changes?" as a checkbox that starts unchecked. Approving the page without ticking any of them produces a read-only connection, even if the client asked for everything.
+- **Everything that is not a read is opt-in, one at a time.** Each appears under "Also allow it to make changes?" as a checkbox that starts unchecked - the writes, and also `media:delete` and `website:publish`, which delete a file for good and make draft edits public. Approving the page without ticking any of them produces a read-only connection, even if the client asked for everything.
 - **The set is fixed once approved.** To add or remove a scope, revoke the connection and authorize it again - see [Disconnect or revoke](/mcp/connect#disconnect-or-revoke).
 
 An assistant that authenticates with a [Platform API key](/settings/api-tokens) instead of OAuth uses that key's scopes, which you edit on the token itself.
 
 <Note>
-  The wildcard scope `*` is an API-key feature: on a Platform API key it satisfies
-  every current and future scope. MCP OAuth rejects it - a client that asks for
-  `*` gets an `invalid_scope` error and has to name the scopes it wants. Even for
-  a key, [explicit scopes are the better
-  choice](/settings/api-tokens#token-scopes) unless the integration is fully
-  trusted and internally managed.
+  The wildcard scope `*` means "everything", and the two credential types treat it
+  differently. On a Platform API key it is stored as-is and satisfies every current
+  and future scope. MCP OAuth accepts a request for `*` but never stores it: the
+  wildcard is expanded into the concrete scopes that exist at that moment, so the
+  authorization page can list each one and you can leave the destructive ones
+  unticked. A connection therefore does not silently gain new powers as 1Club adds
+  scopes - reconnect when you want the newer ones. For a key, [explicit scopes are
+  the better choice](/settings/api-tokens#token-scopes) unless the integration is
+  fully trusted and internally managed.
 </Note>
 
 Each admin tool is a thin wrapper over the documented Platform API, so the request limits, error shapes, and field meanings are the same as the [API reference](/api-reference/introduction).

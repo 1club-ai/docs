@@ -12,9 +12,9 @@ Connect your assistant directly to 1Club with OAuth. You do not need to create, 
 You need:
 
 - A 1Club account with access to the organization you want to connect.
-- Permission to manage organization settings.
-- A paid 1Club plan with API and MCP access.
-- A client that supports remote MCP servers and OAuth.
+- The **settings.manage.organization** permission, which is what lets you authorize a connection. Owners and admins hold it.
+- A paid 1Club plan. MCP and API access are locked on free plans and during a trial.
+- A client that supports remote MCP servers over HTTP, with OAuth.
 
 The admin MCP address is:
 
@@ -36,17 +36,27 @@ The public discovery server is `https://mcp.1club.ai/discovery`. It searches pub
   </Step>
 
   <Step title="Sign in to 1Club">
-    Sign in on the 1Club authorization page. If you manage more than one organization, choose the organization the assistant should access.
+    Sign in on the 1Club authorization page. If you manage more than one organization, pick the one the assistant should access. A connection is bound to exactly one organization.
   </Step>
 
   <Step title="Review and authorize access">
-    The authorization page lists the read access the client asked for, and shows every write capability it requested as its own checkbox, unchecked. Approve without ticking anything and the assistant gets read-only access, even if the client asked for everything. Tick only the write permissions you actually want it to have - plans, classes, bookings, memberships, contacts, or check-ins - then authorize.
+    The page lists the read access the client asked for under **This assistant will be able to**. Everything that changes data appears below it, under **Also allow it to make changes?**, as its own checkbox that starts unticked.
+
+    Leave every box unticked and the assistant gets read-only access, even if the client asked for everything. Tick only the capabilities you want it to have, then select **Allow access to** your organization.
   </Step>
 
   <Step title="Test the connection">
     Ask: "Which 1Club organization are you connected to?" The assistant should call `get_account` and return the selected organization and granted scopes.
   </Step>
 </Steps>
+
+<Note>
+  **Allow** stays disabled until at least one capability is granted. That only
+  bites when a client requests no read access at all: it has nothing to list
+  under **This assistant will be able to**, so you have to tick one of its write
+  boxes to connect it. Every client that asks for any read scope can be approved
+  with nothing ticked.
+</Note>
 
 <Warning>
   Only connect assistants you trust. Review tool confirmations carefully before
@@ -97,7 +107,21 @@ Use the same endpoint and choose OAuth when the client asks how to authenticate:
 https://mcp.1club.ai/admin
 ```
 
-1Club supports dynamic client registration, authorization code flow with PKCE, access-token refresh, and revocation. A compatible client should discover these details without manual URLs or secrets.
+1Club supports dynamic client registration, the authorization code flow with PKCE, access-token refresh, and revocation. A compatible client discovers all of it from the endpoint alone, with no manual URLs and no client secret.
+
+If you are building the client rather than configuring one, this is what it will find:
+
+| Detail                | Value                                                                                  |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| Transport             | Streamable HTTP. JSON-RPC over `POST`, stateless, no SSE stream                         |
+| Resource metadata     | `https://mcp.1club.ai/.well-known/oauth-protected-resource`                            |
+| Authorization server  | `https://auth.1club.ai`, named by that metadata document rather than by the 401 itself  |
+| Client authentication | None. Clients are public and register themselves                                        |
+| PKCE                  | Required, `S256` only                                                                   |
+| Resource indicator    | `https://mcp.1club.ai/admin`, required on the authorize and token requests              |
+| Grant types           | `authorization_code`, `refresh_token`                                                   |
+
+A request without a valid bearer token gets a `401` whose `WWW-Authenticate` header names the resource metadata document. That is the normal way to start the flow, not an error to work around.
 
 ## Existing API-key connections
 
@@ -127,26 +151,47 @@ To move an existing connection to OAuth:
   </Step>
 </Steps>
 
-## Legacy developer setup
+## Local stdio setup
 
-The hosted MCP connection is the recommended setup. A developer can still run the repository's MCP server over stdio with `ONECLUB_API_KEY`, but that path needs a manually created API token and is intended for local development only.
+A developer can also run the MCP server locally over stdio, which is what an editor or a script on your own machine talks to. This path has no OAuth: it authenticates with a [Platform API key](/settings/api-tokens) and is meant for local development.
+
+The server is not published to a package registry, so build it from the `mcp-server` workspace of the product repository and start it with `npm start`. It reads these environment variables:
+
+| Variable              | Purpose                                                                                             |
+| --------------------- | --------------------------------------------------------------------------------------------------- |
+| `ONECLUB_API_KEY`     | Your `1club_sk_...` key. The admin surface refuses to start without it                              |
+| `BASE_URL`            | The API to call. Set it to `https://api.1club.ai`, or it defaults to `http://localhost:8000`        |
+| `ONECLUB_MCP_SURFACE` | `admin` or `discovery`. Defaults to `admin` when a key is set and `discovery` when it is not         |
+
+Set `BASE_URL` explicitly. Left unset it points at a local API rather than failing, so an assistant aimed at production will simply find nothing there.
+
+Point your client's stdio command at the built entry point. There is no global binary to install.
 
 ## Verify access
 
 Confirm these checks after connecting:
 
-1. Ask the assistant to call `get_account`. Confirm the organization is correct.
+1. Ask the assistant to call `get_account`. Confirm the organization is correct, and read the reach from `effectiveScopes` rather than `scopes`.
 2. Ask for next week's classes. This confirms `classes:read` access.
 3. Ask the assistant to list recent check-ins. This confirms `checkins:read` access.
 4. Before testing a write, use a disposable record and review the tool confirmation.
 
-You can review and revoke connected assistants under **Settings > Artificial Intelligence > AI assistants (MCP)** in 1Club.
+## Review connected assistants
+
+Go to **Settings > Artificial Intelligence > AI assistants (MCP)**. The page shows the endpoint to hand to a client, and lists every assistant connected to this organization with who authorized it, the scopes it holds, and when it was last used.
+
+Connections appear here no matter who created them, because an assistant is authorized by whoever connects it rather than created on this page. Seeing what has access, and cutting it off, is what the page is for. Viewing it needs **settings.read.organization**; revoking needs **settings.manage.organization**.
 
 ## Disconnect or revoke
 
 - Disconnecting in the MCP client removes the connection from that client.
 - Revoking it in 1Club ends access immediately. The client must complete OAuth again to reconnect.
-- There is nothing to rotate on an OAuth connection - the access and refresh credentials are managed by the client and 1Club, and never handled by you.
-- **An approved scope set cannot be edited afterwards.** To give an assistant a write permission you did not tick, or to take one back, revoke the connection and authorize it again with the boxes you want.
+- There is nothing to rotate on an OAuth connection. The access and refresh credentials are managed by the client and 1Club, and never handled by you. An access token lasts an hour, and the client refreshes it silently. Each refresh issues a fresh pair, so an assistant in regular use stays connected indefinitely and 30 days is the idle limit, not a deadline.
+- **An approved scope set cannot be edited afterwards.** To give an assistant a capability you did not tick, or to take one back, revoke the connection and authorize it again with the boxes you want.
+
+Two things also revoke a connection without anyone pressing a button:
+
+- **The authorizing person losing access.** A connection carries the permission of whoever approved it. If that person loses **settings.manage.organization**, or leaves the organization, the connection is revoked the next time the assistant calls a tool.
+- **Long disuse.** A client that has not been used for 90 days is deleted along with its tokens, so it has to register and authorize again.
 
 If setup fails, see [MCP troubleshooting](/mcp/troubleshooting).

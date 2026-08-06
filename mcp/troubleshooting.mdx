@@ -31,7 +31,7 @@ The discovery server at `https://mcp.1club.ai/discovery` remains public and does
 
 ## A tool fails with a permission error
 
-Ask the assistant to call `get_account`. It returns the authorized organization and exact scopes on the connection. Compare those scopes with the [tools reference](/mcp/tools).
+Ask the assistant to call `get_account`. It returns the authorized organization and the scopes on the connection. Read `effectiveScopes`, not `scopes`: a full-access API key reports `scopes` as `["*"]`, and only `effectiveScopes` spells out what that expands to. Compare that list with the [tools reference](/mcp/tools).
 
 An OAuth grant's scopes are fixed once you approve them - there is no way to widen or narrow a live connection. To change them, revoke the connection under **Settings > Artificial Intelligence > AI assistants (MCP)**, disconnect it in the client, and authorize it again, ticking the write permissions you need this time.
 
@@ -60,15 +60,17 @@ The admin and discovery servers never expose each other's tools.
 
 Compare the client's list with the [tools reference](/mcp/tools). Re-scan tools or remove and re-add the connection. Many clients cache the tool catalog.
 
-The admin server includes plan, class, booking, membership, contact, and check-in actions. A missing OAuth scope causes a permission error when a tool runs. It does not normally remove the tool from the list.
+The admin server covers classes, areas and blocks, bookings, check-ins, contacts and instructors, plans, memberships, products, content, media, the website, gyms, and transactions. A missing OAuth scope causes a permission error when a tool runs. It does not normally remove the tool from the list.
 
 ## Everything worked, then stopped
 
 Check these items:
 
 - **The connection was revoked.** Review connected assistants in 1Club.
+- **The person who authorized it lost access.** A connection carries the permission of whoever approved it. If they left the organization or no longer hold **settings.manage.organization**, the connection is revoked on its next tool call. Someone who still holds the permission has to connect the assistant again. Check this first when an assistant stops working around a staff change.
 - **The organization downgraded.** API and MCP access stop when the paid feature is no longer available.
-- **The client lost its refresh credentials.** Disconnect and complete OAuth again.
+- **It sat unused for 90 days.** The client registration and its tokens are deleted, so the client has to register and authorize again.
+- **The client lost its refresh credentials.** Disconnect and complete OAuth again. Replaying a refresh token that has already been rotated revokes the whole connection, so a client that restores an old copy of its credentials has to reconnect. Parallel refreshes are not affected: tool calls that all refresh at once are treated as one rotation.
 - **The rate limit was reached.** MCP shares the Platform API limit of 100 requests per minute per organization. Wait a minute and retry.
 
 The **Last used** column on the MCP page shows whether recent requests reached 1Club.

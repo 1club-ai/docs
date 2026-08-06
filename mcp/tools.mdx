@@ -26,11 +26,15 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
 | `get_account`                    | Names the authorized organization and lists its granted scopes     | None                |
 | `list_classes`                   | Lists your classes                                                 | `classes:read`      |
 | `get_class`                      | Opens one class by id                                              | `classes:read`      |
+| `list_class_bookings`            | Lists a class roster, with each attendee's status and what they paid | `bookings:read`     |
 | `create_class`                   | Creates one class occurrence                                       | `classes:write`     |
 | `update_class`                   | Updates one class occurrence                                       | `classes:write`     |
 | `delete_class`                   | Deletes one class or this and future recurring occurrences         | `classes:write`     |
 | `list_areas`                     | Lists your bookable areas                                          | `areas:read`        |
 | `get_platform_area_availability` | Checks when an area is free, for a date or a date range            | `areas:read`        |
+| `list_area_blocks`               | Lists area blocks overlapping a date range                         | `areas:read`        |
+| `create_area_block`              | Closes one court, or a whole gym, for a time range                 | `areas:write`       |
+| `delete_area_block`              | Deletes a block, reopening the courts it covered                   | `areas:write`       |
 | `search_contacts`                | Finds customers by name, email, or phone                           | `contacts:read`     |
 | `get_contact`                    | Opens one customer by id                                           | `contacts:read`     |
 | `create_contact`                 | Creates a customer                                                 | `contacts:write`    |
@@ -64,8 +68,30 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
 | `add_booking_participant`        | Adds a player to a booking                                         | `bookings:write`    |
 | `remove_booking_participant`     | Removes a player from a booking                                    | `bookings:write`    |
 | `get_club`                       | Opens one of your gyms by slug, with amenities and rating          | `clubs:read`        |
-| `list_content`                   | Lists published website and CMS content                            | `content:read`      |
+| `list_content`                   | Lists CMS content - posts, FAQs, documents, and reusable blocks    | `content:read`      |
 | `get_content`                    | Opens one published content item by slug                           | `content:read`      |
+| `create_content`                 | Creates a content item                                             | `content:write`     |
+| `update_content`                 | Updates a content item, including taking it back to draft          | `content:write`     |
+| `delete_content`                 | Permanently deletes a content item                                 | `content:write`     |
+| `get_website`                    | Opens the website: pages, layout, theme, and its public and preview URLs | `website:read`  |
+| `list_websites`                  | Lists every website the organization owns, its default one first   | `website:read`      |
+| `get_website_section_types`      | Lists every section type a page can use, and the fields each takes | `website:read`      |
+| `get_website_page`               | Opens one page with all of its sections and settings               | `website:read`      |
+| `get_website_css`                | Reads the website's custom stylesheet                              | `website:read`      |
+| `list_website_releases`          | Lists the publish history, newest first                            | `website:read`      |
+| `update_website`                 | Updates site-level settings: name, theme support, SEO defaults, and the languages the organization offers | `website:write`, plus `organization:write` for the language fields |
+| `create_website_page`            | Adds a page to the website                                         | `website:write`     |
+| `update_website_page`            | Updates a page's title, SEO fields, or entire content              | `website:write`     |
+| `delete_website_page`            | Deletes a page                                                     | `website:write`     |
+| `update_website_section`         | Changes one section on a page, leaving the rest alone              | `website:write`     |
+| `update_website_layout`          | Updates the header or footer, including navigation links           | `website:write`     |
+| `set_website_css`                | Replaces the website's custom stylesheet                           | `website:write`     |
+| `publish_website`                | Publishes the draft, making every pending edit public              | `website:publish`   |
+| `rollback_website`               | Restores an earlier published version and puts it live             | `website:publish`   |
+| `list_media`                     | Browses or searches the media library                              | `media:read`        |
+| `create_media`                   | Registers an already-hosted image or video in the library          | `media:write`       |
+| `update_media`                   | Updates a media item's name, alt text, or caption                  | `media:write`       |
+| `delete_media`                   | Permanently deletes a file from the library                        | `media:delete`      |
 | `list_transactions`              | Lists billing transactions, newest first                           | `transactions:read` |
 | `get_transaction`                | Opens one transaction by id                                        | `transactions:read` |
 
@@ -74,6 +100,21 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
   That makes it the right first call when an assistant is behaving as if it has
   no access: if `get_account` succeeds, authentication worked and the problem is
   usually the granted scopes.
+</Note>
+
+<Note>
+  **The website tools edit a draft.** Every change is invisible to the public
+  until `publish_website` runs, which is why publishing is its own scope. An
+  assistant that holds `website:write` but not `website:publish` can build a page
+  and hand you the preview URL, and cannot put it live. Read
+  `get_website_section_types` before composing a page, and take image URLs from
+  `list_media` rather than guessing them.
+
+  `supportedLocales` and `defaultLocale` on `update_website` are the exception.
+  They are organization-wide rather than website content, so they need
+  `organization:write` as well and apply immediately instead of waiting for a
+  publish - the same languages drive the member portal, the mobile app, and
+  outbound email.
 </Note>
 
 <Note>
@@ -133,6 +174,8 @@ These tools take marketplace ids, which are not the same as the ids an assistant
 The admin server is built strictly on the documented Platform API, so anything that API does not cover is unreachable through MCP today. That currently includes messaging and the inbox, automations and promotions, invoices and payments, access control, and reporting.
 
 Contacts and memberships are readable and creatable but not deletable. Instructors are read-only and are configured in 1Club. Plans and individual class occurrences can be managed through their write tools; recurring-series creation remains in the 1Club dashboard.
+
+Media can be registered but not uploaded: `create_media` records a file that is already hosted, so putting a new image online still happens in 1Club or through your own hosting.
 
 Products and product categories can be created, edited, and retired, but not deleted - deleting a product destroys its sales history. Stock is read-only: `get_product_availability` reports how many are left to sell, while booking a delivery in, correcting a count after a stocktake, and writing off damaged stock stay in the 1Club dashboard. See [Products](/api-reference/channel-integration/products).
 

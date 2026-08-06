@@ -3,7 +3,7 @@
   "info": {
     "title": "1Club Platform API",
     "version": "1.0.0",
-    "description": "The 1Club Platform API lets you programmatically access and manage your organization's data.\n\n## Official API Contract\n\nThis documentation is the official source of truth for the 1Club Platform API.\nIf an integration relies on undocumented endpoints, fields, response shapes, or internal behavior outside this spec, we can't guarantee backward compatibility.\nBuild against what's documented here to stay stable as the platform evolves.\n\n## Authentication\n\nAll requests require a customer API key passed as a Bearer token:\n\n```\nAuthorization: Bearer 1club_sk_live_...\n```\n\nGenerate API keys from the admin portal under **Settings > API Tokens**.\nThe key is tied to your organization — all responses are scoped to your org's data.\n\n## Rate Limiting\n\n- **100 requests per minute** per API key\n- When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header\n- Rate limit headers are included in every response:\n  - `X-RateLimit-Limit` — max requests per window\n  - `X-RateLimit-Remaining` — requests remaining\n  - `X-RateLimit-Reset` — seconds until the window resets\n\n## Errors\n\n| Status | Meaning |\n|--------|---------|\n| `400` | Invalid request parameters |\n| `401` | Missing or invalid API key |\n| `404` | Resource not found (or doesn't belong to your organization) |\n| `429` | Rate limit exceeded |\n| `500` | Internal server error |",
+    "description": "The 1Club Platform API lets you programmatically access and manage your organization's data.\n\n## Official API Contract\n\nThis documentation is the official source of truth for the 1Club Platform API.\nIf an integration relies on undocumented endpoints, fields, response shapes, or internal behavior outside this spec, we can't guarantee backward compatibility.\nBuild against what's documented here to stay stable as the platform evolves.\n\n## Authentication\n\nAll requests require a customer API key passed as a Bearer token:\n\n```\nAuthorization: Bearer 1club_sk_live_...\n```\n\nGenerate API keys from the admin portal under **Settings > API Tokens**.\nThe key is tied to your organization - all responses are scoped to your org's data.\n\n## Rate Limiting\n\n- **100 requests per minute** per API key\n- When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header\n- Rate limit headers are included in every response:\n  - `X-RateLimit-Limit` - max requests per window\n  - `X-RateLimit-Remaining` - requests remaining\n  - `X-RateLimit-Reset` - seconds until the window resets\n\n## Errors\n\n| Status | Meaning |\n|--------|---------|\n| `400` | Invalid request parameters |\n| `401` | Missing or invalid API key |\n| `404` | Resource not found (or doesn't belong to your organization) |\n| `429` | Rate limit exceeded |\n| `500` | Internal server error |",
     "contact": {
       "name": "1Club API Support",
       "email": "support@1club.ai"
@@ -63,7 +63,7 @@
           "priceBeforeTax": {
             "type": "number",
             "minimum": 0,
-            "description": "The price to store, excluding tax — the same field reads return. The tax-inclusive `price` a class reads back with is computed and cannot be written: sending it is a 400, because posting it back would re-apply tax on every round trip."
+            "description": "The price to store, excluding tax - the same field reads return. The tax-inclusive `price` a class reads back with is computed and cannot be written: sending it is a 400, because posting it back would re-apply tax on every round trip."
           },
           "isFree": {
             "type": "boolean"
@@ -135,7 +135,7 @@
           "priceBeforeTax": {
             "type": "number",
             "minimum": 0,
-            "description": "The price to store, excluding tax — the same field reads return. The tax-inclusive `price` a class reads back with is computed and cannot be written: sending it is a 400, because posting it back would re-apply tax on every round trip."
+            "description": "The price to store, excluding tax - the same field reads return. The tax-inclusive `price` a class reads back with is computed and cannot be written: sending it is a 400, because posting it back would re-apply tax on every round trip."
           },
           "isFree": {
             "type": "boolean"
@@ -533,7 +533,7 @@
       },
       "PlatformClass": {
         "type": "object",
-        "description": "One class occurrence. A weekly class materializes a row per session, linked by `recurrenceId` and `occurrenceIndex`, so `id` is what a booking's `classId` points at — and what distinguishes two groups running in the same hour. Read the roster with GET /v1/platform/classes/{id}/bookings.",
+        "description": "One class occurrence. A weekly class materializes a row per session, linked by `recurrenceId` and `occurrenceIndex`, so `id` is what a booking's `classId` points at - and what distinguishes two groups running in the same hour. Read the roster with GET /v1/platform/classes/{id}/bookings.",
         "properties": {
           "id": {
             "type": "integer"
@@ -658,7 +658,7 @@
             "type": "number",
             "format": "float",
             "nullable": true,
-            "description": "Price including the organization's default tax — what a member is charged."
+            "description": "Price including the organization's default tax - what a member is charged."
           },
           "priceBeforeTax": {
             "type": "number",
@@ -784,7 +784,7 @@
           "externalSource": {
             "type": "string",
             "nullable": true,
-            "description": "Import provenance — set when the occurrence came from an external system rather than being created in 1Club."
+            "description": "Import provenance - set when the occurrence came from an external system rather than being created in 1Club."
           },
           "externalId": {
             "type": "string",
@@ -841,7 +841,7 @@
           "contactId": {
             "type": "integer",
             "nullable": true,
-            "description": "Null for an anonymous seat — a pass sold without naming who would use it. `bookerName` is then who paid for it."
+            "description": "Null for an anonymous seat - a pass sold without naming who would use it. `bookerName` is then who paid for it."
           },
           "contactName": {
             "type": "string",
@@ -850,12 +850,12 @@
           "bookerName": {
             "type": "string",
             "nullable": true,
-            "description": "Who paid, when the seat is anonymous and was sold through an order — so a roster reads \"Anonymous (Ivan Petrov)\" rather than an opaque booking number."
+            "description": "Who paid, when the seat is anonymous and was sold through an order - so a roster reads \"Anonymous (Ivan Petrov)\" rather than an opaque booking number."
           },
           "contactEmail": {
             "type": "string",
             "nullable": true,
-            "description": "Null unless the key also holds `contacts:read` — an email address is contact PII, gated as it is on the contacts resource."
+            "description": "Null unless the key also holds `contacts:read` - an email address is contact PII, gated as it is on the contacts resource."
           },
           "status": {
             "type": "string",
@@ -903,7 +903,7 @@
                   "unpaid",
                   "no_charge"
                 ],
-                "description": "Classified exactly as on `PlatformBooking`. A class seat covered by a membership or an external program is `no_charge` — it owes nothing even though it carries a price — so do not read it as an outstanding balance."
+                "description": "Classified exactly as on `PlatformBooking`. A class seat covered by a membership or an external program is `no_charge` - it owes nothing even though it carries a price - so do not read it as an outstanding balance."
               },
               "amount": {
                 "type": "number",
@@ -1231,7 +1231,7 @@
           },
           "url": {
             "type": "string",
-            "description": "Public URL of the file. Immutable — register a new item to replace a file."
+            "description": "Public URL of the file. Immutable - register a new item to replace a file."
           },
           "name": {
             "type": "string",
@@ -1265,7 +1265,7 @@
       },
       "PlatformWebsiteSection": {
         "type": "object",
-        "description": "One section of a page or of the site layout. `config` fields depend on `type` — see GET /v1/platform/website/section-types for the definitions.",
+        "description": "One section of a page or of the site layout. `config` fields depend on `type` - see GET /v1/platform/website/section-types for the definitions.",
         "properties": {
           "type": {
             "type": "string",
@@ -1324,9 +1324,77 @@
             "type": "string",
             "nullable": true
           },
+          "noindex": {
+            "type": "boolean",
+            "description": "True when the page asks search engines not to index it and is left out of `sitemap.xml`."
+          },
+          "translations": {
+            "type": "object",
+            "nullable": true,
+            "description": "Per-locale `metaTitle`/`metaDescription` overrides, keyed by locale: { \"bg\": { \"metaTitle\": \"…\" } }. Present when fetching a single page.",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "metaTitle": {
+                  "type": "string"
+                },
+                "metaDescription": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "seo": {
+            "$ref": "#/components/schemas/PlatformWebsitePageSeo"
+          },
           "url": {
             "type": "string",
             "description": "The page's public URL once published."
+          }
+        }
+      },
+      "PlatformWebsitePageSeo": {
+        "type": "object",
+        "description": "What the published page will actually put in its `<head>`, after every fallback has been applied - the authored fields alone do not answer \"is my SEO right?\". Present when fetching a single page. Read-only.",
+        "properties": {
+          "metaTitle": {
+            "type": "string",
+            "description": "The `<title>`, after falling back to the page title."
+          },
+          "metaDescription": {
+            "type": "string",
+            "nullable": true,
+            "description": "After falling back to `seoSettings.siteDescription`."
+          },
+          "ogImage": {
+            "type": "string",
+            "nullable": true,
+            "description": "After falling back to `seoSettings.defaultOgImage`."
+          },
+          "canonicalUrl": {
+            "type": "string",
+            "description": "The `rel=canonical` the default-locale render emits, locale prefix included."
+          },
+          "indexable": {
+            "type": "boolean",
+            "description": "Whether search engines are asked to index this page."
+          },
+          "notIndexableReason": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "page_noindex",
+              "site_unpublished",
+              "site_inactive"
+            ],
+            "description": "Why `indexable` is false. An unpublished or switched-off site is not indexable however the page is configured."
+          },
+          "localizedLocales": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Locales carrying their own metaTitle/metaDescription overrides."
           }
         }
       },
@@ -1342,7 +1410,7 @@
           },
           "slug": {
             "type": "string",
-            "description": "Platform host label — the site answers on `<slug>.1club.me`."
+            "description": "Platform host label - the site answers on `<slug>.1club.me`."
           },
           "domain": {
             "type": "string",
@@ -1359,11 +1427,11 @@
           },
           "url": {
             "type": "string",
-            "description": "Public URL — the custom domain when set, else the platform host."
+            "description": "Public URL - the custom domain when set, else the platform host."
           },
           "previewUrl": {
             "type": "string",
-            "description": "The same site rendered from the unpublished draft — the link to review edits before publishing. Carries a signed grant that expires 24 hours after this response was generated; read the website again for a fresh one. Anyone holding the link can view the draft, so it is shareable without a login but should be treated as sensitive."
+            "description": "The same site rendered from the unpublished draft - the link to review edits before publishing. Carries a signed grant that expires 24 hours after this response was generated; read the website again for a fresh one. Anyone holding the link can view the draft, so it is shareable without a login but should be treated as sensitive."
           },
           "published": {
             "type": "boolean",
@@ -1401,15 +1469,40 @@
             "nullable": true,
             "items": {
               "type": "string"
-            }
+            },
+            "description": "Locales the site serves, which is what its `hreflang` alternates and `sitemap.xml` advertise. Organization-level - see `PATCH /v1/platform/website`."
           },
           "defaultLocale": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "description": "Locale served at the site root. Organization-level."
           },
           "seoSettings": {
             "type": "object",
-            "additionalProperties": true
+            "description": "Site-wide SEO defaults. Each field is a fallback a page can override.",
+            "additionalProperties": false,
+            "properties": {
+              "siteDescription": {
+                "type": "string",
+                "description": "Meta-description fallback, and the `description` in the site's structured data."
+              },
+              "defaultOgImage": {
+                "type": "string",
+                "description": "Social-share image for pages with no `ogImage` of their own."
+              },
+              "verification": {
+                "type": "object",
+                "description": "Search-console ownership tokens, rendered as meta tags on every page.",
+                "properties": {
+                  "google": {
+                    "type": "string"
+                  },
+                  "bing": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
           },
           "pages": {
             "type": "array",
@@ -1498,7 +1591,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Scopes granted to the bearer credential — an API key or an MCP OAuth grant — exactly as held (e.g. \"classes:read\"). A full-access key holds the single wildcard scope \"*\"; read `effectiveScopes` to see what that resolves to. An MCP grant never holds \"*\": the wildcard is expanded at consent so each capability can be shown and approved."
+            "description": "Scopes granted to the bearer credential - an API key or an MCP OAuth grant - exactly as held (e.g. \"classes:read\"). A full-access key holds the single wildcard scope \"*\"; read `effectiveScopes` to see what that resolves to. An MCP grant never holds \"*\": the wildcard is expanded at consent so each capability can be shown and approved."
           },
           "fullAccess": {
             "type": "boolean",
@@ -1509,7 +1602,7 @@
             "items": {
               "type": "string"
             },
-            "description": "The scopes this credential can actually use — identical to `scopes` for a narrow grant, and the full expansion of \"*\" for a full-access key. Check a capability against this list, not `scopes`."
+            "description": "The scopes this credential can actually use - identical to `scopes` for a narrow grant, and the full expansion of \"*\" for a full-access key. Check a capability against this list, not `scopes`."
           },
           "resources": {
             "type": "array",
@@ -1624,7 +1717,7 @@
           "classId": {
             "type": "integer",
             "nullable": true,
-            "description": "The class occurrence this booking attends, when it is a class booking. Every attendee holds their own booking row against the same `classId`, and `classes` rows are per-occurrence — so this is what tells two classes running in the same hour apart. Join it against GET /v1/platform/classes, or read the roster with GET /v1/platform/classes/{id}/bookings."
+            "description": "The class occurrence this booking attends, when it is a class booking. Every attendee holds their own booking row against the same `classId`, and `classes` rows are per-occurrence - so this is what tells two classes running in the same hour apart. Join it against GET /v1/platform/classes, or read the roster with GET /v1/platform/classes/{id}/bookings."
           },
           "eventId": {
             "type": "integer",
@@ -1659,12 +1752,12 @@
                   "unpaid",
                   "no_charge"
                 ],
-                "description": "`no_charge` means there is nothing to collect: either nothing was ever owed (a free area, an amount of 0) or an entitlement covers it — a membership or external program the attendee already holds, which is why a covered booking can carry a price and still owe nothing. `paid` counts every financially closed transaction status (`paid`, `settled`, `refunded`), and every charge type, not only the one this API records."
+                "description": "`no_charge` means there is nothing to collect: either nothing was ever owed (a free area, an amount of 0) or an entitlement covers it - a membership or external program the attendee already holds, which is why a covered booking can carry a price and still owe nothing. `paid` counts every financially closed transaction status (`paid`, `settled`, `refunded`), and every charge type, not only the one this API records."
               },
               "amount": {
                 "type": "number",
                 "nullable": true,
-                "description": "The booking's recorded price in the organization's currency; `status` is what says whether anything was collectable. Where the price is 0 but a real charge exists — an external program's per-visit fee lives entirely in its transaction — the ledger total is reported instead."
+                "description": "The booking's recorded price in the organization's currency; `status` is what says whether anything was collectable. Where the price is 0 but a real charge exists - an external program's per-visit fee lives entirely in its transaction - the ledger total is reported instead."
               }
             }
           }
@@ -1811,7 +1904,7 @@
           },
           "priceIncludesArea": {
             "type": "boolean",
-            "description": "When true, `hourlyRate` is an all-in price that already covers the booked area — the area's price is not added on top of it."
+            "description": "When true, `hourlyRate` is an all-in price that already covers the booked area - the area's price is not added on top of it."
           },
           "isBookable": {
             "type": "boolean",
@@ -2054,100 +2147,6 @@
           }
         }
       },
-      "PlatformCheckin": {
-        "type": "object",
-        "description": "An attendance record for a booking, class, membership, or direct gym visit.",
-        "properties": {
-          "checkinId": {
-            "type": "integer"
-          },
-          "contactId": {
-            "type": "integer",
-            "nullable": true
-          },
-          "clubId": {
-            "type": "integer"
-          },
-          "classId": {
-            "type": "integer",
-            "nullable": true
-          },
-          "bookingId": {
-            "type": "integer",
-            "nullable": true
-          },
-          "membershipId": {
-            "type": "integer",
-            "nullable": true
-          },
-          "externalProgramId": {
-            "type": "integer",
-            "nullable": true
-          },
-          "entranceMethod": {
-            "type": "string",
-            "nullable": true
-          },
-          "date": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "contact": {
-            "type": "object",
-            "nullable": true,
-            "additionalProperties": true
-          },
-          "club": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "class": {
-            "type": "object",
-            "nullable": true,
-            "additionalProperties": true
-          },
-          "booking": {
-            "type": "object",
-            "nullable": true,
-            "additionalProperties": true
-          },
-          "membership": {
-            "type": "object",
-            "nullable": true,
-            "additionalProperties": true
-          },
-          "externalProgram": {
-            "type": "object",
-            "nullable": true,
-            "additionalProperties": true
-          }
-        }
-      },
-      "PlatformCheckinPage": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PlatformCheckin"
-            }
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total check-ins matching the filters, ignoring pagination"
-          },
-          "limit": {
-            "type": "integer"
-          },
-          "offset": {
-            "type": "integer"
-          }
-        }
-      },
       "PlatformProduct": {
         "type": "object",
         "description": "A product the organization sells over the counter.",
@@ -2257,34 +2256,6 @@
           },
           "offset": {
             "type": "integer"
-          }
-        }
-      },
-      "PlatformProductCategory": {
-        "type": "object",
-        "description": "How products are grouped - the tabs on the till and the sections of a shop page.",
-        "properties": {
-          "categoryId": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "sortOrder": {
-            "type": "integer",
-            "description": "Ascending display order; ties fall back to name."
-          },
-          "productCount": {
-            "type": "integer",
-            "description": "Products currently in this category, active and inactive."
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
           }
         }
       },
@@ -2460,6 +2431,128 @@
             "description": "Replaces the whole list."
           }
         }
+      },
+      "PlatformProductCategory": {
+        "type": "object",
+        "description": "How products are grouped - the tabs on the till and the sections of a shop page.",
+        "properties": {
+          "categoryId": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "description": "Ascending display order; ties fall back to name."
+          },
+          "productCount": {
+            "type": "integer",
+            "description": "Products currently in this category, active and inactive."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PlatformCheckin": {
+        "type": "object",
+        "description": "An attendance record for a booking, class, membership, or direct gym visit.",
+        "properties": {
+          "checkinId": {
+            "type": "integer"
+          },
+          "contactId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "clubId": {
+            "type": "integer"
+          },
+          "classId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "bookingId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "membershipId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "externalProgramId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "entranceMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "contact": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "club": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "class": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "booking": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "membership": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "externalProgram": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          }
+        }
+      },
+      "PlatformCheckinPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformCheckin"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total check-ins matching the filters, ignoring pagination"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
       }
     },
     "responses": {
@@ -2534,7 +2627,7 @@
     "/v1/platform/area-blocks": {
       "get": {
         "summary": "List area blocks",
-        "description": "Returns the blocks overlapping a window — the time-ranged unavailability of a court, the counterpart of instructor time off. A block with `areaId: null` is club-wide and closes every area in `clubId`; expand it against the club's areas the same way availability does. Filtering by `areaId` includes the club-wide blocks covering that area, so the result is everything that closes it.\n",
+        "description": "Returns the blocks overlapping a window - the time-ranged unavailability of a court, the counterpart of instructor time off. A block with `areaId: null` is club-wide and closes every area in `clubId`; expand it against the club's areas the same way availability does. Filtering by `areaId` includes the club-wide blocks covering that area, so the result is everything that closes it.\n",
         "tags": [
           "Area Blocks"
         ],
@@ -2672,7 +2765,7 @@
       },
       "post": {
         "summary": "Create an area block",
-        "description": "Closes a court, or a whole club, for a time range. Send `areaId` to close one court (its club is derived), or `clubId` with `areaId` omitted/null to close every court in that club with a single record. Existing bookings in the window are left alone — a block stops NEW bookings; cancel or move the affected bookings separately.\n",
+        "description": "Closes a court, or a whole club, for a time range. Send `areaId` to close one court (its club is derived), or `clubId` with `areaId` omitted/null to close every court in that club with a single record. Existing bookings in the window are left alone - a block stops NEW bookings; cancel or move the affected bookings separately.\n",
         "tags": [
           "Area Blocks"
         ],
@@ -2778,7 +2871,7 @@
     "/v1/platform/area-blocks/{blockId}": {
       "delete": {
         "summary": "Delete an area block",
-        "description": "Removes a block, reopening the court(s) it covered for booking. Idempotent from the caller's perspective only in the sense that a second delete returns 404 — the first one already reopened the slot.\n",
+        "description": "Removes a block, reopening the court(s) it covered for booking. Idempotent from the caller's perspective only in the sense that a second delete returns 404 - the first one already reopened the slot.\n",
         "tags": [
           "Area Blocks"
         ],
@@ -3523,7 +3616,7 @@
     "/v1/platform/bookings": {
       "post": {
         "summary": "Create a booking",
-        "description": "Creates a booking on an area (e.g. a padel court), optionally with an instructor leading the session. Identify the customer with `contactId` (resolve it via GET /v1/platform/contacts) or, for callers that do not track 1Club ids, with an inline `customer` matched to a contact by email and created if new — exactly one of the two.\n\nA booking transaction is recorded so the booking counts for revenue: `paid` marks it settled against the External / API payment method (no gateway call), `unpaid` leaves it outstanding. `amount` defaults to the computed price for the slot — the area's price, plus the instructor's hourly rate when one is attached.\n\nThis API assumes the calling system enforces its own booking rules, so 1Club's member-facing policy (minimum notice, maximum days in advance, operating-hours envelope, slots that have already ended) is not applied — which is what lets an existing schedule be recorded as-is. Physical constraints always apply: a real double-booking, the area's concurrency capacity, and whether an instructor takes one-on-one bookings.\n",
+        "description": "Creates a booking on an area (e.g. a padel court), optionally with an instructor leading the session. Identify the customer with `contactId` (resolve it via GET /v1/platform/contacts) or, for callers that do not track 1Club ids, with an inline `customer` matched to a contact by email and created if new - exactly one of the two.\n\nA booking transaction is recorded so the booking counts for revenue: `paid` marks it settled against the External / API payment method (no gateway call), `unpaid` leaves it outstanding. `amount` defaults to the computed price for the slot - the area's price, plus the instructor's hourly rate when one is attached.\n\nThis API assumes the calling system enforces its own booking rules, so 1Club's member-facing policy (minimum notice, maximum days in advance, operating-hours envelope, slots that have already ended) is not applied - which is what lets an existing schedule be recorded as-is. Physical constraints always apply: a real double-booking, the area's concurrency capacity, and whether an instructor takes one-on-one bookings.\n",
         "tags": [
           "Bookings"
         ],
@@ -3628,7 +3721,7 @@
                   "notifyCustomer": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Send the customer a 1Club booking confirmation email. Off by default — callers normally send their own."
+                    "description": "Send the customer a 1Club booking confirmation email. Off by default - callers normally send their own."
                   }
                 }
               }
@@ -3672,7 +3765,7 @@
       },
       "get": {
         "summary": "List bookings",
-        "description": "Returns bookings whose start time falls in the requested window, ordered by start time. Each bound is an ISO date-time, or a bare `YYYY-MM-DD` read as midnight UTC. When `from`/`to` are omitted the window defaults to the next 7 days, and passing one derives the other.\n\nA single request may span at most 93 days. To cover a longer range, walk it in consecutive windows of 93 days or less, paging each window with `limit`/`offset` against the `total` it reports. Ordering is stable (`startTime`, then id), so paging is well defined for a window that is not being written to; bookings created or cancelled mid-walk can still shift rows across page boundaries.\n\nBookings from every channel are returned, each tagged with `source`. That is deliberate: a caller reconciling its own writes has to be able to see member- and staff-created bookings to know whether a slot was already taken. Only the writes (cancel, add/remove participant) are restricted to bookings this API created.\n\nA class booking carries the occurrence it attends as `classId`. Every attendee of a class holds their own booking row against the same `classId`, and `classes` rows are per-occurrence, so that is what tells two groups running in the same hour apart — filter by it, or read the roster from the class side with GET /v1/platform/classes/{id}/bookings.\n",
+        "description": "Returns bookings whose start time falls in the requested window, ordered by start time. Each bound is an ISO date-time, or a bare `YYYY-MM-DD` read as midnight UTC. When `from`/`to` are omitted the window defaults to the next 7 days, and passing one derives the other.\n\nA single request may span at most 93 days. To cover a longer range, walk it in consecutive windows of 93 days or less, paging each window with `limit`/`offset` against the `total` it reports. Ordering is stable (`startTime`, then id), so paging is well defined for a window that is not being written to; bookings created or cancelled mid-walk can still shift rows across page boundaries.\n\nBookings from every channel are returned, each tagged with `source`. That is deliberate: a caller reconciling its own writes has to be able to see member- and staff-created bookings to know whether a slot was already taken. Only the writes (cancel, add/remove participant) are restricted to bookings this API created.\n\nA class booking carries the occurrence it attends as `classId`. Every attendee of a class holds their own booking row against the same `classId`, and `classes` rows are per-occurrence, so that is what tells two groups running in the same hour apart - filter by it, or read the roster from the class side with GET /v1/platform/classes/{id}/bookings.\n",
         "tags": [
           "Bookings"
         ],
@@ -3812,7 +3905,7 @@
     "/v1/platform/bookings/{id}/cancel": {
       "post": {
         "summary": "Cancel a booking",
-        "description": "Cancels the booking by its 1Club id. No refund is issued by 1Club — the caller owns refunds. Idempotent: cancelling an already-cancelled booking succeeds.\n",
+        "description": "Cancels the booking by its 1Club id. No refund is issued by 1Club - the caller owns refunds. Idempotent: cancelling an already-cancelled booking succeeds.\n",
         "tags": [
           "Bookings"
         ],
@@ -3880,7 +3973,7 @@
     "/v1/platform/bookings/{id}": {
       "get": {
         "summary": "Get a booking",
-        "description": "Returns the current state of a booking (including payment status) by its 1Club id — any of the organization's bookings, whichever channel created it. Nothing here is absent from the list endpoint, which has always returned every source.\n",
+        "description": "Returns the current state of a booking (including payment status) by its 1Club id - any of the organization's bookings, whichever channel created it. Nothing here is absent from the list endpoint, which has always returned every source.\n",
         "tags": [
           "Bookings"
         ],
@@ -3939,7 +4032,7 @@
     "/v1/platform/bookings/{id}/participants": {
       "get": {
         "summary": "List the additional players on a booking",
-        "description": "Returns the extra players on a booking — any of the organization's, whichever channel created it. The person the booking is for (the organizer) is on the booking itself as `contactId` and is not repeated here. Only the add and remove writes are restricted to bookings this API created.\n\nThis lists the co-players sharing *one* booking (a doubles court). The attendees of a class each hold their own booking — read those with GET /v1/platform/classes/{id}/bookings.\n",
+        "description": "Returns the extra players on a booking - any of the organization's, whichever channel created it. The person the booking is for (the organizer) is on the booking itself as `contactId` and is not repeated here. Only the add and remove writes are restricted to bookings this API created.\n\nThis lists the co-players sharing *one* booking (a doubles court). The attendees of a class each hold their own booking - read those with GET /v1/platform/classes/{id}/bookings.\n",
         "tags": [
           "Bookings"
         ],
@@ -4010,7 +4103,7 @@
       },
       "post": {
         "summary": "Add a player to a booking",
-        "description": "Adds another player to a booking created through this API — for a doubles court, the three players joining the organizer. The contact must already exist (create it via POST /v1/platform/contacts). The total, counting the organizer, is capped by the area type's maximum players.\n",
+        "description": "Adds another player to a booking created through this API - for a doubles court, the three players joining the organizer. The contact must already exist (create it via POST /v1/platform/contacts). The total, counting the organizer, is capped by the area type's maximum players.\n",
         "tags": [
           "Bookings"
         ],
@@ -4315,9 +4408,7 @@
             }
           },
           "400": {
-            "description": "The booking is not `confirmed` or `pending`",
-            "has an unpaid balance": null,
-            "or `clubId` is missing or not in this organization": null
+            "description": "The booking is not `confirmed` or `pending`, has an unpaid balance, or `clubId` is missing or not in this organization"
           },
           "403": {
             "description": "Missing `checkins:write` scope or check-in is outside the allowed window"
@@ -4375,7 +4466,7 @@
     "/v1/platform/classes": {
       "get": {
         "summary": "List classes",
-        "description": "Returns the organization's class occurrences, ordered by start time. One row is one occurrence — a weekly class materializes a row per session, linked by `recurrenceId` and `occurrenceIndex` — so a row's `id` is what a booking's `classId` points at.\n\nThe window is open by default: with neither bound the whole schedule is in scope, past included, because this endpoint serves operators reconciling what happened rather than members shopping for a slot. `startDate` keeps occurrences still running at or after it, `endDate` keeps occurrences starting before it (exclusive), and each accepts an ISO date-time or a bare `YYYY-MM-DD` read as midnight UTC. Overlap, not containment, so a long or multi-day class shows up on every day it covers.\n\nPage with `limit`/`offset` against the `total` the response reports. Ordering is stable (`startTime`, then id).\n\nEvery class the organization owns is in scope — member-only and private occurrences included, and those at a deactivated club — because the key holder is the operator, not a visitor. `locale` resolves `name` and `description`; the full `translations` blob is returned either way.\n",
+        "description": "Returns the organization's class occurrences, ordered by start time. One row is one occurrence - a weekly class materializes a row per session, linked by `recurrenceId` and `occurrenceIndex` - so a row's `id` is what a booking's `classId` points at.\n\nThe window is open by default: with neither bound the whole schedule is in scope, past included, because this endpoint serves operators reconciling what happened rather than members shopping for a slot. `startDate` keeps occurrences still running at or after it, `endDate` keeps occurrences starting before it (exclusive), and each accepts an ISO date-time or a bare `YYYY-MM-DD` read as midnight UTC. Overlap, not containment, so a long or multi-day class shows up on every day it covers.\n\nPage with `limit`/`offset` against the `total` the response reports. Ordering is stable (`startTime`, then id).\n\nEvery class the organization owns is in scope - member-only and private occurrences included, and those at a deactivated club - because the key holder is the operator, not a visitor. `locale` resolves `name` and `description`; the full `translations` blob is returned either way.\n",
         "tags": [
           "Classes"
         ],
@@ -4567,7 +4658,7 @@
     "/v1/platform/classes/{id}/bookings": {
       "get": {
         "summary": "List a class's roster",
-        "description": "Returns who is booked into one class occurrence, whether they were checked in, and what they paid — the roster, from the class side. This is the answer to \"two groups run at 10:00, who is in which\": every attendee holds their own booking row against this class's id.\n\nAttendees only: the occurrence's own area hold and any instructor slot are excluded by the same predicate that decides capacity, so the roster is drawn from exactly the population the class's `bookedCount` counts.\n\nDo not expect `total` to equal `bookedCount`. Capacity counts `confirmed`, `pending` and `checked_in`, and adds standalone walk-in check-ins that have no booking to list; the roster also keeps `no_show`, because whether someone was enrolled and failed to turn up is what an attendance reconciliation is asking. Cancelled seats are the one status left out, unless `status=cancelled` asks for them.\n\nRequires both `classes:read` and `bookings:read`: it is a class sub-resource that returns booking data. `contactEmail` additionally needs `contacts:read` and is null without it — a name identifies who is on the roster, an email address is contact PII and stays behind the scope that guards it elsewhere.\n",
+        "description": "Returns who is booked into one class occurrence, whether they were checked in, and what they paid - the roster, from the class side. This is the answer to \"two groups run at 10:00, who is in which\": every attendee holds their own booking row against this class's id.\n\nAttendees only: the occurrence's own area hold and any instructor slot are excluded by the same predicate that decides capacity, so the roster is drawn from exactly the population the class's `bookedCount` counts.\n\nDo not expect `total` to equal `bookedCount`. Capacity counts `confirmed`, `pending` and `checked_in`, and adds standalone walk-in check-ins that have no booking to list; the roster also keeps `no_show`, because whether someone was enrolled and failed to turn up is what an attendance reconciliation is asking. Cancelled seats are the one status left out, unless `status=cancelled` asks for them.\n\nRequires both `classes:read` and `bookings:read`: it is a class sub-resource that returns booking data. `contactEmail` additionally needs `contacts:read` and is null without it - a name identifies who is on the roster, an email address is contact PII and stays behind the scope that guards it elsewhere.\n",
         "tags": [
           "Classes"
         ],
@@ -4922,7 +5013,7 @@
     "/v1/platform/contacts": {
       "get": {
         "summary": "List and search contacts",
-        "description": "Returns the organization's contacts ordered by name, excluding archived ones. Use `search` to match on name, email, or phone — matching is case-insensitive and cross-script, so `ivan` also matches `Иван`. Resolve a customer here and pass the returned `id` as `contactId` when creating a booking.\n",
+        "description": "Returns the organization's contacts ordered by name, excluding archived ones. Use `search` to match on name, email, or phone - matching is case-insensitive and cross-script, so `ivan` also matches `Иван`. Resolve a customer here and pass the returned `id` as `contactId` when creating a booking.\n",
         "tags": [
           "Contacts"
         ],
@@ -4997,7 +5088,7 @@
       },
       "post": {
         "summary": "Create a contact",
-        "description": "Creates a contact in the organization. At least one of `email` or `phone` is required so the person stays reachable and findable. Creating a contact whose email already exists returns 409 — search first, then reference the existing id. Supports the `Idempotency-Key` header.\n",
+        "description": "Creates a contact in the organization. At least one of `email` or `phone` is required so the person stays reachable and findable. Creating a contact whose email already exists returns 409 - search first, then reference the existing id. Supports the `Idempotency-Key` header.\n",
         "tags": [
           "Contacts"
         ],
@@ -5146,7 +5237,7 @@
     "/v1/platform/content": {
       "get": {
         "summary": "List content",
-        "description": "Returns content for the organization. By default this is the public view: published items with `Public` visibility, the same thing a website visitor could see.\nTo manage content you need the rest of it — pass `status=all` for drafts and `visibility=all` for member-only and private items. Both require the `content:write` scope, since they expose material the organization has not published.\n",
+        "description": "Returns content for the organization. By default this is the public view: published items with `Public` visibility, the same thing a website visitor could see.\nTo manage content you need the rest of it - pass `status=all` for drafts and `visibility=all` for member-only and private items. Both require the `content:write` scope, since they expose material the organization has not published.\n",
         "tags": [
           "Content"
         ],
@@ -5274,7 +5365,7 @@
       },
       "post": {
         "summary": "Create content",
-        "description": "Creates a post, FAQ, document, block or how-to guide.\nSend the body as either `contentBlocks` (Editor.js blocks, what the admin editor writes) or `contentHtml` — not both. A `block` created here is what a website `block` section renders: reference it by the slug this returns.\nThe slug is derived from the title when omitted, and de-duplicated with a numeric suffix rather than rejected — read the returned `slug` rather than assuming the one you sent.\n",
+        "description": "Creates a post, FAQ, document, block or how-to guide.\nSend the body as either `contentBlocks` (Editor.js blocks, what the admin editor writes) or `contentHtml` - not both. A `block` created here is what a website `block` section renders: reference it by the slug this returns.\nThe slug is derived from the title when omitted, and de-duplicated with a numeric suffix rather than rejected - read the returned `slug` rather than assuming the one you sent.\n",
         "tags": [
           "Content"
         ],
@@ -5320,8 +5411,7 @@
                   },
                   "contentHtml": {
                     "type": "string",
-                    "description": "HTML body",
-                    "as an alternative to contentBlocks": null
+                    "description": "HTML body, as an alternative to contentBlocks"
                   },
                   "excerpt": {
                     "type": "string",
@@ -5338,15 +5428,14 @@
                     "items": {
                       "type": "string"
                     },
-                    "description": "URLs from the media library — never invented URLs"
+                    "description": "URLs from the media library - never invented URLs"
                   },
                   "imageNameQueries": {
                     "type": "array",
                     "items": {
                       "type": "string"
                     },
-                    "description": "Media library search terms",
-                    "resolved to URLs and merged into images": null
+                    "description": "Media library search terms, resolved to URLs and merged into images"
                   },
                   "status": {
                     "type": "string",
@@ -5365,11 +5454,19 @@
                   },
                   "metaTitle": {
                     "type": "string",
-                    "nullable": true
+                    "nullable": true,
+                    "description": "SEO title. Falls back to the item's title."
                   },
                   "metaDescription": {
                     "type": "string",
-                    "nullable": true
+                    "nullable": true,
+                    "description": "SEO description. Falls back to `excerpt`."
+                  },
+                  "canonicalUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "nullable": true,
+                    "description": "Absolute URL this item canonicalizes to, for content that also lives elsewhere and should be indexed there instead. Leave unset for original content - the page then canonicalizes to itself.\n"
                   },
                   "language": {
                     "type": "string",
@@ -5427,7 +5524,7 @@
     "/v1/platform/content/{slug}": {
       "get": {
         "summary": "Get published content by slug",
-        "description": "Returns a single published, publicly-visible content item by slug — the public view. Use the list endpoint with `status=all` to reach drafts.\n",
+        "description": "Returns a single published, publicly-visible content item by slug - the public view. Use the list endpoint with `status=all` to reach drafts.\n",
         "tags": [
           "Content"
         ],
@@ -5498,7 +5595,7 @@
     "/v1/platform/content/{contentId}": {
       "patch": {
         "summary": "Update content",
-        "description": "Updates a content item by id — the numeric `id` from the list endpoint, not the slug. Only the fields you send change.\n`tags` and `images` replace their arrays wholesale. Switching `status` to `draft` takes the item off the public site without deleting it.\n",
+        "description": "Updates a content item by id - the numeric `id` from the list endpoint, not the slug. Only the fields you send change.\n`tags` and `images` replace their arrays wholesale. Switching `status` to `draft` takes the item off the public site without deleting it.\n",
         "tags": [
           "Content"
         ],
@@ -5578,11 +5675,19 @@
                   },
                   "metaTitle": {
                     "type": "string",
-                    "nullable": true
+                    "nullable": true,
+                    "description": "SEO title. Falls back to the item's title."
                   },
                   "metaDescription": {
                     "type": "string",
-                    "nullable": true
+                    "nullable": true,
+                    "description": "SEO description. Falls back to `excerpt`."
+                  },
+                  "canonicalUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "nullable": true,
+                    "description": "Absolute URL this item canonicalizes to, for content that also lives elsewhere and should be indexed there instead. Leave unset for original content - the page then canonicalizes to itself.\n"
                   },
                   "featured": {
                     "type": "boolean"
@@ -5643,7 +5748,7 @@
       },
       "delete": {
         "summary": "Delete content",
-        "description": "Permanently deletes a content item. A website `block` section still referencing its slug will render nothing, and a `document` with signatures against it should be taken out of use with `status: draft` instead — deleting it takes the signed text with it.\n",
+        "description": "Permanently deletes a content item. A website `block` section still referencing its slug will render nothing, and a `document` with signatures against it should be taken out of use with `status: draft` instead - deleting it takes the signed text with it.\n",
         "tags": [
           "Content"
         ],
@@ -5720,7 +5825,7 @@
     "/v1/platform/instructors": {
       "get": {
         "summary": "List and search instructors",
-        "description": "Returns the organization's active instructors. Use `search` to match on name — case-insensitive and cross-script, so `maya` also matches `Мая`. Resolve a coach here and pass the returned `id` as `instructorId` when creating a booking. `isBookable` is a hard requirement for that: an instructor who does not take one-on-one bookings cannot be booked from any channel. Instructors are staff records managed in the admin portal and cannot be created through this API.\n",
+        "description": "Returns the organization's active instructors. Use `search` to match on name - case-insensitive and cross-script, so `maya` also matches `Мая`. Resolve a coach here and pass the returned `id` as `instructorId` when creating a booking. `isBookable` is a hard requirement for that: an instructor who does not take one-on-one bookings cannot be booked from any channel. Instructors are staff records managed in the admin portal and cannot be created through this API.\n",
         "tags": [
           "Instructors"
         ],
@@ -5884,7 +5989,7 @@
     "/v1/platform/me": {
       "get": {
         "summary": "Describe the API key's organization and granted scopes",
-        "description": "Returns the organization the API key belongs to, the scopes granted to the key, and the catalog of resources/actions the platform API exposes. Requires a valid API key but no specific scope — use it to verify a key and discover what it can access.\n\nA full-access key holds the single wildcard scope `*`. Test a capability against `effectiveScopes`, which expands the wildcard, rather than against `scopes`, which reports the grant verbatim.\n",
+        "description": "Returns the organization the API key belongs to, the scopes granted to the key, and the catalog of resources/actions the platform API exposes. Requires a valid API key but no specific scope - use it to verify a key and discover what it can access.\n\nA full-access key holds the single wildcard scope `*`. Test a capability against `effectiveScopes`, which expands the wildcard, rather than against `scopes`, which reports the grant verbatim.\n",
         "tags": [
           "Account"
         ],
@@ -5940,7 +6045,7 @@
     "/v1/platform/media": {
       "get": {
         "summary": "List media",
-        "description": "The organization's media library, newest first. Pass `search` to match by name or alt text, which is how you find the URL for an image to put on a website section — never invent an image URL.\nA `search` returns the best matches ranked by relevance rather than a page of results, so `offset` does not apply to it and `total` reports how many matched.\n",
+        "description": "The organization's media library, newest first. Pass `search` to match by name or alt text, which is how you find the URL for an image to put on a website section - never invent an image URL.\nA `search` returns the best matches ranked by relevance rather than a page of results, so `offset` does not apply to it and `total` reports how many matched.\n",
         "tags": [
           "Media"
         ],
@@ -6037,7 +6142,7 @@
       },
       "post": {
         "summary": "Register a file in the media library",
-        "description": "Adds an already-hosted file to the library so website sections and content can reference it. The API does not accept file uploads — upload to your image host first (the admin editor uses Cloudinary) and register the resulting URL here.\nIdempotent per URL: registering one the organization already has updates whatever metadata you send and returns the existing item, with `created: false`.\n",
+        "description": "Adds an already-hosted file to the library so website sections and content can reference it. The API does not accept file uploads - upload to your image host first (the admin editor uses Cloudinary) and register the resulting URL here.\nIdempotent per URL: registering one the organization already has updates whatever metadata you send and returns the existing item, with `created: false`.\n",
         "tags": [
           "Media"
         ],
@@ -6062,14 +6167,12 @@
                   },
                   "name": {
                     "type": "string",
-                    "description": "Display name. Derived from the URL when omitted — this is what `search` matches on",
-                    "so a descriptive name is worth sending.": null
+                    "description": "Display name. Derived from the URL when omitted - this is what `search` matches on, so a descriptive name is worth sending."
                   },
                   "altText": {
                     "type": "string",
                     "nullable": true,
-                    "description": "Alternative text",
-                    "used by screen readers and searched alongside the name": null
+                    "description": "Alternative text, used by screen readers and searched alongside the name"
                   },
                   "caption": {
                     "type": "string",
@@ -6213,7 +6316,7 @@
       },
       "patch": {
         "summary": "Update media metadata",
-        "description": "Changes the name, alt text or caption. The file itself and its URL are immutable — register a new item to replace a file.\nAlt text is worth filling in: it is what screen readers announce, and it is searched alongside the name when finding an image to place.\n",
+        "description": "Changes the name, alt text or caption. The file itself and its URL are immutable - register a new item to replace a file.\nAlt text is worth filling in: it is what screen readers announce, and it is searched alongside the name when finding an image to place.\n",
         "tags": [
           "Media"
         ],
@@ -6306,7 +6409,7 @@
       },
       "delete": {
         "summary": "Delete a media item",
-        "description": "Removes the item from the library **and deletes the file from Cloudinary**. This cannot be undone, and any website section or content item still referencing the URL will render a broken image — check before deleting.\nNeeds its own `media:delete` scope for that reason; `media:write` alone is not enough.\n",
+        "description": "Removes the item from the library **and deletes the file from Cloudinary**. This cannot be undone, and any website section or content item still referencing the URL will render a broken image - check before deleting.\nNeeds its own `media:delete` scope for that reason; `media:write` alone is not enough.\n",
         "tags": [
           "Media"
         ],
@@ -6525,11 +6628,6 @@
                     "format": "date-time",
                     "description": "Defaults to now"
                   },
-                  "endDate": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Omit to let the plan's billing frequency decide"
-                  },
                   "autoRenew": {
                     "type": "boolean",
                     "description": "Defaults to the plan's setting"
@@ -6723,7 +6821,7 @@
                       "paused",
                       "cancelled"
                     ],
-                    "description": "Statuses the platform derives itself (expired, used, pending_payment) cannot be set here. Send `status` on its own - `endDate` and `autoRenew` cannot be combined with it, because a status transition sets them itself. `active` only applies to a paused membership.\n"
+                    "description": "Statuses the platform derives itself (expired, used, pending_payment) cannot be set here. Send `status` on its own - `autoRenew` and the allowance fields cannot be combined with it, because a status transition sets them itself. `active` only applies to a paused membership.\n"
                   },
                   "cancelMode": {
                     "type": "string",
@@ -6739,11 +6837,6 @@
                     "format": "date-time",
                     "nullable": true,
                     "description": "Only valid with `status: paused`. When the pause lifts by itself; must be in the future."
-                  },
-                  "endDate": {
-                    "type": "string",
-                    "format": "date-time",
-                    "nullable": true
                   },
                   "autoRenew": {
                     "type": "boolean"
@@ -7066,7 +7159,7 @@
       },
       "delete": {
         "summary": "Delete a membership plan",
-        "description": "Delete a plan with no dependent records. Set `isActive` to false to retire a plan that is already in use — a retired plan is still readable by id, and `includeInactive=true` brings it back into the list.\n",
+        "description": "Delete a plan with no dependent records. Set `isActive` to false to retire a plan that is already in use - a retired plan is still readable by id, and `includeInactive=true` brings it back into the list.\n",
         "tags": [
           "Plans"
         ],
@@ -7098,112 +7191,42 @@
         }
       }
     },
-    "/v1/platform/transactions": {
+    "/v1/platform/product-categories": {
       "get": {
-        "summary": "List transactions for the organization",
-        "description": "Returns transactions for the organization associated with the API token, filtered by transaction creation time and ordered by `createdAt` descending, then by id. Each bound is an ISO date-time, or a bare `YYYY-MM-DD` read as midnight UTC. `startDate` is inclusive and `endDate` is exclusive. When both are omitted, the window defaults to the last 24 hours (`endDate = now`, `startDate = now - 24h`); when only one is given, the other is derived from that same 24-hour span.\n\nA single request may span at most 93 days. Cover a longer range in consecutive windows, passing the previous window's `endDate` as the next one's `startDate` — because the upper bound is exclusive, that chains without counting a boundary transaction twice.\n\nNote that this endpoint returns a bare array with no total — a full page (`limit` rows) means there are probably more, so keep advancing `offset` until a short page comes back.\n\nOrdering is total (`createdAt` descending, then id), so `offset` paging is well defined for a fixed set of rows. It is not stable against concurrent writes: rows are ordered newest first, so a transaction created part-way through a walk lands on the first page and shifts every later row down by one, which can push an unread row past an `offset` already passed. Pass an explicit `endDate` in the past rather than relying on the `now` default — anything written after it falls outside the window and cannot shift the pages underneath you.\n",
+        "summary": "List product categories",
+        "description": "Returns every product category in the organization, in display order - the tabs on the till and the sections of a shop page. Resolve a category here, then pass its `categoryId` when creating a product or filtering the catalogue.\n\nThere is no paging: an organization has a handful of these, and a caller composing a menu wants all of them.\n",
         "tags": [
-          "Transactions"
+          "Products"
         ],
         "security": [
           {
             "customerApiAuth": []
           }
         ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "startDate",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Inclusive lower bound on transaction `createdAt`, as an ISO date-time or `YYYY-MM-DD`. Defaults to `endDate - 24h`."
-          },
-          {
-            "in": "query",
-            "name": "endDate",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Exclusive upper bound on transaction `createdAt`, as an ISO date-time or `YYYY-MM-DD`. Defaults to `now`."
-          },
-          {
-            "in": "query",
-            "name": "paymentStatus",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "paid",
-                "void",
-                "failed",
-                "settled",
-                "overdue",
-                "partially_paid",
-                "refunded",
-                "cancelled"
-              ]
-            },
-            "description": "Filter by payment status. When omitted, all statuses are returned."
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 100
-            },
-            "description": "Maximum number of transactions to return."
-          },
-          {
-            "in": "query",
-            "name": "offset",
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0
-            },
-            "description": "Number of transactions to skip."
-          }
-        ],
         "responses": {
           "200": {
-            "description": "List of transactions",
+            "description": "Every product category, in display order",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PlatformTransaction"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformProductCategory"
+                      }
+                    }
                   }
                 }
               }
             }
           },
-          "400": {
-            "description": "Invalid query parameters (e.g. malformed date, window > 93 days)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
           "401": {
-            "description": "Invalid or missing API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
+            "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `transactions:read` scope",
+            "description": "API key is missing the required `products:read` scope",
             "content": {
               "application/json": {
                 "schema": {
@@ -7213,7 +7236,75 @@
             }
           },
           "429": {
-            "description": "Rate limit exceeded",
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a product category",
+        "description": "Adds a product category. Omit `sortOrder` and it goes to the end of the list, which is what you want unless you are rebuilding the whole ordering. Supports the `Idempotency-Key` header.\n",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "sortOrder": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Display position; defaults to the end of the list"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product category created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProductCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `products:write` scope",
             "content": {
               "application/json": {
                 "schema": {
@@ -7221,16 +7312,19 @@
                 }
               }
             }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
           }
         }
       }
     },
-    "/v1/platform/transactions/{id}": {
+    "/v1/platform/product-categories/{id}": {
       "get": {
-        "summary": "Get a transaction by ID",
-        "description": "Returns a single transaction. The transaction must belong to the organization associated with the API token.\n",
+        "summary": "Get a product category",
+        "description": "Returns a single product category and how many products sit in it.",
         "tags": [
-          "Transactions"
+          "Products"
         ],
         "security": [
           {
@@ -7244,112 +7338,28 @@
             "required": true,
             "schema": {
               "type": "integer"
-            },
-            "description": "Transaction ID"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Transaction details",
+            "description": "The product category",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlatformTransaction"
+                  "$ref": "#/components/schemas/PlatformProductCategory"
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid transaction ID",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid or missing API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "API key is missing the required `transactions:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Transaction not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/platform/website": {
-      "get": {
-        "summary": "Get the website",
-        "description": "Returns one website with its page list, layout, publish state and public URLs. Omit `siteId` for the organization's default website.\n`previewUrl` renders the unpublished draft, which is how you review edits made through this API before publishing them; `url` is what the public sees and only reflects the last published release.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Which website, when the organization has more than one. Defaults to its default website."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The website, its pages and its layout",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformWebsite"
-                }
-              }
-            }
+            "$ref": "#/components/responses/PlatformBadRequest"
           },
           "401": {
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `website:read` scope",
+            "description": "API key is missing the required `products:read` scope",
             "content": {
               "application/json": {
                 "schema": {
@@ -7359,14 +7369,7 @@
             }
           },
           "404": {
-            "description": "No website with that id in this organization",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
+            "$ref": "#/components/responses/PlatformNotFound"
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"
@@ -7374,10 +7377,10 @@
         }
       },
       "patch": {
-        "summary": "Update website-level settings",
-        "description": "Changes the website's name, theme behaviour and SEO defaults. Every field is optional; omitted fields are left alone.\nDeliberately cannot change the site's address (`slug`, `domain`), which website is the organization's default, or whether the site is switched on — those move a customer's public presence and are not side effects a content edit should have.\n",
+        "summary": "Update a product category",
+        "description": "Renames a category or moves it in the display order. Products in it are unaffected.",
         "tags": [
-          "Website"
+          "Products"
         ],
         "security": [
           {
@@ -7386,8 +7389,9 @@
         ],
         "parameters": [
           {
-            "in": "query",
-            "name": "siteId",
+            "in": "path",
+            "name": "id",
+            "required": true,
             "schema": {
               "type": "integer"
             }
@@ -7399,1155 +7403,15 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "minProperties": 1,
                 "properties": {
                   "name": {
-                    "type": "string"
-                  },
-                  "themeSupport": {
                     "type": "string",
-                    "enum": [
-                      "both",
-                      "light",
-                      "dark"
-                    ],
-                    "description": "`both` lets a visitor switch; `light`/`dark` fixes the theme."
+                    "maxLength": 255
                   },
-                  "defaultTheme": {
-                    "type": "string",
-                    "enum": [
-                      "light",
-                      "dark",
-                      "system"
-                    ],
-                    "description": "Only meaningful when themeSupport is `both`."
-                  },
-                  "seoSettings": {
-                    "type": "object",
-                    "description": "Site-wide SEO defaults. Replaces the whole object."
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The updated website",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformWebsite"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid body",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:write` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/website/sites": {
-      "get": {
-        "summary": "List the organization's websites",
-        "description": "Every website the organization owns, its default one first. Use this when the organization runs more than one site to find the `siteId` the other endpoints take.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of websites",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PlatformWebsite"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/website/section-types": {
-      "get": {
-        "summary": "Get the section-type catalog",
-        "description": "Every section type a page or layout may use, with its config fields, their allowed values, and authoring notes.\nRead this before composing sections: it is the machine-readable definition of what a `hero` or a `plans` block accepts, and section types are added over time. `content` types belong in a page's `sections`; `layout` types (header, footer) belong to the site layout and appear on every page.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Section types with their config field definitions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "content": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "layout": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "sectionTypes": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "object",
-                        "properties": {
-                          "fields": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "key": {
-                                  "type": "string"
-                                },
-                                "type": {
-                                  "type": "string",
-                                  "enum": [
-                                    "string",
-                                    "text",
-                                    "number",
-                                    "select",
-                                    "string_list"
-                                  ]
-                                },
-                                "options": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "string"
-                                  }
-                                },
-                                "defaultValue": {}
-                              }
-                            }
-                          },
-                          "notes": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/website/css": {
-      "get": {
-        "summary": "Get the website's custom CSS",
-        "description": "Returns the site-wide custom stylesheet, or an empty string when none is set.",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The custom stylesheet",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "css": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      },
-      "put": {
-        "summary": "Replace the website's custom CSS",
-        "description": "Sets the site-wide stylesheet, replacing it entirely — read `GET /css` first and send the whole thing back with your changes.\nApplied globally on the public site. Target sections with `.section-{type}` (`.section-hero`, `.section-footer`) and prefer theme variables such as `var(--primary-color)` so styles survive a light/dark switch. Script tags are rejected.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "css"
-                ],
-                "properties": {
-                  "css": {
-                    "type": "string",
-                    "description": "The complete stylesheet. Send an empty string to remove it."
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The stored stylesheet"
-          },
-          "400": {
-            "description": "Stylesheet too large, or contains a script tag",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:write` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/website/pages": {
-      "get": {
-        "summary": "List the website's pages",
-        "description": "Every page on the site with its section types and SEO fields, but not the section bodies — fetch one page for those.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of pages",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PlatformWebsitePage"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      },
-      "post": {
-        "summary": "Add a page",
-        "description": "Creates a page on the draft. `slug` becomes its URL path segment and must be unique on the site; it is lowercased and stripped of surrounding slashes.\nAdding a page does not link to it — update the header's `navItems` and the footer's links afterwards, or visitors will never find it.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "slug",
-                  "title"
-                ],
-                "properties": {
-                  "slug": {
-                    "type": "string",
-                    "description": "Lowercase letters, numbers and hyphens, e.g. \"personal-training\""
-                  },
-                  "title": {
-                    "type": "string"
-                  },
-                  "isHomepage": {
-                    "type": "boolean",
-                    "description": "Makes this the homepage",
-                    "clearing the flag on whichever page held it": null
-                  },
-                  "sections": {
-                    "type": "array",
-                    "description": "Initial sections. See GET /section-types for the types and their config.",
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "type"
-                      ],
-                      "properties": {
-                        "type": {
-                          "type": "string"
-                        },
-                        "config": {
-                          "type": "object"
-                        },
-                        "translations": {
-                          "type": "object"
-                        }
-                      }
-                    }
-                  },
-                  "metaTitle": {
-                    "type": "string",
-                    "nullable": true
-                  },
-                  "metaDescription": {
-                    "type": "string",
-                    "nullable": true
-                  },
-                  "ogImage": {
-                    "type": "string",
-                    "nullable": true
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The created page",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformWebsitePage"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid slug, invalid section type, or the page limit is reached",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:write` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "A page with that slug already exists",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/website/pages/{slug}": {
-      "get": {
-        "summary": "Get one page",
-        "description": "A single page with its full section list, config and translations.",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The page",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformWebsitePage"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No page with that slug",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      },
-      "put": {
-        "summary": "Update a page",
-        "description": "Updates a page on the draft. Omitted fields are left alone, so this doubles as a partial update.\n`sections`, when present, **replaces the entire list** — which is the intended way to rebuild a page: one request that either applies whole or fails whole, rather than a sequence of per-section calls that can leave the page half-edited. Send `metaTitle`/`metaDescription`/`ogImage` as `null` to clear them.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "slug": {
-                    "type": "string",
-                    "description": "Renames the page",
-                    "moving its public URL. Nothing redirects from the old one.": null
-                  },
-                  "title": {
-                    "type": "string"
-                  },
-                  "isHomepage": {
-                    "type": "boolean"
-                  },
-                  "sections": {
-                    "type": "array",
-                    "description": "Replaces every section on the page.",
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "type"
-                      ],
-                      "properties": {
-                        "type": {
-                          "type": "string"
-                        },
-                        "config": {
-                          "type": "object"
-                        },
-                        "translations": {
-                          "type": "object"
-                        }
-                      }
-                    }
-                  },
-                  "metaTitle": {
-                    "type": "string",
-                    "nullable": true
-                  },
-                  "metaDescription": {
-                    "type": "string",
-                    "nullable": true
-                  },
-                  "ogImage": {
-                    "type": "string",
-                    "nullable": true
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The updated page",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformWebsitePage"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid body, invalid section type, or an attempt to leave the site without a homepage",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:write` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No page with that slug",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "The requested slug is taken by another page",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete a page",
-        "description": "Removes a page from the draft. The homepage cannot be deleted while other pages remain — make another page the homepage first. Remember to drop the page from the header and footer links afterwards.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Confirmation and the remaining page count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "slug": {
-                      "type": "string"
-                    },
-                    "pageCount": {
-                      "type": "integer"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "The page is the homepage and other pages remain",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:write` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No page with that slug",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/website/releases": {
-      "get": {
-        "summary": "List publish history",
-        "description": "Releases newest first. The one with `isActive: true` is what the public site is serving; its id is what `POST /releases/{releaseId}/rollback` takes to undo a publish.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Max results (1-100, default 20)"
-          },
-          {
-            "in": "query",
-            "name": "offset",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Releases and the total count",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "releases": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/PlatformWebsiteRelease"
-                      }
-                    },
-                    "total": {
-                      "type": "integer"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid pagination parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      },
-      "post": {
-        "summary": "Publish the website",
-        "description": "Makes the current draft live. Until this is called, edits made through this API are invisible to the public — this is the one endpoint that changes what visitors see, which is why it needs `website:publish` rather than `website:write`.\n`amend` (the default) overwrites the active release in place, so routine edits do not litter the history. `snapshot` cuts a new version, which is what you want before a large change so there is a version to roll back to.\nRequires the Website plan addon, the same as publishing from the admin editor.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "mode": {
-                    "type": "string",
-                    "enum": [
-                      "amend",
-                      "snapshot"
-                    ],
-                    "description": "`amend` (default) updates the live release in place; `snapshot` records a new version."
-                  },
-                  "note": {
-                    "type": "string",
-                    "description": "What changed. Shown in the publish history, most useful with `snapshot`."
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The release now serving the public site",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformWebsiteRelease"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the `website:publish` scope, or the organization does not have the Website plan addon",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No website with that id in this organization",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/website/pages/{slug}/sections": {
-      "post": {
-        "summary": "Add a section to a page",
-        "description": "Appends a section, or inserts it at `position`. A position past the end appends rather than failing.\nFor rebuilding a page, prefer `PUT /pages/{slug}` with the full `sections` array — it is one request instead of many, and cannot leave the page half-built.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "description": "A content section type from GET /section-types"
-                  },
-                  "config": {
-                    "type": "object"
-                  },
-                  "translations": {
-                    "type": "object"
-                  },
-                  "position": {
+                  "sortOrder": {
                     "type": "integer",
-                    "description": "0-based insert position. Omit to append."
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The page, with the section in place",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformWebsitePage"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid section type, or the page's section limit is reached",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:write` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No page with that slug",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/website/pages/{slug}/sections/{index}": {
-      "patch": {
-        "summary": "Update a section's config",
-        "description": "Merges the given fields into the section's existing config; fields you do not send keep their current values. Array fields are replaced wholesale, so send the whole array when changing one entry.\n`index` is the section's 0-based position as returned by `GET /pages/{slug}`. Indexes shift when sections are added or removed, so re-read the page rather than reusing a stale one.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "index",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "config"
-                ],
-                "properties": {
-                  "config": {
-                    "type": "object",
-                    "description": "Config fields to merge in"
+                    "minimum": 0
                   }
                 }
               }
@@ -8556,30 +7420,23 @@
         },
         "responses": {
           "200": {
-            "description": "The page, with the section updated",
+            "description": "The updated product category",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlatformWebsitePage"
+                  "$ref": "#/components/schemas/PlatformProductCategory"
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid body, or the index is out of range",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
+            "$ref": "#/components/responses/PlatformBadRequest"
           },
           "401": {
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `website:write` scope",
+            "description": "API key is missing the required `products:write` scope",
             "content": {
               "application/json": {
                 "schema": {
@@ -8589,263 +7446,7 @@
             }
           },
           "404": {
-            "description": "No page with that slug",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Remove a section from a page",
-        "description": "Deletes the section at `index`. Later sections shift down by one, so re-read the page before deleting another.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "index",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The page, with the section gone",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformWebsitePage"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "The index is out of range",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:write` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No page with that slug",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/website/layout/{slot}": {
-      "put": {
-        "summary": "Update the site header or footer",
-        "description": "The header and footer are site-level and render on every page. Config is merged into what is there, creating the slot if the site has none.\nThe link arrays (`navItems` on the header, `linkCategories`/`links` on the footer) **replace** rather than merge — read the current layout from `GET /v1/platform/website` and send the complete array, or you will drop the links you left out.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "slot",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "header",
-                "footer"
-              ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "config"
-                ],
-                "properties": {
-                  "config": {
-                    "type": "object",
-                    "description": "Header or footer config. See GET /section-types for the fields."
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The updated layout slot"
-          },
-          "400": {
-            "description": "Invalid slot or body",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `website:write` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/website/releases/{releaseId}/rollback": {
-      "post": {
-        "summary": "Roll back to an earlier release",
-        "description": "Restores a previous release: its content becomes the draft and is published as a new version, so the rollback is itself recorded rather than rewriting history. Use `GET /releases` to find the id.\nThis discards unpublished draft edits — the draft is overwritten with the release's content.\n",
-        "tags": [
-          "Website"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "releaseId",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "siteId",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The new release created by the rollback",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformWebsiteRelease"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid release id",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the `website:publish` scope, or the organization does not have the Website plan addon",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No such release on this website",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
+            "$ref": "#/components/responses/PlatformNotFound"
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"
@@ -9233,33 +7834,249 @@
         }
       }
     },
-    "/v1/platform/product-categories": {
+    "/v1/platform/transactions": {
       "get": {
-        "summary": "List product categories",
-        "description": "Returns every product category in the organization, in display order - the tabs on the till and the sections of a shop page. Resolve a category here, then pass its `categoryId` when creating a product or filtering the catalogue.\n\nThere is no paging: an organization has a handful of these, and a caller composing a menu wants all of them.\n",
+        "summary": "List transactions for the organization",
+        "description": "Returns transactions for the organization associated with the API token, filtered by transaction creation time and ordered by `createdAt` descending, then by id. Each bound is an ISO date-time, or a bare `YYYY-MM-DD` read as midnight UTC. `startDate` is inclusive and `endDate` is exclusive. When both are omitted, the window defaults to the last 24 hours (`endDate = now`, `startDate = now - 24h`); when only one is given, the other is derived from that same 24-hour span.\n\nA single request may span at most 93 days. Cover a longer range in consecutive windows, passing the previous window's `endDate` as the next one's `startDate` - because the upper bound is exclusive, that chains without counting a boundary transaction twice.\n\nNote that this endpoint returns a bare array with no total - a full page (`limit` rows) means there are probably more, so keep advancing `offset` until a short page comes back.\n\nOrdering is total (`createdAt` descending, then id), so `offset` paging is well defined for a fixed set of rows. It is not stable against concurrent writes: rows are ordered newest first, so a transaction created part-way through a walk lands on the first page and shifts every later row down by one, which can push an unread row past an `offset` already passed. Pass an explicit `endDate` in the past rather than relying on the `now` default - anything written after it falls outside the window and cannot shift the pages underneath you.\n",
         "tags": [
-          "Products"
+          "Transactions"
         ],
         "security": [
           {
             "customerApiAuth": []
           }
         ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "startDate",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Inclusive lower bound on transaction `createdAt`, as an ISO date-time or `YYYY-MM-DD`. Defaults to `endDate - 24h`."
+          },
+          {
+            "in": "query",
+            "name": "endDate",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Exclusive upper bound on transaction `createdAt`, as an ISO date-time or `YYYY-MM-DD`. Defaults to `now`."
+          },
+          {
+            "in": "query",
+            "name": "paymentStatus",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "paid",
+                "void",
+                "failed",
+                "settled",
+                "overdue",
+                "partially_paid",
+                "refunded",
+                "cancelled"
+              ]
+            },
+            "description": "Filter by payment status. When omitted, all statuses are returned."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100
+            },
+            "description": "Maximum number of transactions to return."
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "Number of transactions to skip."
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Every product category, in display order",
+            "description": "List of transactions",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/PlatformProductCategory"
-                      }
-                    }
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlatformTransaction"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters (e.g. malformed date, window > 93 days)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `transactions:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/transactions/{id}": {
+      "get": {
+        "summary": "Get a transaction by ID",
+        "description": "Returns a single transaction. The transaction must belong to the organization associated with the API token.\n",
+        "tags": [
+          "Transactions"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Transaction ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformTransaction"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid transaction ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key is missing the required `transactions:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/website": {
+      "get": {
+        "summary": "Get the website",
+        "description": "Returns one website with its page list, layout, publish state and public URLs. Omit `siteId` for the organization's default website.\n`previewUrl` renders the unpublished draft, which is how you review edits made through this API before publishing them; `url` is what the public sees and only reflects the last published release.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Which website, when the organization has more than one. Defaults to its default website."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The website, its pages and its layout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformWebsite"
                 }
               }
             }
@@ -9268,7 +8085,17 @@
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `products:read` scope",
+            "description": "API key is missing the required `website:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No website with that id in this organization",
             "content": {
               "application/json": {
                 "schema": {
@@ -9282,11 +8109,11 @@
           }
         }
       },
-      "post": {
-        "summary": "Create a product category",
-        "description": "Adds a product category. Omit `sortOrder` and it goes to the end of the list, which is what you want unless you are rebuilding the whole ordering. Supports the `Idempotency-Key` header.\n",
+      "patch": {
+        "summary": "Update website-level settings",
+        "description": "Changes the website's name, theme behaviour and site-wide SEO defaults. Every field is optional; omitted fields are left alone.\n`supportedLocales` and `defaultLocale` are **organization-level** and need the additional `organization:write` scope. They also decide which languages the member portal, the mobile app and outbound email offer, and they take effect immediately rather than on publish - so they are a separate grant from editing the draft. They are reachable here at all because they are what decides which localized URLs the website serves: a page or section translated into an unlisted locale has no URL to be served at and no `hreflang` alternate pointing to it. A `defaultLocale` outside `supportedLocales` is a 400.\nEverything else in this body edits the **draft**, `seoSettings` included - it is stored in the site's settings, so a release carries it and the public site keeps serving the previously published values until you publish.\nDeliberately cannot change the site's address (`slug`, `domain`), which website is the organization's default, or whether the site is switched on - those move a customer's public presence and are not side effects a content edit should have.\n",
         "tags": [
-          "Products"
+          "Website"
         ],
         "security": [
           {
@@ -9295,13 +8122,11 @@
         ],
         "parameters": [
           {
-            "in": "header",
-            "name": "Idempotency-Key",
+            "in": "query",
+            "name": "siteId",
             "schema": {
-              "type": "string",
-              "maxLength": 255
-            },
-            "description": "Retry-safe key; a repeat of the same request replays the first response"
+              "type": "integer"
+            }
           }
         ],
         "requestBody": {
@@ -9310,18 +8135,90 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "name"
-                ],
                 "properties": {
                   "name": {
-                    "type": "string",
-                    "maxLength": 255
+                    "type": "string"
                   },
-                  "sortOrder": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "description": "Display position; defaults to the end of the list"
+                  "themeSupport": {
+                    "type": "string",
+                    "enum": [
+                      "both",
+                      "light",
+                      "dark"
+                    ],
+                    "description": "`both` lets a visitor switch; `light`/`dark` fixes the theme."
+                  },
+                  "defaultTheme": {
+                    "type": "string",
+                    "enum": [
+                      "light",
+                      "dark",
+                      "system"
+                    ],
+                    "description": "Only meaningful when themeSupport is `both`."
+                  },
+                  "seoSettings": {
+                    "type": "object",
+                    "description": "Site-wide SEO defaults, replacing the whole object - read the current one from `GET /website` first. Every field is a fallback a page can override.\n",
+                    "additionalProperties": false,
+                    "properties": {
+                      "siteDescription": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Meta description for pages that set none, and the `description` in the site's Organization / LocalBusiness / WebSite structured data.\n"
+                      },
+                      "defaultOgImage": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true,
+                        "description": "Social-share image for pages with no `ogImage`. Get a URL from `GET /media`."
+                      },
+                      "verification": {
+                        "type": "object",
+                        "nullable": true,
+                        "additionalProperties": false,
+                        "description": "Search-console ownership tokens, rendered as meta tags on every page.",
+                        "properties": {
+                          "google": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Google Search Console token"
+                          },
+                          "bing": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Bing Webmaster Tools token"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "supportedLocales": {
+                    "type": "array",
+                    "description": "Locales this organization serves, in display order. Organization-level, requires `organization:write`, and applies immediately - see the endpoint description. Must contain `defaultLocale`.\n",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "en",
+                        "es",
+                        "fr",
+                        "de",
+                        "bg",
+                        "cs"
+                      ]
+                    }
+                  },
+                  "defaultLocale": {
+                    "type": "string",
+                    "enum": [
+                      "en",
+                      "es",
+                      "fr",
+                      "de",
+                      "bg",
+                      "cs"
+                    ],
+                    "description": "Locale served at the site root. Organization-level, requires `organization:write`."
                   }
                 }
               }
@@ -9329,24 +8226,31 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "Product category created",
+          "200": {
+            "description": "The updated website",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlatformProductCategory"
+                  "$ref": "#/components/schemas/PlatformWebsite"
                 }
               }
             }
           },
           "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
+            "description": "Invalid body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `products:write` scope",
+            "description": "API key is missing `website:write`, or `organization:write` when the body carries locale fields",
             "content": {
               "application/json": {
                 "schema": {
@@ -9361,47 +8265,37 @@
         }
       }
     },
-    "/v1/platform/product-categories/{id}": {
+    "/v1/platform/website/sites": {
       "get": {
-        "summary": "Get a product category",
-        "description": "Returns a single product category and how many products sit in it.",
+        "summary": "List the organization's websites",
+        "description": "Every website the organization owns, its default one first. Use this when the organization runs more than one site to find the `siteId` the other endpoints take.\n",
         "tags": [
-          "Products"
+          "Website"
         ],
         "security": [
           {
             "customerApiAuth": []
           }
         ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
         "responses": {
           "200": {
-            "description": "The product category",
+            "description": "List of websites",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlatformProductCategory"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlatformWebsite"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
           },
           "401": {
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `products:read` scope",
+            "description": "API key is missing the required `website:read` scope",
             "content": {
               "application/json": {
                 "schema": {
@@ -9410,19 +8304,113 @@
               }
             }
           },
-          "404": {
-            "$ref": "#/components/responses/PlatformNotFound"
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/website/section-types": {
+      "get": {
+        "summary": "Get the section-type catalog",
+        "description": "Every section type a page or layout may use, with its config fields, their allowed values, and authoring notes.\nRead this before composing sections: it is the machine-readable definition of what a `hero` or a `plans` block accepts, and section types are added over time. `content` types belong in a page's `sections`; `layout` types (header, footer) belong to the site layout and appear on every page.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Section types with their config field definitions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "layout": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "sectionTypes": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "fields": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "string",
+                                  "enum": [
+                                    "string",
+                                    "text",
+                                    "number",
+                                    "select",
+                                    "string_list"
+                                  ]
+                                },
+                                "options": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "defaultValue": {}
+                              }
+                            }
+                          },
+                          "notes": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `website:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"
           }
         }
-      },
-      "patch": {
-        "summary": "Update a product category",
-        "description": "Renames a category or moves it in the display order. Products in it are unaffected.",
+      }
+    },
+    "/v1/platform/website/css": {
+      "get": {
+        "summary": "Get the website's custom CSS",
+        "description": "Returns the site-wide custom stylesheet, or an empty string when none is set.",
         "tags": [
-          "Products"
+          "Website"
         ],
         "security": [
           {
@@ -9431,9 +8419,62 @@
         ],
         "parameters": [
           {
-            "in": "path",
-            "name": "id",
-            "required": true,
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The custom stylesheet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "css": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `website:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace the website's custom CSS",
+        "description": "Sets the site-wide stylesheet, replacing it entirely - read `GET /css` first and send the whole thing back with your changes.\nApplied globally on the public site. Target sections with `.section-{type}` (`.section-hero`, `.section-footer`) and prefer theme variables such as `var(--primary-color)` so styles survive a light/dark switch. Script tags are rejected.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "siteId",
             "schema": {
               "type": "integer"
             }
@@ -9445,15 +8486,13 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "minProperties": 1,
+                "required": [
+                  "css"
+                ],
                 "properties": {
-                  "name": {
+                  "css": {
                     "type": "string",
-                    "maxLength": 255
-                  },
-                  "sortOrder": {
-                    "type": "integer",
-                    "minimum": 0
+                    "description": "The complete stylesheet. Send an empty string to remove it."
                   }
                 }
               }
@@ -9462,23 +8501,290 @@
         },
         "responses": {
           "200": {
-            "description": "The updated product category",
+            "description": "The stored stylesheet"
+          },
+          "400": {
+            "description": "Stylesheet too large, or contains a script tag",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlatformProductCategory"
+                  "$ref": "#/components/schemas/PlatformError"
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
           },
           "401": {
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `products:write` scope",
+            "description": "API key is missing the required `website:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/website/pages": {
+      "get": {
+        "summary": "List the website's pages",
+        "description": "Every page on the site with its section types and SEO fields, but not the section bodies - fetch one page for those.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of pages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlatformWebsitePage"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `website:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a page",
+        "description": "Creates a page on the draft. `slug` becomes its URL path segment and must be unique on the site; it is lowercased and stripped of surrounding slashes.\nAdding a page does not link to it - update the header's `navItems` and the footer's links afterwards, or visitors will never find it.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "slug",
+                  "title"
+                ],
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "description": "Lowercase letters, numbers and hyphens, e.g. \"personal-training\""
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "isHomepage": {
+                    "type": "boolean",
+                    "description": "Makes this the homepage, clearing the flag on whichever page held it"
+                  },
+                  "sections": {
+                    "type": "array",
+                    "description": "Initial sections. See GET /section-types for the types and their config.",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "type"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "config": {
+                          "type": "object"
+                        },
+                        "translations": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  },
+                  "metaTitle": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "SEO title. Falls back to the page title."
+                  },
+                  "metaDescription": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Falls back to `seoSettings.siteDescription`."
+                  },
+                  "ogImage": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Absolute URL. Get one from GET /media rather than composing it."
+                  },
+                  "noindex": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "description": "Ask search engines not to index this page, and leave it out of `sitemap.xml`. For thank-you pages and campaign landing variants. The page stays publicly reachable - this is not a privacy control.\n"
+                  },
+                  "translations": {
+                    "type": "object",
+                    "nullable": true,
+                    "description": "Per-locale `metaTitle`/`metaDescription`, keyed by locale: `{ \"bg\": { \"metaTitle\": \"…\" } }`. Replaces the whole map. `ogImage` is not localizable - one social card serves every locale.\nAn override only reaches a visitor for a locale the organization actually serves: check `supportedLocales` on `GET /website` and add the locale there first, or the translation has no URL to be served at.\n",
+                    "additionalProperties": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "metaTitle": {
+                          "type": "string"
+                        },
+                        "metaDescription": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The created page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformWebsitePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid slug, invalid section type, or the page limit is reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `website:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A page with that slug already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/website/pages/{slug}": {
+      "get": {
+        "summary": "Get one page",
+        "description": "A single page with its full section list, config and translations.",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformWebsitePage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `website:read` scope",
             "content": {
               "application/json": {
                 "schema": {
@@ -9488,7 +8794,898 @@
             }
           },
           "404": {
-            "$ref": "#/components/responses/PlatformNotFound"
+            "description": "No page with that slug",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a page",
+        "description": "Updates a page on the draft. Omitted fields are left alone, so this doubles as a partial update.\n`sections`, when present, **replaces the entire list** - which is the intended way to rebuild a page: one request that either applies whole or fails whole, rather than a sequence of per-section calls that can leave the page half-edited. `translations` replaces the whole locale map for the same reason. Send `metaTitle`/`metaDescription`/`ogImage` as `null` to clear them.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "description": "Renames the page, moving its public URL. Nothing redirects from the old one."
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "isHomepage": {
+                    "type": "boolean"
+                  },
+                  "sections": {
+                    "type": "array",
+                    "description": "Replaces every section on the page.",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "type"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "config": {
+                          "type": "object"
+                        },
+                        "translations": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  },
+                  "metaTitle": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "metaDescription": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "ogImage": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "noindex": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "description": "Keep the page out of search indexes and `sitemap.xml`. `false` or `null` makes it indexable again."
+                  },
+                  "translations": {
+                    "type": "object",
+                    "nullable": true,
+                    "description": "Per-locale `metaTitle`/`metaDescription`, keyed by locale. **Replaces the whole map** - read the page first and send every locale back, the same way `sections` works. `null` clears all overrides.\n",
+                    "additionalProperties": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "metaTitle": {
+                          "type": "string"
+                        },
+                        "metaDescription": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformWebsitePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body, invalid section type, or an attempt to leave the site without a homepage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `website:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No page with that slug",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The requested slug is taken by another page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a page",
+        "description": "Removes a page from the draft. The homepage cannot be deleted while other pages remain - make another page the homepage first. Remember to drop the page from the header and footer links afterwards.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Confirmation and the remaining page count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "pageCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The page is the homepage and other pages remain",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `website:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No page with that slug",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/website/releases": {
+      "get": {
+        "summary": "List publish history",
+        "description": "Releases newest first. The one with `isActive: true` is what the public site is serving; its id is what `POST /releases/{releaseId}/rollback` takes to undo a publish.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Max results (1-100, default 20)"
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Releases and the total count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "releases": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformWebsiteRelease"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `website:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "summary": "Publish the website",
+        "description": "Makes the current draft live. Until this is called, edits made through this API are invisible to the public - this is the one endpoint that changes what visitors see, which is why it needs `website:publish` rather than `website:write`.\n`amend` (the default) overwrites the active release in place, so routine edits do not litter the history. `snapshot` cuts a new version, which is what you want before a large change so there is a version to roll back to.\nRequires the Website plan addon, the same as publishing from the admin editor.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "amend",
+                      "snapshot"
+                    ],
+                    "description": "`amend` (default) updates the live release in place; `snapshot` records a new version."
+                  },
+                  "note": {
+                    "type": "string",
+                    "description": "What changed. Shown in the publish history, most useful with `snapshot`."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The release now serving the public site",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformWebsiteRelease"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the `website:publish` scope, or the organization does not have the Website plan addon",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No website with that id in this organization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/website/pages/{slug}/sections": {
+      "post": {
+        "summary": "Add a section to a page",
+        "description": "Appends a section, or inserts it at `position`. A position past the end appends rather than failing.\nFor rebuilding a page, prefer `PUT /pages/{slug}` with the full `sections` array - it is one request instead of many, and cannot leave the page half-built.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "description": "A content section type from GET /section-types"
+                  },
+                  "config": {
+                    "type": "object"
+                  },
+                  "translations": {
+                    "type": "object"
+                  },
+                  "position": {
+                    "type": "integer",
+                    "description": "0-based insert position. Omit to append."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The page, with the section in place",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformWebsitePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid section type, or the page's section limit is reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `website:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No page with that slug",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/website/pages/{slug}/sections/{index}": {
+      "patch": {
+        "summary": "Update a section's config",
+        "description": "Merges the given fields into the section's existing config; fields you do not send keep their current values. Array fields are replaced wholesale, so send the whole array when changing one entry.\n`index` is the section's 0-based position as returned by `GET /pages/{slug}`. Indexes shift when sections are added or removed, so re-read the page rather than reusing a stale one.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "index",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "config"
+                ],
+                "properties": {
+                  "config": {
+                    "type": "object",
+                    "description": "Config fields to merge in"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The page, with the section updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformWebsitePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body, or the index is out of range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `website:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No page with that slug",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove a section from a page",
+        "description": "Deletes the section at `index`. Later sections shift down by one, so re-read the page before deleting another.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "index",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The page, with the section gone",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformWebsitePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The index is out of range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `website:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No page with that slug",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/website/layout/{slot}": {
+      "put": {
+        "summary": "Update the site header or footer",
+        "description": "The header and footer are site-level and render on every page. Config is merged into what is there, creating the slot if the site has none.\nThe link arrays (`navItems` on the header, `linkCategories`/`links` on the footer) **replace** rather than merge - read the current layout from `GET /v1/platform/website` and send the complete array, or you will drop the links you left out.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slot",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "header",
+                "footer"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "config"
+                ],
+                "properties": {
+                  "config": {
+                    "type": "object",
+                    "description": "Header or footer config. See GET /section-types for the fields."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated layout slot"
+          },
+          "400": {
+            "description": "Invalid slot or body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `website:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/website/releases/{releaseId}/rollback": {
+      "post": {
+        "summary": "Roll back to an earlier release",
+        "description": "Restores a previous release: its content becomes the draft and is published as a new version, so the rollback is itself recorded rather than rewriting history. Use `GET /releases` to find the id.\nThis discards unpublished draft edits - the draft is overwritten with the release's content.\n",
+        "tags": [
+          "Website"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "releaseId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "siteId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The new release created by the rollback",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformWebsiteRelease"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid release id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the `website:publish` scope, or the organization does not have the Website plan addon",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such release on this website",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"

@@ -23,10 +23,10 @@ You connect once, and from then on you can ask an assistant things like "which c
 
 1Club exposes **two separate MCP servers**. Each has its own address, and an assistant connected to one never sees the other's tools.
 
-| Server        | Address                          | Who it is for                                    | Authentication             |
-| ------------- | -------------------------------- | ------------------------------------------------ | -------------------------- |
-| **Admin**     | `https://mcp.1club.ai/admin`     | Your gym's staff and internal systems            | 1Club OAuth sign-in        |
-| **Discovery** | `https://mcp.1club.ai/discovery` | Anyone searching the public 1club.me marketplace | None                       |
+| Server        | Address                          | Who it is for                                    | Authentication                                  |
+| ------------- | -------------------------------- | ------------------------------------------------ | ----------------------------------------------- |
+| **Admin**     | `https://mcp.1club.ai/admin`     | Your gym's staff and internal systems            | 1Club OAuth sign-in, or a Platform API key      |
+| **Discovery** | `https://mcp.1club.ai/discovery` | Anyone searching the public 1club.me marketplace | None                                            |
 
 - The **admin server** reads and writes one organization's own data. You sign in to 1Club, choose the organization, and approve the requested access. Every response is limited to that organization. This is the one you want for running your gym. A developer-managed client that cannot sign in interactively can send a [Platform API key](/settings/api-tokens) as a bearer token instead; OAuth is the recommended path for everyone else.
 - The **discovery server** searches the public marketplace across all listed gyms and checks published availability. It is anonymous by design and can never reach a single organization's private data.
@@ -41,41 +41,56 @@ Pick the one that matches what you are trying to do, then follow [Connect an ass
 
 ## What an assistant can do
 
-The admin server covers operational reads and writes:
+The admin server covers your operations, your catalogue, and your website:
 
-- **Classes** - list, create, update, and delete class occurrences.
-- **Areas and availability** - list bookable areas and check when they are free.
+- **Classes** - list, create, update, and delete class occurrences, and read a class roster.
+- **Areas and availability** - list bookable areas, check when they are free, and block or reopen a court.
 - **Plans** - find, create, update, retire, and delete membership plans.
 - **Memberships** - create and update customer memberships.
 - **Bookings** - create, cancel, and inspect bookings and their participants.
 - **Check-ins** - list attendance and check in an existing booking.
 - **Contacts and instructors** - resolve customers and coaches, and create contacts.
+- **Products** - search the catalogue, reprice or retire a product, manage categories, and see how many are left to sell.
+- **Website** - read and edit pages, sections, navigation, and custom CSS, then publish or roll back.
+- **Media** - browse the media library, register hosted images and videos, and edit their alt text.
+- **Content** - read, create, update, and delete CMS content such as posts, FAQs, documents, and reusable blocks.
 - **Gyms** - read a gym's details, amenities, and rating.
-- **Content** - read published website and CMS content.
 - **Transactions** - list and open billing transactions.
 
 The full list, with the OAuth scope each tool needs, is on the [Tools reference](/mcp/tools) page.
+
+<Note>
+  Website edits go to a draft, so nothing an assistant changes is public until it
+  publishes, and publishing is a scope of its own that you can withhold while
+  still letting the assistant edit. The one exception is the languages your
+  organization offers: those are organization-wide, need the separate
+  `organization:write` scope, and take effect immediately.
+</Note>
 
 The discovery server covers marketplace search and public availability for classes, areas, and instructors.
 
 ## Current boundaries
 
 - **There is no member-facing server.** The admin connection acts on an organization. It does not sign in as a member or expose a member's private portal session.
-- **MCP follows the Platform API.** Messaging, automations, staff administration, and other resources not listed in the [Tools reference](/mcp/tools) are not exposed.
+- **MCP follows the Platform API.** Messaging, automations, invoices and payments, access control, staff administration, and reporting are not exposed. Anything absent from the [Tools reference](/mcp/tools) is unreachable through MCP today.
 - **Check-in creation is booking-based.** The assistant can check in an existing booking. Front-desk walk-ins and payment collection remain in 1Club.
+- **Stock is read-only.** An assistant can see how many of a product are left to sell, but receiving a delivery, correcting a count, and writing off damage stay in 1Club.
+- **Some things are deliberately not deletable.** Contacts, memberships, and products have no delete tool. Retire a product with its update tool instead, which takes it off the till and keeps its sales history.
 
 ## Security model
 
 - **OAuth keeps credentials out of setup.** You sign in directly on 1Club's authorization page. You do not paste a password or API token into the assistant.
 - **Read-only is the default.** A client that requests no scopes gets a read-only connection, and every write capability a client does request is a checkbox on the authorization page that starts unchecked. Approving without ticking anything leaves the assistant able to look things up and nothing more.
-- **Anything beyond reading is a deliberate opt-in, per capability.** Tick only what the assistant actually needs. That covers the writes and the two that go further - `media:delete` removes a file permanently, `website:publish` makes draft edits public. Content the assistant reads - a member note, a website page - can contain text that tries to steer it, so these belong only on a connection you supervise.
+- **Anything beyond reading is a deliberate opt-in, per capability.** Tick only what the assistant actually needs. That covers the writes and the three that go further - `media:delete` removes a file permanently, `website:publish` makes draft edits public, and `organization:write` changes settings such as your languages everywhere at once and immediately, rather than into a draft. Content the assistant reads - a member note, a website page - can contain text that tries to steer it, so these belong only on a connection you supervise.
 - **Scopes are the limit.** An assistant can only use tools its granted scopes allow. A connection with `classes:read` cannot create or update a class. The set cannot be changed after approval: revoke the connection and authorize it again with different boxes ticked.
+- **A connection never outlives the person behind it.** It carries the permission of whoever authorized it. If they lose **settings.manage.organization** or leave the organization, the connection is revoked on its next tool call. A client unused for 90 days is dropped as well.
 - **Revocation is instant.** Revoking a connection under **Settings > Artificial Intelligence > AI assistants (MCP)** cuts the assistant off immediately.
+- **Credentials are short-lived and rotated.** An access token is valid for an hour, and each silent refresh issues a fresh pair. A connection left idle for 30 days expires; one in regular use does not. Only hashes are ever stored, and replaying a spent refresh token revokes the entire connection.
 - **Rate limits apply.** MCP calls count against the Platform API's limit of 100 requests per minute per organization.
 
 ## Before you start
 
-- API and MCP access are **paid features**. The discovery server remains public and needs no sign-in.
+- API and MCP access are **paid features**, locked on free plans and during a trial. The discovery server remains public and needs no sign-in.
 - Authorizing a connection requires the **settings.manage.organization** permission. In practice that means admins and owners.
 - Your MCP client must support remote HTTP MCP servers, and OAuth for the recommended setup. A client that can only send a fixed `Authorization` header can use a [Platform API key](/settings/api-tokens) instead. [Connect an assistant](/mcp/connect) covers both.
 
@@ -98,7 +113,7 @@ The discovery server covers marketplace search and public availability for class
   What to do when the connection or a tool call fails.
 </Card>
 
-  <Card title="Manage connections" icon="link" href="/mcp/connect#disconnect-or-revoke">
-    Review how OAuth connections are authorized and revoked.
+  <Card title="Manage connections" icon="link" href="/mcp/connect#review-connected-assistants">
+    See which assistants have access to your organization, and revoke one.
   </Card>
 </Columns>

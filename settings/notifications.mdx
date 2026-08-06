@@ -1,10 +1,10 @@
 ---
 title: "Notifications"
 description: "Choose which notification categories you receive and on which channels, and understand how staff alerts route to the right people."
-keywords: [notifications, notification settings, channels, in-app, push, email, SMS, staff alerts, subscriptions, booking alerts, notification categories]
+keywords: [notifications, notification settings, channels, app notifications, in-app, push, email, SMS, staff alerts, subscriptions, booking alerts, notification categories]
 ---
 
-Notification settings control which categories of notifications you personally receive and on which channels they reach you. A **notification** is the system's record of something that happened, addressed to a person ("a member booked a court", "a renewal payment failed"). It is delivered through one or more **channels** - in-app, push, email, or SMS - and which channels fire for you, per category, is exactly what this page governs.
+Notification settings control which categories of notifications you personally receive and on which channels they reach you. A **notification** is the system's record of something that happened, addressed to a person ("a member booked a court", "a renewal payment failed"). It is delivered through one or more **channels** - App, email, or SMS - and which channels fire for you, per category, is exactly what this page governs.
 
 These preferences are per user: each staff member sets their own. They do not change what the system generates, only how it reaches you.
 
@@ -74,19 +74,22 @@ Owners are treated as admins for relevance, so they see every category.
 
 A notification can be delivered on any of these channels:
 
-- **In-app** - Appears in your notification center inside 1Club. Turning this off for a category removes those notifications from the notification center entirely.
-- **Push** - The mobile-app nudge. Push and in-app are two channels of the same notification and share its read state, not two separate notifications.
+- **App** - Reaches you inside 1Club: the notification center in the dashboard, plus an alert on any phone or browser where you have allowed notifications. These are one channel, not two. Which of your devices light up depends on what you have connected, not on anything you pick here.
 - **Email** - Sent through SendGrid, using your organization's branding.
 - **SMS** - A text message, sent through Twilio, used for staff alerts where a mobile number is on file.
 
-In this settings screen you select **In-App** and **Email** per category. Push is governed by your mobile app, and SMS is used by the platform for staff alerts where configured; both ride the same per-category preferences model.
+In this settings screen you select **App** and **Email** per category. SMS is used by the platform for staff alerts where configured, and rides the same per-category preferences model.
+
+<Note>
+**App** was previously two separate channels, **In-app** and **Push**. They were merged because they never really were separate: switching off In-app did not stop the phone alert. Anything you had set to In-app is now set to **App**, so you may start seeing device alerts you did not get before. To stop those while keeping the notification center, turn off notifications for 1Club in your phone or browser settings rather than here.
+</Note>
 
 ### How channels resolve
 
 For each category, the effective channels are the ones you selected, intersected with the channels that category actually supports - you never receive a channel you didn't ask for. Beyond that:
 
 - **Category off** - You receive nothing for that category, on any channel.
-- **On-by-default categories with no saved preference** - You receive them on their default channels (In-App and Email).
+- **On-by-default categories with no saved preference** - You receive them on their default channels (App and Email).
 - **Opt-in categories** (User bookings and My bookings) - You receive nothing until you enable them; they start off by design to avoid noise from high-volume booking activity.
 
 <Note>
@@ -100,9 +103,9 @@ Staff alerts about member actions are resolved and delivered automatically. Unde
 - **By role** - Alerts like New booking, New membership, and New signup go to every active user whose role matches (admins and managers for most; front desk and instructors are also included for inbound messages).
 - **By instructor** - Class-booking and instructor-review alerts resolve to the instructors of the specific class or session involved: the directly assigned instructor for one-to-one sessions, plus the class's instructors for class bookings. Only active instructors with an active linked account are reachable.
 - **Deduplicated** - If one person matches more than one rule for the same event (for example an admin who also teaches the booked class), they receive a single notification, not one per rule.
-- **Per-recipient channels** - Each recipient's own notification preferences decide which channels fire for them. One person may get a new booking in-app while another gets it by email.
+- **Per-recipient channels** - Each recipient's own notification preferences decide which channels fire for them. One person may get a new booking in the app while another gets it by email.
 
-Delivery per channel is independent: an email failure doesn't suppress the in-app notification, and vice versa.
+Delivery per channel is independent: an email failure doesn't suppress the App notification, and vice versa.
 
 ## Worked examples
 
@@ -111,7 +114,7 @@ Delivery per channel is independent: an email failure doesn't suppress the in-ap
 You run a busy pilates and yoga studio and don't want a ping for every class booking.
 
 - Leave **User bookings** off (it starts off anyway).
-- Keep **User memberships** and **User signups** on with **In-App** and **Email** so you see new members and new revenue.
+- Keep **User memberships** and **User signups** on with **App** and **Email** so you see new members and new revenue.
 - Keep **My inbox** on so member replies reach you.
 
 ### Instructor at a climbing gym
@@ -126,21 +129,21 @@ You teach classes and want to know about your own sessions only.
 
 You triage member enquiries at reception.
 
-- **User messages** appears for your role - keep it on with **In-App** so inbound member emails and messages surface immediately at the desk.
+- **User messages** appears for your role - keep it on with **App** so inbound member emails and messages surface immediately at the desk.
 - Turn on **User bookings** if reception also tracks new court bookings; leave it off if that's noise for you.
 
-### Studio manager who prefers email digests over in-app
+### Studio manager who prefers email over app notifications
 
 You'd rather everything arrive by email.
 
-- For each staff category you care about, open its **Channels** selector and choose **Email** only, removing **In-App**.
-- Those categories then skip the notification center and land in your inbox instead.
+- For each staff category you care about, open its **Channels** selector and choose **Email** only, removing **App**.
+- Those categories then skip the notification center and your devices, and land in your inbox instead.
 
 ## Tips & best practices
 
-- **Start from the defaults.** Most categories are on with In-App and Email out of the box. Turn things off rather than trying to enable everything.
+- **Start from the defaults.** Most categories are on with App and Email out of the box. Turn things off rather than trying to enable everything.
 - **Opt in to booking alerts deliberately.** User bookings and My bookings are off by design; enable them only if you actually want per-booking pings.
-- **Use channels to match how you work.** Front-desk staff often prefer In-App; owners who live in email can drop In-App for staff categories.
+- **Use channels to match how you work.** Front-desk staff often prefer App; owners who live in email can drop App for staff categories.
 - **Remember routing is role-based.** If a colleague isn't getting an alert, check their role and instructor profile before assuming a preference is wrong - some categories simply never route to some roles.
 
 ## Troubleshooting
@@ -161,9 +164,13 @@ You'd rather everything arrive by email.
 
 **Cause / fix**: They shouldn't - matching multiple routing rules for one event is deduplicated to a single notification. If you see genuine duplicates, confirm they aren't two different categories (for example a class instructor also being an admin who enabled User bookings), which are distinct notifications by design.
 
-**Issue**: Turning off In-App didn't stop the email (or vice versa).
+**Issue**: Turning off App didn't stop the email (or vice versa).
 
-**Cause / fix**: Channels are independent. Removing In-App only stops the notification-center entry; you must also remove Email from that category's channels to stop the email.
+**Cause / fix**: Channels are independent. Removing **App** stops both the notification-center entry and the device alert; you must also remove **Email** from that category's channels to stop the email.
+
+**Issue**: I started getting alerts on my phone for a category I had set to In-app.
+
+**Cause / fix**: In-app and Push are now a single **App** channel, so a category you had on In-app now also alerts your devices. Either remove **App** from that category here, which also drops it from the notification center, or leave it on and turn off notifications for 1Club in your phone or browser settings to keep the notification center without the interruption.
 
 ## Related
 

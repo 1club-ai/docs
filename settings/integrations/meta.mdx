@@ -1,0 +1,176 @@
+---
+title: Meta
+description: Connect your Meta Business account so your Facebook and Instagram ads are measured on the bookings and revenue they actually produce, not just clicks.
+keywords: [meta, facebook, instagram, pixel, dataset, conversions api, ads, advertising, tracking, attribution, roas, marketing cookies, consent, events manager]
+---
+
+The Meta integration connects your gym's Meta Business account to 1Club, so every booking and payment is reported back to Facebook and Instagram as a conversion. Your ads then optimize against real revenue instead of clicks, and you can finally see which campaigns fill classes.
+
+You connect it in one step through Meta's own sign-in popup, where you pick your business, your dataset and your ad account. There is no pixel ID to hunt down and no access token to copy out of Events Manager.
+
+## Why connect Meta
+
+- **See what your ads actually earned.** Meta reports how many people clicked. 1Club tells Meta how many of them booked and what they paid, so your ad results show bookings and revenue.
+- **Better ads for the same spend.** Once Meta can see real purchases, it can find more people like the ones who bought. Optimizing on revenue beats optimizing on clicks.
+- **Measurement that survives ad blockers.** Roughly a third of visitors block tracking scripts. Because 1Club also reports conversions from its own servers, those bookings still count.
+- **Counts sales a browser never sees.** A membership that renews on a saved card, or a pass sold at the front desk, is reported too - something a website-only pixel cannot do.
+- **Nothing to copy or paste.** No pixel ID, no token, no tag manager. Sign in with Meta and pick from a list.
+
+## Overview
+
+- Connect your Meta Business account from **Settings > Integrations > Meta**.
+- Choose the **dataset** your conversions are reported to. Optionally choose an ad account and Facebook Page for future campaign features.
+- The **Meta pixel** loads on your member portal and website, and records page views and people reaching checkout.
+- **1Club's servers** report the bookings and payments themselves, with the real amount charged.
+- Both halves can be switched on or off independently at any time.
+- The pixel only ever loads for visitors who accept marketing cookies.
+
+## Before you start
+
+- Meta is a **paid-plan** feature. On the Free plan and during the Grow trial the connect step is blocked until you upgrade.
+- Connecting requires the **settings.manage.organization** permission. Viewing the status requires **settings.read.organization**.
+- You need a Meta Business account, and permission inside it to manage the ad account and dataset you want to use. If someone else runs your ads, they may need to do this step or grant you access first.
+
+<Note>
+  The Meta connection must be enabled on the 1Club server for your deployment. If it is not, the page shows "Meta isn't set up on this server yet" instead of the connect button. Contact 1Club support if you expect it to be available and it is not.
+</Note>
+
+## What a dataset is
+
+Meta calls the thing that collects your conversions a **dataset**. You may know it by its old name, the **pixel** - they are the same thing, and Meta renamed it. One dataset holds all the activity for one business: page views, bookings, purchases.
+
+If you have ever run a Facebook or Instagram ad with a website, you almost certainly already have one. If you have never advertised, you will not, and 1Club can create it for you during setup.
+
+## Connect Meta
+
+1. Go to **Settings > Integrations** and open the **Meta** card.
+2. Click **Connect with Meta**.
+3. A Meta popup opens. Sign in, then choose the business, ad account, dataset and Facebook Page you want to share with 1Club, and confirm.
+4. When the popup finishes, 1Club stores the connection and shows what you shared.
+5. If you shared exactly one of each, 1Club selects them for you and the status becomes **Active** immediately. If you shared several, pick the ones you want in the **Meta assets** panel.
+
+<Note>
+  If you close the popup or decline, nothing is saved and nothing changes. Click **Connect with Meta** again to retry.
+</Note>
+
+### If you have no dataset yet
+
+When the business you connected has no dataset, the **Dataset (pixel)** picker is empty and a **New dataset name** box appears below it. Type a name - your gym's name is the usual choice, and it is what you will see in Meta Events Manager - and click **Create dataset**. 1Club creates it inside your business and selects it.
+
+## Connection status
+
+The chip on the connect card shows one of:
+
+- **Not connected** - no Meta connection exists yet.
+- **Inactive** - a connection exists but is not currently reporting. Usually this means access was removed on Meta's side; use **Reconnect**.
+- **Active** - a dataset is selected and conversions are being reported.
+
+If you connect but do not pick a dataset, the page tells you so and nothing is tracked until you do. A connection without a dataset holds your permission but has nowhere to send events.
+
+## Meta assets
+
+Once connected, the **Meta assets** panel lets you change what the connection points at. You can only pick from what you actually shared in the popup - if something is missing from a list, reconnect and share it.
+
+- **Dataset (pixel)** - where your page views, bookings and purchases are reported. Required.
+- **Ad account** - used for audiences and campaign features. Not needed for tracking, but worth selecting now so you do not have to reconnect later.
+- **Facebook Page** - the Page your ads run from.
+
+**Refresh assets** re-reads the lists from Meta. Use it after you create a new dataset or ad account on Meta's side, or if you suspect the connection was changed there.
+
+Each picker also has a **None** option if you want to clear a choice.
+
+## How conversions are reported
+
+1Club reports in two halves, and each does the part it is good at.
+
+**From the browser - the Meta pixel.** Loads on your member portal and CMS website and records:
+
+- **Page view** - every page a visitor opens.
+- **Reaching checkout** - a visitor starting to pay for a booking or purchase.
+
+**From 1Club's servers - the Conversions API.** Reports what actually happened, with the amount charged:
+
+- **Booking** - when a member books.
+- **Purchase** - when an order is paid.
+
+This split matters. The pixel is blocked for a large share of visitors and it never knows what anything cost. Reporting bookings and purchases from our servers means those conversions still count, carry the real revenue, and include sales that never touched a browser at all - a saved-card renewal, or a pass rung up at the desk.
+
+<Note>
+  Because the two halves report different things, you will not see bookings twice. Page views and checkouts come from the browser; bookings and purchases come from 1Club.
+</Note>
+
+### Online and in-person sales are labelled differently
+
+Meta asks every conversion where it happened, and requires the answer to be accurate. 1Club labels each one honestly:
+
+- A booking made in the member portal, on your website, on the mobile app or through the marketplace is reported as a **website** conversion.
+- A booking or sale taken at the front desk or on a kiosk is reported as an **in-person** conversion.
+
+This is deliberate. Reporting till sales as website conversions would inflate your online ad results and teach Meta to optimize toward the wrong thing.
+
+## Cookie consent
+
+The Meta pixel is advertising tracking, so it is covered by your cookie banner. It **only loads for visitors who accept marketing cookies**, and it never loads before they answer. If a visitor accepts partway through their visit, the pixel starts on that page.
+
+The **Marketing** category on your banner controls this. Analytics consent is separate - a visitor can allow you to measure site usage while still refusing ad tracking, and 1Club honors that.
+
+Server-side reporting is a different matter under privacy rules and is not governed by the browser banner. Turn it off with the **Conversions API** switch if your policy requires it.
+
+## Switching tracking on and off
+
+Two independent switches:
+
+- **Browser pixel** - loads the Meta pixel on your portal and website. Turn it off to stop all browser-side tracking while keeping server-side reporting.
+- **Conversions API** - reports bookings and payments from 1Club's servers. Turn it off to stop server-side reporting while keeping the pixel.
+
+Turning both off keeps the connection but reports nothing.
+
+## Testing your setup
+
+Meta Events Manager has a **Test events** tool that shows conversions arriving in real time.
+
+1. In Meta Events Manager, open your dataset and go to **Test events**. Copy the test code it shows (it looks like `TEST12345`).
+2. Paste it into **Test event code** on the 1Club Meta page.
+3. Make a test booking. It appears in Meta's Test events view within a few seconds.
+4. **Clear the field when you are done.** It is only for testing.
+
+## Disconnect
+
+Use the disconnect action on the Meta page to remove the connection. 1Club stops reporting conversions, the pixel stops loading on your portal and website, and 1Club hands your permission back to Meta.
+
+Your dataset and its history stay in your Meta account - disconnecting removes 1Club's access, not your data.
+
+## Worked examples
+
+**Padel club running Instagram ads for off-peak courts.** The club connects Meta and selects the dataset it already used for a previous website. Within a week, its Instagram campaign in Ads Manager shows 34 bookings worth 1,190 BGN instead of just "412 link clicks". They shift budget to the ad set that produced the bookings rather than the one with the cheapest clicks.
+
+**Yoga studio that has never advertised.** The owner connects Meta, finds the dataset list empty, and uses **Create dataset** with the studio's name. She runs her first Instagram ad the following week and can see from day one which ad brought people who actually bought a class pass.
+
+**Gym selling most memberships at the desk.** The gym connects Meta and sees online bookings reported as website conversions and desk sales as in-person ones. The split makes it obvious that ads are driving discovery, but the sale closes in the building - so they start pointing ads at a free trial rather than an online checkout.
+
+## Tips and best practices
+
+- **Select the ad account when you connect**, even if you are not running ads yet. It costs nothing and saves reconnecting later.
+- **Give it a few days.** Meta needs a number of conversions before it can optimize on them. Do not judge a campaign on its first day of accurate data.
+- **Leave the Conversions API on.** It is the half that keeps working when the pixel is blocked, and the only one that sees saved-card renewals.
+- **Use one dataset per business.** Splitting your bookings across several datasets divides the signal and makes every campaign learn more slowly.
+- **Clear the test event code** once you have finished testing.
+
+## Troubleshooting
+
+- **"Meta isn't set up on this server yet"** - the Meta connection is not enabled for your deployment. Contact 1Club support.
+- **The connect button is blocked or asks you to upgrade** - Meta is a paid-plan feature. Upgrade from the Free plan or the Grow trial.
+- **"Choose a dataset below to start reporting conversions"** - you connected but did not select a dataset. Pick one in **Meta assets**, or create one.
+- **The dataset list is empty** - the business you shared has no dataset. Use **Create dataset**, or reconnect and share a business that has one.
+- **The ad account or Page list is empty** - you did not share them in the popup. Click **Reconnect** and tick them this time.
+- **"That Meta asset was not shared with 1Club"** - the item you picked is no longer shared. **Refresh assets**, or reconnect and share it again.
+- **Status went to Inactive on its own** - access was removed on Meta's side, or the connection expired. Click **Reconnect**.
+- **No conversions in Events Manager** - check the status is **Active**, that a dataset is selected, and that the **Conversions API** switch is on. Use the test event code to watch events arrive live.
+- **Page views are missing but bookings appear** - that is the cookie banner doing its job. Visitors who decline marketing cookies get no pixel, so browser events are always lower than server events.
+
+## Related
+
+- [Integrations](/settings/integrations) - the full integration catalog and how installs work.
+- [Social booking](/settings/integrations/social-booking) - tagged "Book now" links that show which social platforms drive bookings.
+- [Google Tag Manager](/settings/integrations/google-tag-manager) - load your own analytics tags on the portal and website.
+- [Automations](/marketing/automations) - follow up with the members your ads bring in.

@@ -85,6 +85,7 @@ Useful conventions the importer follows:
 
 - **Member name** - use either `name` (a full name that is split into first and last) or `firstName` plus `lastName`. At least one is required.
 - **Custom fields** - for member imports, any column whose header starts with `custom_` is treated as a contact custom field automatically. Do not map those to standard fields.
+- **Tags** - `tags` takes a comma-separated list, for example `Open day, Lead`. A tag that does not exist yet is created as a manual tag, so you do not have to set your tags up before importing. To tag a whole upload at once, put the same value in the `tags` column of every row.
 - **Dates** - accepted formats are `dd.MM.yyyy`, `dd.MM.yyyy HH:mm:ss`, `yyyy-MM-dd`, `yyyy-MM-dd HH:mm:ss`, and ISO-8601. A row with an unparseable date is flagged in the preview.
 - **Transactions default to paid**, using your organization currency when none is given.
 
@@ -102,7 +103,7 @@ A member import is more than contacts. When the extra columns are present on a m
 Members are matched by email within your organization. If a row's email already exists:
 
 - The existing member is reused, not recreated.
-- The transaction, wallet credit, and notes on that row are skipped, so re-running an import does not double-charge or double-note anyone.
+- The transaction, wallet credit, notes, tags, and custom fields on that row are skipped, so re-running an import does not double-charge or double-note anyone. This also means an import cannot add tags to members who are already in your organization - tag those from their profile instead.
 - A membership or dependents on that row are still attached to the existing member. This is how you deliberately import several rows for the same member (one per membership) or add family members to an existing account.
 
 Memberships themselves are de-duplicated by member, plan, and start date, so the same membership row imported twice is not duplicated.
@@ -133,6 +134,7 @@ Because members were matched by email, running the same file again would reuse e
 - **Use the preview as a linter.** Download the invalid rows, fix them in your source file, and re-upload rather than editing inside 1Club.
 - **Re-running is safe for members.** Email matching means a second run reuses members and only adds missing memberships or dependents.
 - **For member imports, prefix custom columns with `custom_`** so they map to contact custom fields automatically.
+- **Tag the batch as you import it.** Add a `tags` column with the same value on every row (for example the source or campaign the list came from) so you can filter and message that group afterwards. Tags only apply to members the import creates, so do this on the first run.
 
 ## Troubleshooting
 
@@ -144,6 +146,7 @@ Because members were matched by email, running the same file again would reuse e
 | Member rows rejected for no name | Neither `name` nor `firstName` is present | Provide `name` (full) or `firstName` (and optionally `lastName`) |
 | Fewer records imported than expected | Invalid rows are skipped on execute | Fix the rows flagged in the preview and re-import |
 | Re-import did not re-add transactions | The member already exists (matched by email) | Expected behavior - existing members are reused and their transactions and notes are not re-run |
+| The `tags` column did not tag anyone | Those members already existed, so the row's tags were skipped | Tags apply only to members the import creates. Add the tags from the member's profile, or use a smart tag rule for an ongoing group |
 | Contact import blocked | Bulk contact import requires a paid plan (trials are allowed) | Upgrade your 1Club plan, or import during your trial |
 | Membership import blocked | It would exceed your active-member quota | Free up capacity or upgrade your 1Club plan |
 | A class or booking row cannot find its club, area, or instructor | The referenced record does not exist yet | Create the club, area, or instructor first, then re-import |

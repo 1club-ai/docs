@@ -45,10 +45,32 @@ This is the heart of the policy. Every toggle and field below lives in the **Boo
 - **Max. booking slot (minutes)** - Maximum duration. Longer bookings are rejected.
 - **Booking duration step (minutes)** - Booking duration must be the minimum plus a multiple of this step (e.g. min 60 \+ step 60 → only 60, 120, 180 min are allowed).
 
-### Lead times
+### Booking window
 
-- **Min. booking in advance (hours)** - Members must book at least this many hours ahead. Leave blank for no limit.
-- **Max. schedule in advance (days)** - Members can only see and book up to this many calendar days ahead. Leave empty for no limit.
+- **Min. notice** (hours) - Members must book at least this many hours ahead. Leave blank for no limit.
+- **Max. ahead** (days) - Members can only see and book up to this many calendar days ahead. Leave blank for no limit.
+
+#### Max. ahead and repeating bookings
+
+**Max. ahead** is measured against the **last** occurrence a repeating booking would
+create, not just the first one. A series that ends on a date, or after a set number of
+repeats, is created in full the moment you save it (see
+[Repeating schedules](/reference/repeating-schedules)), so every occurrence in it has to
+fit the window.
+
+With **Max. ahead** set to 14 days, a weekly court booking repeating "after 52 times"
+reaches nearly a year out and is refused. The same booking repeating "after 2 times" ends
+inside the window and is created normally.
+
+Two things to know:
+
+- **Staff can override it.** The refusal offers **Book anyway** to anyone with
+  manage-level booking permission, and the override is recorded on the individual
+  occurrences that actually fell outside the window - not on the whole series.
+- **Repeating with no end is exempt.** A series set to **Never** has no last occurrence to
+  measure, and it is written a rolling eight weeks at a time, so each occurrence lands
+  inside the window when it is created. Use **Never** for a standing weekly booking at a
+  gym that also sets a short **Max. ahead**.
 
 ### Waitlist claim window (minutes)
 
@@ -199,6 +221,12 @@ You let admins book PT for callers who haven't signed up yet.
 
 **Solution**: The more specific scope wins. Class-type-scoped beats club-scoped beats org-wide. Open both policies and check their **Scope** sections to confirm precedence.
 
+**Issue**: A repeating booking is refused for being too far in advance, but its first session is next week.
+
+**Solution**: **Max. ahead** measures the series' last occurrence, not its first. Shorten
+the series (an earlier end date or fewer repeats), raise **Max. ahead**, set it to
+repeat with no end, or use **Book anyway** if you hold manage-level booking permission.
+
 **Issue**: Cancellations are giving full refunds when I expected partial 
 
 **Solution**: Check the **Cancellation rules** section. If empty, the system gives full refunds. Add tiered rules to enforce partial refunds.
@@ -209,4 +237,5 @@ You let admins book PT for callers who haven't signed up yet.
 - [Access Control](/settings/access-control) - Per-club check-in mode and identification methods.
 - [External Programs](/settings/external-programs) - Third-party entrance methods that satisfy payment-at-check-in.
 - [Bookings](/operations/bookings) - Day-to-day booking management.
+- [Repeating schedules](/reference/repeating-schedules) - How a repeating series is created, and why **Max. ahead** measures its last occurrence.
 - [Payments](/billing/payments) - How and when payments are recorded.

@@ -1,0 +1,148 @@
+---
+title: "Repeating schedules"
+description: "How a repeating class, booking, or instructor rotation is created - the three end conditions, why every occurrence exists as its own row, and the 520-occurrence limit."
+keywords:
+  - recurring class
+  - recurring booking
+  - repeating schedule
+  - recurrence pattern
+  - ends never
+  - ends until date
+  - ends after occurrences
+  - occurrence
+  - series
+  - rolling window
+  - 520 occurrences
+  - book a court for the season
+  - instructor rotation end date
+  - max ahead
+  - too far in advance
+  - book anyway
+---
+
+Classes, area and instructor bookings, and instructor rotations all repeat the same way. You pick a pattern (daily, weekly by weekday, or monthly) and an end condition, and 1club creates the individual occurrences. This page explains what gets created when, because the answer decides what your schedule shows for dates months ahead.
+
+## Overview
+
+- **Every occurrence is a real row.** A repeating class is not a rule evaluated when someone looks at the calendar - it is N separate classes, each with its own bookings, attendance, price, and check-ins.
+- **Three end conditions** - **Until date**, **After N times**, or **Never**.
+- **A series with an end is created in full**, the moment you save. All of it appears on the schedule immediately.
+- **A series with no end extends automatically**, about eight weeks ahead at a time, because there is no end to create up to.
+- **A series can cover up to 520 occurrences** - two years of a weekly slot, or a year of a twice-weekly one.
+
+## The three end conditions
+
+| Ends              | What you set        | What gets created                                                                   |
+| :---------------- | :------------------ | :---------------------------------------------------------------------------------- |
+| **Until date**    | A calendar date     | Every occurrence from the start through that date, immediately                      |
+| **After N times** | A number of repeats | Exactly N occurrences, immediately                                                  |
+| **Never**         | Nothing             | A rolling window of roughly the next eight weeks, extended automatically each night |
+
+### Until date and After N times
+
+These are the ones to reach for when you know how long something runs: a term of classes, a court held for a season, a coach's contract through June.
+
+Both are created in full when you save. If you book a court every Tuesday until the end of the season, all of those Tuesdays show as occupied straight away, so the calendar answers "is this court free in four months?" correctly and conflicts surface while you are still planning.
+
+<Note>
+  A series that ends on a date or after a set number of repeats is complete once
+  you save it. Nothing appears later and nothing needs to catch up.
+</Note>
+
+### Never
+
+Use **Never** for something with no planned end - a standing weekly class you intend to run indefinitely, or a court blocked for a members' social every week.
+
+Because there is no end to create up to, 1club keeps roughly the next eight weeks materialized and extends the series automatically every night. The schedule therefore shows about two months of an endless series at any time, and the horizon moves forward a day each day.
+
+If you need to see further ahead than that, use **Until date** with a date far enough out instead. The trade is that the series then genuinely ends on that date rather than running forever.
+
+## The 520-occurrence limit
+
+One series can hold at most 520 occurrences. In practice:
+
+| Pattern       | How far 520 reaches    |
+| :------------ | :--------------------- |
+| Weekly        | About two years        |
+| Twice a week  | About a year           |
+| Weekdays only | About two years        |
+| Daily         | About seventeen months |
+
+If the end date or repeat count you choose would exceed the limit, 1club refuses to create the series and tells you so, rather than quietly creating part of it. Choose an earlier end date, a lower repeat count, a less frequent pattern, or **Never**.
+
+<Note>
+  The limit exists because occurrences are real rows. A daily class "until 2040"
+  would be over five thousand classes, each with its own bookings and
+  attendance, created inside one request.
+</Note>
+
+## How far ahead a booking may reach
+
+A repeating **booking** also has to fit the **Max. ahead** window on the
+[booking policy](/operations/booking-policies) that matches it - and because a bounded
+series is created in full, the window is measured against its **last** occurrence, not its
+first. A weekly court repeating for a year is refused at a gym that only lets members book
+14 days out, even though the first session is next week.
+
+Staff with manage-level booking permission can override it with **Book anyway**; the
+override is recorded on the occurrences that actually fell outside the window. A series set
+to **Never** is exempt, since it has no last occurrence and is written a rolling eight
+weeks at a time.
+
+Classes are not affected: **Max. ahead** governs what members may book, not what you may
+schedule.
+
+## Editing and deleting a series
+
+Every edit and delete on a repeating item asks for a scope:
+
+- **This instance** - only the occurrence you opened. Move one week's class to a different court without touching the other weeks.
+- **All future** - this occurrence and every one after it. Past occurrences are never changed, so your history and attendance stay intact.
+
+Changing the pattern or the end condition with **All future** replaces the upcoming occurrences. Shortening a series removes the occurrences past the new end and cancels any member bookings on them, with the refund and notification the matching [booking policy](/operations/booking-policies) calls for. Lengthening one adds the new occurrences immediately, up to the same 520 limit.
+
+## Where repeating schedules appear
+
+<CardGroup cols={3}>
+  <Card title="Classes" icon="calendar-days" href="/operations/classes">
+    Repeat a class daily, weekly by weekday, or monthly. Each occurrence carries
+    its own capacity, roster, and check-ins.
+  </Card>
+  <Card title="Bookings" icon="ticket" href="/operations/bookings">
+    Repeat an area or instructor booking. Each occurrence is priced and checked
+    for availability on its own date.
+  </Card>
+  <Card
+    title="Instructor rotations"
+    icon="users"
+    href="/operations/instructors"
+  >
+    An assignment with an **Effective until** date generates the whole roster;
+    an **Ongoing** one uses the rolling eight-week window.
+  </Card>
+</CardGroup>
+
+## Tips & best practices
+
+- **Set a real end date for anything seasonal.** A term, a season, or a contract has a last day. Using **Until date** puts the whole thing on the calendar at once, which is what makes court occupancy and conflict checks trustworthy months ahead.
+- **Reserve Never for genuinely open-ended things.** It is the only option that shows a short horizon, so a season entered as **Never** looks two months long on the schedule.
+- **Check the last occurrence after you save.** On a class, the **Information** card shows the recurrence summary; on a booking, the **Bookings** tab lists every sibling occurrence. Both are the fastest confirmation that the series is the length you meant.
+- **Move one week with This instance.** A one-off court change or time shift does not need to touch the series.
+
+## Troubleshooting
+
+**Issue**: Only the next few weeks of my repeating class or booking appear on the schedule.
+
+**Solution**: The series is set to **Never**, which keeps a rolling eight-week horizon. Edit it, choose **All future**, and set **Until date** to the real end of the season or term. Every occurrence up to that date is created when you save.
+
+**Issue**: I get an error saying the series is too long.
+
+**Solution**: The pattern would exceed 520 occurrences. Pick an earlier end date, a lower repeat count, or a less frequent pattern. For something with no real end, use **Never** instead.
+
+**Issue**: An occurrence in the middle of my series is missing.
+
+**Solution**: For a repeating booking, an occurrence is skipped when it cannot be placed - the area is blocked or already taken at that time, or the class it attends is full or does not run that day. Check [Area blocks](/operations/area-blocks) and the other bookings on that resource for the missing date, then add the single occurrence by hand.
+
+**Issue**: I changed a rotation and an instructor's shift did not update.
+
+**Solution**: A shift you edited by hand is a manual override, and rotation regeneration deliberately leaves it alone. Use **Cancel shift** to drop it, or edit it again to the value you want.

@@ -8,7 +8,7 @@ A class is a scheduled group activity with a capacity, optional price, one or mo
 ## Overview
 
 - **Scheduled group activity** - capacity, optional price, one or more instructors, an area, and a class type.
-- **One-off or recurring** - repeat daily, weekly (by weekday), or monthly, with per-instance or all-future edits.
+- **One-off or recurring** - repeat daily, weekly (by weekday), or monthly, with per-instance or all-future edits. A series with an end date is created in full; see [Repeating schedules](/reference/repeating-schedules).
 - **Capacity and waitlist** - cap seats and let members queue when full; a claim window offers freed seats to the next in line.
 - **Party bookings** - members can reserve multiple seats in one booking, controlled per class type.
 - **Attendance and check-in** - run check-in, add walk-ins, and convert waitlist entries from the detail page.
@@ -31,9 +31,11 @@ The class dialog asks for:
 - **Max capacity** - leave blank for unlimited. The class is never "full" while capacity is unlimited.
 - **Price** - per booked seat, in your organization's currency. Set to `0` for a free class.
 - **Visibility** - **Public**, **Member only**, or **Private**.
-- **Recurrence** - turn on to repeat. Pick the pattern (daily, weekly with specific weekdays, monthly) and an end date.
+- **Recurrence** - turn on to repeat. Pick the pattern (daily, weekly with specific weekdays, monthly) and how the series ends: **Until date**, **After N times**, or **Never**.
 
-A recurring class is stored as a recurrence with N occurrences. Editing or deleting offers a scope choice: **This instance** or **All future**.
+A recurring class is stored as a series of N separate class occurrences, each with its own bookings, attendance, and check-ins. Editing or deleting offers a scope choice: **This instance** or **All future**.
+
+A series that ends on a date or after a set number of repeats is created in full when you save, so the whole term shows on the schedule immediately. **Never** keeps a rolling eight-week horizon and extends itself each night, because there is no end to create up to. See [Repeating schedules](/reference/repeating-schedules) for the full model and the 520-occurrence limit.
 
 ## The class detail page
 
@@ -91,7 +93,7 @@ For a free kids' BJJ session, set **Price** to `0` and pair the class type with 
 
 ### Recurring weekly spin class
 
-Turn on **Recurrence**, pick weekly with the right weekdays, and set an end date. Assign the instructor and area; each week becomes an occurrence. Editing offers **This instance** or **All future**, so you can move one week's class without disturbing the series.
+Turn on **Recurrence**, pick weekly with the right weekdays, and set **Ends** to **Until date** with the last day of the term. Assign the instructor and area; every week from now to that date becomes an occurrence, created the moment you save, so the court reads as occupied for the whole term. Editing offers **This instance** or **All future**, so you can move one week's class without disturbing the series.
 
 ### Padel clinic with friends
 
@@ -122,6 +124,10 @@ Raise **Max party size** on the clinic's class type so a member can book several
 **Issue**: A recurring edit changed every week when I meant just one.
 
 **Solution**: Editing a recurring class asks for a scope - choose **This instance** rather than **All future**.
+
+**Issue**: Only the next couple of months of a recurring class appear on the schedule.
+
+**Solution**: The series ends in **Never**, which keeps a rolling eight-week horizon. Edit it with the **All future** scope and set **Ends** to **Until date** with the real last day. See [Repeating schedules](/reference/repeating-schedules).
 
 ## Related
 

@@ -97,15 +97,22 @@ Response:
 
 ### Conditional requests
 
-The response sends an `ETag` built from `version`. Send it back as `If-None-Match`
-to get a cheap `304 Not Modified` when nothing has changed - useful as a polling
-fallback where you don't run webhooks.
+The response sends an `ETag`. Send it back as `If-None-Match` to get a cheap
+`304 Not Modified` when nothing has changed - useful as a polling fallback where
+you don't run webhooks.
 
 ```bash
 curl "https://api.1club.ai/v1/platform/areas/51/availability?from=...&to=..." \
   -H "Authorization: Bearer 1club_sk_live_..." \
-  -H 'If-None-Match: "48213-60"'
+  -H 'If-None-Match: "v2-48213-1784505600000-1784592000000-60"'
 ```
+
+**Treat the token as opaque.** It covers the area's `version`, the window you
+asked for, the slot size, and the shape of the response itself - so it changes
+when we ship a new field, not only when a court's availability moves. Store it
+verbatim against the request that produced it and send it back unmodified; do not
+parse it or rebuild it from `version`, or a release that adds a field will leave
+you on a `304` and the old body.
 
 ## Club availability grid
 

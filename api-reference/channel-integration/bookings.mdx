@@ -339,6 +339,8 @@ curl "https://api.1club.ai/v1/platform/bookings?from=2026-07-20T00:00:00Z&includ
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
+Each row in `data` then carries a `customer` alongside its `contactId`:
+
 ```json
 {
   "bookingId": 48213,
@@ -367,6 +369,12 @@ booking has no contact.
   which would read as "these bookings have no customer". `phone` can be `null`:
   1Club requires an email **or** a phone on a contact, not both.
 </Note>
+
+If your key deliberately holds no contacts scope, attendee **names** are still
+available for class bookings: `GET /v1/platform/classes/{id}/bookings` returns
+`contactName` under `bookings:read` alone, and gates only the email on
+`contacts:read`. A name identifies who is on a roster; the whole contact record is
+CRM data.
 
 ## Players on a booking
 

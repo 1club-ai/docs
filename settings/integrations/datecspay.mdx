@@ -1,13 +1,8 @@
 ---
 title: DatecsPay
-tag: "Coming soon"
 description: Accept card payments through DatecsPay (BORICA) hosted checkout, with a BORICA-backed test gateway and a live production environment
-keywords: [datecspay, datecs pay, borica, hosted checkout, payment provider, 3-d secure, terminal id, merchant id, test mode, live mode, coming soon]
+keywords: [datecspay, datecs pay, borica, hosted checkout, payment provider, 3-d secure, terminal id, merchant id, test mode, live mode]
 ---
-
-<Note>
-  **DatecsPay is coming soon.** The integration is not yet available to activate from **Settings → Integrations**. This page previews how it will work once released, so you can line up your BORICA credentials in advance.
-</Note>
 
 DatecsPay is a card payment provider you can use instead of Stripe or myPOS. It is built on BORICA's hosted checkout: customers are redirected to BORICA's secure page to enter their card details (with EMV 3-D Secure), then bounced back to 1Club once the payment completes. Card data never touches 1Club servers, and every request is signed with your own RSA key.
 
@@ -46,10 +41,6 @@ DatecsPay credentials come from **BORICA** (through your bank or acquirer), not 
 Generate your key pair and register it with BORICA before you configure 1Club, and download the matching BORICA certificate for the environment you are setting up.
 
 ## Connect DatecsPay
-
-<Note>
-  These steps describe the flow that ships when DatecsPay becomes available.
-</Note>
 
 1. Go to **Settings → Integrations** and click **Install** on the DatecsPay card.
 2. On the DatecsPay page, choose an **Environment**:
@@ -105,6 +96,10 @@ The **Test configuration** button checks that your saved credentials are well-fo
   3. **Reconciliation** - a background job runs every few minutes and confirms any payment still pending (for example because the customer closed the tab before returning) with a direct status check to BORICA.
 - The payment status and BORICA transaction references are recorded on the 1Club payment, and any linked transactions and bookings are settled automatically.
 - Every path is matched to the same payment by a unique reference, so a redelivered notification or an overlapping reconciliation never double-charges or double-settles.
+
+## Payment links
+
+DatecsPay has no shareable payment link. The **Send payment link** action on a transaction is myPOS-only, so on DatecsPay a member pays through the checkout in the portal, the app, or your website rather than from a link you send them. If sending a pay-by-link is central to how you collect, myPOS is the better fit today.
 
 ## Refunds
 

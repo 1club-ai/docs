@@ -1,11 +1,11 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "1Club Platform API",
+    "title": "1club Platform API",
     "version": "1.0.0",
-    "description": "The 1Club Platform API lets you programmatically access and manage your organization's data.\n\n## Official API Contract\n\nThis documentation is the official source of truth for the 1Club Platform API.\nIf an integration relies on undocumented endpoints, fields, response shapes, or internal behavior outside this spec, we can't guarantee backward compatibility.\nBuild against what's documented here to stay stable as the platform evolves.\n\n## Authentication\n\nAll requests require a customer API key passed as a Bearer token:\n\n```\nAuthorization: Bearer 1club_sk_live_...\n```\n\nGenerate API keys from the admin portal under **Settings > API Tokens**.\nThe key is tied to your organization - all responses are scoped to your org's data.\n\n## Rate Limiting\n\n- **100 requests per minute** per API key\n- When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header\n- Rate limit headers are included in every response:\n  - `X-RateLimit-Limit` - max requests per window\n  - `X-RateLimit-Remaining` - requests remaining\n  - `X-RateLimit-Reset` - seconds until the window resets\n\n## Errors\n\n| Status | Meaning |\n|--------|---------|\n| `400` | Invalid request parameters |\n| `401` | Missing or invalid API key |\n| `404` | Resource not found (or doesn't belong to your organization) |\n| `429` | Rate limit exceeded |\n| `500` | Internal server error |",
+    "description": "The 1club Platform API lets you programmatically access and manage your organization's data.\n\n## Official API Contract\n\nThis documentation is the official source of truth for the 1club Platform API.\nIf an integration relies on undocumented endpoints, fields, response shapes, or internal behavior outside this spec, we can't guarantee backward compatibility.\nBuild against what's documented here to stay stable as the platform evolves.\n\n## Authentication\n\nAll requests require a customer API key passed as a Bearer token:\n\n```\nAuthorization: Bearer 1club_sk_live_...\n```\n\nGenerate API keys from the admin portal under **Settings > API Tokens**.\nThe key is tied to your organization - all responses are scoped to your org's data.\n\n## Rate Limiting\n\n- **100 requests per minute** per API key\n- When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header\n- Rate limit headers are included in every response:\n  - `X-RateLimit-Limit` - max requests per window\n  - `X-RateLimit-Remaining` - requests remaining\n  - `X-RateLimit-Reset` - seconds until the window resets\n\n## Errors\n\n| Status | Meaning |\n|--------|---------|\n| `400` | Invalid request parameters |\n| `401` | Missing or invalid API key |\n| `404` | Resource not found (or doesn't belong to your organization) |\n| `429` | Rate limit exceeded |\n| `500` | Internal server error |",
     "contact": {
-      "name": "1Club API Support",
+      "name": "1club API Support",
       "email": "support@1club.ai"
     }
   },
@@ -171,6 +171,11 @@
           "color": {
             "type": "string",
             "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "notifyCustomer": {
+            "type": "boolean",
+            "default": false,
+            "description": "Tell the people booked on this class what changed - email plus the in-app and WhatsApp notification. Only sent when the edit changes something visible on their booking (start/end time, area, club, or the instructors); a rename or a price change notifies nobody. Off by default, so callers normally send their own. Assigned instructors get their calendar update either way."
           }
         }
       },
@@ -784,7 +789,7 @@
           "externalSource": {
             "type": "string",
             "nullable": true,
-            "description": "Import provenance - set when the occurrence came from an external system rather than being created in 1Club."
+            "description": "Import provenance - set when the occurrence came from an external system rather than being created in 1club."
           },
           "externalId": {
             "type": "string",
@@ -1583,6 +1588,10 @@
               },
               "slug": {
                 "type": "string"
+              },
+              "currency": {
+                "type": "string",
+                "description": "ISO 4217 code the organization trades in (e.g. \"EUR\"). Every monetary amount on this API - booking `payment.amount`, plan and product prices, transaction totals - is expressed in it, and no other endpoint repeats it. Read it once when you connect."
               }
             }
           },
@@ -1698,7 +1707,7 @@
         "properties": {
           "bookingId": {
             "type": "integer",
-            "description": "1Club booking id"
+            "description": "1club booking id"
           },
           "bookingUuid": {
             "type": "string",
@@ -1741,6 +1750,15 @@
           "endTime": {
             "type": "string",
             "format": "date-time"
+          },
+          "customer": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlatformContact"
+              }
+            ],
+            "nullable": true,
+            "description": "The booking's customer, identical to what GET /v1/platform/contacts/{id} returns. Present only when the request passes `include=customer`, which additionally requires the `contacts:read` scope; `null` when the booking has no contact. Use it to import a window of bookings without a contact lookup per row."
           },
           "payment": {
             "type": "object",
@@ -1942,7 +1960,7 @@
       },
       "PlatformMembership": {
         "type": "object",
-        "description": "A customer's membership on a plan. The plan is snapshotted onto it at creation, so allowance and coverage behave exactly as they do for a membership sold in 1Club.",
+        "description": "A customer's membership on a plan. The plan is snapshotted onto it at creation, so allowance and coverage behave exactly as they do for a membership sold in 1club.",
         "properties": {
           "membershipId": {
             "type": "integer"
@@ -3021,6 +3039,10 @@
                       "maxConcurrentBookings": {
                         "type": "integer"
                       },
+                      "timezone": {
+                        "type": "string",
+                        "description": "IANA timezone the operating hours are expressed in (the club's, falling back to the organization's). Convert a local wall time in this zone when sending `startTime`/`endTime` to POST /v1/platform/bookings.\n"
+                      },
                       "operatingHours": {
                         "type": "object",
                         "description": "Per-day-of-week opening schedule"
@@ -3077,7 +3099,7 @@
     "/v1/platform/areas/{areaId}/availability": {
       "get": {
         "summary": "Get area availability",
-        "description": "Returns the area's club timezone, operating hours, the intervals already taken (`busy`), and computed open `slots` (with remaining capacity) for the window. Send `If-None-Match` with the last `version` you saw to get a cheap `304` when nothing changed. 1Club remains the source of truth: booking creation re-checks availability atomically and rejects conflicts.\n",
+        "description": "Returns the area's club timezone, operating hours, the intervals already taken (`busy`), and computed open `slots` (with remaining capacity) for the window. Send `If-None-Match` with the last `version` you saw to get a cheap `304` when nothing changed. 1club remains the source of truth: booking creation re-checks availability atomically and rejects conflicts.\n",
         "tags": [
           "Areas"
         ],
@@ -3180,6 +3202,18 @@
                           "endTime": {
                             "type": "string",
                             "format": "date-time"
+                          },
+                          "subject": {
+                            "type": "string",
+                            "enum": [
+                              "member_booking",
+                              "class",
+                              "event",
+                              "area_block",
+                              "time_off",
+                              "shift_break"
+                            ],
+                            "description": "What holds the court for this interval, in the same vocabulary as `details.conflicts[].subject` on a refused create. `area_block` is the club closing the court (maintenance, a private hire) rather than a sale. No id or name is attached - an availability read is not a read of who booked; use GET /v1/platform/bookings for the rows you may see.\n"
                           }
                         }
                       }
@@ -3405,6 +3439,18 @@
                                 "endTime": {
                                   "type": "string",
                                   "format": "date-time"
+                                },
+                                "subject": {
+                                  "type": "string",
+                                  "enum": [
+                                    "member_booking",
+                                    "class",
+                                    "event",
+                                    "area_block",
+                                    "time_off",
+                                    "shift_break"
+                                  ],
+                                  "description": "What holds the court for this interval, in the same vocabulary as `details.conflicts[].subject` on a refused create. `area_block` is the club closing the court (maintenance, a private hire) rather than a sale. No id or name is attached - an availability read is not a read of who booked; use GET /v1/platform/bookings for the rows you may see.\n"
                                 }
                               }
                             }
@@ -3616,7 +3662,7 @@
     "/v1/platform/bookings": {
       "post": {
         "summary": "Create a booking",
-        "description": "Creates a booking on an area (e.g. a padel court), optionally with an instructor leading the session. Identify the customer with `contactId` (resolve it via GET /v1/platform/contacts) or, for callers that do not track 1Club ids, with an inline `customer` matched to a contact by email and created if new - exactly one of the two.\n\nA booking transaction is recorded so the booking counts for revenue: `paid` marks it settled against the External / API payment method (no gateway call), `unpaid` leaves it outstanding. `amount` defaults to the computed price for the slot - the area's price, plus the instructor's hourly rate when one is attached.\n\nThis API assumes the calling system enforces its own booking rules, so 1Club's member-facing policy (minimum notice, maximum days in advance, operating-hours envelope, slots that have already ended) is not applied - which is what lets an existing schedule be recorded as-is. Physical constraints always apply: a real double-booking, the area's concurrency capacity, and whether an instructor takes one-on-one bookings.\n",
+        "description": "Creates a booking on an area (e.g. a padel court), optionally with an instructor leading the session. Identify the customer with `contactId` (resolve it via GET /v1/platform/contacts) or, for callers that do not track 1club ids, with an inline `customer` matched to a contact by email and created if new - exactly one of the two.\n\nA booking transaction is recorded so the booking counts for revenue: `paid` marks it settled against the External / API payment method (no gateway call), `unpaid` leaves it outstanding. `amount` defaults to the computed price for the slot - the area's price, plus the instructor's hourly rate when one is attached.\n\nThis API assumes the calling system enforces its own booking rules, so 1club's member-facing policy (minimum notice, maximum days in advance, operating-hours envelope, slots that have already ended, instructor availability) is not applied - which is what lets an existing schedule be recorded as-is.\n\nWhat the club physically has is never overridden, and a booking that breaks one of these is refused with `400` and a populated `details.conflicts[]`: the area's concurrency capacity (`AREA_AT_CAPACITY`), a court the club has blocked for maintenance or a private hire (`AREA_BLOCKED`), a live event on the court (`AREA_RUNNING_EVENT`), the instructor already booked or teaching (`INSTRUCTOR_AT_CAPACITY`, `INSTRUCTOR_TEACHING_CLASS`, `INSTRUCTOR_RUNNING_EVENT`), whether an instructor takes one-on-one bookings, and the slot alignment the area requires. There is no override parameter: a conflict is a refusal, not a warning.\n",
         "tags": [
           "Bookings"
         ],
@@ -3721,7 +3767,7 @@
                   "notifyCustomer": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Send the customer a 1Club booking confirmation email. Off by default - callers normally send their own."
+                    "description": "Send the customer a 1club booking confirmation email. Off by default - callers normally send their own."
                   }
                 }
               }
@@ -3740,7 +3786,14 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
+            "description": "Invalid request, or the slot cannot be sold. A scheduling refusal carries a machine-readable `code` and a populated `details.conflicts[]` naming what overlaps (`resource`, `resourceId`, `subject`, and the counterpart's own `startTime`/`endTime`). Detect a taken slot on the presence of `details.conflicts[]` rather than on a list of codes, which grows as new kinds of occupancy are modelled.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/PlatformUnauthorized"
@@ -3756,7 +3809,14 @@
             }
           },
           "409": {
-            "$ref": "#/components/responses/PlatformConflict"
+            "description": "An `Idempotency-Key` was reused with a different request body. Scheduling conflicts are `400`, not `409`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"
@@ -3765,7 +3825,7 @@
       },
       "get": {
         "summary": "List bookings",
-        "description": "Returns bookings whose start time falls in the requested window, ordered by start time. Each bound is an ISO date-time, or a bare `YYYY-MM-DD` read as midnight UTC. When `from`/`to` are omitted the window defaults to the next 7 days, and passing one derives the other.\n\nA single request may span at most 93 days. To cover a longer range, walk it in consecutive windows of 93 days or less, paging each window with `limit`/`offset` against the `total` it reports. Ordering is stable (`startTime`, then id), so paging is well defined for a window that is not being written to; bookings created or cancelled mid-walk can still shift rows across page boundaries.\n\nBookings from every channel are returned, each tagged with `source`. That is deliberate: a caller reconciling its own writes has to be able to see member- and staff-created bookings to know whether a slot was already taken. Only the writes (cancel, add/remove participant) are restricted to bookings this API created.\n\nA class booking carries the occurrence it attends as `classId`. Every attendee of a class holds their own booking row against the same `classId`, and `classes` rows are per-occurrence, so that is what tells two groups running in the same hour apart - filter by it, or read the roster from the class side with GET /v1/platform/classes/{id}/bookings.\n",
+        "description": "Returns bookings whose start time falls in the requested window, ordered by start time. Each bound is an ISO date-time, or a bare `YYYY-MM-DD` read as midnight UTC. When `from`/`to` are omitted the window defaults to the next 7 days, and passing one derives the other.\n\nA single request may span at most 93 days. To cover a longer range, walk it in consecutive windows of 93 days or less, paging each window with `limit`/`offset` against the `total` it reports. Ordering is stable (`startTime`, then id), so paging is well defined for a window that is not being written to; bookings created or cancelled mid-walk can still shift rows across page boundaries.\n\nBookings from every channel are returned, each tagged with `source`. That is deliberate: a caller reconciling its own writes has to be able to see member- and staff-created bookings to know whether a slot was already taken. Whether the writes (cancel, add/remove participant) reach those bookings too depends on the credential: an API key may only mutate the bookings it created (`source: api`), while a staff member acting through an authorized 1club assistant may mutate any of the organization's.\n\nA class booking carries the occurrence it attends as `classId`. Every attendee of a class holds their own booking row against the same `classId`, and `classes` rows are per-occurrence, so that is what tells two groups running in the same hour apart - filter by it, or read the roster from the class side with GET /v1/platform/classes/{id}/bookings.\n",
         "tags": [
           "Bookings"
         ],
@@ -3849,6 +3909,17 @@
           },
           {
             "in": "query",
+            "name": "include",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "customer"
+              ]
+            },
+            "description": "Embed each booking's customer as `customer`, identical to what GET /v1/platform/contacts/{id} returns - one request instead of a contact lookup per booking. Requires the `contacts:read` scope in addition to `bookings:read`, and is refused with 403 without it.\n"
+          },
+          {
+            "in": "query",
             "name": "limit",
             "schema": {
               "type": "integer",
@@ -3887,7 +3958,7 @@
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `bookings:read` scope",
+            "description": "API key is missing the required `bookings:read` scope, or `include=customer` was sent without `contacts:read`",
             "content": {
               "application/json": {
                 "schema": {
@@ -3905,7 +3976,7 @@
     "/v1/platform/bookings/{id}/cancel": {
       "post": {
         "summary": "Cancel a booking",
-        "description": "Cancels the booking by its 1Club id. No refund is issued by 1Club - the caller owns refunds. Idempotent: cancelling an already-cancelled booking succeeds.\n",
+        "description": "Cancels the booking by its 1club id. Idempotent: cancelling an already-cancelled booking succeeds.\n\nWhich bookings are cancellable depends on the credential. An API key may cancel only the bookings it created (`source: api`); anything else is reported as not found. A staff member acting through an authorized 1club assistant may cancel any of the organization's bookings, as they can in the admin portal.\n\nRefunds follow the money. On a booking this API created, 1club never held the payment, so no refund is issued and the caller owns it. On a booking taken through 1club (member portal, app, front desk), the club's own cancellation policy decides the refund, exactly as it does for a staff cancellation in the admin portal.\n\nA booking that has already been checked in cannot be cancelled (409) - voiding a check-in is an admin-portal action. One occurrence of a recurring booking is cancelled, not the series.\n",
         "tags": [
           "Bookings"
         ],
@@ -3922,9 +3993,25 @@
             "schema": {
               "type": "integer"
             },
-            "description": "1Club booking id (returned by create)"
+            "description": "1club booking id (returned by create)"
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "notifyCustomer": {
+                    "type": "boolean",
+                    "description": "Tell the customer their booking was cancelled - email plus the in-app and WhatsApp notification. Defaults to off for a booking this API created, since callers normally send their own notice, and to on for a booking taken through 1club, whose customer expects to hear it from the club. The club's own staff alerts are sent either way.\n"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Booking cancelled",
@@ -3964,6 +4051,16 @@
           "404": {
             "$ref": "#/components/responses/PlatformNotFound"
           },
+          "409": {
+            "description": "The booking has already been checked in, so it cannot be cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"
           }
@@ -3973,7 +4070,7 @@
     "/v1/platform/bookings/{id}": {
       "get": {
         "summary": "Get a booking",
-        "description": "Returns the current state of a booking (including payment status) by its 1Club id - any of the organization's bookings, whichever channel created it. Nothing here is absent from the list endpoint, which has always returned every source.\n",
+        "description": "Returns the current state of a booking (including payment status) by its 1club id - any of the organization's bookings, whichever channel created it. Nothing here is absent from the list endpoint, which has always returned every source.\n",
         "tags": [
           "Bookings"
         ],
@@ -3990,7 +4087,18 @@
             "schema": {
               "type": "integer"
             },
-            "description": "1Club booking id"
+            "description": "1club booking id"
+          },
+          {
+            "in": "query",
+            "name": "include",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "customer"
+              ]
+            },
+            "description": "Embed the booking's customer as `customer`, identical to what GET /v1/platform/contacts/{id} returns. Requires the `contacts:read` scope in addition to `bookings:read`, and is refused with 403 without it.\n"
           }
         ],
         "responses": {
@@ -4011,7 +4119,7 @@
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `bookings:read` scope",
+            "description": "API key is missing the required `bookings:read` scope, or `include=customer` was sent without `contacts:read`",
             "content": {
               "application/json": {
                 "schema": {
@@ -4049,7 +4157,7 @@
             "schema": {
               "type": "integer"
             },
-            "description": "1Club booking id"
+            "description": "1club booking id"
           }
         ],
         "responses": {
@@ -4103,7 +4211,7 @@
       },
       "post": {
         "summary": "Add a player to a booking",
-        "description": "Adds another player to a booking created through this API - for a doubles court, the three players joining the organizer. The contact must already exist (create it via POST /v1/platform/contacts). The total, counting the organizer, is capped by the area type's maximum players.\n",
+        "description": "Adds another player to a booking - for a doubles court, the three players joining the organizer. The contact must already exist (create it via POST /v1/platform/contacts). The total, counting the organizer, is capped by the area type's maximum players.\n\nReaches the same bookings as cancel: an API key may only add to the ones it created, a staff member acting through an authorized 1club assistant to any of the organization's.\n",
         "tags": [
           "Bookings"
         ],
@@ -4120,7 +4228,7 @@
             "schema": {
               "type": "integer"
             },
-            "description": "1Club booking id"
+            "description": "1club booking id"
           },
           {
             "in": "header",
@@ -4201,7 +4309,7 @@
     "/v1/platform/bookings/{id}/participants/{contactId}": {
       "delete": {
         "summary": "Remove a player from a booking",
-        "description": "Removes an additional player from a booking created through this API.",
+        "description": "Removes an additional player from a booking. Reaches the same bookings as cancel: an API key may only remove from the ones it created, a staff member acting through an authorized 1club assistant from any of the organization's.\n",
         "tags": [
           "Bookings"
         ],
@@ -4218,7 +4326,7 @@
             "schema": {
               "type": "integer"
             },
-            "description": "1Club booking id"
+            "description": "1club booking id"
           },
           {
             "in": "path",
@@ -5178,7 +5286,7 @@
     "/v1/platform/contacts/{id}": {
       "get": {
         "summary": "Get a contact",
-        "description": "Returns a single contact by its 1Club id.",
+        "description": "Returns a single contact by its 1club id.",
         "tags": [
           "Contacts"
         ],
@@ -5195,7 +5303,7 @@
             "schema": {
               "type": "integer"
             },
-            "description": "1Club contact id"
+            "description": "1club contact id"
           }
         ],
         "responses": {
@@ -5237,7 +5345,7 @@
     "/v1/platform/content": {
       "get": {
         "summary": "List content",
-        "description": "Returns content for the organization. By default this is the public view: published items with `Public` visibility, the same thing a website visitor could see.\nTo manage content you need the rest of it - pass `status=all` for drafts and `visibility=all` for member-only and private items. Both require the `content:write` scope, since they expose material the organization has not published.\n",
+        "description": "Returns content for the organization. By default this is the public view: published items with `Public` visibility, the same thing a website visitor could see.\nTo manage content you need the rest of it - pass `status=all` for drafts and `visibility=all` for member-only and private items. Both require the `content:write` scope, since they expose material the organization has not published.\nTranslations are separate items sharing one slug, each with its own `language` (see `POST /v1/platform/content`). `locale` *resolves* them - it returns one item per slug, the best match for that locale. To see every variant instead, omit `locale` and read each item's `language`; to list one language only, pass `language` (`language=none` for the untagged base items).\n",
         "tags": [
           "Content"
         ],
@@ -5295,7 +5403,15 @@
             "schema": {
               "type": "string"
             },
-            "description": "Locale for content resolution"
+            "description": "Resolve translations for this locale - one item per slug, preferring the variant in this language, then the untagged one, then English.\n"
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Return only variants tagged with this language, or `none` for the untagged base items. A filter, not a resolution - use it to find what has not been translated yet. Cannot be combined with `locale`, which asks the opposite question.\n"
           },
           {
             "in": "query",
@@ -5365,7 +5481,7 @@
       },
       "post": {
         "summary": "Create content",
-        "description": "Creates a post, FAQ, document, block or how-to guide.\nSend the body as either `contentBlocks` (Editor.js blocks, what the admin editor writes) or `contentHtml` - not both. A `block` created here is what a website `block` section renders: reference it by the slug this returns.\nThe slug is derived from the title when omitted, and de-duplicated with a numeric suffix rather than rejected - read the returned `slug` rather than assuming the one you sent.\n",
+        "description": "Creates a post, FAQ, document, block or how-to guide.\nSend the body as either `contentBlocks` (Editor.js blocks, what the admin editor writes) or `contentHtml` - not both. A `block` created here is what a website `block` section renders: reference it by the slug this returns.\nThe slug is derived from the title when omitted, and de-duplicated with a numeric suffix rather than rejected - read the returned `slug` rather than assuming the one you sent. Non-Latin titles transliterate (\"Работно време\" becomes `rabotno-vreme`), so a title in any language yields a usable URL.\nTo translate an item, create a second one with the **same slug** and a `language`. The two are one piece of content in two languages, and the public site serves whichever matches the visitor's locale.\n",
         "tags": [
           "Content"
         ],
@@ -5471,7 +5587,7 @@
                   "language": {
                     "type": "string",
                     "nullable": true,
-                    "description": "Locale code for a translated variant of an existing slug"
+                    "description": "Locale code (`bg`, `de`, ...) marking this item as the variant of its slug for that language. Translations are separate items sharing one slug: send the **same slug** as the item you are translating, or the two are unrelated rows. Uniqueness is per (slug, language), so the same slug with a new language is accepted rather than de-duplicated. Leave unset for the base item, which every locale falls back to.\n"
                   },
                   "featured": {
                     "type": "boolean"
@@ -5689,6 +5805,11 @@
                     "nullable": true,
                     "description": "Absolute URL this item canonicalizes to, for content that also lives elsewhere and should be indexed there instead. Leave unset for original content - the page then canonicalizes to itself.\n"
                   },
+                  "language": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Re-tag which language this variant is, or `null` to make it the base item every locale falls back to. A 409 when the slug already has a variant in that language.\n"
+                  },
                   "featured": {
                     "type": "boolean"
                   }
@@ -5733,6 +5854,16 @@
           },
           "404": {
             "description": "Content not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another item already occupies that (slug, language) pair. Unlike create, an update never renames around a clash.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -5930,7 +6061,7 @@
     "/v1/platform/instructors/{id}": {
       "get": {
         "summary": "Get an instructor",
-        "description": "Returns a single active instructor by its 1Club id.",
+        "description": "Returns a single active instructor by its 1club id.",
         "tags": [
           "Instructors"
         ],
@@ -5947,7 +6078,7 @@
             "schema": {
               "type": "integer"
             },
-            "description": "1Club instructor id"
+            "description": "1club instructor id"
           }
         ],
         "responses": {
@@ -6583,7 +6714,7 @@
       },
       "post": {
         "summary": "Create a membership",
-        "description": "Puts a customer on a plan. The plan is snapshotted onto the membership exactly as it is when sold in 1Club - club, session allowance, coverage, billing frequency and renewal window - so the membership draws down booking allowance identically.\n\n`paid` records a payment against the External / API method with no gateway call; `unpaid` leaves the membership's transactions outstanding. The total charged is the period amount plus any joining fee, both taken from the plan unless overridden. Collection and refunds stay with you.\n\nWhen nothing is owed at all - a free plan with no joining fee, or an `amount` of 0 on such a plan - the membership is created active straight away rather than awaiting a payment that will never come.\n\nSupports the `Idempotency-Key` header.\n",
+        "description": "Puts a customer on a plan. The plan is snapshotted onto the membership exactly as it is when sold in 1club - club, session allowance, coverage, billing frequency and renewal window - so the membership draws down booking allowance identically.\n\n`paid` records a payment against the External / API method with no gateway call; `unpaid` leaves the membership's transactions outstanding. The total charged is the period amount plus any joining fee, both taken from the plan unless overridden. Collection and refunds stay with you.\n\nWhen nothing is owed at all - a free plan with no joining fee, or an `amount` of 0 on such a plan - the membership is created active straight away rather than awaiting a payment that will never come.\n\nSupports the `Idempotency-Key` header.\n",
         "tags": [
           "Memberships"
         ],
@@ -6732,7 +6863,7 @@
     "/v1/platform/memberships/{id}": {
       "get": {
         "summary": "Get a membership",
-        "description": "Returns a single membership by its 1Club id, including its remaining session allowance.",
+        "description": "Returns a single membership by its 1club id, including its remaining session allowance.",
         "tags": [
           "Memberships"
         ],
@@ -6788,7 +6919,7 @@
       },
       "patch": {
         "summary": "Update a membership",
-        "description": "Changes whether the membership renews, when it ends, and whether it is active, paused, or cancelled. Cancelling stamps the cancellation date, as cancelling in 1Club does.\n\nChanging the plan is not supported: that is a priced change needing proration, invoicing and possibly a refund. Move the customer to another plan in 1Club instead.\n",
+        "description": "Changes whether the membership renews, when it ends, and whether it is active, paused, or cancelled. Cancelling stamps the cancellation date, as cancelling in 1club does.\n\nChanging the plan is not supported: that is a priced change needing proration, invoicing and possibly a refund. Move the customer to another plan in 1club instead.\n",
         "tags": [
           "Memberships"
         ],
@@ -8974,7 +9105,7 @@
       },
       "delete": {
         "summary": "Delete a page",
-        "description": "Removes a page from the draft. The homepage cannot be deleted while other pages remain - make another page the homepage first. Remember to drop the page from the header and footer links afterwards.\n",
+        "description": "Removes a page from the draft. A website must keep at least one page, so the last one cannot be deleted - delete the website itself instead. The homepage cannot be deleted while other pages remain - make another page the homepage first. Remember to drop the page from the header and footer links afterwards.\n",
         "tags": [
           "Website"
         ],
@@ -9341,7 +9472,7 @@
     "/v1/platform/website/pages/{slug}/sections/{index}": {
       "patch": {
         "summary": "Update a section's config",
-        "description": "Merges the given fields into the section's existing config; fields you do not send keep their current values. Array fields are replaced wholesale, so send the whole array when changing one entry.\n`index` is the section's 0-based position as returned by `GET /pages/{slug}`. Indexes shift when sections are added or removed, so re-read the page rather than reusing a stale one.\n",
+        "description": "Merges the given fields into the section's existing config; fields you do not send keep their current values. Array fields are replaced wholesale, so send the whole array when changing one entry.\n`index` is the section's 0-based position as returned by `GET /pages/{slug}`. Indexes shift when sections are added or removed, so re-read the page rather than reusing a stale one.\n`translations` is how one section's copy is localized without rewriting the page. Unlike `config` it **replaces** the whole locale map, so read the section first and send back every locale you are keeping.\n",
         "tags": [
           "Website"
         ],
@@ -9388,6 +9519,10 @@
                   "config": {
                     "type": "object",
                     "description": "Config fields to merge in"
+                  },
+                  "translations": {
+                    "type": "object",
+                    "description": "Per-locale overrides of this section's config, keyed by locale then field. Replaces the whole map. Leave `config` in the language the site is written in; a locale with no entry renders it as written.\n"
                   }
                 }
               }

@@ -5,7 +5,7 @@ description: "Receive real-time availability changes so your calendar stays live
 
 Webhooks push availability changes to your app in near real time, so you can show
 a live calendar instead of discovering conflicts only when a booking is rejected.
-1Club sends a signed HTTP `POST` to your endpoint within seconds whenever a court's
+1Club sends a signed HTTP `POST` to your endpoint whenever a court's
 bookable availability changes on **any** channel - your app, the club's own tools,
 another partner, a class, or an event.
 
@@ -127,6 +127,23 @@ function verify(rawBody: string, header: string, secret: string, toleranceSec = 
 </Note>
 
 ## Delivery, retries, and idempotency
+
+### Delivery timing
+
+Changes are dispatched by a worker that runs **every 30 seconds**, so a first
+delivery normally arrives within about half a minute of the change, plus network
+time. Treat the integration as near-real-time rather than instant: design the
+booking flow so a court can be sold on either side during that window, and let the
+[atomic re-check on create](/api-reference/channel-integration/bookings#conflicts)
+be what stops a double-booking.
+
+<Warning>
+  Do not measure delivery latency against a **staging** or trial environment. Those
+  run with CPU allocated only while serving requests, which starves the dispatch
+  worker between ticks and inflates the figure well past what production does.
+</Warning>
+
+### Reliability
 
 - **Respond within 10 seconds.** Any `2xx` marks the delivery successful. A non-`2xx`, a connection error, or a response slower than the **10-second** timeout counts as a failure. Do the minimum synchronously (verify, enqueue, ack) and re-pull availability asynchronously.
 - **At-least-once.** You may receive the same `id` more than once. Deduplicate on `id` and make handling idempotent (re-pulling availability already is).

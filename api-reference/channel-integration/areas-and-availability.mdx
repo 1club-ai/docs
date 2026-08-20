@@ -30,6 +30,7 @@ Response:
     "sports": ["padel"],
     "pricePerHour": 24,
     "maxConcurrentBookings": 1,
+    "timezone": "Europe/Madrid",
     "operatingHours": {
       "monday": [{ "open": "08:00", "close": "22:00" }],
       "tuesday": [{ "open": "08:00", "close": "22:00" }]
@@ -39,6 +40,12 @@ Response:
 ```
 
 Use each area's `id` as the `areaId` when creating a booking.
+
+`timezone` is the IANA zone the gym keeps, and the one `operatingHours` are
+expressed in. Convert a local wall time in it when you send `startTime` and
+`endTime` - a booking sent in the wrong zone lands an hour out twice a year, at
+the daylight-saving boundary, and looks correct the rest of the time. Map it once
+when you map the courts.
 
 ## Area availability
 
@@ -71,7 +78,8 @@ Response:
     "monday": { "enabled": true, "openTime": "08:00", "closeTime": "22:00" }
   },
   "busy": [
-    { "startTime": "2026-07-20T17:00:00.000Z", "endTime": "2026-07-20T18:00:00.000Z" }
+    { "startTime": "2026-07-20T17:00:00.000Z", "endTime": "2026-07-20T18:00:00.000Z", "subject": "member_booking" },
+    { "startTime": "2026-07-20T19:00:00.000Z", "endTime": "2026-07-20T20:00:00.000Z", "subject": "area_block" }
   ],
   "slots": [
     { "start": "2026-07-20T06:00:00.000Z", "end": "2026-07-20T07:00:00.000Z", "capacity": 1, "remaining": 1, "bookable": true },
@@ -83,6 +91,7 @@ Response:
 - **`timezone`** - the IANA timezone the `operatingHours` are expressed in. Operating hours are per-weekday **local** times; slots are already resolved to absolute UTC instants for you (DST included), so prefer `slots` over re-deriving from `operatingHours`.
 - **`slots`** - open slots computed from effective bookable hours (club ∩ area) minus `busy`, honouring `maxConcurrentBookings`. `remaining` is how many of `capacity` are still free; `bookable` is `remaining > 0` and no hard block.
 - **`busy`** and **`operatingHours`** are still returned raw if you'd rather compute slots yourself. An area with `maxConcurrentBookings` greater than 1 can hold that many overlapping bookings before a slot is full.
+- **`busy[].subject`** - what holds the court for that interval: `member_booking`, `class`, `event`, `area_block` (the gym closed the court for maintenance or a private hire), `time_off`, or `shift_break`. Same vocabulary as `details.conflicts[].subject` on a [refused booking](/api-reference/channel-integration/bookings#conflicts), so an hour you cannot sell can be explained rather than shown as unattributed busy time. No id or name is attached - an availability read is not a read of who booked. Use [List bookings](/api-reference/channel-integration/bookings#list-bookings) for the rows you may see.
 - **`version`** - a consistency token (the highest change sequence for this area). Compare it to the `sequence` on an [availability webhook](/api-reference/channel-integration/webhooks) to know whether this read already reflects that change.
 
 ### Conditional requests
@@ -124,7 +133,7 @@ Query parameters: `clubId` (optional), `sport` (optional), `from`/`to` (required
       "maxConcurrentBookings": 1,
       "version": "48213",
       "operatingHours": { "monday": { "enabled": true, "openTime": "08:00", "closeTime": "22:00" } },
-      "busy": [{ "startTime": "2026-07-20T17:00:00.000Z", "endTime": "2026-07-20T18:00:00.000Z" }],
+      "busy": [{ "startTime": "2026-07-20T17:00:00.000Z", "endTime": "2026-07-20T18:00:00.000Z", "subject": "member_booking" }],
       "slots": [{ "start": "2026-07-20T06:00:00.000Z", "end": "2026-07-20T07:00:00.000Z", "capacity": 1, "remaining": 1, "bookable": true }]
     }
   ]

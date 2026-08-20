@@ -50,6 +50,40 @@ Authorization: Bearer 1club_sk_live_...
 
 The key is tied to one organization, so all areas and bookings are scoped to that organization automatically.
 
+## Verify a key
+
+`GET /v1/platform/me` needs a valid key but **no scope of its own**, which makes it
+the right call to run when a gym connects your integration: it confirms the key
+works, names the organization, and tells you what the key may do.
+
+```bash
+curl "https://api.1club.ai/v1/platform/me" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+```json
+{
+  "organization": { "id": 1435, "name": "Tennis & Padel Club", "slug": "tennis-padel", "currency": "EUR" },
+  "scopes": ["areas:read", "bookings:read", "bookings:write"],
+  "fullAccess": false,
+  "effectiveScopes": ["areas:read", "bookings:read", "bookings:write"],
+  "resources": [{ "resource": "bookings", "actions": ["read", "write"] }]
+}
+```
+
+- **Check a capability against `effectiveScopes`, not `scopes`.** A full-access key
+  holds the single wildcard scope `*` and reports `scopes: ["*"]` with
+  `fullAccess: true`. Looking for `"bookings:write"` in `scopes` would reject the
+  one key that can do everything; `effectiveScopes` expands the wildcard for you.
+- **`organization.currency`** is the ISO 4217 code the gym trades in, and the only
+  place this API states it. Every monetary amount elsewhere - a booking's
+  `payment.amount`, plan and product prices, transaction totals - is a bare number
+  in this currency. Read it once and store it against the connection rather than
+  assuming it matches your own.
+- **`organization.id`** is the same id that arrives as `organizationId` on an
+  [availability webhook](/api-reference/channel-integration/webhooks), so a
+  per-organization connection can be keyed on it.
+
 ## Rate limits and errors
 
 The channel endpoints share the Platform API's limits and error model:

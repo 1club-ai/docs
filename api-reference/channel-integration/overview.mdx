@@ -65,6 +65,12 @@ You collect payment on your side; 1Club records the booking so it counts for rev
 
 `amount` is optional and defaults to the computed price for the slot: the area's price, plus the coach's hourly rate when the booking names one. A booking that carries no charge at all comes back as `no_charge` rather than `paid` or `unpaid`. Refund handling and collection stay on your side - cancelling a booking releases the area and issues no refund from 1Club.
 
+Amounts are bare numbers in the gym's own currency. Read it once from
+`organization.currency` on [`GET /me`](/api-reference/channel-integration/authentication#verify-a-key)
+and store it with the connection: nothing else on this API repeats it, so an
+integration that assumes its own currency misprices every booking without ever
+erroring.
+
 ## How it works
 
 1. **Create an API key** under **Settings > Organization > APIs & webhooks** with the `areas:read`, `bookings:read`, and `bookings:write` scopes, adding `contacts:read`, `contacts:write`, and `instructors:read` if you resolve customers or coaches by name. See [Authentication](/api-reference/channel-integration/authentication).
@@ -77,8 +83,8 @@ You collect payment on your side; 1Club records the booking so it counts for rev
 
 1Club is a shared inventory: the same court can be booked from your app, the club's own tools, another channel, a class, or an event. To keep your calendar live you need to know when availability changes - not just discover it at booking time. Three mechanisms work together:
 
-- **Availability change webhooks (push).** Register an HTTPS endpoint and 1Club sends a signed `availability.changed` event within seconds whenever a court's bookable availability changes on **any** channel. The event is a thin invalidation - it tells you *which area and window changed*, and you re-pull the authoritative availability for that window. See [Webhooks](/api-reference/channel-integration/webhooks).
-- **The read API is the source of truth (pull).** Webhooks tell you *when* to read; [`GET /availability`](/api-reference/channel-integration/areas-and-availability) tells you *what's true*. Every read carries a `version`/`cursor` so you can tell whether it already reflects a webhook you're holding. Booking creation still re-checks atomically and rejects conflicts, so a stale calendar can never cause a double-booking.
+- **Availability change webhooks (push).** Register an HTTPS endpoint and 1Club sends a signed `availability.changed` event whenever a court's bookable availability changes on **any** channel, typically within half a minute - see [Delivery timing](/api-reference/channel-integration/webhooks#delivery-timing). The event is a thin invalidation - it tells you *which area and window changed*, and you re-pull the authoritative availability for that window. See [Webhooks](/api-reference/channel-integration/webhooks).
+- **The read API is the source of truth (pull).** Webhooks tell you *when* to read; [`GET /availability`](/api-reference/channel-integration/areas-and-availability) tells you *what's true*. Every read carries a `version`/`cursor` so you can tell whether it already reflects a webhook you're holding. Booking creation still re-checks atomically and rejects conflicts - including a court the gym has blocked - so a stale calendar can never cause a double-booking. It is a backstop, not a substitute for honouring `bookable` and `remaining` yourself.
 - **The change feed is the backstop (reconcile).** Webhooks are delivered at-least-once but can be missed (your endpoint is down, a deploy, a network blip). [`GET /availability/changes?since=<cursor>`](/api-reference/channel-integration/areas-and-availability#availability-change-feed) returns every change since a cursor, so you can catch up exactly and never drift. Poll it periodically (e.g. every few minutes) and after any downtime.
 
 <Note>

@@ -89,9 +89,11 @@ That is what lets you record a schedule as it stands, including sessions in the 
 
 <Warning>
   Physical constraints always apply and are never overridden: a genuine
-  double-booking, the area's concurrency capacity, whether an instructor takes
-  one-on-one bookings, and the slot alignment the area requires. A booking that
-  breaks one of these is rejected.
+  double-booking, the area's concurrency capacity, a court the gym has **blocked**
+  for maintenance or a private hire, a live event on the court, the coach's own
+  calendar, whether an instructor takes one-on-one bookings, and the slot
+  alignment the area requires. A booking that breaks one of these is rejected -
+  see [Conflicts](#conflicts). There is no override parameter.
 </Warning>
 
 ## How contacts sync
@@ -150,7 +152,8 @@ contact automatically, as a by-product of booking sync. Sync is one-way:
   </Step>
   <Step title="Create the booking">
     Link the resolved `contactId` and write the booking, re-checking availability
-    **atomically**. If the slot was taken in the meantime → `409`.
+    **atomically**. If the slot was taken in the meantime → `400` with a populated
+    `details.conflicts` - see [Conflicts](#conflicts).
   </Step>
   <Step title="Record revenue & respond">
     Record the transaction (`paid` → settled, `unpaid` → outstanding) and return
@@ -160,16 +163,69 @@ contact automatically, as a by-product of booking sync. Sync is one-way:
 
 <Note>
   Contact resolution runs **before** the booking write. So if the slot turns out to
-  be taken (`409`) or the request is otherwise rejected, a contact just created for a
+  be taken (`400`) or the request is otherwise rejected, a contact just created for a
   first-time customer is **kept** - it isn't rolled back. That's harmless: it carries
   no booking, stays matched by email, and is reused on retry. Only the booking write
   re-checks availability atomically and rejects conflicts.
 </Note>
 
+### Conflicts
+
+A slot that cannot be sold is refused with **`400`**, not `409`. The body carries a
+machine-readable `code` and a `details.conflicts` array naming what is in the way:
+
+```json
+{
+  "error": "The area is already booked for the selected time",
+  "message": "The area is already booked for the selected time",
+  "code": "AREA_AT_CAPACITY",
+  "details": {
+    "conflicts": [
+      {
+        "resource": "area",
+        "resourceId": 1028,
+        "subject": "member_booking",
+        "id": null,
+        "label": null,
+        "startTime": "2026-09-15T15:00:00.000Z",
+        "endTime": "2026-09-15T16:00:00.000Z"
+      }
+    ],
+    "capacity": 1,
+    "booked": 1
+  }
+}
+```
+
+`subject` says what holds the slot, in the same vocabulary the
+[availability](/api-reference/channel-integration/areas-and-availability) response
+uses for `busy[].subject`. A court conflict is `member_booking`, `class`, `event`,
+or `area_block`; a coach conflict adds `time_off` and `shift_break`. The counterpart's own `startTime`/`endTime` may be wider
+than the slot you asked for.
+
+`id` and `label` are always `null` on this API. They carry the counterpart's row id
+and the member's name for the gym's own staff calendar, where someone is entitled to
+see who they would be displacing - an integration is not, so it is told that the hour
+is taken and no more.
+
+The codes you can see today are `AREA_AT_CAPACITY`, `AREA_BLOCKED`,
+`AREA_RUNNING_EVENT`, `INSTRUCTOR_AT_CAPACITY`, `INSTRUCTOR_TEACHING_CLASS`, and
+`INSTRUCTOR_RUNNING_EVENT`.
+
+<Tip>
+  **Detect a taken slot on the presence of a populated `details.conflicts`, not on
+  a list of codes.** The list grows as new kinds of occupancy are modelled, and a
+  code you do not recognise would otherwise read as a generic error - which at
+  checkout means confirming a booking the gym rejected.
+</Tip>
+
+Retrying a conflict does not help, and there is no parameter that forces one
+through. Re-read availability for the window and offer another slot.
+
 ### Common errors
 
-- `409` - the area is not available for the selected time, the instructor is already busy, or an `Idempotency-Key` was reused with a different body.
-- `400` - the area is not bookable through this API, the contact or instructor was not found in your organization, the contact is archived, the instructor does not take one-on-one bookings, or you sent both `contactId` and `customer` (or neither).
+- `400` - the slot cannot be sold (see [Conflicts](#conflicts)), the area is not bookable through this API, the contact or instructor was not found in your organization, the contact is archived, the instructor does not take one-on-one bookings, or you sent both `contactId` and `customer` (or neither).
+- `409` - an `Idempotency-Key` was reused with a different request body. Scheduling conflicts are `400`.
 - `403` - the API key is missing the `bookings:write` scope.
 - `429` - rate limit exceeded (booking writes are throttled in addition to the standard per-org limit).
 
@@ -214,7 +270,9 @@ curl "https://api.1club.ai/v1/platform/bookings/48213" \
 }
 ```
 
-A `404` means no booking with that id exists in your organization.
+A `404` means no booking with that id exists in your organization. Pass
+`include=customer` to embed the contact, as on
+[List bookings](#embedding-the-customer).
 
 <Note>
   Look-up and cancel only reach bookings **this API created**. That is deliberate:
@@ -234,9 +292,10 @@ curl "https://api.1club.ai/v1/platform/bookings?from=2026-07-20T00:00:00Z&to=202
 
 Query parameters:
 
-- `from`, `to` (optional) - ISO date-times bounding the booking start time. The window may span at most 92 days. Omit both for the next 7 days; pass one and the other is derived from it.
+- `from`, `to` (optional) - ISO date-times bounding the booking start time. The window may span at most 93 days. Omit both for the next 7 days; pass one and the other is derived from it.
 - `clubId`, `areaId`, `instructorId`, `contactId` (optional) - narrow to one gym, court, coach, or customer
 - `status` (optional) - for example `confirmed`, `pending`, `cancelled`
+- `include` (optional) - `customer` embeds each booking's customer, see [Embedding the customer](#embedding-the-customer)
 - `limit` (optional) - 1 to 100, defaults to 50
 - `offset` (optional) - defaults to 0
 
@@ -267,6 +326,55 @@ Response:
 ```
 
 Unlike look-up by id, this returns bookings from **every** channel, each tagged with `source` (`api` for yours, plus `admin`, `portal`, `app`, and others). That is what makes reconciliation possible: a caller that cannot see member and staff bookings cannot tell that a slot it thinks is free was taken in the gym's own tools.
+
+### Embedding the customer
+
+A booking carries the customer as a bare `contactId`. Pass `include=customer` on
+either read to get the whole contact inline, so importing a window of bookings
+costs one request instead of a [contact look-up](/api-reference/channel-integration/contacts)
+per row - which matters against the 100 requests per minute budget.
+
+```bash
+curl "https://api.1club.ai/v1/platform/bookings?from=2026-07-20T00:00:00Z&include=customer" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Each row in `data` then carries a `customer` alongside its `contactId`:
+
+```json
+{
+  "bookingId": 48213,
+  "contactId": 300,
+  "customer": {
+    "id": 300,
+    "uuid": "0199a1c2-...",
+    "name": "Alex Petrov",
+    "firstName": "Alex",
+    "lastName": "Petrov",
+    "email": "alex@example.com",
+    "phone": "+359881234567",
+    "type": "member",
+    "createdAt": "2026-05-02T09:14:00.000Z"
+  }
+}
+```
+
+The object is exactly what [`GET /contacts/{id}`](/api-reference/channel-integration/contacts)
+returns, so nothing is lost by skipping that call. `customer` is `null` when the
+booking has no contact.
+
+<Note>
+  Requires the **`contacts:read`** scope in addition to `bookings:read`. A key
+  without it gets a `403` rather than a page with the field quietly missing -
+  which would read as "these bookings have no customer". `phone` can be `null`:
+  1Club requires an email **or** a phone on a contact, not both.
+</Note>
+
+If your key deliberately holds no contacts scope, attendee **names** are still
+available for class bookings: `GET /v1/platform/classes/{id}/bookings` returns
+`contactName` under `bookings:read` alone, and gates only the email on
+`contacts:read`. A name identifies who is on a roster; the whole contact record is
+CRM data.
 
 ## Players on a booking
 

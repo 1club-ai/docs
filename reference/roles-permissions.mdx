@@ -1,11 +1,12 @@
 ---
 title: Roles and permissions
-description: Understand how 1club authorizes admin users - the five built-in roles, the permission-first model (module, action, scope), how to read the Role permissions table, and how admins customize per-role permissions.
+description: How 1Club authorizes admin users - the five built-in roles, the permission model (module, action, scope), what every permission allows, and how to change a role's permissions in Settings > Permissions.
 keywords:
   - roles
   - permissions
   - RBAC
   - permission scope
+  - permission editor
   - admin access
   - front desk
   - instructor
@@ -13,194 +14,581 @@ keywords:
   - owner
 ---
 
-1club decides what an admin user can do from **permissions**, not from their job title. Each admin user has one **role**, and a role is a default bundle of permissions. Every operation in the admin is gated on a specific permission, so two users with different roles can do the same thing whenever they hold the same permission. This page explains the built-in roles, the permission model behind them, and how to tailor a role's permissions.
+1Club decides what an admin user can do from **permissions**, not from their job title. Each admin user holds one **role**, and a role is a default bundle of permissions. Every operation in the admin is gated on a specific permission, so two people with different roles can do the same thing whenever they hold the same permission.
+
+This page covers the five roles, the permission model behind them, exactly what each permission allows, and how to change a role's permissions in **Settings > Permissions**.
 
 ## Overview
 
-- **Five built-in roles** - Admin, Manager, Front Desk, Instructor, and Member. Every admin user has exactly one.
-- **Permission-first authorization** - access is granted by permissions in the form `module.action.scope`; roles are just the default set of permissions a user starts with.
-- **Hierarchical permissions** - a broader permission automatically covers narrower ones, so you grant the least a task needs.
-- **Customizable per role** - an admin can change which permissions most modules grant per role. You cannot create brand-new named roles.
-- **Owner and super admin** - two capabilities that sit outside the role list and bypass permission checks by design.
+- **Five built-in roles** - Admin, Manager, Front Desk, Instructor, and Member. Every admin user holds exactly one.
+- **Permissions decide access** - a permission is written `module.action.scope`, and a role is just the set of permissions its holders start with.
+- **Four actions and a shortcut** - View, Create, Edit, and Delete, plus **Full access**, which grants all of them at once.
+- **Three scopes** - Organization, Club, and Own, from widest to narrowest.
+- **Customizable per role** - an admin edits which permissions each role grants in **Settings > Permissions**. You cannot create a sixth named role.
+- **Owner and super admin** - two capabilities outside the role list that bypass permission checks by design.
 
 ## Roles
 
-There are five roles. Every admin user has exactly one. The **Member** role has no admin access; members use the member portal and public apps.
+There are five roles and every admin user holds exactly one. The **Member** role has no admin access at all; members use the member portal and public apps.
 
 | Role | Typical use | Default access |
 |------|-------------|----------------|
-| **Admin** | Owner or main administrator | Full management of every module across the whole organization, including settings and permissions. |
-| **Manager** | Club or department manager | Full management of members, messaging, operations, bookings, check-ins, marketing, analytics, and inventory within a club, plus organization-wide staff management. Can view and create billing. No settings access. |
-| **Front Desk** | Receptionist or front-of-house staff | Create and view members; full messaging; create and view bookings and check-ins; view operations; view and create billing (point of sale); view inventory; view their own analytics. No staff, marketing, or settings access. |
-| **Instructor** | Coach or teacher | Manage only their own schedule, classes, bookings, and check-ins; read and send their own messages; view their own earnings and analytics; manage their own profile and notification preferences. No organization-wide access. |
-| **Member** | End member | No admin access; uses the member portal and public apps. |
+| **Admin** | Owner or main administrator | Full access to every module at organization scope, including settings and the permission editor. Cannot be customized. |
+| **Manager** | Club or department manager | Runs the club: members and memberships, the timetable, bookings, check-ins, attendance, marketing, analytics, inventory, rentals, cash, and the till. Manages staff organization-wide. Views and takes payments but does not configure billing. No settings access. |
+| **Front Desk** | Receptionist or front-of-house staff | Works the desk: looks members up, signs them up to a plan, books them in, checks them in, runs the till, lends gear, handles the inbox. Reads the timetable and catalog without editing them. No staff, marketing, or settings access. |
+| **Instructor** | Coach or teacher | Own world only: reads their own timetable, runs the bookings and attendance on it, sees the members they teach, reads their own earnings and stats, sends their own messages, manages their own profile. |
+| **Member** | End member | No admin access. Uses the member portal and public apps. |
 
 <Note>
-You may see the term **staff** in some screens or reports - that's a label for any organization user who can reach the admin (Admin, Manager, Front Desk, or Instructor), not a separate stored role.
+You may see **staff** on some screens and reports. That is a label for any organization user who can reach the admin (Admin, Manager, Front Desk, or Instructor), not a sixth stored role.
 </Note>
 
 ### Owner
 
-Within the Admin role, an organization can mark one or more users as **owner**. Owners bypass permission checks entirely, and only owners can delete the organization. Owner is a flag on the user's membership, not a separate role.
+Within the Admin role, an organization can mark one or more users as **owner**. Owners bypass permission checks entirely, and only an owner can delete the organization. Owner is a flag on the user's membership, not a role. See [Users](/settings/admin-users).
 
 ### Super admin
 
-Super admin is a 1club platform-level capability used by the 1club team for support and provisioning. It bypasses organization permission checks and is not something you assign to your own staff.
+Super admin is a 1Club platform capability used by the 1Club team for support and provisioning. It bypasses organization permission checks and is not something you assign to your own staff.
 
-## The permission model
+## How a permission is built
 
-Every permission is written as `module.action.scope`, for example `members.manage.club` or `billing.read.organization`. Access is decided by matching the permission an operation requires against the permissions a user holds.
+Every permission has three parts: `module.action.scope`. For example `members.read.club` is "view members, within a club".
 
-Permissions are **hierarchical**, and 1club applies the hierarchy for you:
+- **Module** - the area of the product, such as Members, Bookings, or Billing.
+- **Action** - what you may do there: View, Create, Edit, Delete, or Full access.
+- **Scope** - how much of the organization it reaches: Organization, Club, or Own.
 
-- **Actions** - **Manage (Full)** implies all the other actions on that module (create, read, update, delete, and any module-specific actions such as invite, export, import). So a user with `members.manage.club` also satisfies a `members.read.club` check.
-- **Scopes** - a broader scope covers narrower ones: `organization` covers `club` covers `own`. A user with `members.read.organization` satisfies a `members.read.club` requirement.
-
-Because of this, each operation requires the **narrowest** permission it actually needs, and broader holders pass automatically. A read screen requires a `.read.` permission; a change requires `.create.`, `.update.`, `.delete.`, or `.manage.`.
+An operation always requires the **narrowest** permission that actually fits it. A screen that only lists things requires View. A button that changes something requires Create, Edit, or Delete.
 
 ### Actions
 
-| Action | Label in the UI | Meaning |
-|--------|-----------------|---------|
-| `read` | View | See the data. |
-| `create` | Create | Add new records. |
-| `update` | Edit | Change existing records. |
-| `delete` | Delete | Remove records. |
-| `manage` | Full | Everything on the module - implies all the actions above, plus invite, export, and import. |
-| `invite` | Invite users | Invite people (where the module supports it). |
-| `export` | Export | Export data. |
-| `import` | Import | Import data. |
+| Action | Permission key | What it means |
+|--------|----------------|---------------|
+| **View** | `read` | See the data. Every list, detail page, and picker in the module. |
+| **Create** | `create` | Add new records. |
+| **Edit** | `update` | Change records that already exist. |
+| **Delete** | `delete` | Remove records, and in several modules cancel them (see the module reference below). |
+| **Full access** | - | Everything the module offers. Granting Full access grants View, Create, Edit, and Delete together, plus any configuration the module keeps behind it. |
+
+Not every module offers all four actions. The editor only shows an action when granting it changes something real, so Marketing offers View and Full access while Members offers all four. The [module reference](#what-each-permission-allows) lists what each one actually has.
+
+<Note>
+**Full access is a shortcut, not a fifth kind of access.** On screen it is a single checkbox labelled **Full access**. Checking it ticks and locks the other actions in that module, because it already grants them, and it also carries whatever configuration that module keeps behind its individual actions.
+</Note>
 
 ### Scopes
 
-| Scope | Meaning |
+| Scope | Reaches |
 |-------|---------|
-| `organization` | All resources in the organization. |
-| `club` | Resources within a single club. |
-| `own` | Only resources the user owns or is assigned to. |
+| **Organization** | Everything in the organization, across every club. |
+| **Club** | Records in a single club. |
+| **Own** | Only records the user owns or is assigned to. |
 
-Scope is why an Instructor is limited to their own world. Their permissions are `own`-scoped, so they manage their own classes, bookings, and check-ins but cannot reach organization-wide surfaces such as billing, settings, staff, or organization analytics - even where the underlying action matches.
+A wider scope automatically covers the narrower ones: Organization covers Club, and Club covers Own. So a user holding "View members (Organization)" satisfies any check for "View members (Club)".
 
-### Modules
+Scope is why an Instructor stays in their own world. Their permissions are Own-scoped, so they run their own classes, bookings, and check-ins but cannot reach organization-wide surfaces like billing, staff, or settings, even where the action matches. For what a club is, see [Organizations and clubs](/reference/organization-clubs).
 
-Permissions are grouped by module. These are the modules 1club checks:
+### How the hierarchy plays out
 
-| Module | What it covers |
-|--------|----------------|
-| **Account** | Your own profile. |
-| **Preferences** | Your own notification preferences. |
-| **Members** | Members, contacts, and user accounts. |
-| **Directory** | A limited member directory - names and membership status, without contact details. |
-| **Messages** | Inboxes, messages, and communication history. |
-| **Operations** | Areas, classes, schedules, and day-to-day operations. |
-| **Booking** | Create, view, edit, and cancel bookings and waitlists. |
-| **Check-in** | Check members in and manage attendance. |
-| **Staff** | Staff members, instructor profiles, pay rates, and admin access. |
-| **Billing** | Billing, invoices, payments, and point of sale. |
-| **Marketing** | Deals, pipeline, promotions, automations, the website builder, content, media, and reviews. |
-| **Analytics** | Reports, analytics, and insights. |
-| **Inventory** | Ingredients, stock levels, recipes, and inventory reports. |
-| **Settings** | Organization settings and configuration. |
-| **Permissions** | Administer role permissions (admin only). |
+Both hierarchies apply at the same time, so one grant can satisfy several checks:
+
+- Full access covers View, Create, Edit, and Delete on the same module.
+- Organization covers Club, and Club covers Own.
+
+A Manager holding **Bookings: Full access (Club)** therefore passes a check for "View bookings (Own)" without holding it literally. That is the point of the model: you grant the least a person needs, and broader holders pass automatically.
+
+<Warning>
+Widening the scope of a Full access grant can hand over more than the editor shows. A few sensitive operations are deliberately pinned to **Organization** scope so that, by default, only an admin or owner reaches them - deleting the website, editing another member's notification settings, undoing a check-in that has already been recorded. If you grant a role **Full access (Organization)** on Marketing, Check-ins, or Members, it satisfies those checks too, with no separate checkbox saying so. Grant Organization scope deliberately.
+</Warning>
+
+## What each permission allows
+
+The modules below are in the order they appear in **Settings > Permissions**. Each one lists the actions it offers and what they unlock in the product.
+
+### Profile
+
+Your own account details: name, photo, contact details, password, and language. Own scope only.
+
+| Action | Allows |
+|--------|--------|
+| **View** | Open your own profile. |
+| **Full access** | Change your own profile. |
+
+Every staff role holds this by default. It never gives access to anyone else's profile - that is the Members module.
+
+### Notifications
+
+Your own notification preferences: which emails, push messages, and SMS you personally receive. Own scope only.
+
+| Action | Allows |
+|--------|--------|
+| **View** | See your own notification settings. |
+| **Full access** | Change your own notification settings. |
 
 <Note>
-Website tooling used to be its own permission module; it is now governed by the **Marketing** module.
+Setting notification defaults for a whole role is a different thing. **Settings > Notifications** is organization configuration and needs settings access, so it is admin and owner only. Editing another member's notification settings is admin and owner only too.
 </Note>
+
+### Members
+
+The people and their records: contacts, members, tags, custom fields, and billing accounts.
+
+| Action | Allows |
+|--------|--------|
+| **View** | The member list, a member's profile, and every member picker in the admin. |
+| **Create** | Add a member or contact. Also creates billing accounts, tag definitions, custom-field definitions, and recorded matches. |
+| **Edit** | Amend an existing record: details, notes, household links, PIN, tags, email preferences, invitations, member type, progression, and archiving or unarchiving. |
+| **Delete** | Delete a member or a billing account, purge the archive, delete a tag or custom-field definition, **and merge two profiles**. |
+| **Full access** | All four. |
+
+Two things are worth knowing here:
+
+- **Merging is a Delete.** A merge absorbs one profile into another and removes it, so a role with Edit can correct a duplicate but cannot resolve it by merging.
+- **Archiving is an Edit.** Archiving is reversible, so it does not need Delete.
+- **Viewing a member does not include their memberships.** A role with member View but no membership View sees the profile - name, contact details, tags, bookings - with the memberships section empty. The expiring-memberships block on Home disappears the same way.
+
+### Memberships
+
+The plans and passes a member holds: subscriptions, punch cards, and their remaining allowance.
+
+| Action | Allows |
+|--------|--------|
+| **View** | The memberships list and detail, plus the active, expiring, and stats views. |
+| **Create** | Sign a member up from their profile or from the memberships list. This charges the payment, honours the plan's upfront-payment rule, and records the transaction. |
+| **Edit** | Extend, renew, pause, resume, top up remaining visits, apply or remove a promotion, and reconcile. Also allows selling on credit by overriding the upfront-payment requirement. |
+| **Delete** | Delete a membership, **and cancel one**. |
+| **Full access** | All four. |
+
+- **Cancelling is a Delete.** It ends the membership and triggers its refunds, so a role with Edit can extend a membership but cannot call it off.
+- **Selling a pass as part of a visit is not this module.** The "Add plan or pass" tab inside the booking and check-in dialogs, and selling at the till, ride along with the booking or check-in itself. Whoever may check a member in may also sell them the thing that gets them in.
+
+### Member directory
+
+A deliberately limited roster: names and membership status, with no contact details. It exists so an instructor can see who they teach without being handed the member database.
+
+| Action | Allows |
+|--------|--------|
+| **View** | The limited directory. At **Own** scope it is the attendees of their classes and the bookings assigned to them. |
+| **Full access** | The same reads. There is nothing to write here. |
+
+### Messages
+
+The inbox, message threads, templates, and shared email inboxes.
+
+| Action | Allows |
+|--------|--------|
+| **View** | Read messages and threads. At **Own** scope, only their own. |
+| **Create** | Compose, edit a draft, delete a draft, and send. |
+| **Full access** | Also the shared surfaces: create, verify, and delete organization email inboxes, and create, edit, and delete message templates. |
+
+### Classes
+
+The timetable: classes, their instructors, capacity, and schedule.
+
+| Action | Allows |
+|--------|--------|
+| **View** | The class list, class detail, and booking counts. |
+| **Create** | Create a class, including duplicating one on the calendar. |
+| **Edit** | Change an existing class: rename, reschedule, change instructor or capacity. |
+| **Delete** | Delete a class, delete in bulk, **and cancel a class**. |
+| **Full access** | All four. |
+
+- **Cancelling is a Delete.** Cancelling a class cancels every member booking on it and triggers their refunds, so a role with Edit can reschedule and rename a class but cannot call it off.
+- **Own scope for a class write means sole instructor.** An Own-scoped user may only change a class they teach alone, before and after the change, and a class they create can name only themselves. **Own** on View is looser: they see any class they teach, including one co-taught with a colleague, while the write actions disappear on it.
+- **Viewing a class does not include its attendees.** The roster hanging off a class is Bookings: View.
+
+### Bookings
+
+Bookings and waitlists, for classes and for area or court reservations.
+
+| Action | Allows |
+|--------|--------|
+| **View** | The booking list and detail, plus the attendee roster on a class. |
+| **Create** | Make a booking, and add someone to a waitlist. |
+| **Edit** | Edit or reschedule a booking, confirm it, add or remove a participant, and process a waitlist. |
+| **Delete** | Cancel a booking, and remove someone from a waitlist. |
+| **Full access** | All four, plus two overrides: **Book anyway** (booking past capacity or outside opening hours) and waiving the cancellation policy to issue a full refund. |
+
+- **Delete means cancel.** There is no hard delete for a booking. Cancelling carries refunds, notifications, and a knock-on to any order it belongs to.
+- **Own scope is not "bookings I made".** It is bookings assigned to the user, plus every booking on a class they teach. Unlike class writes there is no sole-instructor rule, so a co-taught class's bookings belong to all of its instructors. Editing a whole recurring series additionally requires that no later occurrence belongs to another instructor.
+- **Cancelling a booking that is already checked in** needs the Check-ins override described below, on top of Bookings: Delete.
+- Bookings also get cancelled by neighbouring operations under their own permissions: cancelling a class, cancelling an order, cancelling an event, and resolving an instructor time-off conflict.
+
+### Check-ins
+
+Recording and undoing attendance.
+
+| Action | Allows |
+|--------|--------|
+| **View** | The attendance log and check-in detail. |
+| **Create** | Record a check-in. |
+| **Edit** | Change an existing check-in, in practice converting the entrance method used for a visit. |
+| **Delete** | Undo a check-in. |
+| **Full access** | All four. At **Organization** scope it also clears the check-in window and recovers a no-show. |
+
+Three overrides live behind **Full access (Organization)** specifically, and they are the reason to think before widening this module's scope:
+
+- **Ignoring the check-in window.** Normally a member can only be checked in from an hour before the class until the end of that day.
+- **Cancelling a booking that has already been checked in.** This voids the attendance record and zeroes the instructor's pay for it.
+- **Rewriting the entrance method after the visit was recorded and paid for.**
+
+By default those three land only on Admin, owner, and 1Club support, because Manager holds Check-ins at Club scope. You can delegate any of them to another role by granting it at Organization scope. You cannot take them away from an Admin.
+
+### Staff
+
+The instructor roster and admin access for your team.
+
+| Action | Allows |
+|--------|--------|
+| **View** | The instructor list and detail, pay-rate policies, and time off. |
+| **Full access** | Create, edit, delete, merge, and reorder instructors; manage pay-rate policies; manage time off and resolve its booking conflicts; **and manage team members and admin access** - invite, edit, change role, reset a password, and remove a user. |
+
+Organization scope only - there is no per-club version of this module.
+
+Staff management is bounded by a role hierarchy regardless of the permission. See [Managing who has which role](#managing-who-has-which-role).
+
+### Billing
+
+Transactions, invoices, payments, orders, plans, and revenue configuration.
+
+| Action | Allows |
+|--------|--------|
+| **View** | Transactions, invoices, payments, orders, plans, and packages. At **Own** scope it is the signed-in user's own earnings ledger, which is how an instructor sees their pay. |
+| **Create** | Take a payment, create and amend an order, close or cancel an order, and create and send an invoice. |
+| **Delete** | Delete a manually recorded payment. Organization scope only. |
+| **Full access** | Everything above plus billing configuration: tax rates, revenue accounts, payment methods, bill runs, refunds, and voids. |
+
+<Note>
+**Billing's configuration and its Delete both sit at Organization scope.** Full access at **Club** scope therefore behaves as View plus Create - it does not unlock tax rates, revenue accounts, payment methods, refunds, or deleting a payment. Grant **Full access (Organization)** for those.
+</Note>
+
+<Note>
+Billing includes selling. A role with Billing: Create can ring up an order whether or not it also holds Point of sale, because the register and the Billing > Orders screen drive the same operations. See the Point of sale note below.
+</Note>
+
+### Point of sale
+
+Running the till. This module is layered on top of Billing rather than carved out of it, which makes it useful subtractively: you can grant "can work the register" without granting "can see the books".
+
+| Action | Allows |
+|--------|--------|
+| **View** | Load the register: the sellable catalog and prices, the totals preview, drafts and open tabs, order and receipt lookup, the bookable timetable, and the customer picker. |
+| **Create** | Transact: create, amend, execute, close, and cancel an order; record the tender; add a walk-in customer; and record a check-in. |
+| **Full access** | Today this is exactly View plus Create. |
+
+Four things to know before granting it:
+
+- **Point of sale: View conveys member contact details and the organization's order history.** The register cannot attach a sale to anyone without the customer picker, so this is not a prices-only grant.
+- **A register-only cashier still cannot do back office.** They cannot settle a customer's outstanding invoice, and they cannot reverse a sale that has already been fulfilled - only discard a draft cart.
+- **To build a register-only cashier, grant Point of sale and revoke Billing.** Unchecking Point of sale on its own does not stop a role that still holds Billing: Create from selling.
+- **A Point of sale grant widens timetable and roster reads to Club scope.** An Own-scoped instructor who is also given Point of sale will see the whole club's timetable and rosters. That follows from the grant, and it is a reason not to hand the till to instructors casually.
+
+If your organization has the point of sale switched off in settings, the register refuses new sales regardless of permissions, while everything already on the books stays settleable.
+
+### Marketing
+
+Deals and pipeline, promotions, automations, content, media, reviews, and the website builder.
+
+| Action | Allows |
+|--------|--------|
+| **View** | See all of the above. |
+| **Full access** | Create and change all of it, including publishing the website, rolling a release back, taking the site offline, and restoring an archived site. |
+
+<Warning>
+**Full access (Organization)** on Marketing also allows **deleting the website**, even though no Delete checkbox appears. Deletion is pinned to Organization scope so that a Manager's Club-scoped grant cannot reach it. Deleting is reversible for 30 days; after that the archive is purged.
+</Warning>
+
+### Analytics
+
+Reports and insights.
+
+| Action | Allows |
+|--------|--------|
+| **View** | At **Club** scope: the dashboard and the revenue, bookings, members, memberships, check-in, audit, and utilization reports, plus global search. At **Own** scope: the user's own booking and class stats. |
+| **Full access** | The same reads. Analytics has nothing to write. |
+
+### Products
+
+The product catalog: products, brands, and product categories.
+
+| Action | Allows |
+|--------|--------|
+| **View** | Products, categories, and brands. |
+| **Create** | Add a product, category, or brand. |
+| **Edit** | Change any of the three, including reordering them. |
+| **Delete** | Delete any of the three, including bulk delete. |
+| **Full access** | All four. |
+
+- **Stock is not part of this module.** Stock levels, ingredients, recipes, and deliveries sit on the same screens but belong to Inventory, so a catalog-only editor sees the product grid without the stock panel or recipe editor.
+- **Any single product permission reveals Revenue > Products.** The write actions do not imply View, so a role granted only Create sees the section with Products as its only tab.
+- **A write action is useless without View.** Every catalog screen loads through View, so the editor ticks View for you when you check a write action.
+- The register reads the catalog through Point of sale: View, so a cashier prices a sale without holding a product permission.
+
+### Inventory
+
+Stock, ingredients, recipes, suppliers, and deliveries.
+
+| Action | Allows |
+|--------|--------|
+| **View** | Stock levels, stock movements, ingredients, recipes, suppliers, delivery receipts, and product availability. |
+| **Full access** | Receive and adjust stock, manage ingredients and suppliers, edit recipes, and create, scan, and edit delivery receipts. |
+
+### Rentals
+
+Lending gear out for a session and getting it back.
+
+| Action | Allows |
+|--------|--------|
+| **View** | The rentals list, the counts, and what a given member still has out. |
+| **Create** | Check gear out. |
+| **Edit** | Take gear back in. |
+| **Delete** | Write off gear that is not coming back. |
+| **Full access** | All four. |
+
+This split is deliberate: the desk can lend and take back without being able to write off missing gear.
+
+### Cash
+
+The cash drawer, cash movements, and expenses.
+
+| Action | Allows |
+|--------|--------|
+| **View** | The cash ledger, the drawer, the overview, and expense categories. |
+| **Create** | Record a cash movement or expense, scan an expense receipt, and count the drawer. |
+| **Full access** | Also reverse a ledger entry and manage expense categories. |
+
+### Permissions
+
+Administering role permissions - the editor described below.
+
+This module is **locked to Admin**. It shows in the editor with an **Admin only** badge, an admin always holds it, and no other role can be granted it. That is what stops a role from widening its own access.
+
+### Modules that are not in the editor
+
+Three modules are enforced by 1Club but are not per-role customizable. They always resolve from the role defaults.
+
+| Module | Covers | Why it is not customizable |
+|--------|--------|----------------------------|
+| **Operations** | Areas, opening hours, pricing sheets, events, the instructor roster, and time-off reads. | Not something organizations customize per role. Classes, Bookings, and Check-ins were split out of it precisely so they could be. |
+| **Settings** | Organization settings and configuration: users, notification policies, integrations, API tokens, domains, and locales. | Too broad to hand out a piece at a time. In practice this is admin and owner only. |
+| **Website** | Retired. The website builder is governed by Marketing. | Deprecated. |
+
+## Default permissions by role
+
+This is what each role starts with out of the box, before any customization. Admin holds Full access (Organization) on everything and is not shown. Member holds nothing.
+
+| Module | Manager | Front Desk | Instructor |
+|--------|---------|------------|------------|
+| Profile | Full access (Own) | Full access (Own) | Full access (Own) |
+| Notifications | Full access (Own) | Full access (Own) | Full access (Own) |
+| Members | View, Create, Edit, Delete (Club) | View (Club) | - |
+| Memberships | View, Create, Edit, Delete (Club) | View, Create (Club) | - |
+| Member directory | - | - | View (Own) |
+| Messages | Full access (Club) | Full access (Club) | View, Create (Own) |
+| Classes | Full access (Club) | View (Club) | View (Own) |
+| Bookings | Full access (Club) | View, Create (Club) | Full access (Own) |
+| Check-ins | Full access (Club) | View, Create (Club) | Full access (Own) |
+| Staff | Full access (Org) | - | - |
+| Billing | View, Create (Club) | View, Create (Club) | View (Own) |
+| Point of sale | View, Create (Club) | View, Create (Club) | - |
+| Marketing | Full access (Club) | - | - |
+| Analytics | Full access (Club) | View (Own) | View (Own) |
+| Products | View (Club) | View (Club) | - |
+| Inventory | Full access (Club) | View (Club) | - |
+| Rentals | Full access (Club) | View, Create, Edit (Club) | - |
+| Cash | Full access (Club) | View, Create (Club) | - |
+| Permissions | Admin only | Admin only | Admin only |
+
+Worth noticing in that table:
+
+- **Front Desk can book and check in, but not undo either.** It holds View and Create on Bookings and Check-ins, not Edit or Delete. Grant Edit or Delete if your desk needs to amend or cancel.
+- **Front Desk reads members but does not amend them**, and signs a member up to a plan without being able to extend or delete that membership.
+- **Instructors read their timetable but do not write it.** A class is scheduled *for* an instructor, so Classes is View only, while the bookings and attendance on that timetable are theirs to run in full.
+- **Manager runs the club but does not configure it.** Settings is not one of the modules the editor can grant, so organization configuration stays with Admin and owner.
+- **Neither desk role maintains the product catalog** - both read it. Catalog writes were admin-only before Products became its own module, and the defaults preserve that.
+
+## The Permissions page
+
+**Settings > Permissions** is where an admin changes what each role can do. It is the whole permission model in one screen, and every checkbox on it maps to a real check in the product.
+
+Open it from **Settings**, in the **Organization** section. Only users holding the Permissions module reach it, which in practice means Admin and owner.
+
+### Reading the page
+
+The page is two columns.
+
+**On the left, the five roles.** Each non-admin role carries a badge: **Default** if it still matches the built-in bundle, **Customized** if your organization has changed it. Select a role to load it.
+
+**On the right, that role's permissions**, as one collapsible section per module. A collapsed section still tells you what the role holds there, on the right of its header - for example `View, Create` or `Full access` or **No access** - so you can read the whole role without opening anything.
+
+A search box above the list filters by module name, action name, and the words in a module's description, and it also matches a pasted permission string like `members.delete`. Matches open automatically. Press `Escape` or click the clear icon to reset. The search survives switching roles, which is the point: comparing the same permission between Front Desk and Instructor is the usual reason to search.
+
+Selecting **Admin** shows the whole grid ticked and read-only. The Admin role cannot be customized, by design - it is the role that always has a way back in.
+
+### Changing a permission
+
+Open a module and you get one row per action. Each row is a checkbox and, where more than one scope is meaningful, a scope dropdown.
+
+<Steps>
+<Step title="Pick the role">
+Select it on the left. Changes apply to that role, and therefore to everyone holding it.
+</Step>
+<Step title="Find the module">
+Scroll or search. Open the section.
+</Step>
+<Step title="Check the action">
+Tick **View**, **Create**, **Edit**, **Delete**, or **Full access**. A newly checked action starts at **Club** scope where the module offers it, so you never widen a role to the whole organization by accident.
+</Step>
+<Step title="Set the scope">
+Use the dropdown next to the action. Organization, Club, or Own - only the scopes that mean something for that module and action are listed.
+</Step>
+<Step title="Save">
+A save bar appears as soon as anything is different. It saves every role you edited, not just the one on screen.
+</Step>
+</Steps>
+
+### Rules the editor enforces for you
+
+The editor prevents the combinations that would produce a role that half-works.
+
+- **Checking a write action also checks View.** A role with Edit but not View passes the write check and then fails on every list and detail screen it needs to aim that edit at. Unchecking View clears the write actions that depended on it.
+- **Full access ticks and locks the actions it implies.** You cannot uncheck View while Full access is granting it. Uncheck Full access first.
+- **Only real permissions are offered.** The action rows and scope options are derived from the checks the product actually performs, so there is no checkbox that quietly does nothing.
+- **A role cannot be left with nothing.** Clearing every permission is indistinguishable from reverting the role, so the save is refused with a message pointing you at **Reset to default** instead.
+- **The Permissions module cannot be granted to another role.** It renders with an **Admin only** badge and no working checkbox.
+
+### When a change takes effect
+
+Permission changes are not instant. They apply the next time an affected user's session refreshes, within about 15 minutes, or immediately if they sign out and back in. The page says so above the editor. If you are testing a change on your own account, sign out and back in rather than waiting.
+
+### Resetting a role
+
+**Reset to default** on a role deletes your organization's customization for that role and puts it back on the built-in bundle. It is enabled only when the role is actually customized, it asks for confirmation, and it warns you if you have unsaved edits it will also discard. There is no history to restore a customization from afterwards, so treat it as final.
+
+### What the editor cannot do
+
+- **Create a role.** The five names are fixed. Pick the closest one and tailor its permissions.
+- **Customize Admin.** Admin always holds everything.
+- **Customize Operations or Settings.** Those modules always resolve from the role defaults.
+- **Take an override away from Admin.** The organization-scoped check-in overrides, for instance, can be delegated to other roles but never removed from Admin.
 
 ## Reading the Role permissions table
 
-To see exactly what each role can do, open **Settings > Users**, edit or invite a user, and click the **Role permissions** info icon. It shows a grid of every role against every module. Each cell shows the actions that role holds for the module, with a scope badge (for example, **(Own)**) where the permission is scoped narrower than the organization.
+There is also a read-only view of the whole matrix, for when you are assigning a role rather than editing one. Open **Settings > Users**, invite or edit a user, and click the info icon next to the role picker.
 
-- Roles with no permissions (Member) are omitted.
-- The admin-only **Permissions** module is not shown as an assignable row.
+It shows every role against every module, with the actions each role holds and a scope badge such as **(Own)** where the permission is narrower than the organization. It reflects **your organization's** permissions, including any customization, not the generic defaults. Roles with no permissions - Member - are left out, and so is the admin-only Permissions module.
 
-## Customizing role permissions
-
-The five roles are fixed - you cannot create a new named role - but an admin can change **which permissions each role grants** for most modules. This lets you, for example, give Front Desk the ability to edit members, or take booking cancellation away from Instructors.
-
-- The editor lives in **Settings**, in the organization's **Permissions** section, and is available only to users who hold the **Permissions** capability (admins).
-- You pick, per role and per module, which actions are granted and at what scope. The editor only offers actions and scopes that map to a real check, so every choice does something.
-- A few modules always follow the role default and are not customizable per role: **Operations**, **Settings**, and the deprecated **Website** module. The **Permissions** module is locked to Admin - admins always have it and no other role can be granted it.
-- Clearing every custom choice for a role reverts it to the built-in default.
-
-<Note>
-Permission changes take effect after the affected user's session refreshes (within a short window) or the next time they sign in.
-</Note>
+If the table cannot load your organization's real sets it says so and falls back to the built-in defaults rather than showing nothing.
 
 ## Managing who has which role
 
-- **Admins and owners** manage every user and can assign any role, including Admin and owner.
-- **Managers** (through organization-wide staff management) can invite, edit, reset the password of, and remove users whose role is **below** manager - Front Desk, Instructor, and Member - and can promote someone up to Manager. A manager cannot modify themselves, another manager, or an admin, and can never grant the Admin role or account ownership.
-- Roles are assigned when a user is invited to the organization and can be changed later by editing the user. Changing a role replaces the previous one; the owner flag is separate and preserved.
+- **Admins and owners** manage every user and can assign any role, including Admin and the owner flag.
+- **Managers**, through staff management, can invite, edit, reset the password of, and remove users whose role is **below** Manager - Front Desk, Instructor, and Member - and can promote someone up to Manager. A Manager cannot modify themselves, another Manager, or an Admin, and can never grant the Admin role or account ownership.
+- A role is assigned when a user is invited and can be changed later by editing them. Changing a role replaces the old one; the owner flag is separate and is preserved.
 
-Manage all of this under **Settings > Users**. See [Users](/settings/admin-users).
+This hierarchy holds regardless of permissions, on both the screen and the server. Manage it all under **Settings > Users**. See [Users](/settings/admin-users).
 
 ## Worked examples
 
 ### Hiring a receptionist for a racket-sports club
 
-Invite them as **Front Desk**. Out of the box they can check members in, take court payments at the desk (point of sale), create and look up members, and answer messages - but they can't change organization settings or see staff pay. If your desk also edits member profiles, an admin can add the members edit permission to the Front Desk role in the permissions editor.
+Invite them as **Front Desk**. Out of the box they look members up, sign them up to a plan, book courts, check people in, take payment at the desk, lend rackets, and answer the inbox. They cannot change organization settings, see staff pay, or maintain the product catalog.
+
+Two adjustments are common. If your desk amends member records, grant Members: **Edit**. If your desk cancels bookings, grant Bookings: **Delete** - the default deliberately lets them book but not cancel.
 
 ### Onboarding a coach at a jiu-jitsu academy
 
-Invite them as **Instructor**. They see and manage only their own classes, bookings, and check-ins, send messages, and view their own earnings and class stats. They cannot open organization billing or settings. If you don't want instructors cancelling their own bookings, remove the booking delete permission from the Instructor role.
+Invite them as **Instructor**. They see their own timetable, run the bookings and attendance on it, see the members they teach as names and membership status, read their own earnings, and send their own messages. They cannot open organization billing or settings.
+
+If you do not want instructors cancelling bookings on their own classes, remove Bookings: **Delete**. If you want them amending their own classes, grant Classes: **Edit (Own)** - it is off by default because a timetable is set *for* an instructor. Avoid granting them Point of sale: it widens their timetable and roster reads to the whole club.
 
 ### Promoting a studio lead to run a location
 
-Give a trusted senior staffer **Manager**. They can run members, the schedule, bookings, check-ins, marketing, analytics, inventory, and staff for the club, and view and create billing - without touching organization settings. A Manager can also invite and manage Front Desk and Instructor accounts themselves, so day-to-day team changes don't need an admin.
+Give a trusted senior staffer **Manager**. They run members and memberships, the timetable, bookings, check-ins, marketing, analytics, inventory, rentals, cash, and the till, and they manage Front Desk and Instructor accounts themselves, so day-to-day team changes no longer need an admin. They take payments but do not configure billing, and they cannot reach organization settings.
+
+### Building a register-only cashier
+
+Start from **Front Desk**, then grant **Point of sale: View and Create** and **revoke Billing entirely**. Revoking Billing is the part that matters - leaving Billing: Create in place keeps them able to sell through the Orders screen, so unchecking Point of sale alone changes nothing. The result is a role that rings up sales but cannot see the books, settle an invoice, or reverse a fulfilled sale.
 
 ### Adding a co-owner
 
-Give them the **Admin** role and mark them as **owner**. Owners bypass permission checks and are the only users who can delete the organization - reserve this for the people who truly own the business.
+Give them **Admin** and mark them as **owner**. Owners bypass every permission check and are the only users who can delete the organization. Reserve this for the people who actually own the business.
 
 ## Tips and best practices
 
-- **Assign the lowest role that fits.** Start with Front Desk or Instructor and add permissions if needed, rather than defaulting everyone to Admin.
-- **Use the permissions editor before inventing workarounds.** If a role is missing one capability, grant that permission instead of bumping the person to a broader role.
-- **Keep owners few.** Owners bypass every check and can delete the organization - limit the flag to actual business owners.
-- **Remember scope.** An Instructor's `own` scope is deliberate; widening it usually means the person should be a Manager instead.
-- **Roles are default bundles, not walls.** What a user can do is the sum of their permissions after any customization, not the label on their role.
+- **Assign the lowest role that fits, then add.** Start at Front Desk or Instructor and grant the one permission that is missing, rather than defaulting people to Admin.
+- **Grant the narrowest action that does the job.** Prefer View, Create, Edit, or Delete over Full access when only one of them is needed. Full access absorbs anything added to that module later.
+- **Be deliberate about Organization scope.** Club is the right default for staff. Organization is what unlocks the sensitive overrides described above.
+- **Remember that Delete often means cancel.** On classes, bookings, and memberships, Delete is the destructive customer-facing action that triggers refunds and notifications. Withholding it is a real control.
+- **Keep owners few.** Owners bypass every check and can delete the organization.
+- **Read the role, not the label.** What a user can do is the sum of their permissions after customization, not the name of their role.
+- **Check the Customized badge before debugging.** A role that behaves differently from this page's defaults has probably been customized in your organization.
 
 ## Troubleshooting
 
-**Issue**: A Front Desk user can't edit a member, only view and create.
-
-**Cause**: The default Front Desk role has create and read on members, not edit.
-
-**Fix**: In the permissions editor, grant the members **Edit** (or **Full**) action to the Front Desk role at club scope, or handle edits with a Manager.
-
-**Issue**: An Instructor can't see organization billing or settings.
-
-**Cause**: Instructor permissions are `own`-scoped by design and don't include organization surfaces.
-
-**Fix**: This is expected. If the person needs that access, make them a Manager (settings still requires Admin) rather than widening the Instructor role.
-
-**Issue**: A Manager can't change another Manager's or an Admin's role.
-
-**Cause**: Managers can only manage users in roles below Manager and can never grant Admin or ownership.
-
-**Fix**: Have an Admin or owner make the change.
-
-**Issue**: I changed a role's permissions but the user still sees the old access.
+**Issue**: I changed a role's permissions but the user still has the old access.
 
 **Cause**: Permission changes apply when the user's session refreshes.
 
-**Fix**: Ask them to sign out and back in, or wait for the session to refresh.
+**Fix**: Ask them to sign out and back in, or wait up to about 15 minutes.
+
+**Issue**: A Front Desk user can look a member up but not edit them.
+
+**Cause**: Front Desk holds Members: View by default, not Edit.
+
+**Fix**: Grant Members: **Edit** at Club scope in **Settings > Permissions**.
+
+**Issue**: A Front Desk user can book a member in but cannot cancel the booking.
+
+**Cause**: Front Desk holds Bookings: View and Create, not Delete.
+
+**Fix**: Grant Bookings: **Delete** at Club scope, or route cancellations to a Manager.
+
+**Issue**: I unchecked Point of sale but the role can still sell.
+
+**Cause**: The register and the Billing > Orders screen drive the same operations, and the role still holds Billing: Create.
+
+**Fix**: Revoke Billing from that role as well. See [Building a register-only cashier](#building-a-register-only-cashier).
+
+**Issue**: I granted a write action and the screen loads empty or errors.
+
+**Cause**: Write actions need the View on the same module to load the records they act on.
+
+**Fix**: The editor ticks View for you when you check a write action. If the role was configured some other way, add View back.
+
+**Issue**: I cannot uncheck View on a module.
+
+**Cause**: Full access is granting it through the hierarchy, so the row is ticked and locked.
+
+**Fix**: Uncheck **Full access** first, then pick the individual actions you want.
+
+**Issue**: My save was refused with a message about keeping at least one permission.
+
+**Cause**: You cleared every permission for the role, which is indistinguishable from reverting it.
+
+**Fix**: Use **Reset to default** if that is what you meant, or leave at least one permission checked.
+
+**Issue**: An Instructor cannot see organization billing or settings.
+
+**Cause**: Instructor permissions are Own-scoped by design.
+
+**Fix**: This is expected. If the person needs that access, make them a Manager rather than widening the Instructor role. Settings still requires Admin.
+
+**Issue**: A Manager cannot change another Manager's or an Admin's role.
+
+**Cause**: Managers only manage roles below Manager, and can never grant Admin or ownership.
+
+**Fix**: Have an Admin or owner make the change.
 
 **Issue**: I want a brand-new role with a custom name.
 
-**Cause**: 1club has five fixed roles; custom named roles aren't supported.
+**Cause**: 1Club has five fixed roles. Custom named roles are not supported.
 
-**Fix**: Pick the closest role and tailor its permissions in the permissions editor.
-
-**Issue**: A staff member gets a plain "already booked" refusal instead of an option to double-book anyway.
-
-**Cause**: Overriding a scheduling conflict needs **Full access** on Booking (or Classes, for a class) at Club scope or higher. Front Desk and Instructor hold create/view access by default, not Full access, so they can't override it.
-
-**Fix**: Grant Booking (or Classes) **Full access** at Club scope to the role, or make the change from a Manager or Admin account. See [Overriding a scheduling conflict](/operations/bookings#overriding-a-scheduling-conflict).
+**Fix**: Pick the closest role and tailor its permissions in **Settings > Permissions**.
 
 ## Related
 
 - [Users](/settings/admin-users) - Invite and manage organization users and assign roles.
 - [Signing in](/reference/sign-in) - How staff authenticate into the admin.
-- [Organization and clubs](/reference/organization-clubs) - How organizations and clubs relate, and what club scope means.
+- [Organizations and clubs](/reference/organization-clubs) - How organizations and clubs relate, and what Club scope means.

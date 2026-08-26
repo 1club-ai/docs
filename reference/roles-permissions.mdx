@@ -53,7 +53,7 @@ Super admin is a 1Club platform capability used by the 1Club team for support an
 
 ## How a permission is built
 
-Every permission has three parts: `module.action.scope`. For example `members.read.club` is "view members, within one gym".
+Every permission has three parts: `module.action.scope`. For example `members.read.club` is "view members, within a single club".
 
 - **Module** - the area of the product, such as Members, Bookings, or Billing.
 - **Action** - what you may do there: View, Create, Edit, Delete, or Full access.
@@ -81,13 +81,15 @@ Not every module offers all four actions. The editor only shows an action when g
 
 | Scope | Reaches |
 |-------|---------|
-| **Organization** | Everything in the organization, across every gym. |
-| **Club** | Records in a single gym. |
+| **Organization** | Everything in the organization, across every club. |
+| **Club** | Records in a single club. |
 | **Own** | Only records the user owns or is assigned to. |
+
+**Club** here is 1Club's own word for one of your locations, which may be a gym, a studio, a court complex, or any other venue. It is the name of the scope, not a facility type. See [Organizations and clubs](/reference/organization-clubs).
 
 A wider scope automatically covers the narrower ones: Organization covers Club, and Club covers Own. So a user holding "View members (Organization)" satisfies any check for "View members (Club)".
 
-Scope is why an Instructor stays in their own world. Their permissions are Own-scoped, so they run their own classes, bookings, and check-ins but cannot reach organization-wide surfaces like billing, staff, or settings, even where the action matches. For what Club scope covers, see [Organizations and clubs](/reference/organization-clubs).
+Scope is why an Instructor stays in their own world. Their permissions are Own-scoped, so they run their own classes, bookings, and check-ins but cannot reach organization-wide surfaces like billing, staff, or settings, even where the action matches.
 
 ### How the hierarchy plays out
 
@@ -282,7 +284,7 @@ Four things to know before granting it:
 - **Point of sale: View conveys member contact details and the organization's order history.** The register cannot attach a sale to anyone without the customer picker, so this is not a prices-only grant.
 - **A register-only cashier still cannot do back office.** They cannot settle a customer's outstanding invoice, and they cannot reverse a sale that has already been fulfilled - only discard a draft cart.
 - **To build a register-only cashier, grant Point of sale and revoke Billing.** Unchecking Point of sale on its own does not stop a role that still holds Billing: Create from selling.
-- **A Point of sale grant widens timetable and roster reads to Club scope.** An Own-scoped instructor who is also given Point of sale will see the whole gym's timetable and rosters. That follows from the grant, and it is a reason not to hand the till to instructors casually.
+- **A Point of sale grant widens timetable and roster reads to Club scope.** An Own-scoped instructor who is also given Point of sale will see the whole club's timetable and rosters. That follows from the grant, and it is a reason not to hand the till to instructors casually.
 
 If your organization has the point of sale switched off in settings, the register refuses new sales regardless of permissions, while everything already on the books stays settleable.
 
@@ -491,7 +493,7 @@ This hierarchy holds regardless of permissions, on both the screen and the serve
 
 ## Worked examples
 
-### Hiring a receptionist for a racket-sports gym
+### Hiring a receptionist at a racket-sports venue
 
 Invite them as **Front Desk**. Out of the box they look members up, sign them up to a plan, book courts, check people in, take payment at the desk, lend rackets, and answer the inbox. They cannot change organization settings, see staff pay, or maintain the product catalog.
 
@@ -501,7 +503,7 @@ Two adjustments are common. If your desk amends member records, grant Members: *
 
 Invite them as **Instructor**. They see their own timetable, run the bookings and attendance on it, see the members they teach as names and membership status, read their own earnings, and send their own messages. They cannot open organization billing or settings.
 
-If you do not want instructors cancelling bookings on their own classes, remove Bookings: **Delete**. If you want them amending their own classes, grant Classes: **Edit (Own)** - it is off by default because a timetable is set *for* an instructor. Avoid granting them Point of sale: it widens their timetable and roster reads to the whole gym.
+If you do not want instructors cancelling bookings on their own classes, remove Bookings: **Delete**. If you want them amending their own classes, grant Classes: **Edit (Own)** - it is off by default because a timetable is set *for* an instructor. Avoid granting them Point of sale: it widens their timetable and roster reads to the whole club.
 
 ### Promoting a studio lead to run a location
 
@@ -591,4 +593,4 @@ Give them **Admin** and mark them as **owner**. Owners bypass every permission c
 
 - [Users](/settings/admin-users) - Invite and manage organization users and assign roles.
 - [Signing in](/reference/sign-in) - How staff authenticate into the admin.
-- [Organizations and clubs](/reference/organization-clubs) - How organizations and gyms relate, and what Club scope means.
+- [Organizations and clubs](/reference/organization-clubs) - How organizations and clubs relate, and what Club scope means.

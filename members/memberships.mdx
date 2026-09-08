@@ -3,6 +3,7 @@ title: Memberships
 description: The org-wide membership grid. Sell, pause, resume, renew, and cancel memberships, and track how members consume their usage allowance.
 keywords:
   - membership
+  - season pass
   - pause membership
   - resume membership
   - renew membership
@@ -15,6 +16,8 @@ keywords:
 A membership is an instance of a [plan](/billing/plans) assigned to a specific contact. The plan defines price, billing frequency, scope, and use limits; the membership snapshots those values at the moment of sale and tracks that member's usage and billing schedule from then on. Editing the plan later does not rewrite memberships already sold, so each member keeps the terms they bought.
 
 The same contact can hold more than one membership at the same time (for example a monthly main plan plus a 10-class add-on pack). The Memberships page lists every membership in the org, regardless of status.
+
+A [season pass](/operations/season-passes) appears here too, sold from the schedule rather than from this page. It behaves differently in three places, each noted below: its allowance, its cancel dialog, and its renewal.
 
 ## Overview
 
@@ -119,6 +122,7 @@ The renew dialog previews the resulting **New billing period** dates and the pri
   - **Cancel at end of period** - the membership stays active until the current period ends, then will not renew. The row shows "Cancelling on {date}". This is the default.
   - **Cancel immediately** - the status flips to cancelled, the end date is set to today, and access is revoked at end of day.
 - **Non-renewing memberships** (including one-time packs) are cancelled immediately - there is no future period to cancel against.
+- **Season passes** open their own dialog instead. Ending one has to release the courts and close the pass together, so the generic cancel is refused for them. See [Cancelling a season pass](/operations/season-passes#cancelling-a-season-pass).
 
 Either mode voids any pending future recurrence charges so the member is not billed again. A membership already scheduled to cancel at period end can be flipped to immediate cancellation from the same dialog.
 
@@ -140,6 +144,10 @@ When and how a use is debited:
 - **No double-debit** - a check-in linked to a booking does not debit again, because the booking already paid for the session.
 
 <Note>
+  A [season pass](/operations/season-passes) reads its allowance the other way round. The sale spends the season's hours up front on the weeks it books, so a freshly sold pass shows its allowance fully committed (`27 / 27 hours`) and rests there for the season. It is never marked **Used** at zero, and the counter rises only when a cancelled week credits a makeup hour back. Its two real ends are the season's last day and cancelling the pass.
+</Note>
+
+<Note>
   An exhausted or no-longer-active membership still honors bookings that were created against it while it was active. The booking debited a use at booking time, so check-in for that specific booking goes through even if the membership has since hit zero uses or expired. See [Attendance](/members/attendance) for the walk-in versus pre-booked distinction.
 </Note>
 
@@ -154,6 +162,8 @@ You can edit the scope on an existing membership if the plan's snapshot is stale
 ## Auto-renew
 
 Recurring memberships can auto-renew. When the period ends, a renewal transaction is generated and charged against the member's saved payment method. Auto-renew is only available for active, used, or pending memberships, and defaults to the plan's default-auto-renewal setting. If a renewal charge is declined, the membership is deactivated until the payment settles, then reactivates and resumes its billing cycle from the failed period.
+
+A [season pass](/operations/season-passes) never auto-renews. It is paid once for a fixed period, and the next season is a fresh sale at the new season's prices.
 
 ## Worked examples
 

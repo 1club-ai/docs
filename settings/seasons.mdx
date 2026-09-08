@@ -1,0 +1,151 @@
+---
+title: "Seasons"
+description: "Define the fixed period a season pass is sold for - a winter, a term, a league - set the volume discount for holding more hours a week, and choose when the season goes on sale."
+keywords: ["seasons", "season setup", "winter season", "season pass setup", "volume discount", "volume ladder", "hours per week discount", "indoor season", "term", "league period", "contract court time", "season pricing"]
+---
+
+A season is the fixed period a [season pass](/operations/season-passes) is sold for: a winter, a term, a league. It carries a name your members recognize, a first and last day, and the volume discount that rewards holding more hours each week. Everything else about the price comes from your [pricing rules](/settings/pricing-rules).
+
+Open **Settings > Revenue > Seasons** (route `/settings/billing/seasons`). It sits directly after **Pricing rules**, because they are the same task: a season's price is its hourly rates from there, multiplied by its weeks, with the volume discount from here applied once.
+
+## Overview
+
+- **A period, not a product** - a season is the window; what you sell against it is a season pass, sold from the [schedule](/operations/schedule).
+- **One gym per season** - a season belongs to a single gym, so two venues with different price lists run their own seasons.
+- **Volume discount ladder** - hold more hours a week, earn a bigger discount. Steps are keyed on weekly hours, and the highest step reached is the one that applies.
+- **Rates live in pricing rules** - a season carries no price of its own, so a published price table stays in one place.
+- **Readiness at a glance** - each row says whether the season is on sale, not priced yet, or needs fixing, with the exact reason on hover.
+- **On sale toggle** - stop selling a season without touching the passes already sold.
+- **Whole weeks warning** - a range that is not a whole number of weeks is allowed but flagged, because it charges two members differently for the same weekly hour.
+
+## The list page
+
+The table has these columns:
+
+- **Name** - what you called the season. This is the name members see everywhere.
+- **Dates** - first and last day.
+- **Length** - the season's length in weeks.
+- **Setup** - a chip reading **On sale**, **Pricing not set up**, **Pricing needs fixing**, or **Not on sale**. Hover it to read the exact issue.
+- **Passes** - how many season passes have been sold against this season.
+- **Status** - whether the season is upcoming, running, or finished.
+
+Use **New season** to create one, or the row menu to edit or delete. When you have no seasons yet, the page explains what a season is and offers the same button.
+
+## Creating a season
+
+Click **New season**. The dialog has four sections.
+
+### Season
+
+- **Name** (required) - whatever your members call it, for example _Winter 2027_. This name appears on the schedule, on the member's pass, and on the sale.
+- **Club** - the gym the season runs at. Once a pass has been sold against the season this is locked, because the courts it holds belong to that venue.
+
+### Dates
+
+- **First day** and **Last day** - the season's range, inclusive. The subtitle shows the resulting length in weeks as you pick.
+- **Existing subscribers claim by** - an optional date you record for your own renewal communication with last season's holders. The platform does not enforce it: nothing is reserved and no reminder is sent.
+
+A range that runs backwards is refused. A range that is not a whole number of weeks is allowed but warns you, because some weekdays then occur more often than others: two members buying one weekly hour would be charged different totals depending on the day they picked.
+
+### Pricing
+
+- **Revenue account** - where the season's income posts. Optional, exactly like any other plan; leave it empty to use your organization default.
+- **Volume discount** - the ladder. Each step is **From (hours/week)** plus a **Discount**, read as "hold this many hours a week, get this discount".
+
+A new season starts with a sensible default ladder:
+
+| From (hours/week) | Discount |
+| ----------------- | -------- |
+| 1                 | 3%       |
+| 2                 | 5%       |
+| 3                 | 7%       |
+| 4                 | 10%      |
+
+The highest step a member reaches is the one that applies, and the last step is the cap, so someone holding five or six hours a week simply gets the top discount. Below the first threshold there is no discount. Steps are keyed on **hours**, not on the number of weekly slots, so a single 90-minute slot lands on the one-hour step rather than falling into a gap.
+
+Two steps cannot start at the same number of hours, hours must be between 0 and 168, and a discount must be between 0% and 100%. Without any step at all, every season pass sells at full price.
+
+<Note>
+  A season plan carries no price field. The pass costs the sum of the hours it books, priced by your [pricing rules](/settings/pricing-rules), with one volume discount applied to that total. Set an hourly rate per time band in Pricing rules and the season prices itself from them.
+</Note>
+
+### Availability
+
+- **On sale** - turn this off to stop selling the season. Passes already sold are untouched; the sale option simply stops being offered on the schedule.
+
+## What saving a season creates
+
+Saving writes two things: the season itself, and the plan the pass is sold through. You never create that plan by hand, and it never appears in a plan catalogue - not in the member portal, not on the marketplace, not in POS, and not in the plan picker on a booking - because a season pass can only be sold from the schedule, where the courts are.
+
+If the season saves but its pricing does not, the dialog tells you so and keeps your input: fix the field it points at and save again. You will not end up with a duplicate season.
+
+## Readiness states
+
+The **Setup** chip answers one question: can you sell this season right now?
+
+| Chip                    | What it means                                                        |
+| ----------------------- | -------------------------------------------------------------------- |
+| **On sale**             | Priced and available. The schedule offers the sale inside its dates.  |
+| **Pricing not set up**  | The season has no plan to sell yet, so nothing can be priced.         |
+| **Pricing needs fixing**| The plan exists but is misconfigured. Hover the chip for the reason.  |
+| **Not on sale**         | Configured correctly, but the **On sale** toggle is off.              |
+
+The reasons behind **Pricing needs fixing** are specific, and each names the field to change:
+
+- A season is paid once, not on a repeating cycle.
+- The season needs to belong to one gym.
+- The pricing belongs to a different gym than the season.
+- A season counts sessions in hours.
+- No volume discount is set.
+
+## Editing and deleting
+
+Editing a season updates its name, dates, discount ladder, revenue account, and availability. Two things are protected:
+
+- **The gym is locked once a pass has been sold**, because the sold courts belong to that venue.
+- **Deleting is only possible while nothing has been sold** against the season. Once a pass exists, the season is part of a paid contract; turn **On sale** off instead. Deleting is permanent and asks for confirmation.
+
+## Worked example: an indoor tennis winter
+
+A tennis venue sells its indoor winter as a season, October to April.
+
+1. **Pricing rules first.** Author one rule per time band with the **Absolute price** type, matching the printed price table: off-peak morning 41, day 39, peak 47, late 41, weekend 41. Add a second rule per band scoped to the season's plan with the member rate: 37, 34, 42, 37, 37. See [Pricing rules](/settings/pricing-rules).
+2. **Create the season.** Name it _Winter 2026/27_, pick the gym, set the first and last day so the range is a whole number of weeks, and record your claim-by date for last season's holders.
+3. **Set the ladder.** The default 1/2/3/4-hour steps at 3/5/7/10% match how most venues publish theirs. Adjust the percentages to your own table.
+4. **Turn On sale on**, then sell from the schedule. A member holding a Tuesday 19:00 court and a Thursday 10:00 court holds two hours a week, so they land on the 5% step, and each week is priced by the band its hour falls in.
+
+## Current limits
+
+- **Renewal is not automated.** A season pass never auto-renews, and the **Existing subscribers claim by** date is a note to yourself, not an enforced hold. Next season is a fresh sale.
+- **One gym per season.** A multi-venue organization creates one season per venue.
+- **No self-serve purchase.** Members cannot buy a season pass themselves yet; the sale happens in the admin, on the schedule.
+- **The ladder is per season**, not per plan or per member. Two different discount structures need two seasons.
+
+## Troubleshooting
+
+**Issue**: The schedule does not offer **Sell Season Pass** on a date inside my season.
+
+**Solution**: The option appears only when the season is actually sellable on that date. Check the **Setup** chip: a season that is switched off, or never finished pricing, still sits in its own date range but cannot be sold. Also confirm you hold the permission to create memberships.
+
+**Issue**: Every season pass sells at full price.
+
+**Solution**: The volume discount ladder has no steps. Add at least one.
+
+**Issue**: The dialog warns that my range is not a whole number of weeks.
+
+**Solution**: That is a warning, not an error, and the season saves. Adjust the last day so the range covers whole weeks if you want every weekday to occur the same number of times; otherwise expect a Monday hour and a Saturday hour to total differently.
+
+**Issue**: I cannot change the gym on a season.
+
+**Solution**: A season that has sold a pass is locked to its gym, because the courts held for that pass belong to it. Create a new season for the other venue.
+
+**Issue**: I cannot delete a season.
+
+**Solution**: A season with a pass sold against it cannot be deleted, so financial history and the booked courts stay intact. Turn **On sale** off to retire it.
+
+## Related
+
+- [Season passes](/operations/season-passes) - Selling, cancelling, and makeup hours.
+- [Pricing rules](/settings/pricing-rules) - Where the hourly rates and the member rate live.
+- [Schedule](/operations/schedule) - Where a season pass is sold.
+- [Memberships](/members/memberships) - Where a sold pass appears afterwards.

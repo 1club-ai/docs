@@ -120,6 +120,15 @@ A member can easily hold two rate-granting plans at once - a season pass for the
 
 Rules that are not plan-scoped are never candidates here. Your published time bands keep applying over the winner, which is how a printed price list reads: the band says what the hour costs, the member rate says what a member pays for it.
 
+### Which memberships grant a member rate
+
+- **An active membership** grants its rate on any slot it is quoted against.
+- **A season pass sold before its season opens** grants its rate too, but only for slots inside its own season. A gym sells the winter in September, so the pass waits at pending until the season's first day; the holder is still quoted their rate for the December hours they buy on top of the contract, and the published rate for anything before the season starts. The slot's start time decides, read on the venue's clock, and the season's last day is covered in full.
+- **A pass waiting on its payment** grants nothing. The rate is part of what was bought, and the money is not in yet.
+- **A cancelled, expired or paused membership** grants nothing.
+
+The calendar and the booking dialog resolve this the same way, so the price shown under a slot is the price checkout charges.
+
 ## How the booking price is computed
 
 The price is built from a base rate and then adjusted by the matching rules.
@@ -275,6 +284,10 @@ Repeat the pair for each band (off-peak morning, day, peak, late, weekend) and t
 **Issue**: A member holding two plans got the wrong rate.
 
 **Solution**: Only one plan grants the member rate. The lowest **Priority** among the matching plan-scoped rules nominates the plan, and a tie is settled in the member's favour. Set an explicit priority on the rate you intend to win, or scope the other plan's rule so it does not match this booking.
+
+**Issue**: A holder was quoted the published rate instead of their member rate.
+
+**Solution**: Check what the membership grants right now; see [Which memberships grant a member rate](#which-memberships-grant-a-member-rate). The usual causes are a pass still waiting on payment, a cancelled or expired one, or a season pass whose season has not started priced against an hour that falls outside that season.
 
 **Issue**: A rule authored for one venue is pricing another venue's courts.
 

@@ -1,17 +1,22 @@
 ---
 title: "Pricing rules"
-description: "Configure dynamic pricing for bookings - peak and off-peak surcharges, weekend premiums, and conditional discounts scoped to areas, instructors, and class types, with percentage or fixed adjustments applied to the calculated booking price."
-keywords: ["pricing rules", "dynamic pricing", "peak pricing", "off-peak discount", "surcharge", "pricing sheet", "price per hour", "padel peak hours", "weekend premium", "conditional pricing", "percentage adjustment", "fixed amount"]
+description: "Configure dynamic pricing for bookings - publish an hourly rate per time band, layer peak surcharges and off-peak discounts, give plan holders their own member rate, and scope any rule to a gym, area, instructor, or class type."
+keywords: ["pricing rules", "dynamic pricing", "peak pricing", "off-peak discount", "surcharge", "pricing sheet", "price per hour", "absolute price", "rate card", "price list", "rule priority", "member rate", "plan rate", "padel peak hours", "weekend premium", "conditional pricing", "percentage adjustment", "fixed amount", "per-gym pricing"]
 ---
 
-Pricing rules let you adjust the price of a booking based on when it happens and what it is for. Each rule defines an adjustment (a percentage or a fixed amount), a scope (which areas, instructors, or class types it applies to), and a set of conditions (time of day, day of week, booking timing, demand, duration, date range, or plan). When a booking's context matches a rule, that rule's adjustment is applied on top of the resource's base price.
+Pricing rules decide what a booking costs. Each rule defines an adjustment (a percentage, a fixed amount, or an outright price per hour), a scope (which gyms, areas, instructors, or class types it applies to), and a set of conditions (time of day, day of week, booking timing, demand, duration, date range, or plan). When a booking's context matches a rule, that rule is applied to the resource's base price.
+
+Two ways to use them, and most gyms use both. Layer **percentage** and **fixed** adjustments on top of an area's price per hour for surcharges and discounts, or publish your printed rate card directly with **Absolute price** rules that state what each time band costs.
 
 You manage pricing rules on the **Pricing rules** page. Open it from the **Resources > Areas** header using the **Pricing rules** button (it opens the Settings page at `/settings/billing/pricing-rules`).
 
 ## Overview
 
-- **Percentage or fixed adjustments** - Raise or lower the price by a percentage (-100% to +100%) or by a fixed amount in your currency (negative for a discount).
-- **Scope by resource** - Target specific **Areas**, **Instructors**, or **Class types**, or leave a scope open to apply it to every resource of that type.
+- **Percentage, fixed, or absolute** - Raise or lower the price by a percentage (-100% to +100%) or a fixed amount in your currency (negative for a discount), or state the hour's price outright with **Absolute price**.
+- **Publish a rate card** - One absolute rule per time band reproduces a printed price list without translating it into adjustments off a base rate.
+- **Scope by resource or venue** - Target specific **Clubs**, **Areas**, **Instructors**, or **Class types**, or leave a scope open to apply it to every resource of that type.
+- **Member rates** - A rule scoped to a plan is the rate that plan's holders pay. Only one plan can grant the rate on a booking, so two overlapping plans never compound.
+- **Priority when rules collide** - **Priority** decides precedence, and the lower number wins.
 - **Conditional matching** - Attach conditions so a rule only fires in a time window, on certain days, for bookings made far enough ahead, above a duration threshold, in a date range, or for members on specific plans.
 - **Stackable rules** - Create multiple rules; every rule that matches a booking is applied, so you can layer a weekend premium on top of a peak-hour surcharge.
 - **Time-window splitting** - When a rule uses a time range, the booking is split at the window boundaries so only the portion inside the window is adjusted.
@@ -38,15 +43,18 @@ Click **Add** (or edit an existing row) to open the rule dialog. It has three se
 
 - **Rule Name** (required) - a label such as _Padel peak hours_ or _Weekday off-peak discount_.
 - **Description** - optional free text to explain the rule to other staff.
-- **Adjustment Type** - **Percentage** or **Fixed Amount**.
+- **Adjustment Type** - **Percentage**, **Fixed Amount**, or **Absolute price**.
 - **Percentage Adjustment (%)** - shown when the type is Percentage. Accepts -100 to +100. Enter a positive number to increase the price and a negative number to decrease it.
 - **Fixed Amount** - shown when the type is Fixed Amount. Enter the amount to add per hour; use a negative value for a discount.
+- **Price per hour** - shown when the type is Absolute price. What this hour costs, replacing the area price rather than adjusting it. Enter the rate for one hour; a 90-minute booking is charged one and a half times it.
+- **Priority** - precedence when several rules match the same slot, and the lower number wins. Leave it at 0 unless you need a rule to beat another one; see [Priority](#priority).
 - **Active** - toggle the rule on or off without deleting it.
 
 ### Scope
 
 The scope decides which bookings a rule can apply to. Add one or more scope entries; each entry has a **Scope Type** and a list of resources:
 
+- **Clubs** - the rule applies only at the selected gyms. This is the scope a multi-venue organization needs to publish a different price list per site.
 - **Areas** - the rule applies only to bookings against the selected areas (courts, rooms, fields).
 - **Instructors** - the rule applies only to bookings against the selected instructors.
 - **Class types** - the rule applies only to class bookings of the selected class types.
@@ -68,16 +76,58 @@ Conditions further restrict when a rule fires. Add as many as you need - **all**
 - **Demand Level** - fire on **Low Demand** or **High Demand**, which the system derives automatically from availability.
 - **Duration Threshold** - fire only when the booking is at least a **Minimum duration (hours)**.
 - **Date Range** - fire only between a **Start Date** and **End Date** (interpreted as whole days in your organization's timezone), for seasonal pricing.
-- **Plan** - fire only for members on the selected plans (leave empty for all plans). Bookings with no active plan do not match a plan-restricted rule.
+- **Plan** - fire only for members on the selected plans (leave empty for all plans). Bookings with no active plan do not match a plan-restricted rule. A rule with a Plan condition is a **member rate**; see [Member rates](#member-rates) for how two plans are resolved.
 
 ## How a rule matches a booking
 
 When the system prices a booking, it loads every **active** rule for your organization and keeps the ones that match, in this order:
 
-1. **Scope check** - the booking must carry the resource the scope targets. An Areas scope requires an area; a Class types scope requires a class booking. If the scope lists specific IDs, the booking's area, instructor, or class type must be one of them. Empty IDs mean any resource of that type.
+1. **Scope check** - the booking must carry the resource the scope targets. An Areas scope requires an area; a Class types scope requires a class booking; a Clubs scope requires the booking to be at one of the selected gyms. If the scope lists specific IDs, the booking's gym, area, instructor, or class type must be one of them. Empty IDs mean any resource of that type.
 2. **Condition check** - every attached condition must pass (weekday and time window, days, duration, date range, plan, and the availability, booking-timing, and demand checks).
 
-Every rule that passes both checks is applied. There is no "first match wins" - matching rules stack.
+Every **percentage** and **fixed** rule that passes both checks is applied, so those still stack. **Absolute price** is different: it states a total rather than a movement, so only one absolute rule can win a slot, and [Priority](#priority) decides which.
+
+<Note>
+  A Clubs-scoped rule needs the booking to name a gym. A context that carries no gym fails the scope rather than inheriting it, so one venue's price list can never reach another venue's courts.
+</Note>
+
+## Priority
+
+**Priority** is precedence, and the lower number wins. There is one direction to remember, and it is that one: give the rule you consider most specific the smallest number.
+
+What "wins" means depends on whether the rules can coexist:
+
+- **Percentage and fixed rules all apply**, so priority only sets the order they are applied in, lowest first. That matters when you mix the two, because a percentage taken before a fixed deduction gives a different total than after it.
+- **Absolute price rules replace the price**, so exactly one wins: the lowest priority, then the more specific rule (one scoped to a plan beats one that is not), then the older rule.
+- **Member rates nominate a plan.** The lowest priority decides which plan grants the rate.
+
+Every rule you create through the admin starts at priority 0, which is the right answer while your rules do not overlap. Reach for it when two rules of the same kind fight over one slot, for example a holiday rate that has to beat a year-round band:
+
+- Year-round day rate, absolute 39, **Priority 10**.
+- Christmas week rate, absolute 25, date range 22 Dec to 2 Jan, **Priority 0**.
+
+Inside the date range the holiday rule wins because its number is lower. Outside it the rule does not match at all, so the band applies. Without the priority difference the two rules tie, and the tie is broken by age, so the older band would keep winning and the holiday rate would silently never apply.
+
+## Member rates
+
+A rule with a **Plan** condition is the rate that plan's holders pay. It behaves like any other rule with one addition: **only one plan may grant the rate on a booking**.
+
+A member can easily hold two rate-granting plans at once - a season pass for the court and a ten-lesson coaching card. Rather than compounding both discounts, the pricing engine nominates one plan:
+
+1. The lowest **Priority** among the matching plan-scoped rules nominates its plan.
+2. If two plans are nominated together, the winner is the one that leaves the member paying **less**. A gym that gave two overlapping member rates the same priority has not said which it means, and the platform does not resolve that against the person who paid for both.
+3. Every rule scoped to the winning plan then applies normally, so "season plan gets 34 per hour" and "season plan gets another 10% off in winter" both take effect.
+
+Rules that are not plan-scoped are never candidates here. Your published time bands keep applying over the winner, which is how a printed price list reads: the band says what the hour costs, the member rate says what a member pays for it.
+
+### Which memberships grant a member rate
+
+- **An active membership** grants its rate on any slot it is quoted against.
+- **A season pass sold before its season opens** grants its rate too, but only for slots inside its own season. A gym sells the winter in September, so the pass waits at pending until the season's first day; the holder is still quoted their rate for the December hours they buy on top of the contract, and the published rate for anything before the season starts. The slot's start time decides, read on the venue's clock, and the season's last day is covered in full.
+- **A pass waiting on its payment** grants nothing. The rate is part of what was bought, and the money is not in yet.
+- **A cancelled, expired or paused membership** grants nothing.
+
+The calendar and the booking dialog resolve this the same way, so the price shown under a slot is the price checkout charges.
 
 ## How the booking price is computed
 
@@ -93,10 +143,13 @@ The price is built from a base rate and then adjusted by the matching rules.
 
 **Time-window splitting.** If any matching rule uses a Weekdays-with-Time-Range condition, the booking is split into segments at the window boundaries, so each segment is either fully inside or fully outside the window. The base price is prorated across the segments by duration.
 
-**Applying adjustments.** For each segment, the system applies each matching rule in turn:
+**Applying adjustments.** For each segment, the winning absolute rule is resolved first and replaces the base price, then the composing rules fold over that result in priority order:
 
+- **Absolute price** sets the segment price outright: the rate multiplied by the segment's duration in hours. Only the winner is applied, and a losing absolute rule leaves no line on the quote, because a price that was never applied did not price the slot.
 - **Percentage** rules multiply the current segment price: `adjustment = currentPrice x percentage / 100`, added to the running price. Multiple percentage rules compound (each applies to the running total, not the original base).
 - **Fixed Amount** rules add the amount **per hour**: a fixed amount is multiplied by the segment's duration in hours (so a fixed -10 becomes -5 for a 30-minute segment).
+
+The order is what makes a rate card behave: a band rule stating 39 and a member rule taking 10% off produce 35.10, not one or the other depending on which rule you happened to create first.
 
 A segment price is floored at zero (a discount can bring a segment to free but not negative), and the segment totals are summed into the final price.
 
@@ -173,12 +226,35 @@ Offer a standing discount to members on a premium plan for personal training.
 - **Scope**: Instructors - your personal trainers.
 - **Conditions**: Plan - your Premium plan.
 
+### A published rate card with a holder column
+
+An indoor tennis venue prints one table with two columns: what an hour costs, and what a season pass holder pays for the same hour. Reproduce it with two absolute rules per band.
+
+The published rate, for everyone:
+
+- **Adjustment Type**: Absolute price, **Price per hour** 39.
+- **Scope**: Clubs - the venue.
+- **Conditions**: Weekdays with Time Range - Monday to Friday, 10:00 to 17:00.
+- **Priority**: 10.
+
+The holder rate, for the same hour:
+
+- **Adjustment Type**: Absolute price, **Price per hour** 34.
+- **Scope**: Clubs - the venue.
+- **Conditions**: Weekdays with Time Range - Monday to Friday, 10:00 to 17:00, plus Plan - the season's plan.
+- **Priority**: 0.
+
+Repeat the pair for each band (off-peak morning, day, peak, late, weekend) and the slot prices itself for both audiences. This is also what a [season pass](/operations/season-passes) is priced from: its total is the sum of the weeks it books at these rates. See [Seasons](/settings/seasons).
+
 ## Tips & best practices
 
 - **Name rules for their intent.** _Padel peak +25%_ reads better in the list than _Rule 3_.
 - **Keep one scope type per rule** unless you deliberately want to require a booking to carry two resources at once.
 - **Use the sign deliberately.** Positive percentages and fixed amounts increase the price; negatives discount it. Fixed amounts are per hour, so they scale with duration.
-- **Remember rules stack.** If two rules can match the same booking, both apply and percentages compound. Check overlapping time windows and scopes so you do not double-charge or over-discount by accident.
+- **Remember percentage and fixed rules stack.** If two of them match the same booking, both apply and percentages compound. Check overlapping time windows and scopes so you do not double-charge or over-discount by accident.
+- **Use Absolute price for a printed table, adjustments for a policy.** "The day rate is 39" is an absolute rule. "Evenings cost 25% more" is a percentage rule. Translating a printed rate into an adjustment off a base price only introduces arithmetic errors.
+- **Give the more specific rule the lower priority.** A member rate at 0 and a published band at 10 reads the way you mean it, and beats relying on the age of the rules.
+- **Scope to a gym when venues price differently.** Without a Clubs scope, a rule authored for one venue applies to every court in the organization.
 - **Set a base price first.** Rules adjust the area price per hour, instructor hourly rate, or class price. With no base rate, there is nothing to adjust and the slot prices at zero.
 - **Deactivate instead of deleting** a seasonal rule you will reuse. Toggle **Active** off and back on rather than recreating it.
 - **Mind the timezone.** Time windows and date ranges are evaluated in your organization's timezone, not the admin's browser timezone.
@@ -199,7 +275,23 @@ Offer a standing discount to members on a premium plan for personal training.
 
 **Issue**: Two rules both fired and the price compounded.
 
-**Solution**: Matching rules stack; there is no single-winner. Narrow the scopes or time windows so only the intended rule matches, or deactivate one of them.
+**Solution**: Matching percentage and fixed rules stack; there is no single winner among them. Narrow the scopes or time windows so only the intended rule matches, deactivate one of them, or state the price outright with an Absolute price rule, of which only one can win.
+
+**Issue**: My new Absolute price rule has no effect on the slot.
+
+**Solution**: Another absolute rule is winning it. Only one absolute rule prices a slot, decided by the lowest **Priority**, then specificity, then age. Two rules both left at 0 tie, and the older one wins, so give the rule that should win a lower priority number.
+
+**Issue**: A member holding two plans got the wrong rate.
+
+**Solution**: Only one plan grants the member rate. The lowest **Priority** among the matching plan-scoped rules nominates the plan, and a tie is settled in the member's favour. Set an explicit priority on the rate you intend to win, or scope the other plan's rule so it does not match this booking.
+
+**Issue**: A holder was quoted the published rate instead of their member rate.
+
+**Solution**: Check what the membership grants right now; see [Which memberships grant a member rate](#which-memberships-grant-a-member-rate). The usual causes are a pass still waiting on payment, a cancelled or expired one, or a season pass whose season has not started priced against an hour that falls outside that season.
+
+**Issue**: A rule authored for one venue is pricing another venue's courts.
+
+**Solution**: Add a **Clubs** scope naming the venue it belongs to. Without one, a rule applies across the whole organization.
 
 **Issue**: A booking priced at zero and ignored the rule.
 
@@ -214,3 +306,5 @@ Offer a standing discount to members on a premium plan for personal training.
 - [Areas](/operations/areas) - Set the price per hour that rules adjust, and reach the Pricing rules page from the Areas header.
 - [Plans](/billing/plans) - Membership plans referenced by the Plan condition and by membership coverage.
 - [Booking policies](/operations/booking-policies) - Control when members pay, slot lengths, and cancellation rules that work alongside pricing.
+- [Seasons](/settings/seasons) - The period a season pass is sold for, and its volume discount.
+- [Season passes](/operations/season-passes) - Priced entirely from these rules, week by week.

@@ -13,7 +13,7 @@ The list gives you:
 - **Type tabs** - jump between members, drop-ins, leads, lapsed members, accounts, and unpaid contacts, each with a live count badge.
 - **Search and filters** - match by name, email, or phone, then narrow by tag, status, plan, or progression level. Filter state lives in the URL, so a view can be shared as a link.
 - **Configurable columns** - a rich default column set plus optional columns (invitation status, created date, custom fields) you toggle on.
-- **Inline invite** - send a member-portal invitation straight from the User status column for any unregistered contact with an email.
+- **Inline invite** - send a member-portal invitation straight from the User status column for any unregistered contact you can reach, by email, WhatsApp, or text message.
 - **Bulk actions** - select rows to invite or archive many contacts at once.
 - **Create menu** - add a member, a dependent, a membership, or an account without leaving the page.
 - **Quick links** - reach Memberships, Access cards, Matches, Accounts, Document signatures, and the Archive from the header.
@@ -43,7 +43,7 @@ The grid shows, by default:
 - **Name** with avatar, plus email below.
 - **Phone**, with a WhatsApp badge when the number is WhatsApp-verified.
 - **Age** computed from date of birth.
-- **User status** - whether the contact has a member-portal account. If they have no account but do have an email, this cell shows an **Invite** button. Otherwise it shows a status chip (`unregistered`, `invited`, `incomplete`, `active`, `inactive`, or `suspended`).
+- **User status** - whether the contact has a member-portal account. If they have no account but do have an email address or a phone number, this cell shows an **Invite** button. Otherwise it shows a status chip (`unregistered`, `invited`, `incomplete`, `active`, `inactive`, or `suspended`).
 - **Type** chip (member, lead, drop-in, etc.).
 - **Memberships** - active membership plan names (shows "No memberships" when none).
 - **Accounts** - household and company accounts the contact belongs to, each a link, with the account type underneath.
@@ -108,10 +108,57 @@ Click a row to open the member's [profile](/members/member-profiles). The row ac
 
 Select rows with the checkboxes. The bulk action bar appears with the count of selected contacts and up to two actions:
 
-- **Invite** - sends a member-portal invitation to every selected contact who is eligible (has an email and is either unregistered or has an expired invite). The info icon shows how many of your selection are eligible. Invitations go out in a single request that the server governs against your org's daily invite budget; it reports back how many were invited, failed, throttled, skipped, or ineligible, so a problem with one contact never hides another. This action only appears when at least one selected contact is eligible.
+- **Invite** - opens the invite dialog, where you choose how the invitation travels, then sends it to every selected contact who is eligible (reachable on that channel, and either unregistered or holding an expired invite). The info icon shows how many of your selection are eligible. Invitations go out in a single request that the server governs against your gym's daily invite budget; it reports back how many were invited, how many each channel carried, and how many failed, were throttled, skipped, could not be reached on your chosen channel, or were ineligible, so a problem with one contact never hides another. This action only appears when at least one selected contact is eligible.
 - **Archive** - archives each selected contact. Contact records are never hard-deleted, so financial history and audit trails stay intact. Archiving runs one request per contact and reports partial success if some fail. This action needs `members.manage.club`.
 
 Archived contacts disappear from the list. To get back to them, use **Settings > Data > Archive**.
+
+## Choosing how an invitation reaches a member
+
+Every invitation asks how it should travel, whether you are inviting one member
+or fifty. There is no gym-wide default, because the reason to send one member a
+WhatsApp invitation is usually that member: no email address on file, or a number
+they actually answer.
+
+| Choice                    | What happens                                                                           |
+| ------------------------- | -------------------------------------------------------------------------------------- |
+| **Whatever reaches them** | Email if the member has an address, otherwise WhatsApp, otherwise a text message.      |
+| **Email**                 | Only email. A member with no address is reported instead of being invited another way. |
+| **WhatsApp**              | Only WhatsApp, from your own connected number if you have one, otherwise from ours.    |
+| **Text message**          | Only SMS.                                                                              |
+
+A named channel is a requirement, not a preference. If it cannot carry the
+invitation, that member is reported rather than quietly emailed instead, so you
+can see who was missed. The result tells you which channels actually carried the
+batch, which is how you spot a WhatsApp choice that is silently going out as
+email because WhatsApp is not connected yet.
+
+Two things narrow who a phone channel can reach:
+
+- **WhatsApp needs the member's consent.** Sending from our number requires them
+  to have opted in, and a member who has replied `STOP` is never messaged on
+  either phone channel.
+- **A number has to identify the member.** If the contact already has a portal
+  account and the number on their contact has not been verified on it, the
+  invitation is refused. Otherwise a link sent to a stale, shared, or mistyped
+  number could be used by whoever holds it to get into that member's account.
+  Send it by email instead, or have the member verify the number first.
+
+Staff invitations always go by email. A staff role cannot be handed to whoever
+holds a phone number.
+
+For the whole picture - what members can sign in with, social sign-in, verification,
+and what happens when someone returns - see [Member authentication](/members/member-authentication).
+
+### What the member does next
+
+How they accept follows how you sent it:
+
+- **Invited by email** - they open the link and set a password.
+- **Invited by WhatsApp or text** - they open the link and enter a code sent to
+  that number. This is how the invitation proves the number belongs to them, and
+  it is required even when their account also has an email address. Their email
+  address is not marked as confirmed by accepting this way.
 
 ## Worked examples
 
@@ -120,7 +167,7 @@ Archived contacts disappear from the list. To get back to them, use **Settings >
 You just launched online booking and want to nudge members who never activated their account.
 
 1. Open the filter drawer, set **Plan** to your membership plan, and set **Status** to **Unregistered**.
-2. Select all rows and click **Invite**. Everyone with an email gets a portal invitation in one batch.
+2. Select all rows and click **Invite**, pick how the invitation should travel, and confirm. Everyone the chosen channel can reach gets a portal invitation in one batch.
 
 ### Onboard a family at a martial arts gym
 
@@ -146,7 +193,7 @@ Your open day generated a batch of leads that never converted.
 ## Tips & best practices
 
 - **Share filtered views as links.** Because tab, search, and filter state live in the URL, you can bookmark "active members on the coaching plan" or paste it to a colleague.
-- **Use the inline Invite button for one-offs.** You don't need to select a row - the User status column shows an **Invite** button for any unregistered contact with an email.
+- **Use the inline Invite button for one-offs.** You don't need to select a row - the User status column shows an **Invite** button for any unregistered contact you can reach. It opens the same dialog, so a single invitation gets the same channel choice as a batch.
 - **Turn on Created at when auditing signups.** It's hidden by default; toggle it from the column menu when you need to sort or eyeball recent joins.
 - **Let the type calculate itself.** Attach a membership rather than hand-setting `type = member`; the system keeps the type in step with what the contact actually holds.
 - **Archive, don't fear data loss.** Archiving is a soft delete that preserves transactions and history, so it's safe to tidy the list aggressively.
@@ -159,11 +206,11 @@ Your open day generated a batch of leads that never converted.
 
 **Issue**: The **Invite** bulk action doesn't appear even though rows are selected.
 
-**Solution**: Invite only shows when at least one selected contact is eligible - unregistered or holding an expired invite, and with an email on file. Contacts who are already active, still have a pending invite, or have no email are skipped.
+**Solution**: Invite only shows when at least one selected contact is eligible - unregistered or holding an expired invite, and reachable on the channel you pick. Contacts who are already active, still have a pending invite, or have no email address and no phone number are skipped. Picking **WhatsApp** or **Text message** also narrows eligibility to contacts who have a phone number.
 
 **Issue**: Some invitations weren't sent, or the result says "throttled".
 
-**Solution**: Invites are capped by your org's daily invite budget. The result breaks the batch into invited, failed, throttled, skipped, and ineligible counts. Throttled invitations exceeded the budget - retry later or contact support to raise the limit.
+**Solution**: Invites are capped by your gym's daily invite budget. The result breaks the batch into invited, failed, throttled, skipped, could-not-be-reached, and ineligible counts. Throttled invitations exceeded the budget - retry later or contact support to raise the limit. An invitation that could not be delivered does not count against the budget.
 
 **Issue**: A plan or tag is missing from the filter drawer.
 

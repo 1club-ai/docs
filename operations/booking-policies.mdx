@@ -148,18 +148,55 @@ When more than one policy could apply to the same booking, the most specific sco
 
 ## Cancellation rules
 
-Add tiered refund rules based on how far in advance the cancellation happens. For each rule:
+Pick one of three **Cancellation terms** in the policy:
 
-- **Hours in Advance** - How many hours before the booking does the cancellation happens?
-- **Refund %** - What percentage of the booking price is refunded?
+- **Free cancellation** - Members get a full refund whenever they cancel. This is the default for a new policy, and members see it stated as "Full refund at any time".
+- **Refund by notice period** - The refund shrinks as the booking approaches. Add a rule per notice period.
+- **Non-refundable** - Members get nothing back, however early they cancel.
 
-If you don't add any rules, members can cancel anytime for a full refund.
+### Refund by notice period
 
-Example:
+Add a rule for each notice period. For each rule:
 
-- 24 hours in advance - 100% refund
-- 4 hours in advance - 50% refund
-- Less than 4 hours - 0% refund
+- **Hours in Advance** - How many hours before the booking the member cancels.
+- **Refund %** - What percentage of the booking price is refunded.
+
+Refunds can only shrink as the booking gets closer, so a later cancellation can never be worth more than an earlier one.
+
+Example - two rules, `24h / 100%` and `4h / 50%`:
+
+- 24 hours or more in advance - full refund
+- 4 to 24 hours in advance - 50% refund
+- Less than 4 hours - no refund
+
+The last band is added for you: anything inside your smallest notice period refunds nothing, so you never have to add a `0%` rule yourself.
+
+### What members see
+
+Once a member is booking a specific slot, the policy is shown as the **deadlines** for that booking rather than as notice periods, because a date needs no arithmetic:
+
+- Full refund until Friday, Sep 11 at 1:00 PM
+- 50% refund until Saturday, Sep 12 at 11:00 AM
+- No refund after that
+
+Deadlines are shown in the club's timezone. A band whose deadline has already passed is left out, so a member booking a court an hour before it starts is told plainly that there is no refund rather than being shown a tier they cannot reach. Where no specific booking is in context, the notice periods are shown instead.
+
+Policies with no rules at all say so too: under **Free cancellation** a member reads "Full refund at any time" on the confirmation before they pay, and again when they open the cancellation.
+
+### Non-refundable
+
+Members can still cancel a non-refundable booking, and doing so releases the slot for someone else to book. They just get no money back.
+
+Two things follow from the refund being zero, and it is worth telling members before they book:
+
+- A membership session spent on the booking is **not** credited back.
+- The instructor is still paid in full for the cancelled booking.
+
+Members see a single line on the booking confirmation and in their account: "No refund on cancellation". No hours or percentages are shown, because there is no deadline to meet.
+
+<Note>
+  If you previously faked non-refundable bookings with a very large **Hours in Advance** value (such as 9999 hours at 100% refund), switch the policy to **Non-refundable** and save. The old setup refunds nothing in practice, but members reading the booking confirmation are told to cancel 9999 hours ahead for a full refund.
+</Note>
 
 ## Orders
 
@@ -229,7 +266,7 @@ repeat with no end, or use **Book anyway** if you hold manage-level booking perm
 
 **Issue**: Cancellations are giving full refunds when I expected partial 
 
-**Solution**: Check the **Cancellation rules** section. If empty, the system gives full refunds. Add tiered rules to enforce partial refunds.
+**Solution**: Check the **Cancellation terms** in the **Cancellation rules** section. A new policy starts on **Free cancellation**, which refunds in full. Switch to **Refund by notice period** to refund partially, or **Non-refundable** to refund nothing.
 
 ## Related
 

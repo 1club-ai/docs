@@ -1,0 +1,188 @@
+---
+title: Member authentication
+description: How members sign in - the identifier your gym chooses, social sign-in, one-time phone codes, passwords, verification, invitations, and what happens when someone returns.
+keywords:
+  [
+    member sign in,
+    member login,
+    social sign in,
+    Google,
+    Apple,
+    Facebook,
+    phone sign in,
+    one-time code,
+    OTP,
+    WhatsApp,
+    SMS,
+    email verification,
+    phone verification,
+    password reset,
+    sign-in methods,
+    invitation,
+    member portal login,
+  ]
+---
+
+How members get into your member portal, website booking, and mobile app. All three send members to the same sign-in screen, so whatever you configure here applies everywhere they meet you.
+
+## Overview
+
+Two records describe the same person, and it helps to keep them apart:
+
+- **The contact** is your gym's own copy - name, email, phone, memberships, invoices, signatures. You own it, and it exists whether or not the member has ever signed in.
+- **The account** is the person's login identity, shared across every gym on 1club. It holds their password, their social sign-ins, and their verified email and phone.
+
+Staff edit the contact. Members control the account. A contact with no account is a member you have on file who has never signed in - the Member list shows them as `unregistered`.
+
+## Choosing how members are identified
+
+Go to **Settings** > **Contacts** and pick under **How members are identified**:
+
+| Choice                    | Members sign in with                            | At sign-up they give               | Email address |
+| ------------------------- | ----------------------------------------------- | ---------------------------------- | ------------- |
+| **Email** (default)       | Email and password, or a social account         | Email and password                 | Required      |
+| **Email or phone number** | Either                                          | Email and password                 | Required      |
+| **Phone number**          | Either, and the screen asks for the phone first | Name and phone number, then a code | Optional      |
+
+This is the one gym-wide switch. Everything else on this page follows from it.
+
+Two things to know before you move off **Email**:
+
+- **The platform has to be able to send a code.** If no WhatsApp or SMS route is set up, the options are disabled and the page tells you so. Nothing you choose here can take effect until a code can actually reach a member.
+- **Normalize your phone numbers first.** Sign-in matches a member against the number on their contact. Numbers typed by staff or carried in from an import are often written inconsistently, and a member whose number does not match lands on a brand-new record instead of their own. Ask support to run the normalization script for your gym before switching phone sign-in on.
+
+## The ways a member can sign in
+
+A member may collect several of these on one account. Any of them gets them in.
+
+### Email and password
+
+The default. Members type their email address, then their password. Passwords are theirs to set - staff never see or choose one.
+
+### Social sign-in
+
+Members can use **Google**, **Apple**, or **Facebook** where those are switched on for the platform. Google is available on 1club generally; Apple and Facebook are enabled per deployment, so if you do not see a button for one, it is not turned on rather than broken.
+
+What matters operationally is **how a social sign-in is matched to an account**:
+
+- It matches on the provider's own account, not on the email address the provider reports. A member who renames their work Google mailbox, or whose Apple relay address rotates, still lands in the same account.
+- The address the provider reports is recorded next to the sign-in for your reference. It is often **not** the same as the address on their account or on your contact record. A member invited at `name@company.com` who signs in with a personal Gmail has all three.
+- A social sign-in confirms the email address it carries, so a member who joins this way never has to click a confirmation link.
+
+Social buttons do not appear inside an in-app browser (a link opened from within another app). Members there use email or phone instead.
+
+### Phone number with a one-time code
+
+Available once you pick **Email or phone number** or **Phone number**. The member types their number and gets a six-digit code by WhatsApp, or by text message if WhatsApp cannot reach them. Entering the code signs them in - and if the number is new to 1club, it creates their account at the same time. There is no password to choose.
+
+Only a **verified** number identifies a member. A number staff typed is not proof of anything, so it does not resolve an account until the member has proven it by entering a code.
+
+### Phone number with a password
+
+A member who has both a verified number and a password can use them together. This works only where you have allowed phone sign-in.
+
+## Seeing how a member signs in
+
+The member profile and the staff lists show **Sign-in methods** for the linked account: one mark per social sign-in, a key when they hold a password, and a phone when a verified number is a way in for them.
+
+When it shows **None**, hover it - the reason is the useful part, and there are three:
+
+| What it says                                                     | What it means                                                           | What to do                                                         |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| No sign-in method yet                                            | Nothing to work with. Usually an invitation that has not been accepted. | Invite them, or resend it.                                         |
+| The number has not been verified                                 | You have a number on file, but nobody has proven it.                    | Ask them to verify it from their profile, or invite them by phone. |
+| The number is verified but this gym does not allow phone sign-in | Their number is proven, but your identifier setting is **Email**.       | Switch the setting, or get them a password or social sign-in.      |
+
+A verified phone only counts as a sign-in method when your gym actually accepts one, so this column tells you what will work today rather than what exists in theory.
+
+## Getting a member in for the first time
+
+### Invitations
+
+Invite from the Member list and choose how the invitation travels - see [choosing how an invitation reaches a member](/members/member-list#choosing-how-an-invitation-reaches-a-member).
+
+How the member accepts follows how you sent it, and this is deliberate:
+
+- **Sent by email** - they open the link and set a password. Opening a link from their inbox is what proves the address, so accepting this way confirms it.
+- **Sent by WhatsApp or text** - they open the link and enter a code sent to that number. The code is what proves the number is theirs. It is required even when their account also holds an email address, and accepting this way does **not** confirm that address.
+
+An invitation link is a bearer secret: whoever holds it can use it. That is why what the link proves depends on where it was sent, and why a link sent to a number can only ever open an account that number can stand for.
+
+### Self sign-up
+
+Members can also sign up themselves from your portal or website. What they are asked for follows your identifier setting - email and password under **Email** or **Email or phone number**, name and phone number under **Phone number**. Everything else you require of a member (date of birth, waivers, household) is collected right after they get in, not on the sign-up form.
+
+## Verifying an email address and a phone number
+
+Members verify both themselves, from **My account** > **Profile** in the portal:
+
+- **Email address** - they get a confirmation link. A member who joined by social sign-in or accepted an invitation from their inbox is already confirmed.
+- **Phone number** - a check mark shows a verified number. Otherwise a send icon appears next to the field; tapping it texts or WhatsApps a code, and entering it verifies the number.
+
+Changing either one clears its verification, because a proven address or number is proof about that specific one and nothing else.
+
+A member does **not** need a confirmed email address to use their account. Verification matters for two things: it is what lets a phone number sign them in, and it is what stops an unproven address being taken over.
+
+## Passwords
+
+Members set their own password when they accept an email invitation, when they sign up, or from their profile. Staff cannot set one for them.
+
+If a member is locked out, point them at **Forgot password** on the sign-in screen. It sends a reset link to their email address. A member with no email address on file has no reset path - they sign in with a code to their phone instead, which is the point of a phone-first gym.
+
+## How long a member stays signed in
+
+| Where                     | Stays signed in for |
+| ------------------------- | ------------------- |
+| Mobile app                | 180 days            |
+| Member portal and website | 90 days             |
+| Admin dashboard (staff)   | 30 days             |
+
+Members are not asked to sign in again during that window. Behind it, their session is refreshed every fifteen minutes without them noticing, so signing out on one device does not sign them out everywhere.
+
+## When someone comes back
+
+Three situations look similar and behave very differently:
+
+| Situation                           | What happens when they return                                                                                                                                                                                                                               |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Never accepted their invitation** | They can still claim the account - self sign-up with that email leads them into it rather than refusing them as a duplicate.                                                                                                                                |
+| **You archived them**               | They cannot sign in to your gym by any method. The screen tells them the account is no longer active and to contact you. Bringing them back is your decision: unarchive the contact. Archiving is per gym, so they may still be an active member elsewhere. |
+| **They deleted their own account**  | Their login is gone permanently. Signing up again gives them a fresh, empty account. Your contact record and its financial history stay with you.                                                                                                           |
+
+## Blocked email addresses
+
+1club staff can block an email address platform-wide. A blocked address cannot sign in to or sign up for anything, including your gym. This is a platform-level safeguard, not something you control - contact support if you believe an address is blocked in error.
+
+## Troubleshooting
+
+**Issue**: The **How members are identified** options are greyed out.
+
+**Solution**: The platform cannot send a one-time code, so a phone could never be verified. Contact support to have a WhatsApp or SMS route configured for your deployment.
+
+**Issue**: A member signed in and landed on a brand-new record instead of their own.
+
+**Solution**: Their number on your contact record does not match the one they signed in with, usually because it was written in a local format. Ask support to normalize your contact phone numbers, then merge the duplicate record.
+
+**Issue**: An invitation you sent by WhatsApp was refused with a message about the number not being verified.
+
+**Solution**: That member already has an account, and the number on their contact has not been proven on it - so a link sent there could be used by whoever holds that number. Send the invitation by email instead, or have the member verify the number first.
+
+**Issue**: A member says the invitation link asks for a code, not a password.
+
+**Solution**: You sent it to their phone. The code proves the number is theirs. If they cannot receive it, resend the invitation by email and they will get a password form instead.
+
+**Issue**: The Sign-in methods column shows **None** for a member you know has signed in.
+
+**Solution**: The column describes the linked account. If the member accepted at a different gym, or the contact is not linked to their account, there is nothing to show - check the account link on the member profile.
+
+**Issue**: A member's social sign-in shows an email address you do not recognise.
+
+**Solution**: That is the address their provider reports, which is often personal and different from the one you hold. It is recorded for reference only and is not used to match them.
+
+## Related
+
+- [Member list](/members/member-list) - inviting members and choosing the channel
+- [Member profile](/members/member-profiles) - the per-contact view, including account links
+- [Member portal](/settings/member-portal) - what members can see and do once they are in
+- [Contact settings](/settings/overview) - the identifier setting and required contact fields
+- [WhatsApp](/settings/integrations/whatsapp) - connecting your own number for codes and invitations

@@ -1,0 +1,370 @@
+---
+title: Forms
+description: The form builder under Settings > CRM > Forms. Build a public signup page that onboards a new member, or a questionnaire, health declaration or details update you send to people you already have on file.
+keywords: [form, form builder, signup form, questionnaire, health declaration, PAR-Q, form questions, responses, onboarding, order form, self-service registration, public link, wizard, document acceptance]
+---
+
+Forms are 1Club's form builder, under **Settings > CRM > Forms**. One builder produces two rather different things, and which one you get is decided by a single switch:
+
+<CardGroup cols={2}>
+<Card title="Sign up on" icon="user-plus">
+A public page that takes a brand new person from a shared link to a fully onboarded contact - account, documents, and optionally a plan or a cart.
+</Card>
+<Card title="Sign up off" icon="clipboard-list">
+A fill-in form for someone you already have on file: a questionnaire, a health declaration, a consent form, a details refresh. It records answers and creates no account.
+</Card>
+</CardGroup>
+
+Everything else - the questions it asks, the documents it shows, the copy at the top - is configured the same way for both.
+
+Publish as many forms as you want, one per gym, one per offer, one per audience. Each has its own public URL, its own set of plans and products, and its own copy.
+
+## When to use a form
+
+### With sign up on
+
+Reach for this whenever you want to send someone a link that ends with them in your contact list, with the right contracts signed and the right plan or products attached. Common cases:
+
+- A landing-page CTA for prospects who clicked through from an ad or referral.
+- A QR code at the front desk so walk-ins can register before their first session.
+- A link in your link-in-bio that funnels followers into a free trial plan.
+- A parent-facing form that registers children under a guardian account (junior programs, kids' classes).
+- An **order form** where members pick packages and add-on products and pay at checkout.
+- A different form per gym or per audience (adults, juniors, corporate) so each cohort sees the right offerings and the right documents.
+
+<Note>
+If you only need to attach an **existing** person to a plan, create a [membership](/members/memberships) instead. A form with sign up on is for first-time onboarding of new contacts.
+</Note>
+
+### With sign up off
+
+Turn sign up off and you have a page you send to people you already know. No account is created, nothing is sold, and the answers are kept as a dated record:
+
+- A pre-exercise health declaration or PAR-Q before a course or a first session.
+- An emergency contact you never collected.
+- A photo or media consent form.
+- A details refresh at the start of the season.
+- A post-course feedback questionnaire.
+
+You can send it as a public link, or have an [automation](/marketing/automations) mail a personal single-use link to one member with its **Send form** step. A personal link identifies the person, so their answers are attributed and their existing details are pre-filled.
+
+<Note>
+A form with sign up off can also be restricted with **Only authenticated**, so only a signed-in member can open it. Leave that off for a form anyone with the link should be able to complete.
+</Note>
+
+## What members go through
+
+Every form is the same wizard. The steps that appear, and their order, are decided by the form's configuration - steps a form doesn't need are skipped automatically. A form with sign up off skips the account, participant and selling steps entirely.
+
+<Steps>
+<Step title="Details">
+Name, email, password, and any contact fields you require at signup. When the form registers children, this step also collects the participants (see [Registration audience](#who-the-form-is-for)).
+</Step>
+<Step title="Selection">
+Pick a plan, a class type, and/or add packages and products to a cart. This step only appears when the form has at least one of those attached. You can merge it into the Details step with **Combine plan & user details into one step**.
+</Step>
+<Step title="Questions">
+The form's own questions, grouped under their section headings. Appears whenever the form has any (see [Questions](#questions)). Sits after the details and before the agreements, so a member knows what they are declaring before signing anything about it.
+</Step>
+<Step title="Documents">
+Read and accept any documents that apply to the new contact. The wizard automatically picks up the [document rules](/content/documents) and [document signatures](/content/document-signatures) that target member contact types - you don't attach documents to the form directly.
+</Step>
+<Step title="Signature">
+Sign the accepted documents by drawing or typing. Skipped when the form's signature method is set to **No signature**.
+</Step>
+<Step title="Review">
+Confirm the summary and submit. If a selected plan needs upfront payment, the wizard moves straight into a payment step; if a cart has packages or products, the buyer is routed to checkout.
+</Step>
+</Steps>
+
+Drafts are saved in the member's browser as they go, so a half-finished signup survives a page refresh. Passwords, drawn signatures, and answers to the form's own questions are never persisted in the draft - a questionnaire is filled in one sitting, and these pages are often completed on a shared front-desk tablet.
+
+## Creating a form
+
+1. Go to **Settings > CRM > Forms**.
+2. Click **Add form**.
+3. Fill in the sections below.
+4. Save. The form's public URL appears in the **Preview URL** column.
+
+The builder is organized into three sections: **Basic information**, **What members can choose**, and **Settings**.
+
+### Basic information
+
+| Field | What it does |
+| --- | --- |
+| **Name** | Internal label, shown in the admin forms list only. Members never see it. Typing a name auto-fills the slug. |
+| **Slug** | The last segment of the public URL. Lowercase letters, numbers, and dashes only. Must be unique in your organization - if it collides, the system appends a number (`yoga-trial-2`). |
+| **Form title** | The heading shown at the top of the wizard. Leave blank to use 1Club's built-in default copy. |
+| **Form subtitle** | The sub-heading under the title. Same fallback behavior as the title. |
+| **Plan selection title** | The heading shown above the plan picker. |
+| **Class type selection title** | The heading shown above the class-type picker. |
+
+<Note>
+All four heading fields are optional. When left blank, the wizard falls back to sensible default copy rather than showing an empty heading.
+</Note>
+
+### What members can choose
+
+This section defines the offerings on the wizard's Selection step. Attach any combination; leave everything empty to create a plain "just capture the contact" form that skips selection entirely.
+
+- **Plans** - the plans a member can pick from. Only **active** plans appear in the wizard, so deactivating a plan removes it from every form on the next page load without editing the form. Each plan keeps its own pricing, signup fee, payment requirement, and renewal rules - selecting one behaves exactly like a standard [membership](/members/memberships) checkout.
+- **Class types** - attach one or more class types to add a class-type interest step. When set, members pick a single class type they're interested in. Useful for routing new leads to the right program.
+- **Packages** - attaching packages turns the form into an **order form** (see below), where members add or remove packages and check out.
+- **Add-on products** - optional products members can add to their order as extras. Products are only meaningful alongside packages or as part of the order-form cart.
+
+### Settings
+
+<AccordionGroup>
+<Accordion title="Sign up">
+The switch that decides which kind of form this is.
+
+- **On** - the form creates an account, can collect documents and a signature, and can sell a plan or a cart. This is the signup wizard.
+- **Off** - the form records answers and creates nothing. It gains a **Questions** section, and the selling options disappear, because a plan is bought by an account at checkout.
+</Accordion>
+<Accordion title="Only authenticated">
+Only meaningful with sign up off. When on, the person must be signed in to their member portal before the form opens, and their answers are attributed to them. Leave it off for a form anyone with the link can complete, or for one you send as a personal link from an automation - a personal link already names the person.
+</Accordion>
+<Accordion title="Ask for documents and a signature">
+Whether the form runs the agreements ceremony at all. Turn it off for a short questionnaire that needs no contract. When on, the documents shown are the ones your [document rules](/content/documents) match to the person, not a list you attach to the form.
+</Accordion>
+<Accordion title="Who is this form for?">
+Controls who the form registers and whether the wizard collects participants.
+
+- **Individuals** - each person signs up for themselves. No participant list.
+- **Children (registered by a parent)** - a parent or guardian creates their own account and registers one or more children under it. The wizard adds a participants step for the children.
+- **Individuals & children** - the person can sign up for themselves, add family members, or both. The wizard shows a "who is this for?" toggle plus a participants list.
+</Accordion>
+<Accordion title="Signature method">
+How the member signs the documents shown on the Documents step.
+
+- **Draw signature** - the member draws their signature on a canvas.
+- **Type name** - the member types their legal name to bind the acceptance.
+- **No signature (documents only)** - there's no separate signature step. Members still accept documents via the checkboxes on the Documents step; this just removes the dedicated signing ceremony.
+</Accordion>
+<Accordion title="Display mode">
+How surfaces that link to the form should present it.
+
+- **Open as a page** - the link navigates to the full-page wizard at `/signup/<slug>`.
+- **Open as a dialog** - the wizard opens inline as a modal overlay on top of the current page. Use this when embedding the form on a gym page or marketing site so members never leave the page they're on.
+</Accordion>
+<Accordion title="Combine plan & user details into one step">
+When on, the Selection and Details steps are merged into a single first step, so members see plan selection and their sign-up details together instead of on two separate screens. Shorter forms feel faster this way. Off by default. This option only has an effect when the form has something to select (a plan, class type, or cart).
+</Accordion>
+</AccordionGroup>
+
+### Translations
+
+Use the **Translate** button in the Basic information header to provide per-locale overrides for the **Form title**, **Form subtitle**, **Plan selection title**, and **Class type selection title**. Members see the copy for their own language; anything you don't translate falls back to the values above.
+
+## Questions
+
+A form asks the questions you write on it. They belong to that form, they are asked in the order you arrange them, and their answers are kept with the response rather than on the member's profile.
+
+<Note>
+Questions are available on a form with **sign up off**. A form that signs people up asks your central contact configuration instead (see [Contact fields on the Details step](#contact-fields-on-the-details-step)), so it has no questions of its own.
+</Note>
+
+### Adding a question
+
+1. Open the form and scroll to **Questions**.
+2. Click **Add question**.
+3. Type the question in the label box, then pick its type.
+4. Expand the row for the rest of its settings.
+5. Drag the handle to move it. The order you see is the order members are asked.
+
+| Setting | What it does |
+| --- | --- |
+| **Label** | The question itself, as the member reads it. |
+| **Type** | Which control the member gets. See the table below. |
+| **Answer required** | On by default. A member cannot continue until the question is answered. |
+| **Section heading** | Groups this question with the ones above it that share the same heading. Use it to reproduce a numbered paper form. |
+| **Help text** | A line of explanation under the question. |
+| **Placeholder** | Grey hint text inside the input. Not shown for Yes/No or checkbox questions. |
+| **Choices** | For a multiple-choice question, one option per line. |
+| **Also save to profile field** | Optional. Copies the answer onto the member's profile as well. See [Answers that belong on the profile](#answers-that-belong-on-the-profile). |
+
+### Question types
+
+| Type | What the member sees |
+| --- | --- |
+| **Yes / No** | Two buttons. Nothing is pre-selected, so "No" is a real answer and an unanswered question stays unanswered. |
+| **Short text** | A single-line box. |
+| **Long text** | A multi-line box, for a medical note or an explanation. |
+| **Multiple choice** | A dropdown of the choices you listed. |
+| **Checkbox** | A single tick box. A required checkbox has to be ticked to continue, the way a confirmation does. |
+| **Date**, **Time**, **Number** | The matching input for each. |
+| **Email**, **Phone**, **Link** | A text box with the right keyboard on mobile. Stored as text. |
+
+<Tip>
+Reach for **Yes / No** rather than **Checkbox** on anything you might have to prove later. A tick box cannot tell "answered no" apart from "skipped the question", and on a health declaration that is the difference between a record and a blank.
+</Tip>
+
+### Reproducing a paper form
+
+Section headings are what make a long questionnaire readable. Give every question in a run the same heading and it renders once, above the group - so a thirteen-item PAR-Q with two numbered sections reads on screen the way it reads on paper.
+
+```
+1 - Do you currently, or have you ever, suffered from:
+   A heart condition                              Yes / No
+   Chest pain during physical activity            Yes / No
+   Loss of balance or dizziness                   Yes / No
+
+2 - Do you currently receive medical care for:
+   High or low blood pressure                     Yes / No
+   Diabetes                                       Yes / No
+```
+
+### Answers that belong on the profile
+
+Most answers are not profile data. A health declaration is a dated record: you ask it again next season and you want both answers, not the newer one written over the older.
+
+A few answers really are part of someone's record - a shirt size, an emergency contact. For those, point the question at a profile field with **Also save to profile field**. The answer is then stored on the response *and* copied onto the member's profile, and the question pre-fills with whatever you already hold.
+
+Two things to know when you map a question:
+
+- The question's type must match the profile field's type, and the field's choices become the question's choices. Picking a field adopts both.
+- Two questions on the same form cannot write to the same profile field. It holds one value, so only one question may fill it.
+
+<Note>
+**Yes / No** questions cannot be mapped to a profile field. Profile fields store a tick box, which cannot carry the "unanswered" state that makes Yes/No worth using.
+</Note>
+
+### Editing questions later
+
+Rewording, reordering, or deleting a question never changes a response that has already come in. Each response keeps the wording each question carried when it was asked, in the order it was asked, so last season's answers still read correctly against last season's questions.
+
+### Translating questions
+
+Each question has its own **Translate** button, next to its profile-field setting. Translate the label, placeholder, help text, and section heading per locale; members see their own language and anything untranslated falls back to what you typed. Choices are deliberately not translated, because the choice text is also the stored answer.
+
+## Responses
+
+Every submission is recorded against the form, and against the person when we know who they are.
+
+### Per form
+
+On the forms list, open a form's row menu and choose **View responses**. You get everyone who was asked and what they said, including people an automation invited who have not answered yet. Click a row to read one response in full, question by question.
+
+### On the member
+
+A member's own page has a **Form responses** section on the **Documents** tab, showing what that person has declared, most recent first. This is the view to use before a first session: you are asking about the person, not about the form. Only submitted responses appear here; an unanswered invitation stays on the form's own list.
+
+## Order forms (packages and products)
+
+Attaching **packages** switches the form into order-form mode. Instead of picking one plan, members build a cart:
+
+- Packages are the sellable bundles you've configured for your organization. In the wizard, members can add or remove them and adjust quantities.
+- **Add-on products** appear alongside the packages as optional extras.
+- On submit, 1Club creates a **draft order** attached to the new contact and routes the buyer to checkout to pay. Packages are broken down into their component memberships and products automatically - the order isn't charged during signup, so the buyer completes payment on the checkout page.
+
+Order-form mode and plan mode can coexist on the same form: if you attach both, a member can either select a plan or fill a cart. Either path is a valid submission.
+
+## Contact fields on the Details step
+
+A form that signs people up does not define its own account fields. What the Details step asks for - phone, date of birth, gender, and any custom fields - is driven by your contact-field configuration under **Settings > CRM > Contacts**. For each field you control:
+
+- **Signup visibility** - hidden, optional, or required when signing up.
+- **Applies to** - whether the field is collected for the person signing up, for the children/dependents they add, or both.
+
+Because this is central configuration, adding or changing a required signup field updates every form at once - you don't edit forms one by one.
+
+## Sharing the form
+
+Each form has a public URL of the shape:
+
+```
+https://<your-portal>/signup/<slug>     sign up on
+https://<your-portal>/forms/<slug>      sign up off
+```
+
+The **Preview URL** column on the forms list links straight to it. Paste that link into emails, ads, signage, or your link-in-bio, or wire it to a button using the form's **Display mode**.
+
+<Note>
+The portal subdomain is set under **Settings > Member portal** (see the [member portal](/settings/member-portal)). Until that's configured, the **Preview URL** column is empty because there's no public host to build the link against.
+</Note>
+
+The wizard is served first-party from your member portal, so the account it creates is signed in against the portal the moment signup completes - there's no cross-site login hop.
+
+## Documents and signature
+
+The Documents and Signature steps are driven by your [document rules](/content/documents) and [document signatures](/content/document-signatures), not by the form. A new contact created through any form that signs people up is matched against every active rule that targets member contact types. If a rule matches, the wizard shows the document and the contact must accept it before continuing.
+
+Two consequences:
+
+- You don't attach documents to a form directly. Adding a new document rule automatically applies to every form that creates matching contacts.
+- The Signature step appears only when the form's signature method is **Draw** or **Type**. Setting it to **No signature** removes the step; documents are still accepted via their checkboxes.
+
+## Editing and deleting
+
+- **Editing** a form changes the wizard for everyone who opens the link from that point on, including people mid-draft. Drafts are held in the browser but re-fetch the form's config on every step, so changes take effect immediately.
+- **Changing the slug** breaks any previously shared links - the old URL returns a "form not found" page. Prefer leaving the slug alone once you've published it.
+- **Deleting** a form makes its public URL return "form not found" immediately. It does not delete or modify the contacts, memberships, or orders already created through it.
+
+## What gets created
+
+With sign up off, a submission creates one **response** against the form, attributed to the member when we know who they are. Answers to questions you pointed at a profile field are also copied onto their profile. Nothing else is created: no account, no membership, no order.
+
+With sign up on, every successful submission creates:
+
+- A new **contact** of type "member", with the account and contact fields filled in from the Details step.
+- Any **children or family members** added on the participants step, linked to the primary contact.
+- Document **acceptances** (and a signature, unless the form uses **No signature**) for each presented document, tied to the new contact.
+- A **membership** if a plan was selected, plus its first payment if the plan requires upfront payment.
+- A **draft order** if the form is an order form and the cart has packages or products, ready for the buyer to check out.
+
+From there the contact behaves like any other member. They appear in the [member list](/members/member-list), their plan shows up under [memberships](/members/memberships), and any [smart tagging](/settings/smart-tagging) rules they match apply on the next sync.
+
+## Troubleshooting
+
+**The Preview URL column is empty**
+The public URL needs a portal subdomain. Set it under **Settings > Member portal**; until then there's no host to build the link against.
+
+**A plan I attached doesn't appear in the wizard**
+Only **active** plans render. Reactivate the plan under [Plans](/billing/plans) - the form picks it up on the next page load without re-saving the form.
+
+**The Selection step never shows**
+The step only appears when the form has something to select. Attach at least one plan, class type, package, or add-on product under **What members can choose**.
+
+**The Documents or Signature step is missing**
+Documents come from your document rules and [document signatures](/content/document-signatures), not the form - a step appears only when an active rule matches the new contact's member contact type. The Signature step is also skipped when the form's signature method is **No signature**.
+
+**A shared link returns "form not found"**
+The slug changed or the form was deleted. Changing a slug breaks every previously shared link, so avoid editing it once published.
+
+**The Questions section isn't there**
+Questions belong to a form that records answers. Turn **Sign up** off and the section appears.
+
+**A profile field doesn't show in "Also save to profile field"**
+Only fields your members can see are offered, so a field whose visibility is **Private** is never listed. Check it under **Settings > CRM > Contacts**.
+
+**A question won't let me change its type**
+The type is owned by the profile field it saves into. Clear **Also save to profile field** first, or change the field's own type.
+
+**A member's answers aren't on their profile**
+That is the default and usually what you want: answers stay with the response. To copy one onto the profile, point that question at a profile field. Answers given before you set that are not back-filled.
+
+**A required field is missing from the Details step**
+Contact fields are configured centrally under **Settings > CRM > Contacts**, not per form. Set the field's **Signup visibility** to optional or required there, and it updates every form at once.
+
+## Related
+
+<CardGroup cols={2}>
+<Card title="Memberships" icon="id-card" href="/members/memberships">
+The catalog and checkout behavior behind the Selection step's plans.
+</Card>
+<Card title="Plans" icon="tags" href="/billing/plans">
+Pricing, signup fees, and renewal rules the form inherits per plan.
+</Card>
+<Card title="Document signatures" icon="file-signature" href="/content/document-signatures">
+Control which documents appear on which forms.
+</Card>
+<Card title="Member portal" icon="globe" href="/settings/member-portal">
+The portal that serves the form, on the subdomain set under Settings > Member portal.
+</Card>
+<Card title="Automations" icon="bolt" href="/marketing/automations">
+Mail a personal single-use link to one member with the Send form step.
+</Card>
+<Card title="Members overview" icon="table-columns" href="/members/overview">
+Where contact fields are configured - the profile fields a question can copy its answer onto.
+</Card>
+</CardGroup>

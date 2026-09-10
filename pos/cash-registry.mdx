@@ -17,6 +17,10 @@ keywords:
     "cash count",
     "over short",
     "receipt",
+    "edit expense",
+    "correct expense",
+    "reverse entry",
+    "reversing entry",
     "point of sale",
   ]
 ---
@@ -38,7 +42,7 @@ The module is opt-in. Until you turn it on, 1Club tracks neither a drawer balanc
 - **Expenses with categories** - Record what you spend against editable categories, with an optional receipt photo. Non-cash expenses are tracked for reporting without moving the drawer.
 - **Cash in and cash out** - Add or remove cash for anything else: opening floats, bank deposits, and pay-outs.
 - **Optional counts** - Count the drawer whenever you like and 1Club records any over or short so the books match the cash on hand.
-- **Immutable ledger** - Every entry is permanent; corrections are made with a reversing entry, never by editing history, so the trail stays auditable.
+- **Two ways to correct a mistake** - Edit an entry you recorded by hand when its details were wrong, or reverse it when the spend never happened at all. Nothing is ever deleted.
 - **Overview dashboard** - See cash on hand per location, cash in vs out over time, and expenses by category.
 
 ## Turn on the cash module
@@ -50,11 +54,12 @@ The first time you enable it, 1Club stamps an activation moment and seeds a star
 <Note>
   Viewing the drawer and ledger requires the `cash.read.club` permission.
   Recording expenses, cash movements, and counts requires `cash.create.club`.
-  Reversing entries and managing categories requires `cash.manage.club`. Turning
-  the module on or off requires `settings.manage.organization`.
+  Editing an entry, reversing one, and managing categories all require
+  `cash.manage.club`. Turning the module on or off requires
+  `settings.manage.organization`.
 </Note>
 
-Front desk staff can read the drawer and record cash day to day; reversing entries and editing categories stay with managers, a light segregation-of-duties boundary.
+Front desk staff can read the drawer and record cash day to day. Correcting an entry after the fact, whether by editing or reversing it, stays with managers, as does editing categories - a light segregation-of-duties boundary.
 
 ## The cash drawer
 
@@ -84,6 +89,14 @@ Click **Add expense**, choose the location, enter the amount, pick a category, a
 
 Because both cash and non-cash costs live here, your expense reporting is complete regardless of how each one was paid, and the **Expenses by category** breakdown on the overview reflects all of them.
 
+### Fix an expense you already recorded
+
+Click the pencil on the expense's row and change what was wrong: the amount, the payment method, the date, the category, the supplier, the document number, the description, or the receipt. Save, and the expense report and the drawer both follow the corrected figure.
+
+The one thing you cannot change is the location. A recorded movement belongs to one drawer, so to move an expense to another location, reverse it and record it again against the right one.
+
+Changing the payment method moves money in or out of the drawer, because only a cash expense counts toward cash on hand. Switch a cash expense to card and the drawer gives the money back; discover that a card expense was really paid from the till and the drawer takes it.
+
 ## Move cash in and out
 
 Use **Cash in** and **Cash out** for movements that are not sales or expenses:
@@ -107,11 +120,23 @@ Counting is optional. When you want to check the till, open **Cash > Overview**,
 
 1Club compares your count to the expected balance and, if they differ, records a reconciliation entry for the over or short so the book balance matches reality. If the count matches, nothing is posted. Recent counts and their variances show on the overview.
 
+<Note>
+  A count trues the drawer up against the cash actually in it at that moment. If
+  you afterwards edit or reverse a cash entry from before the count, cash on hand
+  moves by the difference and stops matching what you counted. Count again after
+  correcting an older cash entry.
+</Note>
+
 ## The ledger
 
-**Cash > Ledger** is the full history for a location: cash sales captured automatically and every entry you recorded, newest first. It is append-only - entries are never edited or deleted.
+**Cash > Ledger** is the full history for a location: cash sales captured automatically and every entry you recorded, newest first. Nothing is ever deleted.
 
-To correct a mistake, reverse the entry. 1Club posts an equal and opposite **reversing entry** that points back at the original, which keeps the drawer correct while preserving the original record for audit. An entry can only be reversed once.
+Two actions correct a row, and which one you want depends on what went wrong:
+
+- **Edit** fixes an entry whose details were recorded wrongly - a mistyped amount, the wrong category, a receipt nobody attached. The row keeps its place in the history and the drawer follows the corrected figure.
+- **Reverse** undoes an entry that should not be there at all - a duplicate, or spend that never happened. 1Club posts an equal and opposite **reversing entry** pointing back at the original, so both the mistake and the correction stay readable.
+
+An entry can only be reversed once, and once a reversing entry exists neither half of the pair can be edited: a correction you can already read is not rewritten.
 
 ## The overview dashboard
 
@@ -124,7 +149,21 @@ To correct a mistake, reverse the entry. 1Club posts an equal and opposite **rev
 
 ## How corrections keep the books honest
 
-Nothing in the cash registry is edited in place. Cash sales are read from the payments that produced them, manual entries are append-only, and every correction is a reversing entry. That means the ledger is always a faithful, auditable record of what happened, and the drawer balance is always the sum of that record.
+Only the entries a person typed in are editable, and only by a manager. Everything else in the registry is derived from something else, so you correct it at its source:
+
+- A **cash sale** is read from the payment that produced it. Refund the payment; the sale is never edited here.
+- A **cash count adjustment** is computed from the amount you counted. Count again, and 1Club posts a fresh adjustment.
+- An **expense from a delivery** mirrors its goods receipt. Void the delivery and post a corrected one, and the expense follows.
+- A **reversing entry**, and the entry it undoes, are a finished pair. Neither is editable.
+
+Nothing is ever deleted, and the drawer balance is always the sum of the record you can see.
+
+<Note>
+  An edit records that the entry changed, but not what it used to say. When you
+  need the original figure preserved on the page - a disputed invoice, an amount
+  someone else will question - reverse the entry and record a corrected one
+  instead of editing it.
+</Note>
 
 ## A typical daily workflow
 

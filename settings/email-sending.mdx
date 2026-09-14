@@ -1,0 +1,164 @@
+---
+title: "Email sending"
+description: "Control what members see in the From line: verify your email domain, then set the organization and club email addresses 1Club sends from."
+keywords: [email sending, sending domain, from address, reply-to, domain verification, DNS, CNAME, DKIM, SendGrid, organization email, club email, sender]
+---
+
+Every email 1Club sends on your behalf - booking confirmations, invoices, reminders, automations, and replies from the Inbox - carries a **From** name and address. Three settings decide what that looks like: a verified **email domain**, your **organization Email**, and each **club Email**. Get all three right and members see mail from your own gym. Miss the domain and they see a 1Club address instead, with your address only as reply-to.
+
+This page covers outbound mail. For capturing mail members send *to* you, see [Email inboxes](/settings/email-inboxes).
+
+## Overview
+
+- **Verified email domain** - Proves you own the domain so 1Club can send as `you@yourgym.com`. Added under **Settings > Organization > Domains** with purpose **Email (SendGrid)**.
+- **Organization Email** - The fallback sender for organization-wide mail (invoices, notifications, welcome and account emails). Set under **Settings > Organization > Details**.
+- **Club Email** - The sender for anything tied to one location (booking confirmations, daily summaries). Set per gym under **Settings > Clubs**.
+- **From vs reply-to** - The resolved address becomes the **From** only when its domain is verified. Otherwise it drops to **reply-to** and 1Club's platform address sends.
+- **Display name** - The club name when a club address is used, otherwise your organization name, otherwise `1club`.
+
+## What members actually see
+
+A delivered email's From line is built as `Display name <address>`. Which address lands there depends on whether the domain is verified:
+
+| Domain verified? | From | Reply-to |
+| --- | --- | --- |
+| Yes | Your address (`frontdesk@yourgym.com`) | Your address |
+| No | 1Club's platform address | Your address |
+| No address set at all | 1Club's platform address, named `1club` | Not set |
+
+In all three cases replies still reach you. Verification changes trust and deliverability, not routing.
+
+## The two Email fields
+
+There are two places to type an email address, and they are not interchangeable.
+
+### Settings > Organization > Details > Email
+
+The organization-level address. It is used for mail that is not tied to a single location, and it is also surfaced as your public contact address on the marketplace listing. See [Organization](/settings/organization).
+
+### Settings > Clubs > (each club) > Email
+
+The per-location address, set on each gym alongside its phone and website. **This is what members see on most of the email they receive**, because the highest-volume mail (booking confirmations, cancellations, reschedules, order confirmations, daily summaries) is club-scoped.
+
+<Warning>
+A club Email always wins for club-scoped mail, even when its domain is **not** verified and your organization Email's domain **is**. 1Club does not fall back to the organization address in that case. The result is mail sent from the 1Club platform address with the club address as reply-to, despite a perfectly good verified domain being available. Keep every club Email on a domain you have verified.
+</Warning>
+
+### Which address is used for what
+
+| Email | Address used |
+| --- | --- |
+| Booking confirmation, cancellation, reschedule | Club Email |
+| Order confirmation | Club Email |
+| Daily summary | Club Email |
+| Instructor calendar | Club Email |
+| Invoices and proformas | Organization-scoped (see below) |
+| Payment and renewal notices | Organization-scoped |
+| Welcome email, form confirmations, waitlist | Organization-scoped |
+| Sign-in, verification, invitations, password resets | Organization-scoped |
+| Inbox replies and campaigns | The inbox's own address, or the club in scope |
+
+"Organization-scoped" does not simply mean the organization Email. See the next section.
+
+## How 1Club picks the From address
+
+1. **Club-scoped mail** uses that club's **Email** if one is set. There is no fallback to the organization Email if it is missing verification; the club address is taken as-is. If the club has no Email, resolution continues as if the mail were organization-scoped.
+
+2. **Organization-scoped mail** builds a candidate list of every club Email plus the organization Email, then picks **the first candidate whose domain is verified**. If none is verified, it falls back to the first candidate in the list, which is a club address rather than your organization Email.
+
+3. **The verified check** then decides placement. If the resolved address sits on a verified email domain, it becomes the **From**. If not, 1Club sends from its platform address and puts your resolved address in **reply-to**.
+
+4. **The display name** is the club's name when the resolved address belongs to a club, otherwise your organization name, otherwise `1club`.
+
+<Note>
+Step 2 means an unverified club address can be chosen ahead of your organization Email for organization-wide mail such as invoices. Verifying the domain your addresses share is what makes this deterministic.
+</Note>
+
+## Verify your email domain
+
+Verification is per **domain**, not per address. Once `yourgym.com` is verified, any address on it (`hello@`, `billing@`, `northside@`) can be used as a From with no further setup.
+
+1. Go to **Settings > Organization > Domains**.
+2. Enter your domain (for example `yourgym.com`) and set **Purpose** to **Email (SendGrid)**. The domain is created as soon as you finish typing it, so there is no separate **Add** button for email domains.
+3. 1Club provisions the domain and shows **DNS records to add** - three CNAME records. One is the return-path record on an `em` subdomain, the other two are DKIM signing keys (`s1._domainkey` and `s2._domainkey`).
+4. Add all three records at your DNS provider.
+5. Wait for DNS to propagate, usually 5 to 30 minutes, then click **Verify**.
+
+The status moves from **Pending verification** to **Verified**. If the records are not found yet, the verify fails with an error and the status stays pending; add the missing records or wait longer and try again.
+
+<Tip>
+The record names 1Club shows are fully qualified (`em1234.yourgym.com`). Many registrars want only the relative part in the **Host** field (`em1234`), and append the domain themselves. If your provider does that, strip the trailing `.yourgym.com` before saving, or you will create `em1234.yourgym.com.yourgym.com`.
+</Tip>
+
+### What verification does and does not cover
+
+- **Subdomains are not covered.** A verified `yourgym.com` does not authorize `hello@mail.yourgym.com`. Add the subdomain as its own email domain if you want to send from it.
+- **SPF and DMARC are not managed by 1Club.** The three CNAMEs set up DKIM signing and the return path. If you publish your own SPF or DMARC policy, maintain it yourself at your DNS provider.
+- **A domain belongs to one organization.** If another 1Club organization has already connected the same domain for email, adding it returns a conflict.
+- **Deleting a domain removes it at SendGrid too.** Your DNS records are left behind and become inert. Re-adding the domain mints a *new* `em` hostname, so you must replace the old CNAMEs rather than reuse them.
+- **Changing an address does not need re-verification.** Swapping `hello@yourgym.com` for `frontdesk@yourgym.com` works immediately. Swapping to a different domain silently drops you back to the platform From until you verify that domain too.
+
+## Trial sending
+
+Organizations on a trial must have a verified email domain before they can send messages or run automations. Without one, sending is blocked and the admin shows a **Verify your domain to unlock this feature** dialog. Paid plans are never subject to this. See [Platform subscription](/settings/platform-subscription).
+
+## Worked examples
+
+### Padel club with a single location
+
+A racket-sports gym runs one location on `acepadel.com`.
+
+- Verify `acepadel.com` under **Organization > Domains** with purpose **Email (SendGrid)**.
+- Set **Organization > Details > Email** to `hello@acepadel.com`.
+- Set the club's **Email** to `bookings@acepadel.com`.
+
+Booking confirmations now arrive from `Ace Padel <bookings@acepadel.com>` and invoices from `Ace Padel <hello@acepadel.com>`.
+
+### Multi-location gym chain
+
+A fitness organization runs three gyms on one domain.
+
+- Verify `yourgym.com` once. It covers every address on the domain.
+- Set each club's **Email** to `northside@`, `harbor@`, and `airport@yourgym.com`.
+- Set the organization **Email** to `billing@yourgym.com`.
+
+Members booking at Harbor see `Harbor <harbor@yourgym.com>`; the monthly invoice run goes out from `Your Gym <billing@yourgym.com>`.
+
+### Martial arts school that forgot one club
+
+A jiu-jitsu academy verified `northgatemma.com` and set the organization Email correctly, but one club still has an old `northgate.mma@gmail.com` address.
+
+- Mail for that location sends from the 1Club platform address with the Gmail address as reply-to, because `gmail.com` is not a verified domain.
+- Worse, because that club's address is a candidate for organization-wide mail too, it can be picked for invoices if it happens to come first.
+- The fix is to change that club's **Email** to an address on `northgatemma.com`. No re-verification is needed.
+
+## Tips and best practices
+
+- **Verify the domain before you fill in any address.** The addresses are inert branding until a verified domain backs them.
+- **Keep every club Email on the verified domain.** One stray address on a free mail provider degrades that location's mail and can leak into organization-wide sends.
+- **Set the organization Email even if every club has one.** It is the last candidate in the list and the sensible home for billing mail.
+- **Send yourself a test booking confirmation after any change.** The From line is the only reliable confirmation that resolution went the way you expected.
+- **Do not delete a verified domain to "re-do" it.** You will get a new `em` hostname and have to redo the DNS. Fix the address instead.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Mail arrives from a 1Club address, not ours | The resolved address sits on an unverified domain | Verify the domain under **Organization > Domains**, purpose **Email (SendGrid)** |
+| Only *some* mail is branded correctly | A club Email is on a different or unverified domain than the organization Email | Check every club's **Email** under **Settings > Clubs** and move them onto the verified domain |
+| Invoices come from a club address, not the organization | Organization-scoped mail picks the first verified candidate, and club addresses come first | Verify the domain so the choice is deterministic, or align all addresses on one domain |
+| Verify keeps failing | One or more of the three CNAMEs is missing, mistyped, or not propagated | Re-check all three records; watch for a doubled domain suffix in the Host field |
+| Verification does not say which record is wrong | 1Club reports only pass or fail for the domain as a whole | Compare all three records side by side against the DNS instructions panel |
+| Mail to a member using Apple's Hide My Email is unbranded | Apple's relay only forwards from domains registered with Apple, so 1Club sends from its platform address | Expected. Replies still reach you. See [Signing in](/reference/sign-in) |
+| Sending is blocked with an upgrade dialog | You are on a trial without a verified email domain | Verify a domain, or move to a paid plan |
+| Adding the domain returns a conflict | Another 1Club organization already connected it for email | Contact support to release it |
+| The display name shows `1club` | No club or organization Email resolved | Set **Organization > Details > Email**, and an **Email** on each club |
+
+## Related
+
+- [Email inboxes](/settings/email-inboxes) - The inbound counterpart: capture mail members send to your gym.
+- [Organization](/settings/organization) - Where the organization Email, clubs, and the Domains page live.
+- [Organization and clubs](/reference/organization-clubs) - Which settings belong at which scope.
+- [Inbox](/messaging/message-list) - Sending and replying to members.
+- [Platform subscription](/settings/platform-subscription) - Trial restrictions on sending.
+- [Signing in](/reference/sign-in) - Apple Hide My Email and how it affects the sender.

@@ -13,7 +13,7 @@ An email inbox connects a club's real email address (for example `hello@yourclub
 - **Verification** - An inbox stays inactive until you click the verification link, so mail is never captured from an address you don't control.
 - **Threading into the Inbox** - Inbound mail becomes an inbound message, is matched to a contact (created if new), and is threaded onto the original conversation when it is a reply.
 - **Message count and status** - The list shows how many messages each inbox has captured and whether it is verified.
-- **Sending domain (separate)** - Verifying a sending domain lets outbound mail and replies leave from your own domain rather than a platform default. This is configured under **Settings > Domains**, not here, but it pairs naturally with an inbox.
+- **Sending domain (separate)** - Verifying a sending domain lets outbound mail and replies leave from your own domain rather than a platform default. That is configured under **Settings > Organization > Domains** and documented in [Email sending](/settings/email-sending), not here, but it pairs naturally with an inbox.
 
 ## Adding a club inbox
 
@@ -47,7 +47,7 @@ Most providers send their own confirmation code to the forwarding address before
 There are two distinct "verifications" in play. Keep them separate:
 
 - **Inbox verification** activates inbound capture for one inbox. It is a single click on a link 1Club emails to the address you entered. Covered below.
-- **Sending-domain verification** lets 1Club send outbound email and replies *from* your own domain. It is a DNS setup under **Settings > Domains** and is optional but recommended.
+- **Sending-domain verification** lets 1Club send outbound email and replies *from* your own domain. It is a DNS setup under **Settings > Organization > Domains**, covered in full in [Email sending](/settings/email-sending).
 
 ### Verify the inbox (activate inbound capture)
 
@@ -63,12 +63,7 @@ To resend: open the inbox row's actions menu and choose **Resend Verification**,
 
 Verifying the domain your club emails come from means outbound messages and replies leave as `you@yourclub.com` instead of a platform address, which improves deliverability and trust. Without it, 1Club still sends, but falls back to the platform sending address and sets your club address as reply-to.
 
-1. Go to **Settings > Domains** and click **Add**.
-2. Enter your domain (for example `yourclub.com`) and set **Purpose** to **Email**.
-3. 1Club provisions the domain with SendGrid and shows the **DNS records** to add - three CNAME records when automatic security is used.
-4. Add those records at your DNS host, then click **Verify**. The status moves from **Pending** to **Verified** (or **Failed** if the records aren't found yet - propagation can take time, so retry later).
-
-Once the domain is verified for the **Email** purpose, 1Club uses a matching club or organization address as the **From** on outbound mail; otherwise it uses the address only as reply-to. This applies to all mail sent on the organization's behalf, including replies you send from the Inbox.
+The full procedure - DNS records, which address becomes the **From**, and how the organization and club Email fields interact - lives in [Email sending](/settings/email-sending).
 
 <Note>
 The inbox forwarding address always uses the platform's `inbox.1club.ai` domain and does not require any DNS setup from you. Sending-domain verification only affects outbound mail, not inbound capture.
@@ -83,7 +78,7 @@ When a member emails your club address and your provider forwards it to the 1Clu
 3. **Creates an inbound message** with `direction: inbound`, tagged to the inbox, storing the original club address as the recipient.
 4. **Threads replies** when the incoming mail carries `In-Reply-To` / `References` headers that match an existing message, or when the subject is a `Re:` of an earlier inbound message. Otherwise it starts a new conversation.
 
-The result appears in the [Inbox](/messaging/overview) as an inbound conversation you can open and reply to. Replies you send from the Inbox use your verified sending domain when one is set up (see above).
+The result appears in the [Inbox](/messaging/overview) as an inbound conversation you can open and reply to. Replies you send from the Inbox go out from the inbox's own address; see [Email sending](/settings/email-sending) for how that address is chosen and when it needs a verified domain.
 
 <Note>
 Inbound messages are attributed to a staff user internally (the owner, or the earliest-added admin, manager, front-desk, or instructor). This is a system detail; in the Inbox the conversation is shown against the member contact who wrote in.
@@ -109,7 +104,7 @@ Your fitness organization runs three clubs, each with its own address.
 
 - Add one inbox per club (`northside@`, `harbor@`, `airport@`), each scoped to its club.
 - Each gets its own forwarding address, so mail is attributed to the right location automatically.
-- Verify your `yourgym.com` sending domain once under **Settings > Domains** so replies from every club go out branded.
+- Verify your `yourgym.com` sending domain once under **Settings > Organization > Domains** so replies from every club go out branded.
 
 ### Martial-arts school with one shared mailbox
 
@@ -123,7 +118,7 @@ Your jiu-jitsu and muay-thai academy runs everything through `info@northgatemma.
 
 - **Verify before you rely on it.** Inbound mail is silently dropped for unverified inboxes. Send a test email to the club address and confirm it appears in the Inbox before announcing the address.
 - **One inbox per real mailbox.** Don't point two clubs' forwarding at the same source address; capture is keyed on the forwarding address per club.
-- **Pair inbox capture with a verified sending domain.** Members reading a reply from your own domain trust it more, and deliverability is better.
+- **Pair inbox capture with a verified sending domain.** Members reading a reply from your own domain trust it more, and deliverability is better. See [Email sending](/settings/email-sending).
 - **Keep the club address stable.** Because the address can't be edited, choose the mailbox you intend to keep before creating the inbox.
 
 ## Troubleshooting
@@ -142,7 +137,7 @@ Your jiu-jitsu and muay-thai academy runs everything through `info@northgatemma.
 
 **Issue**: Replies I send from the Inbox come from a platform address, not my club's.
 
-**Cause / fix**: Your sending domain isn't verified. Add it under **Settings > Domains** with purpose **Email**, add the DNS records, and click **Verify**. Until the domain is verified, your club address is used as reply-to only.
+**Cause / fix**: Your sending domain isn't verified. Add it under **Settings > Organization > Domains** with purpose **Email (SendGrid)**, add the DNS records, and click **Verify**. Until the domain is verified, your club address is used as reply-to only. See [Email sending](/settings/email-sending).
 
 **Issue**: An inbound email created a duplicate-looking contact.
 
@@ -150,6 +145,7 @@ Your jiu-jitsu and muay-thai academy runs everything through `info@northgatemma.
 
 ## Related
 
+- [Email sending](/settings/email-sending) - The outbound counterpart: sending domain and the From address members see.
 - [Inbox](/messaging/overview) - Where captured inbound mail lands and where you reply.
 - [Notifications](/settings/notifications) - Route new-message alerts to the right staff.
 - [Message templates](/messaging/templates) - Reusable content for replies and sends.

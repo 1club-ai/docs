@@ -139,7 +139,7 @@ Sending does not depend on Stripe. You can email an invoice or a pro-forma with 
 
 ### Document numbering
 
-Each document type has its **own** template and its **own** counter, both at **Settings > Billing**:
+Each document type has its **own** template and its **own** counter, set per company under **Settings > Billing > General**. Most gyms have one company, so there is one pair of templates to fill in; if you trade through several, each keeps its own series and its own templates. See [Billing entities](/billing/billing-entities).
 
 - **Invoice Numbering Template** - default `INV-[id]`.
 - **Pro-forma Numbering Template** - for example `PRO-[id]`.
@@ -151,7 +151,7 @@ Placeholders are the same in both:
 
 The two series are independent, so a pro-forma never takes a number out of the invoice series. Issuing invoice 42 and pro-forma 7 on the same day is normal, and converting a pro-forma consumes the next **invoice** number, leaving the pro-forma series untouched.
 
-Each counter is per organization and assigned under a lock scoped to that series, so numbers stay unique and gapless within your organization even when two staff members create documents at the same moment.
+Each counter belongs to the company issuing the document and is assigned under a lock scoped to that series, so numbers stay unique and gapless for that company even when two staff members create documents at the same moment. Two companies number independently, so both can issue a document numbered 1 - give each a distinct prefix.
 
 ## Invoice statuses
 
@@ -268,7 +268,7 @@ This also holds when two staff members collect at the same moment. The balance i
 | Invoice still shows `pending` after the member paid a link                       | Status recalculation or the Stripe webhook hasn't landed yet.                 | Open the invoice and click **Refresh payment status**.                                       |
 | Editing transaction prices didn't change the invoice total                       | Totals are frozen from the line items at issue time.                          | Delete and re-create the invoice, or edit the invoice line items directly.                   |
 | A pending invoice isn't in the **Overdue** tab yet, though its due date passed   | The tab filters on the stored `overdue` status, which flips on recalculation. | Use the overdue lookup, which catches pending invoices with a past due date immediately.     |
-| Two invoices almost got the same number                                          | Concurrent creation.                                                          | No action needed - numbering retries on collision and stays unique per organization.         |
+| Two invoices almost got the same number                                          | Concurrent creation.                                                          | No action needed - numbering retries on collision and stays unique for the issuing company.  |
 | I can't find a pro-forma I created                                               | The grid shows one document type at a time.                                   | Switch the **Document type** control in the toolbar to **Pro-forma**.                        |
 | **Issue invoice** is missing on a pro-forma                                      | It has already been converted. A pro-forma converts once.                     | Open the invoice it produced; the two are linked.                                            |
 | Deleting a pro-forma or invoice is refused                                       | The document is one side of a conversion, which cannot be broken.             | Leave both on file. To reverse the revenue, credit or void the invoice instead.              |

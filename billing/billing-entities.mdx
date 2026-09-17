@@ -1,0 +1,124 @@
+---
+title: Billing entities
+description: Run more than one company from a single 1Club organization, each with its own legal details, invoice numbering, and payment accounts.
+keywords: ["billing entity", "company", "legal entity", "second company", "invoice numbering", "legal name", "tax number", "VAT", "IBAN", "bank details", "merchant account", "Stripe account", "myPOS", "multi-company", "separate company"]
+---
+
+A **billing entity** is a company you invoice and take money through. Every organization has one from the day it is created, holding the legal name, tax number, registered address, bank details, and invoice numbering that appear on your documents.
+
+Most gyms are one company and never need a second. If yours trades through several - a separate company per venue, or one company for classes and another for the bar and shop - add a billing entity for each, and tell 1Club which one sells what.
+
+## Overview
+
+- **One company by default** - your existing legal details and numbering became your default billing entity, and nothing changes until you add a second one.
+- **Each company keeps its own everything** - legal details, invoice and pro-forma numbering, bank details, and its own Stripe, myPOS, or DatecsPay account.
+- **You decide what sells through which** - point a gym at a company, or point a revenue account at one, and every sale follows.
+- **A sale belongs to one company** - decided when the sale is made and kept with it forever, so re-pointing a gym later never rewrites what you already sold.
+- **Reports and exports narrow to one company** - so your bookkeeper gets the file for the company they are filing for.
+- **Members see nothing new** - they see your gyms and your prices, and their receipt carries the name of the company that sold to them.
+
+## When you need a second company
+
+Add one when money legally belongs to a different business, not merely to a different place or department. Typical cases:
+
+- Each venue is its own registered company, so each must invoice under its own name and number series and be paid into its own bank account.
+- Your classes and courts sit in one company while the bar, the shop, or the physio room sits in another.
+- You have taken over a gym that keeps trading under its own company for now.
+
+If you only want to see what each venue earns, you do not need a second company - the club filter on your reports already does that.
+
+## Set up a company
+
+1. Go to **Settings > Billing > General**. The **Billing entities** section lists the companies you have, with the default marked.
+2. Click **Add billing entity**, give it a name (this is an internal label, members never see it), and save.
+3. Open the row and fill in what should print on its documents: legal name, tax and registration numbers, registered address, and bank details.
+4. Set its **Invoice numbering** and **Pro-forma numbering** templates. Each company numbers its own documents, so give each a distinct prefix - `INV-` for one and, say, `BAR-` for another - or both companies will produce a document numbered `INV-1`.
+
+<Note>
+Your first company is the **default**. It is the one every sale falls back to when nothing else names a company, and it is the only one that can hold wallet credit. You can make another company the default later from its row.
+</Note>
+
+## Decide what sells through which company
+
+There are two ways to route a sale, and you can use both.
+
+### By gym
+
+Open **Settings > Clubs**, pick the gym, and set **Billing entity**. Everything sold at that gym - bookings, memberships, check-ins, the till - bills through that company.
+
+Leave it empty and the gym bills through your default company.
+
+### By revenue account
+
+Open **Settings > Billing > Revenue accounts**, pick the account, and set its billing entity. Everything posted to that account bills through that company **wherever it was sold**.
+
+This is how a bar or a shop owned by a separate company gets its own invoices without having a venue of its own: point the bar's revenue account at the bar company, and a drink sold at any of your gyms bills through it.
+
+### Which one wins
+
+The revenue account decides first, then the gym, then your default company.
+
+| The sale                                                       | Bills through            |
+| -------------------------------------------------------------- | ------------------------ |
+| A court booking at a gym pointed at Company B                   | Company B                |
+| A drink whose revenue account is pointed at Company C           | Company C, at any gym    |
+| A membership at a gym that names no company                     | Your default company     |
+
+## Connect each company's payment accounts
+
+Each company takes money into its own accounts. Under **Settings > Integrations**, pick the company at the top of the Stripe, myPOS, or DatecsPay page and connect it there, the same way you connected your first one.
+
+- Card payments online settle into the account of the company that sold.
+- A card reader charges through the account of the company that bills for the gym it sits at. Register the reader after you have pointed the gym at its company, and connect that company's payment account first.
+- Saved cards belong to the company they were saved with. A member who pays two of your companies has a card stored with each, and their payment methods page in the portal lists both.
+
+<Warning>
+Re-pointing a gym at a different company is refused while that gym still has card readers registered. Retire the readers, change the company, then register them again - a reader belongs to one payment account and cannot charge through another.
+</Warning>
+
+## What each company issues
+
+Invoices and pro-formas carry the legal name, tax number, registered address, and bank details of the company that sold, and draw their number from that company's own series. Two companies therefore number independently, and both can have a document numbered 1 on the same day. That is normal: each company keeps its own sequence, which is why distinct prefixes are worth setting up front.
+
+Bill runs group by company before they issue, so "one invoice per customer" never puts two companies on one document. A member who bought from two of your companies in the same period gets one invoice from each.
+
+Raising an invoice by hand is the one place nothing else names the company for you, so the invoice form asks. Leave it alone and your default company issues it.
+
+See [Invoices](/billing/invoices) for the rest of the invoicing flow.
+
+## Two things that stay whole
+
+**A basket cannot mix companies.** If someone tries to pay for a court booking that bills through one company and a drink that bills through another in a single checkout, the sale is refused and the two companies are named. Sell them separately: one payment goes to one company, and one invoice comes from one company.
+
+**Wallet credit belongs to your default company.** Members can only spend credit on that company's sales, it is only offered at checkout for those sales, and a refund goes back to the wallet only when the original payment was taken by it. Cancelling a booking sold by another company leaves the refund owed instead of crediting the wallet, so you can return it from the payment - see [Payments](/billing/payments).
+
+## Reporting per company
+
+The revenue and transactions reports carry a **Billing entity** filter next to the club filter, and the invoice list carries one too. Narrowing the report narrows its export, and the exported file names the company.
+
+The accounting export under **Settings > Data Tools > Export** can be narrowed the same way, which is usually what your bookkeeper wants: one file per company, per period.
+
+The filter only appears once you have more than one company.
+
+## Retiring a company
+
+Deactivate a company from its row when it stops trading. A deactivated company takes no new sales and is no longer offered when you point a gym or a revenue account at one, while its history, documents, and numbering stay exactly as they were.
+
+Before you can deactivate it, re-point anything that still sells through it. 1Club tells you what is left - gyms or revenue accounts - rather than quietly moving those sales to another company.
+
+Deleting is only possible for a company that never sold anything and holds no payment credentials. Anything with history is deactivated instead.
+
+## Troubleshooting
+
+| What you see                                                                  | Why                                                                                   | What to do                                                                                              |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| "These items are billed by different billing entities"                        | The basket mixes companies.                                                            | Sell the items in separate transactions.                                                                   |
+| Two companies both issued a document numbered 1                               | Each company has its own series.                                                       | Give each company a distinct numbering prefix.                                                             |
+| Wallet is missing at checkout                                                 | The sale bills through a company other than your default.                              | Take another payment method; wallet credit is your default company's.                                      |
+| A card reader stops working after a change                                    | The gym was re-pointed, or the reader was registered before its company was connected. | Connect that company's payment account, then register the reader again.                                    |
+| A member's saved card is not offered for a renewal                            | The card is saved with a different company than the one billing the renewal.           | Ask the member to pay once through the right company, or to add a card for it; the card is then saved there. |
+| You cannot deactivate a company                                               | Gyms or revenue accounts still bill through it.                                        | Re-point them first; the message says how many of each.                                                    |
+
+## What members see
+
+Nothing changes for members. They browse your gyms, book, and pay as before. The only difference is on the paperwork: a receipt or an invoice carries the legal name and details of the company that sold to them, and if they buy from two of your companies they get a document from each.

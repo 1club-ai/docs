@@ -10,6 +10,8 @@ keywords:
     list_classes,
     create_booking,
     search_clubs,
+    find_availability,
+    get_club,
     availability,
     platform api,
   ]
@@ -160,14 +162,31 @@ Each admin tool is a thin wrapper over the documented Platform API, so the reque
 
 `https://mcp.1club.ai/discovery` - no token, no scopes. These search the public 1club.me marketplace across every listed gym and read only published information.
 
-| Tool                          | What it does                                                                   |
-| ----------------------------- | ------------------------------------------------------------------------------ |
-| `search_clubs`                | Searches gyms by sport, location, distance, price, rating, amenities, and date |
-| `get_class_availability`      | Returns a class with its availability status, current bookings, and capacity   |
-| `get_area_availability`       | Checks a public area's availability for a date or a date range                 |
-| `get_instructor_availability` | Checks a public instructor's availability for a date or a date range           |
+| Tool                | What it does                                                                                         |
+| ------------------- | ---------------------------------------------------------------------------------------------------- |
+| `find_availability` | Free, priced court times across the marketplace in one call, each with a link that opens the booking |
+| `search_clubs`      | Finds gyms by name, sport, location, distance, price, rating, amenities, and date                     |
+| `get_club`          | One club's profile and the menu of what it sells - courts by the hour, its classes, its passes        |
 
-These tools take marketplace ids, which are not the same as the ids an assistant sees on the admin server. Do not mix ids between the two servers.
+Reach for `find_availability` for any "when can I play" question. It searches, prices and dates in one step, so there is no need to find clubs first and then look their availability up separately. Give it a `date` when someone names a day - without one it walks forward from today and may never reach the day they meant.
+
+Everything these tools return is the club's own: times are on the venue's clock (`localDay`, `localTime`, `localEndTime`, `localEndDay`, with its `timezone`), and prices come with their currency. Report them as given rather than converting them.
+
+Tools address clubs by their marketplace **slug**, which is what comes back from a search - not the ids an assistant sees on the admin server. Do not mix ids between the two servers.
+
+<Warning>
+  **Removed in September 2026:** `get_class_availability`, `get_area_availability` and
+  `get_instructor_availability`. They addressed classes, areas and instructors by database
+  id, which nobody holds in a conversation, and they overlapped with `find_availability`.
+  Move any client that called them to the three tools above - `find_availability` answers
+  the same questions from a place or a club slug instead of an id.
+</Warning>
+
+### Optional inline interface
+
+The three discovery tools also carry a small inline interface - club cards, slot chips, a club profile - for a host that supports MCP Apps, such as ChatGPT. A client that does not render it is unaffected: every tool still answers in text, and the interface is only ever a view of the same answer.
+
+Nothing on this server writes. A booking is completed on 1club.me, which is why every free slot comes with the `url` that opens it there.
 
 ## What is not exposed
 

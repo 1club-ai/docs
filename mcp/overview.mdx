@@ -29,7 +29,7 @@ You connect once, and from then on you can ask an assistant things like "which c
 | **Discovery** | `https://mcp.1club.ai/discovery` | Anyone searching the public 1club.me marketplace | None                                            |
 
 - The **admin server** reads and writes one organization's own data. You sign in to 1Club, choose the organization, and approve the requested access. Every response is limited to that organization. This is the one you want for running your gym. A developer-managed client that cannot sign in interactively can send a [Platform API key](/settings/api-tokens) as a bearer token instead; OAuth is the recommended path for everyone else.
-- The **discovery server** searches the public marketplace across all listed gyms and checks published availability. It is anonymous by design and can never reach a single organization's private data.
+- The **discovery server** searches the public marketplace across all listed gyms and finds bookable court times. It is anonymous by design, read-only, and can never reach a single organization's private data.
 
 Pick the one that matches what you are trying to do, then follow [Connect an assistant](/mcp/connect).
 
@@ -67,7 +67,7 @@ The full list, with the OAuth scope each tool needs, is on the [Tools reference]
   `organization:write` scope, and take effect immediately.
 </Note>
 
-The discovery server covers marketplace search and public availability for classes, areas, and instructors.
+The discovery server answers three questions about the public marketplace: when can I play (`find_availability`, which returns priced, dated court times with a link that opens the booking), which clubs match what I am after (`search_clubs`), and what is this place like (`get_club`). It reads only published information and never writes - a booking is completed on 1club.me.
 
 ## Current boundaries
 

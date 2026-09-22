@@ -77,6 +77,10 @@ A notified member can claim from either place the offer appears:
 
 - **The claim link** in the notification. This opens a claim page showing the class, date, and gym. Confirming books the seat. If the member does not have a password yet - for example, a contact a staff member added to the list - they set one on this page, and 1club creates their account and signs them in as part of the confirmation.
 - **Account > Waitlist** in the portal. A notified entry shows a **Book now** button and the deadline to book before. Confirming books the seat.
+- **The class in the mobile app.** The spot-available push notification opens the class, where the member sees the deadline with **Accept spot** and **Decline**. Tapping a notification for a class at another of their clubs switches the app to that club first.
+- **Booking the class outright.** A claim window is a deadline, not a hold, so the seat stays open to everyone until it is taken. If the notified member books the class the ordinary way while their window is open, that booking claims the seat: their waitlist entry is converted and linked to it, and they are not told the offer expired.
+
+The two claim-window notices - a spot is available, and the window has passed - are always sent, whatever the member's booking notification setting says. Turning booking notifications off silences confirmations and changes, not an offer that expires on its own.
 
 Claiming runs the same checks as a normal booking. If the offer has expired, the class has already ended, or the seat was filled in the meantime, the claim is rejected with a clear message and the entry is moved on rather than left in limbo.
 
@@ -100,9 +104,10 @@ A converted entry is linked to the booking it created, so the seat and the queue
 
 A background job runs every few minutes to keep the queue moving without anyone having to watch it. For each offer whose claim window has passed, the job:
 
-1. Marks the entry **expired**.
-2. Notifies the member that their opportunity has expired and the spot went to the next person.
-3. Offers the freed spot to the next pending member in line, starting a fresh claim window.
+1. Checks whether the member already holds a seat on that class. If they booked it while the window was open, the entry is marked **converted** and linked to that booking, and no expiry notice is sent.
+2. Otherwise marks the entry **expired**.
+3. Notifies the member that their opportunity has expired and the spot went to the next person.
+4. Offers the freed spot to the next pending member in line, starting a fresh claim window.
 
 This is what lets an unclaimed offer cascade down the queue automatically until someone claims it or the class fills.
 

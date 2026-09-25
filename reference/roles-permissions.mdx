@@ -34,9 +34,9 @@ There are five roles and every admin user holds exactly one. The **Member** role
 | Role | Typical use | Default access |
 |------|-------------|----------------|
 | **Admin** | Owner or main administrator | Full access to every module at organization scope, including settings and the permission editor. Cannot be customized. |
-| **Manager** | Gym or department manager | Runs the gym: members and memberships, the timetable, bookings, check-ins, attendance, marketing, analytics, inventory, rentals, cash, and the till. Manages staff organization-wide. Views and takes payments but does not configure billing. No settings access. |
-| **Front Desk** | Receptionist or front-of-house staff | Works the desk: looks members up, signs them up to a plan, books them in, checks them in, runs the till, lends gear, handles the inbox. Reads the timetable and catalog without editing them. No staff, marketing, or settings access. |
-| **Instructor** | Coach or teacher | Own world only: reads their own timetable, runs the bookings and attendance on it, sees the members they teach, reads their own earnings and stats, sends their own messages, manages their own profile. |
+| **Manager** | Gym or department manager | Runs the gym: members and memberships, the timetable, bookings, check-ins, attendance, assessments, marketing, analytics, inventory, rentals, cash, and the till. Manages staff organization-wide. Views and takes payments but does not configure billing. No settings access. |
+| **Front Desk** | Receptionist or front-of-house staff | Works the desk: looks members up, signs them up to a plan, books them in, checks them in, scores their training, runs the till, lends gear, handles the inbox. Reads the timetable and catalog without editing them. No staff, marketing, or settings access. |
+| **Instructor** | Coach or teacher | Own world only: reads their own timetable, runs the bookings and attendance on it, assesses the members of the sessions they teach, reads their own earnings and stats, sends their own messages, manages their own profile. |
 | **Member** | End member | No admin access. Uses the member portal and public apps. |
 
 <Note>
@@ -236,6 +236,25 @@ Three overrides live behind **Full access (Organization)** specifically, and the
 - **Rewriting the entrance method after the visit was recorded and paid for.**
 
 By default those three land only on Admin, owner, and 1Club support, because Manager holds Check-ins at Club scope. You can delegate any of them to another role by granting it at Organization scope. You cannot take them away from an Admin.
+
+### Assessments
+
+Instructors' score cards on members after a training. See [Assessments](/members/assessments).
+
+| Action | Allows |
+|--------|--------|
+| **View** | The cards on a session's roster and, at **Club** scope, a member's whole history on their profile. |
+| **Create** | Score an attendee of a session. At **Club** scope, also add a card for a training that was never in 1Club. |
+| **Edit** | Correct a card's scores and note. |
+| **Delete** | Remove a card the member may already have received. **Club** scope only. |
+| **Full access** | All four. |
+
+Two things about scope are particular to this module:
+
+- **Own means "a session I teach" for View and Create**: the user's own class, or a booking assigned to them. A member's whole history spans sessions an Own-scoped user does not teach, so the profile view needs **Club**. A card with no session has nothing to own, so adding one needs **Club** too.
+- **Own means "a card I wrote" for Edit**, whatever the session. The desk, which scores club-wide, can still correct its own typo without being able to rewrite an instructor's card, and an instructor can correct their own.
+
+Defaults: Manager holds all four at **Club**; Front Desk holds View and Create at **Club** and Edit at **Own**; Instructor holds View, Create and Edit at **Own**. Templates (the criteria and scale) are organization configuration and live under **Settings**, not here: any assessor can read them, and only a holder of Settings edits them.
 
 ### Staff
 

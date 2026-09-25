@@ -70,11 +70,12 @@ Scope entries are combined with AND. If you add both an Areas entry and an Instr
 Conditions further restrict when a rule fires. Add as many as you need - **all** conditions must pass for the rule to apply (AND logic). A rule with no conditions applies whenever its scope matches.
 
 - **Weekdays with Time Range** - choose weekdays (optional; empty means every day) plus a **Start Time** and **End Time**. The rule applies to bookings whose start time falls in that window, evaluated in your organization's timezone. The end time is exclusive (a 12:00-14:00 window covers slots from 12:00 up to, but not including, 14:00). This is the condition that splits a booking at the window boundary.
+  - **Applies to** - how the window is read. **The part of the booking inside the window** (the default) splits the booking at the window's edges, so only that part is priced by the rule - this is how a peak band works. **Bookings that start in the window** and **Bookings that fit inside the window** price the whole booking or none of it, and do not split it.
 - **Days of Week** - restrict to specific days without a time range (for example, weekends only).
 - **Availability** - fire based on how full the resource is over the next X days, compared with an operator (`>`, `<`, `>=`, `<=`) and a percentage. Useful for demand-based pricing.
 - **Booking Timing** - fire based on how many days ahead the booking is made, compared with an operator and a day count. Useful for early-bird discounts or last-minute surcharges.
 - **Demand Level** - fire on **Low Demand** or **High Demand**, which the system derives automatically from availability.
-- **Duration Threshold** - fire only when the booking is at least a **Minimum duration (hours)**.
+- **Duration Threshold** - fire only when the booking is at least a **Minimum duration (hours)**, and optionally at most a **Maximum duration (hours)**. Set both to the same value to target one length. The duration is always the whole booking's, even when another rule splits it into segments.
 - **Date Range** - fire only between a **Start Date** and **End Date** (interpreted as whole days in your organization's timezone), for seasonal pricing.
 - **Plan** - fire only for members on the selected plans (leave empty for all plans). Bookings with no active plan do not match a plan-restricted rule. A rule with a Plan condition is a **member rate**; see [Member rates](#member-rates) for how two plans are resolved.
 
@@ -141,7 +142,7 @@ The price is built from a base rate and then adjusted by the matching rules.
 - **Class** bookings use the class's own price as a fixed base.
 - If no rate is set, the base is zero.
 
-**Time-window splitting.** If any matching rule uses a Weekdays-with-Time-Range condition, the booking is split into segments at the window boundaries, so each segment is either fully inside or fully outside the window. The base price is prorated across the segments by duration.
+**Time-window splitting.** If any matching rule uses a Weekdays-with-Time-Range condition read as a band (the default), the booking is split into segments at the window boundaries, so each segment is either fully inside or fully outside the window. The base price is prorated across the segments by duration.
 
 **Applying adjustments.** For each segment, the winning absolute rule is resolved first and replaces the base price, then the composing rules fold over that result in priority order:
 
@@ -247,6 +248,8 @@ The holder rate, for the same hour:
 Repeat the pair for each band (off-peak morning, day, peak, late, weekend) and the slot prices itself for both audiences. This is also what a [season pass](/operations/season-passes) is priced from: its total is the sum of the weeks it books at these rates. See [Seasons](/settings/seasons).
 
 ## Tips & best practices
+
+- **Offers members should see belong in promotions.** Pricing rules are silent: members see the resulting price, never the rule. For a named offer such as "2 for 1 on daytime courts" shown on the booking calendar, use an auto-apply [promotion](/marketing/promotions#time-of-day-offers-on-the-booking-calendar).
 
 - **Name rules for their intent.** _Padel peak +25%_ reads better in the list than _Rule 3_.
 - **Keep one scope type per rule** unless you deliberately want to require a booking to carry two resources at once.

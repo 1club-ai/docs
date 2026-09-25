@@ -1,7 +1,7 @@
 ---
 title: Promotions
 description: Create vouchers and discounts with schedules, codes, audience targeting, and usage caps
-keywords: [promotions, vouchers, discounts, promo codes, coupons, discount codes, auto-apply, trials, intro offers, wallet credit]
+keywords: [promotions, vouchers, discounts, promo codes, coupons, discount codes, auto-apply, trials, intro offers, wallet credit, happy hour, off-peak offer, buy one get one, 2 for 1, time of day discount, booking calendar]
 ---
 
 Promotions are time-bound offers you run from **Marketing → Promotions**. They come in two flavours - **Vouchers** credit a member's wallet when the member redeems a code, and **Discounts** reduce the price of a booking or product order at checkout. Both share the same controls for scheduling, codes, redemption caps, audience targeting and scope.
@@ -26,7 +26,7 @@ Promotions are always one of two types. Pick the type when you create the promot
 1. Go to **Marketing → Promotions**.
 2. Click **Add** and choose **Voucher** or **Discount**.
 3. Fill in:
-   - **Name** - internal label shown to staff and on the member-facing receipt.
+   - **Name** - shown to staff, on the member-facing receipt and, for an auto-apply discount, on your booking calendar beside the discounted price (for example "Buy 1 get 1"). Use the translate button next to the field to give it a name in every language your site supports.
    - **Code** *(optional)* - what members type. Codes are normalised to UPPERCASE and must be unique within the organization. If you leave it blank, the promotion can still be applied by staff from the dashboard but won't have a code to share.
    - **Description** - shown to members where the promotion appears.
    - **Value** - for vouchers, the credit amount; for discounts, either a percentage (max 100) or a fixed amount, depending on **Discount format**.
@@ -82,6 +82,7 @@ A discount can target two independent surfaces. List entries on either surface; 
 - **Class types** - applies only when the booking is for one of these class types.
 - **Area types** - applies only when the booking targets one of these area types.
 - **Instructor types** - applies only when the assigned instructor is one of these types.
+- **Gyms** - applies only to bookings at the selected gyms. Leave empty for every gym. Use it when two of your gyms share the same area type but the offer is for one of them.
 
 A promotion with both surfaces (e.g. "Plan: Annual + Class types: Yoga") applies to purchases of the listed plans **and** to bookings of the listed class types. Leaving every surface empty makes the discount valid for any booking or order (but never for a plan purchase, since plan eligibility is opt-in).
 
@@ -131,7 +132,41 @@ This is the most common entry point when you're building a trial for a specific 
 
 ## Conditions
 
-You can also require a checkout context before a discount applies. The **Conditions** section of the promotion has a **Minimum people** field: the discount applies only when the class booking party has at least that many people (minimum 2). Use it to reward group bookings - for example, a discount that kicks in only when someone books a class for three or more. Leave it empty for no people requirement. See [Party bookings](/operations/classes) for how party sizes work.
+You can also require a checkout context before a discount applies. The **Conditions** section of the promotion has:
+
+- **Minimum people** - the discount applies only when the class booking party has at least that many people (minimum 2). Use it to reward group bookings - for example, a discount that kicks in only when someone books a class for three or more. Leave it empty for no people requirement. See [Party bookings](/operations/classes) for how party sizes work.
+- **Time of day** - weekdays (optional; empty means every day) plus a start and end time, read on the gym's clock. Choose how the booking must match the window:
+  - **Starts in the window** - the whole booking qualifies when it starts inside the window. A 15:00 booking that runs to 17:00 qualifies for an 8:00 to 16:00 offer. This is what most offers mean by "book between 8:00 and 16:00".
+  - **Fits entirely in the window** - the booking must start and end inside the window.
+- **Booking length** - a minimum and maximum length. Set both to the same value to target one length exactly, for example 2 hours for a "2 for 1" offer.
+
+Time of day and booking length judge the whole booking: the discount applies to a booking or it does not. They are never split at the window's edges the way a [pricing rule](/settings/pricing-rules) band is.
+
+## Time-of-day offers on the booking calendar
+
+An auto-apply discount with booking conditions is shown to members on your booking calendar before they check out:
+
+- A line under the calendar names the offer and its hours, for example "Buy 1 get 1 - 08:00 to 16:00".
+- When a member picks a booking that qualifies, the regular price is struck through, the discounted total is shown, and the promotion's name appears beside it.
+- When a member picks a shorter booking and a longer one would qualify, the calendar tells them - "Buy 1 get 1: add 1 h for free" - with a button that switches to the longer booking.
+
+Signed-in members see offers they qualify for. Visitors who are not signed in only see offers with no audience, first-booking or per-member conditions, because the calendar cannot check those for them. Checkout always has the final say.
+
+### Example: 2 hours for the price of 1 on daytime courts
+
+A padel gym wants a second hour free on weekday daytime bookings at one of its gyms:
+
+1. Create a **Discount** with **Discount format** set to percentage and **Value** 50.
+2. Name it "Buy 1 get 1" and translate the name if your site has more than one language.
+3. In **Valid for**, pick **Area types** (your court type) and, under **Gyms**, the gym running the offer.
+4. Under **Conditions**, set **Time of day** to Monday to Friday, 08:00 to 16:00, **Starts in the window**, and **Booking length** to exactly 2 hours.
+5. Turn on **Auto-apply** and save.
+
+A 2-hour booking at 10:00 that normally costs 56 is shown - and charged - at 28. A 1-hour booking stays at its regular price, and the calendar offers the second hour for free.
+
+### Courts booked with a coach
+
+When a court and a coach are booked together as one booking, a discount valid only for areas takes its amount off the court's share and leaves the coach's fee untouched. A discount valid for both areas and instructors applies to the whole booking.
 
 ## Stacking
 
@@ -175,7 +210,7 @@ From **Marketing → Promotions → View analytics** you'll find:
 
 ## Validation reasons (admin reference)
 
-When validating a code in the admin (for example, on a booking dialog) you may see one of these reasons. Members always see a single generic "invalid code" message.
+When validating a code in the admin (for example, on a booking dialog) you may see one of these reasons. Members see a single generic "invalid code" message, except when the code needs more people, a different time or a different booking length - those they can fix, so they are told.
 
 - **not_found** - code doesn't exist in this organization.
 - **not_started** - the active window hasn't begun.
@@ -190,6 +225,9 @@ When validating a code in the admin (for example, on a booking dialog) you may s
 - **plan_not_eligible** - discount is scoped to specific plans and this plan isn't one of them. Also fires when the buyer is purchasing a plan and the promotion has no plan rule set (plan eligibility is opt-in).
 - **booking_not_eligible** - the booking-surface scope is set but the booking doesn't satisfy it (catch-all when the granular reason can't be narrowed).
 - **scope_not_eligible** - the promotion declares both plan and booking surfaces, and neither matches.
+- **club_not_eligible** - the discount is limited to some gyms and this booking is at another one.
+- **time_not_eligible** - the booking does not start in (or fit inside) the promotion's time of day.
+- **duration_not_eligible** - the booking is shorter or longer than the promotion's booking length.
 - **not_first_time_buyer** - an auto-apply discount was evaluated for a contact who already holds (or held) a membership on one of the targeted plans.
 - **wrong_type** - a voucher code was entered at checkout (vouchers credit the wallet; they aren't applied as a discount).
 
@@ -198,7 +236,8 @@ When validating a code in the admin (for example, on a booking dialog) you may s
 - **Cap per-member use** for codes you intend to share publicly. A per-member limit of 1 prevents the same member redeeming a public code repeatedly.
 - **Prefer Ends at over deletion.** Setting an end date is reversible and keeps the redemption history intact.
 - **Use segment filters for re-engagement campaigns.** Combine a "lapsed" tag with a generous voucher to bring members back.
-- **Scope discounts to fill specific inventory.** A 30% discount valid only for low-demand class types is a more efficient lever than a blanket discount.
+- **Scope discounts to fill specific inventory.** A 30% discount valid only for low-demand class types is a more efficient lever than a blanket discount. A time-of-day auto-apply discount does the same for quiet hours, and your calendar advertises it for you.
+- **Use a promotion, not a pricing rule, for an offer you want members to see.** Pricing rules set your everyday prices silently. A promotion is named on the calendar and the receipt, can be capped, and shows up in promotion analytics.
 - **Build trials with auto-apply, not free plans.** A 100% auto-apply discount on a paid plan converts to a real subscription at the next renewal without any admin intervention. A separate "free trial plan" requires a manual migration step to start charging.
 - **For one-time intro pricing on a recurring plan, prefer a coded discount over auto-apply.** Auto-apply embeds the discount in the membership and carries it through every renewal; a one-shot intro is cleaner as a code that only applies to the creation transaction.
 - **Don't confuse promotions with deals.** [Deals](/marketing/deals) are sales opportunities tracked in your pipeline - a completely separate feature from promotions.

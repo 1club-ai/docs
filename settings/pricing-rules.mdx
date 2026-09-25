@@ -1,7 +1,7 @@
 ---
 title: "Pricing rules"
 description: "Configure dynamic pricing for bookings - publish an hourly rate per time band, layer peak surcharges and off-peak discounts, give plan holders their own member rate, and scope any rule to a gym, area, instructor, or class type."
-keywords: ["pricing rules", "dynamic pricing", "peak pricing", "off-peak discount", "surcharge", "pricing sheet", "price per hour", "absolute price", "rate card", "price list", "rule priority", "member rate", "plan rate", "padel peak hours", "weekend premium", "conditional pricing", "percentage adjustment", "fixed amount", "per-gym pricing"]
+keywords: ["pricing rules", "dynamic pricing", "peak pricing", "off-peak discount", "surcharge", "pricing sheet", "price per hour", "absolute price", "rate card", "price list", "rule priority", "member rate", "plan rate", "padel peak hours", "court with coach discount", "booked with an instructor", "weekend premium", "conditional pricing", "percentage adjustment", "fixed amount", "per-gym pricing"]
 ---
 
 Pricing rules decide what a booking costs. Each rule defines an adjustment (a percentage, a fixed amount, or an outright price per hour), a scope (which gyms, areas, instructors, or class types it applies to), and a set of conditions (time of day, day of week, booking timing, demand, duration, date range, or plan). When a booking's context matches a rule, that rule is applied to the resource's base price.
@@ -62,7 +62,7 @@ The scope decides which bookings a rule can apply to. Add one or more scope entr
 For any scope entry, leave the selector empty to match **all** resources of that type. A rule with no scope entries at all matches every booking (subject to its conditions).
 
 <Note>
-Scope entries are combined with AND. If you add both an Areas entry and an Instructors entry, a booking must carry both an area and an instructor to match. In practice, use one scope type per rule unless you specifically need that combination. A scope also gates by resource presence: an Areas-scoped rule never applies to a class or instructor-only booking, so area rules do not leak into other booking types.
+Scope entries are combined with AND. If you add both an Areas entry and an Instructors entry, a booking must carry both an area and an instructor to match. In practice, use one scope type per rule unless you specifically need that combination. To price a court only when a coach is booked with it, use the **Booked with an instructor** condition instead of adding an Instructors entry. A scope also gates by resource presence: an Areas-scoped rule never applies to a class or instructor-only booking, so area rules do not leak into other booking types.
 </Note>
 
 ### Conditions
@@ -77,6 +77,7 @@ Conditions further restrict when a rule fires. Add as many as you need - **all**
 - **Duration Threshold** - fire only when the booking is at least a **Minimum duration (hours)**.
 - **Date Range** - fire only between a **Start Date** and **End Date** (interpreted as whole days in your organization's timezone), for seasonal pricing.
 - **Plan** - fire only for members on the selected plans (leave empty for all plans). Bookings with no active plan do not match a plan-restricted rule. A rule with a Plan condition is a **member rate**; see [Member rates](#member-rates) for how two plans are resolved.
+- **Booked with an instructor** - fire only when the court is booked together with an instructor (leave the selector empty for any instructor). Pair it with an **Areas** scope: the rule then adjusts the court's price whether staff book the court and the coach as one booking or a member books them together. It never changes the instructor's own price, and a court booked alone keeps its normal price.
 
 ## How a rule matches a booking
 
@@ -225,6 +226,16 @@ Offer a standing discount to members on a premium plan for personal training.
 - **Adjustment Type**: Percentage, **-20%**.
 - **Scope**: Instructors - your personal trainers.
 - **Conditions**: Plan - your Premium plan.
+
+### Court discount when booked with a coach
+
+Take 2 off the court whenever it is booked together with a coach, at any hour.
+
+- **Adjustment Type**: Fixed amount, **-2**.
+- **Scope**: Areas - your courts (leave empty to cover every court).
+- **Conditions**: Booked with an instructor - leave empty for any instructor.
+
+The discount stacks with your other court rules: a court that costs 28 in a weekday off-peak band costs 26 when a coach is booked with it. The coach is still charged their full rate, and on the booking's transactions the discount appears on the court's line.
 
 ### A published rate card with a holder column
 

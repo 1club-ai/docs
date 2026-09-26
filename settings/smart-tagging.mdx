@@ -38,7 +38,7 @@ Both types behave identically when you filter or segment. A promotion that targe
 The engine treats contacts differently depending on what they are:
 
 - **Members** (contacts with bookings or memberships) are eligible for every enabled category.
-- **Leads** (contacts with no activity yet) only receive the demographic and lifecycle-of-contact categories: **Age**, **Contact stages**, **Relationship**, and **Language**. The activity-based categories (Attendance, Financial, Lifecycle, Loyalty, Membership, Interest) don't apply until the lead becomes a member.
+- **Leads** (contacts with no activity yet) only receive the demographic and lifecycle-of-contact categories: **Age**, **Contact stages**, **Relationship**, and **Language**. The activity-based categories (Attendance, Financial, Lifecycle, Loyalty, Membership, Interest, Progression, Assessment) don't apply until the lead becomes a member.
 - **Staff** (instructors, managers, admins) never receive smart tags. Any auto-tag they picked up before becoming staff is stripped on the next evaluation; their manual tags are kept.
 - **Archived contacts** are frozen - their tags stay as a snapshot and are not recomputed.
 
@@ -117,6 +117,25 @@ A contact with no linked user account (a walk-in or lead who never registered) h
 
 Sport-by-sport tags applied to members who've booked the same sport at least N times. Tags are generated dynamically, one per sport that crosses the threshold, so a member can hold several interest tags at once. The field is **Minimum Bookings per Sport** (default 3). Use these to target audiences with offers relevant to what they already do - for example, a padel-only promotion for members tagged with the padel interest.
 
+### Progression (disabled by default)
+
+Tags members by their levels on your [progression tracks](/settings/progression). The four tags are fixed: you can edit each one's name, colour and threshold, but you can't add or remove rows. A member who holds several tracks gets a tag if any of their tracks qualifies, and can carry more than one.
+
+- **Eligible for Promotion** - has the sessions the next level requires (see [Sessions to the next level](/settings/progression#sessions-to-the-next-level)).
+- **Close to Promotion** - not eligible yet, but has reached a share of the sessions needed (default 80%).
+- **Stalled at Rank** - holds a level but hasn't attended a session in the last N days (default 30).
+- **Recently Promoted** - was promoted in the last N days (default 14). A member's first level, a stripe or a correction never counts as a promotion.
+
+### Assessment (disabled by default)
+
+Tags members by their [assessments](/members/assessments). The three tags are fixed, like Progression.
+
+- **Not Assessed Recently** - attended at least one session in the last N days (default 30) but has no assessment in that time. Members who stopped coming aren't flagged.
+- **Top Performer** - the average of their last 3 assessments is at least a share of the scale (default 80%).
+- **Needs Attention** - the average of their last 3 assessments is at most a share of the scale (default 50%).
+
+The average takes every score on those assessments as a share of its template's scale - the same measure as the average on the member's profile.
+
 ### Engagement scoring (disabled by default)
 
 Sitting at the bottom of the same page, engagement scoring is a related feature rather than a tag category. When enabled, it computes a member engagement score from four weighted inputs - **Financial**, **Services**, **Physical**, and **Engagement** - whose weights must sum to 100%. The score surfaces on the [member engagement](/analytics/marketing) view; it doesn't create tags.
@@ -128,8 +147,8 @@ Sitting at the bottom of the same page, engagement scoring is a related feature 
 3. For each category:
    - Toggle **Enable this tag category** on or off.
    - Edit a tier - adjust the threshold (visits, days, age range, and so on) and rename or recolour the tag.
-   - Add a tier with **Add tag** (not available for Relationship, Language, or Interest, whose rows are fixed or derived).
-   - Delete a tier you don't need (the fixed Unpaid, Parent/Child, and language rows can't be deleted).
+   - Add a tier with **Add tag** (not available for Relationship, Language, Interest, Progression, or Assessment, whose rows are fixed or derived).
+   - Delete a tier you don't need (the fixed Unpaid, Parent/Child, language, progression, and assessment rows can't be deleted).
 4. Save with the floating save alert at the bottom of the page.
 
 Tag names must be unique within a category, and the dialog validates thresholds (for example, minimum visits can't be negative and overdue days must be at least 1).
@@ -140,7 +159,7 @@ After you save, 1Club syncs the tag registry (renames, new tiers, deletions) and
 
 Smart tags are recomputed:
 
-- **Reactively**, on the events that could shift a tag - when a contact is created, a membership is created or cancelled, a payment succeeds or fails, a booking is created, cancelled, marked no-show, or checked in, or a member has a birthday. The affected contact is re-evaluated right away.
+- **Reactively**, on the events that could shift a tag - when a contact is created, a membership is created or cancelled, a payment succeeds or fails, a booking is created, cancelled, marked no-show, or checked in, a member is promoted or a level is corrected or removed, an assessment is added, edited or removed, or a member has a birthday. The affected contact is re-evaluated right away.
 - **Nightly**, as a backstop, for every contact in the organization (runs at 03:00 UTC). This is what catches purely time-based transitions - a membership crossing its expiry window, a lead ageing past "New", a household-role change.
 - **On demand**, via the **Sync tags** button on the Smart tagging page. It re-evaluates everyone and reports how many members were updated.
 
@@ -190,6 +209,8 @@ A jiu-jitsu and muay-thai academy runs junior classes and family memberships.
 
 - Enable **Age** so juniors (13-17) and kids (5-12) are tagged automatically for age-appropriate class messaging.
 - Enable **Relationship** to tag **Parent** and **Child** from household accounts, so you can message parents about their dependents' progress.
+- Enable **Progression** to see who is **Eligible for Promotion** before a grading, and to reach members who are **Close to Promotion** or **Stalled at Rank** with a nudge to keep training.
+- Enable **Assessment** so coaches see who is **Not Assessed Recently**, and so parents of a **Top Performer** can be congratulated automatically.
 
 ### Pilates/yoga studio: recover payments and reward loyalty
 

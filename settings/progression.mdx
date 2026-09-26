@@ -1,7 +1,7 @@
 ---
 title: "Progression tracks"
-description: "Track member skill progression with tracks and levels - martial-arts belts, swim levels, tennis tiers. Enable platform templates, fork and customize them, author your own levels, and assign or promote members with a full progression history."
-keywords: ["progression", "progression track", "level", "belt", "stripes", "skill level", "bjj belts", "swim levels", "promote member", "assign level", "fork template", "progression history"]
+description: "Track member skill progression with tracks and levels - martial-arts belts, swim levels, tennis tiers. Enable platform templates, fork and customize them, author your own levels, set the sessions each level takes, and assign or promote members with a full progression history."
+keywords: ["progression", "progression track", "level", "belt", "stripes", "skill level", "bjj belts", "swim levels", "promote member", "assign level", "fork template", "progression history", "sessions per level", "promotion requirement", "eligible for promotion", "sessions to next belt"]
 ---
 
 A progression track is a named ladder of skill levels that a member advances through over time: the belt system in a jiu-jitsu academy, the graded levels in a kids swim program, or the skill tiers in a tennis club. Each track belongs to one sport and holds an ordered list of levels (for example White, Blue, Purple, Brown, Black). Members are assigned a current level on any enabled track, optionally with stripes and notes, and every change is kept as a dated history entry. You set up the tracks once, and staff assign and promote members from their member profile.
@@ -14,6 +14,7 @@ Typical uses:
 
 - **Belts and stripes** - a jiu-jitsu academy tracks White to Black belt with up to four stripes per belt, and notes each grading in the member's history.
 - **Kids swim levels** - a swim school records which level each child has reached, from water confidence to endurance.
+- **Knowing who is ready to grade** - a Muay Thai gym sets 20 sessions per armband, so students see how close they are and coaches get a list of who is eligible before grading day.
 - **Streaming players into groups** - a tennis gym uses skill tiers from Beginner to Competition to put members in the right coaching group.
 
 See [Worked examples](#worked-examples) for how to set up each of these, plus a Muay Thai armband track.
@@ -33,6 +34,7 @@ A **level** has:
 - **Level** - an optional secondary label shown as a colored chip next to the skill (for example a degree, grade number, or short code).
 - **Color** - an optional hex color used for the level's chip and the belt/line visual on member cards.
 - **Order** - levels are ordered; drag to reorder them into progression sequence.
+- **Sessions** - optional. How many sessions a member needs at the level below before they are eligible for this one. The first level has no **Sessions** field, because there is no level below it to count at.
 
 ## Global templates vs org-owned tracks
 
@@ -70,6 +72,7 @@ Open a custom track (or a global template's Customize view) to edit its levels.
 
 - Click **Add level** to append a row.
 - For each row, fill in the **Skill**, an optional **Level** label, and pick a **Color**.
+- Enter **Sessions** on any level after the first to set how many sessions it takes (see [Sessions to the next level](#sessions-to-the-next-level)). Leave it empty for no requirement.
 - Drag the handle to reorder rows into the correct progression sequence - order is the ladder.
 - Use the delete icon to remove a row. A level cannot be deleted while a member is currently assigned to it; remove or reassign those members first.
 - Set **Stripes per level** for the whole track at the bottom of the dialog.
@@ -96,6 +99,24 @@ Every save appends a dated entry to the member's progression timeline - level ch
 
 The history list under the assign form shows each entry's date, track, level (with belt/line and stripes), and notes, newest first. Delete an individual entry with its trash icon; if you delete the most recent entry, the next-most-recent one becomes the member's current level automatically.
 
+## Sessions to the next level
+
+Set **Sessions** on a level and 1Club counts how many sessions each member has attended toward it.
+
+- **Per level, not a running total.** "Blue belt: 20" means 20 sessions at the level below Blue. The count starts again at every new level, so a later "Black belt: 60" means 60 sessions at the level just below it, not 60 since the member joined.
+- **What counts as a session.** A check-in, or a completed booking - the same count as the member's week streak on their account page, so the two never disagree. Cancelled bookings and no-shows never count. If your gym does not require check-in, a booking counts once the day is over even when the member did not show up, unless you mark it a no-show. Require check-in for an accurate grading count.
+- **When counting starts.** At midnight on your gym's clock, the day after the member earned their current level. The session where a belt is awarded belongs to the level it was earned at. Backdating a level, or correcting its date, recounts automatically.
+- **Every session counts toward every track** the member holds. If you teach two disciplines, a session in one counts toward both.
+
+### Where the count shows
+
+- **Member profile** - the **Progress** tile shows the count with a bar in the next level's color, for example "13 / 20 sessions to Blue belt", or **Eligible for promotion to Blue belt** once the member reaches it.
+- **Member account (portal and website)** - the **Your progression** card on **My account > Overview**, next to the week streak, and the progression section of the member's **Profile** show the same count and bar.
+
+### Eligible is a signal, not a promotion
+
+Reaching the number changes nothing on its own: no level changes and no message is sent. You still promote the member yourself (see [Assigning and promoting a member](#assigning-and-promoting-a-member)). For a list of who is eligible, close, stalled or just promoted, turn on the **Progression** category in [Smart tagging](/settings/smart-tagging#progression-disabled-by-default).
+
 ## Worked examples
 
 ### Adult jiu-jitsu belt system (martial arts)
@@ -111,6 +132,8 @@ Enable or fork the BJJ belt template, or create a track named "Adult BJJ Belts" 
 | 5 | Black belt | Black |
 
 Set **Stripes per level** to `4` to match the IBJJF four-stripe system. When you promote a student, pick the belt and set stripes 0-4; a note like "3rd stripe awarded at May grading" is stored in history.
+
+To show students how close they are, enter **Sessions** on each belt from Blue up and require check-in, so only attended classes count. Turn on the **Progression** smart tags to see who is eligible before your next grading.
 
 ### Learn to swim, kids levels (swimming)
 
@@ -131,6 +154,7 @@ For a `muay-thai` program, author levels mirroring the prajioud armband colors (
 - **Use stripes for intra-level progress.** Set stripes per level only where a level is earned incrementally (belts). Leave it at 0 for graded or tiered programs where you jump level to level.
 - **Write promotion notes.** Notes are stored per history entry and make the timeline a real grading record - capture the date, event, or assessor.
 - **Color consistently.** Reuse the real-world colors of your ladder so the member card belt/line reads at a glance.
+- **Set sessions where attendance drives grading.** Members see exactly how far they are from the next level, which keeps them coming. Require check-in so the count reflects real attendance.
 - **One track per program, not per class.** A track is a syllabus (Adult BJJ, Kids Swim), not a schedule; keep the ladder stable and manage attendance elsewhere.
 
 ## Troubleshooting
@@ -143,6 +167,9 @@ For a `muay-thai` program, author levels mirroring the prajioud armband colors (
 | A level will not delete | A member is currently assigned to that level | Reassign those members to another level, then delete the level |
 | A track does not appear in the member assign dialog | The track is not enabled for your organization | Enable the global template, or confirm the custom track exists, under **Settings > CRM > Progression** |
 | The Stripes selector is missing when assigning a level | The track's **Stripes per level** is set to 0 | Edit the track and set stripes per level to 1 or more |
+| The member sees no session count | The member has no current level, holds the top level, or the next level has no **Sessions** set | Set **Sessions** on the next level |
+| The session count looks lower than expected | Only sessions after the day the current level was earned count, and a booking only counts once it is completed | Check the level's earned date in the member's progression history |
+| A booked member who did not show up was counted | Your gym does not require check-in, so a finished booking counts as attended | Mark the booking as a no-show, or require check-in |
 | Deleting a history entry changed the member's current level | Current level is always the most recent history entry per track | This is expected; the next-most-recent entry becomes current. Add a new assignment to restore the intended level |
 
 ## Related
@@ -150,4 +177,4 @@ For a `muay-thai` program, author levels mirroring the prajioud armband colors (
 - [Member profiles](/members/member-profiles) - where you assign, promote, and review a member's progression and history.
 - [Members analytics](/analytics/members) - reporting across your member base, including progression.
 - [Matches](/members/matches) - the 1club Rating system for objective, match-based skill ranking alongside progression tracks.
-- [Smart tagging](/settings/smart-tagging) - auto-tag members by level and other attributes.
+- [Smart tagging](/settings/smart-tagging) - tag members who are eligible for promotion, close to it, stalled at their level or recently promoted.

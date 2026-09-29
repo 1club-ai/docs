@@ -4,21 +4,20 @@ description: Manage the QR codes, access cards, and PINs that members present at
 keywords: [access cards, credentials, QR code, NFC card, PIN code, check-in, kiosk enrollment, revoke, member identification]
 ---
 
-Access cards is the org-wide registry of the credentials your members use to identify themselves: a QR code on their phone, a physical access card, or a PIN code. Each credential has a type, a unique identifier, a status, and an optional assignment to a contact. When a member presents a credential at a reader or kiosk, the system matches it to a contact and runs the same check-in flow you would run by picking the person by hand.
+Access cards is the org-wide registry of the credentials your members use to identify themselves: a QR code on their phone, a physical access card, or a PIN code. Each credential has a type, a unique identifier, a status, and an optional assignment to a contact. The front desk enrolls and assigns credentials, managers revoke and delete them, and members present them at a reader or kiosk to check in.
 
-This page is named **Access cards** in the admin (URL `/members/access-cards`) even though it covers more than physical cards. The same registry is reachable from the **Members** overflow menu and from a member's profile.
+## When to use it
 
-## Overview
+A credential identifies a member at the door or desk, so nobody has to find their name in a list. When a member presents one at a reader or kiosk, the system matches it to a contact and runs the same check-in flow you would run by picking the person by hand. The registry keeps every credential ever enrolled, so you can see who holds what and shut off a lost card at once.
 
-From Access cards you can:
+Typical uses:
 
-- See every credential ever enrolled in the org, with its assigned contact, type, number, status, and dates.
-- Enroll (add) a new QR code, access card, or PIN and optionally assign it to a member in one step.
-- Assign an unassigned credential to a contact and mark it their primary credential.
-- Revoke an active credential (keeps it as an audit record) or delete an unassigned/revoked one outright.
-- Jump to [Access control settings](/settings/access-control), where check-in mode and identification methods are configured.
+- **An unattended front door** - a 24/7 strength gym hands every member an access card and revokes it when they cancel, so it is rejected at the door immediately.
+- **No hardware at all** - a reformer Pilates studio uses the QR code each member already gets automatically and shows from the member portal.
+- **A keypad entrance** - a bouldering gym gives each member a PIN, and replaces it when someone forgets or shares theirs.
+- **One card for a family** - a padel and tennis gym assigns one access card to every member of a household.
 
-Which credential types you can enroll depends on the identification methods enabled for the club. Only enabled types appear in the **Add Credential** dialog, and the server rejects a disabled type with a message pointing you to **Settings > Access Control > Identification methods**.
+See [Worked examples](#worked-examples) for how to set up each of these.
 
 ## Credential types
 
@@ -30,7 +29,21 @@ There are three credential types, matching the three identification methods conf
 
 The identifier value can be anything that uniquely identifies the credential within your org: a card serial, an NFC UID, a QR string, or a PIN. The hint on the enrollment form is "Enter the card number, NFC ID, or QR code value". When you pick **PIN Code**, the field switches to a PIN entry with the hint "4-10 alphanumeric characters". Identifiers are encrypted at rest and only decrypted for admin display in this grid.
 
+Which credential types you can enroll depends on the identification methods enabled for the club. Only enabled types appear in the **Add Credential** dialog, and the server rejects a disabled type with a message pointing you to **Settings > Access Control > Identification methods**.
+
+## How credentials interact with check-in
+
+How strict the door is, and what happens when a credential is presented, depends on your check-in mode. See [Check-in models](/reference/check-in-models) for the full matrix. Quick summary:
+
+- **Strict** mode requires a credential to match an active booking or membership.
+- **Flexible** mode allows walk-ins and anonymous check-ins.
+- A scanned credential is matched to its primary contact, and the rest of the check-in flow proceeds as if you had selected that contact manually.
+
+Successful scans update the credential's last-used timestamp, so a credential that never registers a scan is a useful signal that a card is faulty or was never handed out.
+
 ## Opening the page
+
+This page is named **Access cards** in the admin (URL `/members/access-cards`) even though it covers more than physical cards. The same registry is reachable from the **Members** overflow menu and from a member's profile.
 
 Go to **Members > Access cards**, or open the overflow menu next to **Add Member** on the member list and pick **Access Cards**. The page shows every credential ever enrolled in the org, newest first.
 
@@ -87,16 +100,6 @@ Revoking captures a reason (defaulting to "Revoked by admin") and by default rev
 - **Suspended** - temporarily disabled.
 - **Revoked** - permanently disabled. The record is kept for the audit trail.
 - **Expired** - past the optional expiry date.
-
-## How credentials interact with check-in
-
-How strict the door is, and what happens when a credential is presented, depends on your check-in mode. See [Check-in models](/reference/check-in-models) for the full matrix. Quick summary:
-
-- **Strict** mode requires a credential to match an active booking or membership.
-- **Flexible** mode allows walk-ins and anonymous check-ins.
-- A scanned credential is matched to its primary contact, and the rest of the check-in flow proceeds as if you had selected that contact manually.
-
-Successful scans update the credential's last-used timestamp, so a credential that never registers a scan is a useful signal that a card is faulty or was never handed out.
 
 ## Worked examples
 

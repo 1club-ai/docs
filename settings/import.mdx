@@ -4,23 +4,26 @@ description: Import members, memberships, plans, classes, bookings, invoices, an
 keywords: [data import, CSV import, import members, AI import, field mapping, bulk import, migrate from legacy system, preview import]
 ---
 
-Data import brings your existing records into 1Club from CSV files. It lives under **Settings > Data Tools > Import** and runs as a four-step wizard: pick what you are importing, upload the file, review a validated preview, then execute. An AI analyzer can detect the record type and map your columns for you, so a file exported from another system usually imports without hand-editing the headers.
+Data import brings your existing records into 1Club from CSV files - usually when you move your gym over from another system or a spreadsheet. It runs as a four-step wizard: pick what you are importing, upload the file, review a validated preview, then execute. An AI analyzer can detect the record type and map your columns for you, so a file exported from another system usually imports without hand-editing the headers.
 
 You can import seven record types: members (contacts), memberships, plans, classes, bookings, invoices, and transactions. Files must be CSV and up to 10 MB.
 
-## Overview
+## When to use it
 
-- **AI-powered import** - upload a CSV and let AI detect the record type and map your columns to 1Club fields, with a confidence score and reasoning.
-- **Manual import** - pick the record type yourself and download a matching template.
-- **Per-type templates** - download a CSV template with the exact expected columns for any record type.
-- **Validated preview** - see total, valid, and invalid row counts and per-row errors before anything is written.
-- **Selective execute** - only valid rows are imported; invalid rows are reported, not saved.
-- **Chained member import** - a single member row can also create a transaction, a membership, a wallet credit, and household dependents.
-- **Idempotent re-runs** - existing members (matched by email) are reused rather than duplicated.
+Use import to start on 1Club with your history intact instead of re-keying members by hand. Nothing is written until you have seen a validated preview, only valid rows are imported, and re-running a file reuses existing members rather than duplicating them.
+
+Typical uses:
+
+- **Migrating members with their memberships** - a padel and tennis gym imports one members file that also creates each member's session-based membership, with sessions already used, and adds children as household dependents.
+- **Plans first, then the people on them** - a martial-arts gym imports its belt-progression plans, then a members file that references those plans by name so each student lands on the right package.
+- **Carrying over class credits** - a Pilates studio imports one-time class-pack memberships with the pack size, so their remaining class credits carry over.
+- **Bringing in past sales** - a climbing gym imports its past day-pass transactions, keyed by the member's email.
+
+See [Worked example: migrating from a legacy system](#worked-example-migrating-from-a-legacy-system) and [Other vertical examples](#other-vertical-examples) for the details.
 
 ## The import wizard
 
-The wizard has four steps, shown as a stepper across the top: **Select Entity**, **Upload File**, **Preview**, and **Import**.
+Import lives under **Settings > Data Tools > Import**. The wizard has four steps, shown as a stepper across the top: **Select Entity**, **Upload File**, **Preview**, and **Import**.
 
 ### Recommended import order
 

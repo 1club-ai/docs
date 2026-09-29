@@ -4,17 +4,17 @@ description: Load a Google Tag Manager container on your member portal and CMS w
 keywords: ["google tag manager", "gtm", "ga4", "google analytics", "conversion tracking", "datalayer", "member portal analytics", "website tracking", "meta pixel"]
 ---
 
-This integration loads a Google Tag Manager (GTM) container on your 1Club public-facing surfaces - the member portal and the CMS website - without any code changes. Paste your container ID once and 1Club injects the GTM snippet on every page load. From there, your GTM workspace controls what fires (GA4, Meta Pixel, conversion pixels, custom tags, and so on).
+This integration loads a Google Tag Manager (GTM) container on your 1Club public-facing surfaces - the member portal and the CMS website - without any code changes. An owner or admin pastes your container ID once and 1Club injects the GTM snippet on every page load. From there, whoever runs your marketing controls what fires from your GTM workspace (GA4, Meta Pixel, conversion pixels, custom tags, and so on).
 
-Google Tag Manager is a paid-plan integration. Organizations on the Free plan or still in the Grow trial cannot save a container ID until they upgrade.
+## When to use it
 
-## Overview
+Use it when you want your own analytics and ad tags on the pages where members sign up, book, and pay. 1Club pushes standard events (page views, sign-up, login, booking, payment, form submit) to the dataLayer, so you can wire them to GA4 or any tag without a redeploy. Consent stays in your hands too: the container works with Google Consent Mode configured in GTM.
 
-- **No-code container loading** - Save a container ID and 1Club injects the GTM snippet; no redeploy needed.
-- **Portal and website** - The same container loads on both the member portal and the CMS website.
-- **Built-in dataLayer events** - 1Club pushes standard events (page views, sign-up, login, booking, payment, form submit) so you can wire them to GA4 or any tag.
-- **Your workspace, your rules** - GA4, Meta Pixel, conversion pixels, and custom tags are all configured inside GTM, not in 1Club.
-- **Consent-ready** - Compatible with Google Consent Mode configured in your container.
+Typical uses:
+
+- **Measuring which ads produce bookings** - forward the `booking_created` event to GA4 and the Meta Pixel, so booking conversions are attributed to campaign and surface.
+- **Separating website leads from portal sign-ups** - trigger on `sign_up`, remap `form_submitted` to GA4's `generate_lead`, and split the reports with `event_source`.
+- **Reporting portal purchases as revenue** - forward `payment_success` to GA4's `purchase` with `transaction_id`, `value`, and `currency`, so checkout revenue appears in GA4's monetization reports.
 
 ## Before you start
 

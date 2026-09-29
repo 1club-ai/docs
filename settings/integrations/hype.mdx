@@ -4,21 +4,21 @@ description: Connect the Hype POS through the Hype Exchange Service to fiscalize
 keywords: [hype, hype pos, fiscalization, kitchen display, point of sale, hype exchange service, service item, order sync, deferred settlement, api token]
 ---
 
-Hype is a point-of-sale and kitchen system. The Hype integration links 1Club to your Hype account through the Hype Exchange Service (HES) so that orders placed in 1Club are pushed to Hype for a compliant fiscal receipt and kitchen display, while your Hype menu (categories and products) syncs back into 1Club. It is aimed at gyms that run a cafe, bar, or kitchen alongside bookings and memberships and need a single fiscalization path for everything they sell.
+Hype is a point-of-sale and kitchen system. The Hype integration links 1Club to your Hype account through the Hype Exchange Service (HES) so that orders placed in 1Club are pushed to Hype for a compliant fiscal receipt and kitchen display, while your Hype menu (categories and products) syncs back into 1Club. An owner or admin installs it, and staff can then take payment for 1Club orders at the Hype counter or terminal.
 
-The integration is provisioned in two hands: Hype support sets up the connection on their side and gives you an API token, and you install that token in 1Club. On the 1Club side the page is labelled **Hype POS**.
+## When to use it
 
-## Overview
+Hype is aimed at gyms that run a cafe, bar, or kitchen alongside bookings and memberships and need a single fiscalization path for everything they sell. Every 1Club order - bookings, memberships, signup fees, and products - is billed against one **Service item** in Hype's catalog, so Hype can fiscalize it without a matching catalog item, while the receipt still prints the real line name. Order state stays in sync both ways: when an order is paid or cancelled at the POS, 1Club updates on its own.
 
-- Push every 1Club order (bookings, memberships, signup fees, and products) to Hype for a compliant fiscal receipt.
-- Sync your Hype menu into 1Club: **Categories** and **Products** flow down and appear under **Synced mappings**.
-- Take payment at the Hype counter or terminal and let 1Club settle the order automatically when Hype confirms it (deferred settlement through a **Hype POS** payment method).
-- Keep order state in sync both ways: when an order is paid or cancelled at the POS, 1Club updates on its own.
-- **Test connection** checks that your token authenticates and shows what Hype's provisioning pipeline is doing (which step of initial sync it is on, and any failed jobs).
-- **Poll queues now** drains Hype's task queues immediately instead of waiting for the background poller.
-- Route all sales through one **Service item** in Hype's catalog, so Hype can fiscalize anything 1Club sells without a matching catalog item on their side.
+Typical uses:
+
+- **A cafe next to the courts** - court bookings and cafe sales both push to Hype for compliant receipts, and the cafe's drinks and snacks sync into 1Club as products.
+- **Taking payment at the counter** - staff choose the **Hype POS** payment method, the member taps their card on the Hype terminal, and 1Club marks the order paid and confirms the booking when Hype confirms it.
+- **Memberships on the same fiscal receipts as the shop** - a yearly membership and its signup fee fiscalize through the service item, and the receipt prints "Membership - Yearly plan" rather than the placeholder name.
 
 ## Before you start
+
+The integration is provisioned in two hands: Hype support sets up the connection on their side and gives you an API token, and you install that token in 1Club. On the 1Club side the page is labelled **Hype POS**.
 
 - You need a Hype account and an integration provisioned by **Hype support**. When they provision it, they give you an **API token** (a bearer token for the Hype Exchange Service). Without a provisioned integration there is nothing for the token to link to.
 - Configuring Hype requires the **settings.manage.organization** permission. Viewing status requires **settings.read.organization**. Admins and users with full settings management can reach this page; other roles cannot.

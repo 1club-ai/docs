@@ -4,22 +4,23 @@ description: Accept card payments through DatecsPay (BORICA) hosted checkout, wi
 keywords: [datecspay, datecs pay, borica, hosted checkout, payment provider, 3-d secure, terminal id, merchant id, test mode, live mode]
 ---
 
-DatecsPay is a card payment provider you can use instead of Stripe or myPOS. It is built on BORICA's hosted checkout: customers are redirected to BORICA's secure page to enter their card details (with EMV 3-D Secure), then bounced back to 1Club once the payment completes. Card data never touches 1Club servers, and every request is signed with your own RSA key.
-
-Unlike Stripe and myPOS, DatecsPay has no free shared sandbox. Both the **Test** and **Live** environments run against BORICA with your own credentials - only the terminal and gateway differ between them.
+DatecsPay is a card payment provider you can use instead of Stripe or myPOS, built on BORICA's hosted checkout. When a customer pays for a booking, class, membership, or outstanding balance, they are redirected to BORICA's secure page to enter their card details (with EMV 3-D Secure), then bounced back to 1Club once the payment completes. An owner or admin connects it once with your gym's own BORICA credentials.
 
 <Note>
 If you invoice through more than one company, each connects its own account. Pick the company at the top of this page before you connect or edit credentials, and money for its sales settles into that account. See [Billing entities](/billing/billing-entities).
 </Note>
 
-## Overview
+## When to use it
 
-- Hosted-checkout payments: customers pay on BORICA's page and return to 1Club, so no card data touches your systems.
-- Two environments: a **Test** gateway and a **Live** production gateway. Both need a full set of BORICA credentials - there is no credential-free sandbox.
-- Charges the same surfaces as your other payment provider: bookings, classes, memberships, and outstanding balances.
-- **Test configuration** runs a local check of your stored key and certificate; a real test payment is the true proof they work.
-- Payment status returns automatically - through the cardholder's browser on return, a signed BORICA notification, and a reconciliation sweep that catches anyone who closes the tab early.
-- Only one hosted-checkout card provider (DatecsPay or myPOS) can be active at a time.
+DatecsPay suits a gym whose bank or acquirer has provisioned a BORICA terminal. Card data never touches 1Club servers, and every request is signed with your own RSA key. Payment status comes back on its own - through the cardholder's browser on return, a signed BORICA notification, and a reconciliation sweep that catches anyone who closes the tab early.
+
+Unlike Stripe and myPOS, DatecsPay has no free shared sandbox. Both the **Test** and **Live** environments run against BORICA with your own credentials - only the terminal and gateway differ between them.
+
+Typical uses:
+
+- **A gym already banking with BORICA** - take card payments online through the BORICA terminal your bank issued, with no Stripe or myPOS account.
+- **Rehearsing checkout before going live** - run the full checkout against BORICA's test gateway with your test terminal, where no real money moves, then switch to **Live**.
+- **A member who closes the tab mid-payment** - the membership still settles, because the reconciliation job confirms the charge with BORICA within a few minutes, with no staff action.
 
 ## Before you start
 

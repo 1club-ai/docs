@@ -4,18 +4,17 @@ description: Turn 1Club memberships and bookings into physical door access throu
 keywords: ["weblock", "valnes", "access control", "door access", "physical access", "pin", "keycard", "rfid", "light rules", "group mapping", "business id"]
 ---
 
-The WebLock integration ties 1Club to the Valnes WebLock physical access control system. Memberships and bookings in 1Club become access grants in WebLock, so the right doors open at the right times without staff handing out PINs or fobs by hand. Area-to-device mappings also let bookings drive WebLock light rules, so a court or studio lights up while it is in use.
+The WebLock integration ties 1Club to the Valnes WebLock physical access control system. Memberships and bookings in 1Club become access grants in WebLock, so the right doors open at the right times without staff handing out PINs or fobs by hand. An owner or admin maps plans, bookings, and areas to WebLock once; members then get in with their check-in PIN or key card.
 
-WebLock is a paid-plan integration. Organizations on the Free plan or still in the Grow trial cannot configure or test it until they upgrade.
+## When to use it
 
-## Overview
+Use it when door access should follow what members have paid for and booked. Grants are created from memberships and bookings, and removed automatically when a booking is cancelled or a membership expires. Area-to-device mappings also let bookings drive WebLock light rules, so a court or studio lights up while it is in use, and separate buffers control how early access opens and how early light rules apply relative to a booking.
 
-- **Membership-driven access** - Active members on a plan are granted the WebLock group you map that plan to.
-- **Booking-driven access** - One-off bookings grant a group based on the area type, class type, or instructor type of the booking.
-- **Per-usage credentials** - Each grant carries the contact's check-in PIN and any key cards; if a contact has neither, WebLock generates a one-time PIN for the grant.
-- **Light rules from the schedule** - Map an area to a WebLock reader so its lighting rule applies while a booking is active.
-- **Configurable buffers** - Separate buffers control how early access opens and how early light rules apply relative to a booking.
-- **Automatic revocation** - Cancelling a booking or expiring a membership removes the matching grant.
+Typical uses:
+
+- **Access outside staffed hours for members on a plan** - a climbing gym maps its Unlimited plan to a group covering the front door and bouldering hall, members get in with their check-in PIN, and lapsed members lose access without staff intervention.
+- **A court door and its lights tied to the booking** - a padel gym maps its court area type to a Courts group and each court to its own reader, so a booking lets players in a little early and switches the court's lights on just before the slot.
+- **A private room for coached sessions** - a jiu-jitsu academy maps an instructor type to a Private room group, so only the coaching room opens for private sessions.
 
 ## How access is decided
 
@@ -27,6 +26,8 @@ When 1Club syncs a grant, it picks the WebLock group in this order:
 Credentials come from the contact: their 1Club check-in PIN and RFID/NFC key cards are pushed to WebLock as PIN and keycard entries. When a contact has no PIN or key card, WebLock generates a one-time PIN for that grant.
 
 ## Before you start
+
+WebLock is a paid-plan integration. Organizations on the Free plan or still in the Grow trial cannot configure or test it until they upgrade.
 
 - A WebLock (Valnes) account with a **Business ID**, and groups and readers already configured in the WebLock console.
 - The list of groups and readers you intend to map. 1Club fetches them after you connect and test, but knowing what each one represents on the physical side makes mapping faster.

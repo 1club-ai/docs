@@ -12,28 +12,51 @@ keywords:
   - leaderboard
 ---
 
-**Matches** let you record the outcome of competitive games between members and turn those results into a per-sport skill rating for each player. Every recorded match is scored with the Glicko-2 algorithm, so a player's rating reflects not just wins and losses but the strength of their opponents and how confident the system is in the estimate. The page lives at **Members > Matches** and appears once you turn on the 1club Rating feature.
+**Matches** let you record the outcome of competitive games between members and turn those results into a per-sport skill rating for each player. Every recorded match is scored with the Glicko-2 algorithm, so a player's rating reflects not just wins and losses but the strength of their opponents and how confident the system is in the estimate. Staff log the games and review the rating history that comes out of them.
 
-## Overview
+## When to use it
 
-The Matches page is where staff log games and review the rating history that comes out of them.
+Ratings give your racket-sports players a per-sport measure of skill, and a ranking you don't have to keep in a spreadsheet. Matches tied to a real booking count in full, casual results count at half weight, and friendly games are kept for the record without touching anyone's rating.
 
-Key capabilities:
+Typical uses:
 
-- **Record match results** - Log a match between two sides for a supported sport, with set-by-set scores and an auto-detected winner.
-- **Per-sport player ratings** - Every player carries an independent rating for each sport, computed with Glicko-2.
-- **Singles and doubles** - Head-to-head matches (tennis, pickleball) and team matches (padel doubles) are both supported.
-- **Ranked vs friendly** - Choose whether a match feeds the rating system or is recorded for the record only.
-- **Verified matches** - Matches anchored to a real booking carry full rating weight; casually recorded ones count at a reduced weight.
-- **Edit and disqualify** - Correct a mis-entered result or void a match, reversing its rating impact.
-- **Rating on the member profile** - Each member's matches and ratings surface on their profile.
-- **Filtering** - Filter the list by sport, type, and status.
+- **Ranked singles on a booked court** - two tennis members play a best-of-three on a reserved court, and both ratings update the moment you save the score.
+- **Padel doubles with mixed experience** - a beginner paired with a regular sees their own rating move more than their partner's, because the change is shared by rating uncertainty.
+- **A gym ladder** - you record every game of an informal pickleball ladder as a ranked singles match, and sorting members by their pickleball rating gives you the ladder.
+- **A casual result reported at the desk** - a friendly tennis game with no booking is recorded as ranked at half weight, or as friendly so ratings stay put.
+
+See [Worked examples](#worked-examples) for each of these step by step.
 
 <Note>
 Matches and ratings are separate from **progression levels** (belts, tiers, skill grades). Recording a match never changes a member's progression assignment, and vice versa. See [Member profile](/members/member-profiles) for progression.
 </Note>
 
+## How ratings work
+
+Ratings use **Glicko-2** (Glickman, 2013). Each player has one rating per sport, so a strong tennis player who is new to padel carries two independent numbers. Three values describe each rating:
+
+- **Rating** - The skill estimate. Everyone starts at **1000**.
+- **Rating deviation (RD)** - How uncertain the system is about the rating. New players start at **200**. A high RD means the rating can still move a lot; as a player logs more matches, RD shrinks and the rating settles.
+- **Volatility** - How erratic a player's recent results have been. Starts at **0.06**.
+
+A player's rating row is created automatically the first time they appear in a match, seeded with those defaults. Every rated match also increments their **games played** count and records the date of their last match.
+
+### What moves a rating
+
+- Only **ranked** matches change ratings. Friendly matches never do.
+- **Beating a stronger opponent** raises your rating more than beating a weaker one; the reverse is true for losses.
+- **New players move fast.** Because their RD starts high, early matches produce large swings (roughly plus or minus 80 points on the first ranked match). After a handful of matches, RD drops and results move the rating in smaller increments.
+- **Verified matches** (linked to a booking) apply the full change; **unverified** matches apply half.
+- A **win** counts as 1, a **loss** as 0, and a **draw** as 0.5 from each player's perspective. The set-based dialog always resolves to a winner, so recording a true draw is a rating-math capability rather than something the standard dialog produces.
+
+### Singles vs doubles
+
+- **Singles** (tennis, pickleball) run standard head-to-head Glicko-2 between the two players.
+- **Doubles / teams** (padel) are computed by first averaging each side into a single team rating, running Glicko-2 team-versus-team, then distributing the team's change back to its members. The share each player absorbs is weighted **inversely by their RD**: a less-established player (high RD) moves more, while a seasoned partner (low RD) barely budges. This keeps a strong veteran from swinging wildly because they happened to partner with a beginner.
+
 ## Turn on 1club Rating
+
+The Matches page lives at **Members > Matches** and appears once you turn on the 1club Rating feature.
 
 The Matches page and all rating behavior are gated behind an organization feature flag. Until it is on, there is no Matches menu item, no Matches tab on member profiles, and the match API returns a "not enabled" error.
 
@@ -96,29 +119,6 @@ To void a match, use **Disqualify** from the row actions or the detail page. You
 <Note>
 Reverting a rating (on edit or disqualify) subtracts the delta that this specific match applied. If the same players have played later matches in the same sport, those later results are not re-derived end to end, so the correction is close but approximate. This is a deliberate trade-off - moderation events are rare.
 </Note>
-
-## How ratings work
-
-Ratings use **Glicko-2** (Glickman, 2013). Each player has one rating per sport, so a strong tennis player who is new to padel carries two independent numbers. Three values describe each rating:
-
-- **Rating** - The skill estimate. Everyone starts at **1000**.
-- **Rating deviation (RD)** - How uncertain the system is about the rating. New players start at **200**. A high RD means the rating can still move a lot; as a player logs more matches, RD shrinks and the rating settles.
-- **Volatility** - How erratic a player's recent results have been. Starts at **0.06**.
-
-A player's rating row is created automatically the first time they appear in a match, seeded with those defaults. Every rated match also increments their **games played** count and records the date of their last match.
-
-### What moves a rating
-
-- Only **ranked** matches change ratings. Friendly matches never do.
-- **Beating a stronger opponent** raises your rating more than beating a weaker one; the reverse is true for losses.
-- **New players move fast.** Because their RD starts high, early matches produce large swings (roughly plus or minus 80 points on the first ranked match). After a handful of matches, RD drops and results move the rating in smaller increments.
-- **Verified matches** (linked to a booking) apply the full change; **unverified** matches apply half.
-- A **win** counts as 1, a **loss** as 0, and a **draw** as 0.5 from each player's perspective. The set-based dialog always resolves to a winner, so recording a true draw is a rating-math capability rather than something the standard dialog produces.
-
-### Singles vs doubles
-
-- **Singles** (tennis, pickleball) run standard head-to-head Glicko-2 between the two players.
-- **Doubles / teams** (padel) are computed by first averaging each side into a single team rating, running Glicko-2 team-versus-team, then distributing the team's change back to its members. The share each player absorbs is weighted **inversely by their RD**: a less-established player (high RD) moves more, while a seasoned partner (low RD) barely budges. This keeps a strong veteran from swinging wildly because they happened to partner with a beginner.
 
 ## Rating settings
 

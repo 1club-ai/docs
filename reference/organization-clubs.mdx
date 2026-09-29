@@ -4,16 +4,14 @@ description: How 1Club's multi-tenant model works - organizations as the top-lev
 keywords: ["organization", "club", "multi-tenant", "tenant", "location", "venue", "org switcher", "club switcher", "all clubs", "organizationId", "data scope"]
 ---
 
-Every record in 1Club belongs to an **organization** - the top-level tenant that owns your members, bookings, plans, invoices, messages, and settings. An organization has one or more **clubs**, the physical locations (a gym, studio, court complex, or venue) where activity actually happens. A single user can belong to more than one organization, and when they open the admin they work inside one organization at a time.
+Every record in 1Club belongs to an **organization** - the top-level tenant that owns your members, bookings, plans, invoices, messages, and settings, and the unit of billing, branding, and permissions. An organization has one or more **clubs**, the physical locations (a gym, studio, court complex, or venue) where activity actually happens. A single user can belong to more than one organization, with a different role in each, and when they open the admin they work inside one organization at a time.
 
-## Overview
+## When this matters
 
-- **Organization is the tenant** - It is the unit of billing, branding, and permissions. All data is scoped by `organizationId`, so you only ever see and manage the organization you are currently using.
-- **Clubs are locations within an org** - One organization can run several clubs (for example "Downtown Gym" and "North Studio"), each with its own address, opening hours, sports, and amenities.
-- **Multi-org users** - The same login can belong to multiple organizations with a different role in each. An organization switcher moves you between them.
-- **Multi-club navigation** - Inside one organization you can switch the active club, and admins can select an aggregated "All clubs" view.
-- **Per-org isolation** - Switching organization clears cached data so records from one org never leak into another.
-- **Scope shapes permissions** - Roles are granted per organization, and permissions carry a scope (organization, club, or own) that decides how much you see.
+- **Opening a second location** - add it as another club in the same organization, so the two share memberships, billing, and branding while each keeps its own address, hours, sports, and amenities.
+- **Running two separate businesses** - keep them as two organizations under one login, each with its own Stripe account and member base, and move between them with the organization switcher.
+- **Comparing locations** - admins switch to **All clubs** for the org-wide picture, while front-desk staff work within one club.
+- **Data that seems to be missing** - most "missing data" reports are really the wrong organization or club selected in the sidebar switchers.
 
 ## Organizations
 

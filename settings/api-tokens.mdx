@@ -4,19 +4,19 @@ description: Create, scope, edit, and revoke API tokens for programmatic integra
 keywords: [api tokens, api keys, scopes, programmatic access, integrations, webhooks, revoke token]
 ---
 
-API tokens are keys that external systems - your website, an integration, or a script - use to read and write your organization's data through the public API, without anyone sharing an admin login. Each token carries its own set of scopes and its own optional expiry, so you can grant exactly the access an integration needs and revoke it independently.
+API tokens are keys that external systems - your website, an integration, or a script - use to read and write your organization's data through the public API, without anyone sharing an admin login. Each token carries its own set of scopes and its own optional expiry, so you can grant exactly the access an integration needs and revoke it independently. Owners and admins create and manage tokens, and hand them to whoever runs the integration.
 
-## Overview
+## When to use it
 
-From **Settings > Organization > APIs & webhooks** you can:
+Create a token whenever software, rather than a person, needs your data. Give each integration its own token with only the scopes it needs and an expiry that matches how long it should live, so one leaked or retired key never exposes more than it has to.
 
-- **Create tokens** with a name, optional description, scopes, and an optional expiry.
-- **Scope each token** to specific resources and actions (read, write) so it can only touch what it needs.
-- **Edit** a token's name, description, scopes, and expiry after creating it.
-- **Revoke** a token instantly when it is no longer needed or may be compromised.
-- **See at a glance** each token's prefix, scopes, expiry, last-used date, and created date.
+Typical uses:
 
-The same page also hosts **Webhooks**. MCP connections now have a separate page under **Settings > Artificial Intelligence** and use OAuth instead of API tokens.
+- **A website showing your timetable** - a padel gym's marketing site reads **Classes**, **Clubs**, and **Areas** with a read-only token that can never change anything.
+- **Piloting a booking integration** - a climbing gym gives a third-party kiosk read and write access to bookings on a one-month token, then extends or reissues it once the pilot is stable.
+- **A one-off export** - a yoga studio pulls a year of transactions for reconciliation with a read-only token that expires after a day.
+
+See [Worked examples](#worked-examples) for the exact scopes and expiry behind each of these.
 
 <Note>
 Programmatic API access is a paid feature. On a free or trial plan you can view and revoke existing tokens, but the **Add** button is disabled until you upgrade. A banner at the top of the page explains this when it applies.
@@ -30,6 +30,8 @@ Programmatic API access is a paid feature. On a free or trial plan you can view 
 In practice, only admins (and owners) hold organization settings management, so managers and other roles cannot create or view API tokens. See [Roles and permissions](/reference/roles-permissions).
 
 ## Creating a token
+
+API tokens live on **Settings > Organization > APIs & webhooks**. The list shows each token's prefix, scopes, expiry, last-used date, and created date.
 
 1. Click **Add** in the API tokens section.
 2. Fill in the token details:

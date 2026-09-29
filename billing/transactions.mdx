@@ -20,23 +20,18 @@ keywords:
 
 A transaction is a single line of "X owes Y for Z." It is the financial obligation record - what is owed. Every chargeable event in 1Club (a booking, a membership creation, a recurring membership period, a signup fee, a product sale, an external program entry) writes exactly one transaction. Settlement happens separately through [payments](/billing/payments), linked to transactions over a join table. Keeping the two apart means one transaction can be settled by several payments (a deposit then a balance), and one payment can clear several transactions at once.
 
-Open the page at **Revenue > Transactions**. The grid pages on the server and is tab-filtered into **All**, **Pending**, **Overdue**, **Paid**, and **Void**, with a live count badge on each tab.
+## When to use it
 
-**Void has its own tab, and voided rows are excluded from All.** Voided charges are not owed and not revenue, so leaving them in the default view inflated every count and total you read off the page. They are still there for audit whenever you need them - just one tab across.
+Transactions are the ledger of every obligation across the organization, filterable by status, contact, membership, booking, revenue account, and date range. Each row shows what is still owed after succeeded payments, so you always know the real figure to collect. Owners and staff who handle billing use it to collect balances one by one or in bulk, wrap a charge into an invoice, void what should never have existed, and add an ad-hoc charge that has no booking or membership behind it.
 
-## Overview
+Typical uses:
 
-From the Transactions page you can:
+- **Charging a clinic roster after the session** - a padel gym selects every pending booking from its weekly clinic and charges each player's saved card in one batch.
+- **Recording cash for a group of drop-ins** - a jiu-jitsu gym settles six open-mat visitors who paid cash at the desk with a single manual payment action.
+- **Collecting from a member with no card on file** - a yoga studio emails a myPOS payment link for a membership started over the phone, and the transaction settles when the member pays.
+- **Clearing charges nobody paid** - after a rained-off tournament, you void thirty unpaid entry charges in one go and refund the few members who had already paid.
 
-- **Read the ledger** - every obligation across the organization, filterable by status, contact, membership, booking, revenue account, and date range.
-- **See what is still owed** - a per-row remaining balance that subtracts succeeded payments and mid-flight membership discounts, so the column agrees with the Add payment dialog.
-- **Record a settlement** - add a manual or Stripe payment against a single transaction.
-- **Batch charge** - charge many customers' saved cards in one action (Stripe).
-- **Batch record manual payments** - log cash or bank-transfer settlements for many transactions at once.
-- **Send a myPOS payment link** - email a customer a secure link to pay on their own device (when myPOS is connected).
-- **Wrap a transaction into an invoice** - turn a single obligation into a sendable document.
-- **Void** an obligation that should never have existed.
-- **Create an ad-hoc transaction** by hand for a charge that has no booking or membership behind it.
+See [Worked examples](#worked-examples) for the steps behind each of these.
 
 ## Transaction vs payment
 
@@ -48,6 +43,10 @@ These are two different records, and the distinction drives everything on this p
 So "recording a payment" and "the transaction becoming paid" are two steps: you record a payment, and its outcome then drives the transaction's status (see [How payment status flows](#how-payment-status-flows)). This is why a transaction can sit at `partially_paid`, and why voiding a transaction does not touch any money that was already collected against it.
 
 ## Anatomy of a transaction
+
+Open the page at **Revenue > Transactions**. The grid pages on the server and is tab-filtered into **All**, **Pending**, **Overdue**, **Paid**, and **Void**, with a live count badge on each tab.
+
+**Void has its own tab, and voided rows are excluded from All.** Voided charges are not owed and not revenue, so leaving them in the default view inflated every count and total you read off the page. They are still there for audit whenever you need them - just one tab across.
 
 Each row carries:
 

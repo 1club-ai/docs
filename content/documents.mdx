@@ -4,21 +4,29 @@ description: Define signable documents (liability waivers, terms, policies) and 
 keywords: [waiver, liability waiver, document rule, required document, typed-name acceptance, consent, onboarding, compliance, minor waiver, guardian]
 ---
 
-Documents and waivers are the signable agreements your members accept - liability waivers, terms of service, codes of conduct, and policies. Each document is paired with one or more **document rules** that decide who must accept it and how strictly acceptance is enforced. A document rule describes whether a signup or setup document is required and how it is gated, so the right people are asked to sign the right agreements at the right moment.
+Documents and waivers are the signable agreements your members accept - liability waivers, terms of service, codes of conduct, and policies. Each document is paired with one or more **document rules** that decide who must accept it and how strictly acceptance is enforced, so the right people are asked to sign the right agreements at the right moment. Owners and admins set up documents and rules, and members accept them during signup, in the portal, or in the app.
 
-Manage both from **Settings > Operations > Documents & Waivers** (route `/settings/operations/waivers`). The page has two sections: **Documents** (the agreements themselves) and **Document Rules** (the targeting and enforcement layer on top of them).
+## When to use it
 
-## Overview
+Rules target each agreement at the people it applies to, and a mandatory document gates a member until they accept it. You stop chasing signatures by hand, and nobody is asked to sign something that doesn't apply to them.
 
-- **Author documents** - Documents are content items of type `document`, written in the same block editor as posts and FAQs. They carry a title, slug, body, and language variants.
-- **Target an audience** - Each rule filters by contact type, plan, tags, and household role. A contact must match every populated filter category to be asked to sign.
-- **Mandatory gating** - A mandatory document blocks a member from using the platform until they accept it (it drives the incomplete-setup state). Optional documents are surfaced but never block.
-- **Typed-name acceptance** - Require members to scroll through the document and type their full name before they can accept. Available only on mandatory documents.
-- **Guardian signing for minors** - Target a rule at the `dependent` household role; the guardian accepts on the dependent's behalf during signup.
-- **Multiple rules per document** - The same document can be targeted by several rules. When rules overlap, the strictest wins: any mandatory rule makes it mandatory, any typed-name rule makes typed-name required.
-- **Version-aware, not disruptive** - A signature counts as accepted regardless of the stored document version. Cosmetic edits to a published document do not re-gate members who already signed.
+Typical uses:
+
+- **A waiver for one plan only** - a climbing gym requires a lead-climbing liability waiver, with a typed name, only from members on its **Lead Climbing** plan.
+- **A minor's waiver signed by the parent** - a jiu-jitsu academy targets its youth waiver at dependents, so the parent accepts it for each child during signup.
+- **A release for every drop-in** - a padel gym asks every drop-in visitor who pays per court to sign a court-use release.
+
+See [Worked examples](#worked-examples) for the exact rule settings.
+
+## How it works
+
+The same document can be targeted by several rules. When rules overlap, the strictest wins: any mandatory rule makes it mandatory, and any typed-name rule makes typed name required.
+
+A signature counts as accepted regardless of the stored document version, so cosmetic edits to a published document don't re-gate members who already signed.
 
 ## Authoring a document
+
+Manage documents and their rules from **Settings > Operations > Documents & Waivers** (route `/settings/operations/waivers`). The page has two sections: **Documents** (the agreements themselves) and **Document Rules** (the targeting and enforcement layer on top of them).
 
 A document is a CMS content item with its type set to `document`, so it is written in the same block editor as your other [content](/content/overview) (posts, FAQs, reusable blocks), with the same title, slug, body, and language-variant support.
 

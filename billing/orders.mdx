@@ -17,19 +17,19 @@ keywords:
   ]
 ---
 
-An order is a single purchase container that groups one or more line items a member is buying together - memberships, products, court and class bookings, event tickets, and packages. Each order carries its own status, an aggregate payment status, and links out to the bookings, memberships, and transactions it creates when it is completed. Use **Revenue > Orders** to review, complete, and cancel every purchase your organization has taken.
+An order is a single purchase container that groups one or more line items a member is buying together - memberships, products, court and class bookings, event tickets, and packages. Each order carries its own status, an aggregate payment status, and links out to the bookings, memberships, and transactions it creates when it is completed. Orders come from the front desk at the point of sale, from members checking out in the portal, and from booking flows; owners, managers, and front-desk staff then review, complete, and cancel them.
 
-## Overview
+## When to use it
 
-The **Orders** tab is the record of every basket your organization has assembled, whether it came from the point of sale, a member checking out in the portal, or an admin building a purchase by hand.
+The **Orders** tab is the record of every basket your organization has assembled. It shows what a member bought together on one receipt, whether the money is in, and lets you finish a draft or reverse a finished purchase with everything it created.
 
-- **Multi-line containers** - One order can mix a membership, a court booking, and a couple of retail products on the same receipt.
-- **Line item types** - Orders hold `booking`, `membership`, `membership signup fee`, `product`, `discount`, and `package` lines.
-- **Lifecycle** - Every order is **Draft**, **Completed**, or **Cancelled**.
-- **Two statuses per order** - An order status (draft/completed/cancelled) and a rolled-up payment status (paid, partially paid, pending, or refunded) across its transactions.
-- **Fulfilment on completion** - Completing a draft turns its lines into real bookings, memberships, and product transactions, and records payment.
-- **Reversible** - Cancelling a completed order reverses its bookings, cancels its memberships, and voids its transactions.
-- **Linked records** - Each order line links to the booking, membership, and transaction it produced, so you can trace a purchase end to end.
+Typical uses:
+
+- **A court plus a racket rental** - a padel member books an hour on court and rents a racket at the desk, paid by card in one order, with each line linked to the booking and transaction it produced.
+- **A drop-in who changes their mind** - a jiu-jitsu visitor pays cash for a mat session and a bottle of water, then decides not to train, so you cancel the completed order to void its transactions and refund the cash from the payment record.
+- **A membership with a joining fee** - a Pilates client joins a monthly reformer plan, and the order carries the membership and its signup fee as separate lines.
+
+See [Worked examples](#worked-examples) for more.
 
 ## What an order contains
 
@@ -43,7 +43,19 @@ An order is the parent; its **line items** are the children. Each line has a typ
 
 An order also carries a **member** (the contact it belongs to), an optional **club**, and an optional order-level **note** (for example kitchen instructions or a buzzer/pager number for a food order). A product-only order can be anonymous, but any order containing a booking or membership line must have a member attached.
 
+## How orders relate to transactions, invoices, and payments
+
+An order is the top of the money trail:
+
+- **Order -> transactions** - Completing an order creates one transaction per billable line (a booking transaction, a membership transaction, a product transaction). The order's payment status is the roll-up of these transactions' statuses. See [Transactions](/billing/transactions).
+- **Transactions -> invoices** - Transactions can be grouped onto an invoice for the member. The invoice is the document; the order is the basket that produced the underlying transactions. See [Invoices](/billing/invoices).
+- **Transactions -> payments** - A payment is recorded against one or more transactions to settle them. Completing an order records a payment against the order's transactions with the method you selected. See [Payments](/billing/payments).
+
+The order detail page surfaces these links directly. Each line's **Linked to** column deep-links to the **booking**, **membership**, and **transaction** it produced, and when an order has been synced to an external system (for example a POS for fiscalisation) an **Integrations** card shows the linked system and sync time.
+
 ## The order list
+
+Use **Revenue > Orders** to review, complete, and cancel every purchase your organization has taken.
 
 Open **Revenue > Orders**. The list shows every order with these columns:
 
@@ -121,16 +133,6 @@ What cancelling does depends on the order's state:
 ## Editing a draft
 
 Only **draft** orders can be edited. Editing replaces the order's line items and, optionally, its member, club, and note. Once an order is completed it is immutable - you cancel and rebuild rather than edit. Attempting to edit a non-draft order is rejected with "Only draft orders can be updated".
-
-## How orders relate to transactions, invoices, and payments
-
-An order is the top of the money trail:
-
-- **Order -> transactions** - Completing an order creates one transaction per billable line (a booking transaction, a membership transaction, a product transaction). The order's payment status is the roll-up of these transactions' statuses. See [Transactions](/billing/transactions).
-- **Transactions -> invoices** - Transactions can be grouped onto an invoice for the member. The invoice is the document; the order is the basket that produced the underlying transactions. See [Invoices](/billing/invoices).
-- **Transactions -> payments** - A payment is recorded against one or more transactions to settle them. Completing an order records a payment against the order's transactions with the method you selected. See [Payments](/billing/payments).
-
-The order detail page surfaces these links directly. Each line's **Linked to** column deep-links to the **booking**, **membership**, and **transaction** it produced, and when an order has been synced to an external system (for example a POS for fiscalisation) an **Integrations** card shows the linked system and sync time.
 
 ## Worked examples
 

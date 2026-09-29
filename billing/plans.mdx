@@ -4,21 +4,33 @@ description: Membership and pass templates in 1Club - price, billing frequency, 
 keywords: ["plan", "membership plan", "pass", "class pack", "billing frequency", "recurring membership", "signup fee", "unlimited plan", "10-class pack", "auto renewal", "valid for", "generic plan"]
 ---
 
-A plan is the template you sell to members. It defines the price, the billing cadence, the usage allowance, what the plan grants access to, and a few visibility and accounting fields. When someone is enrolled in a plan they get a [membership](/members/memberships) record; the plan itself just describes the offer.
+A plan is the template you sell to members. It defines the price, the billing cadence, the usage allowance, what the plan grants access to, and a few visibility and accounting fields. When someone is enrolled in a plan they get a [membership](/members/memberships) record; the plan itself just describes the offer. Owners and admins set plans up, the front desk sells them, and members buy them online.
 
-Plans live under **Revenue > Plans** in the admin (the **Revenue** menu is at route `/billing`). The page opens on the **Active** tab; switch to **Inactive** to see archived offers.
+## When to use it
 
-## Overview
+Create a plan for every membership or pass you sell. One plan can be recurring or a one-time pass, cap how often it can be used, limit which classes, courts, or instructors it covers, add a signup fee or starter wallet credit, and be shown publicly, to members only, or kept private for staff-assisted signups. Trials and intro prices attach to a plan as [promotions](/marketing/promotions).
 
-- **Sell recurring or one-time** - Monthly, weekly, quarterly, annual, or a custom period for recurring memberships, or a one-time pass with a fixed validity window.
-- **Cap usage** - Limit how many sessions a plan grants per period (recurring) or in total (one-time), counted per booking or per hour.
-- **Scope access** - Point a plan at specific class types, area types, or instructor types, or make it valid for all bookings. Leave the scope empty for a generic plan used only for check-ins and dynamic pricing.
-- **Add fees and credit** - Attach a one-off signup fee and grant wallet credit when the membership activates.
-- **Control visibility** - Show a plan publicly, to members only, or keep it private for staff-assisted signups.
-- **Group and order** - Assign plans to categories and set a single global sort order used everywhere they appear.
-- **Attach promotions** - Model free trials, intro pricing, and discount codes as [promotions](/marketing/promotions) targeted at the plan.
+Typical uses:
+
+- **An unlimited monthly membership** - a yoga studio sells an all-access monthly pass that auto-renews, with an optional off-peak version that only works before 4pm.
+- **A class pack that expires** - a Pilates studio sells 10 reformer classes valid for 60 days after purchase.
+- **Court hours per month** - a padel gym sells a monthly membership with eight court hours, counted per hour rather than per booking.
+- **A drop-in day pass** - a one-day pass for visitors who check in at the front desk rather than booking.
+
+See [Worked examples](#worked-examples) for the settings behind each of these.
+
+## How plans turn into transactions
+
+When a contact buys a plan you get a membership and, immediately, a transaction:
+
+- **One-time plans**: one transaction at the plan's price, plus a separate `membership_signup_fee` transaction when the signup fee is set.
+- **Recurring plans**: a `membership_creation` transaction for the current period, with the next period scheduled. An hourly job creates a fresh `membership_recurrence` transaction when each period rolls over.
+
+For plans that have a stored Stripe payment method on file and **Require payment upfront** on, the recurrence job also attempts to charge immediately. If the charge fails or no default method is on file, the transaction is left `pending` and you collect through the [Invoices](/billing/invoices) or [Transactions](/billing/transactions) flow. See the [Revenue overview](/billing/overview) for the full charge lifecycle.
 
 ## The plans list
+
+Plans live under **Revenue > Plans** in the admin (the **Revenue** menu is at route `/billing`). The page opens on the **Active** tab; switch to **Inactive** to see archived offers.
 
 **Revenue > Plans** shows plans as a sortable list. Each row displays:
 
@@ -99,15 +111,6 @@ The plan-details page has a **Promotions** section listing everything currently 
 - **Coded promotion** - leave **Auto-apply** off and give the discount a code to share via email or partners. Members or staff enter the code at checkout.
 
 See the [Promotions](/marketing/promotions) page for the full set of controls (schedule, redemption caps, audience targeting, analytics).
-
-## How plans turn into transactions
-
-When a contact buys a plan you get a membership and, immediately, a transaction:
-
-- **One-time plans**: one transaction at the plan's price, plus a separate `membership_signup_fee` transaction when the signup fee is set.
-- **Recurring plans**: a `membership_creation` transaction for the current period, with the next period scheduled. An hourly job creates a fresh `membership_recurrence` transaction when each period rolls over.
-
-For plans that have a stored Stripe payment method on file and **Require payment upfront** on, the recurrence job also attempts to charge immediately. If the charge fails or no default method is on file, the transaction is left `pending` and you collect through the [Invoices](/billing/invoices) or [Transactions](/billing/transactions) flow. See the [Revenue overview](/billing/overview) for the full charge lifecycle.
 
 ## Plan order
 

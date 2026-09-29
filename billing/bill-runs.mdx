@@ -4,21 +4,21 @@ description: Sweep a period of unbilled transactions into invoices in one batch,
 keywords: [bill run, batch invoicing, recurring billing, scheduled bill run, membership renewal, auto-renew, dunning, failed charge, past due]
 ---
 
-A bill run takes every billable transaction in a period and groups it into invoices. That is the whole job. Bill runs do **not** charge anybody, send anything, or retry failed payments - they generate invoice documents and stop.
+A bill run takes every billable transaction in a period and groups it into invoices. Owners and admins run one on demand or on a schedule to produce invoice documents in one batch. That is the whole job. Bill runs do **not** charge anybody, send anything, or retry failed payments - they generate invoice documents and stop.
 
-If you have been told "the bill run will collect money," that is wrong. Collection happens separately, through the [Payments](/billing/payments) flow, by sending an invoice payment link, or - for auto-renewing memberships - through the automated renewal engine described lower on this page.
+If you have been told "the bill run will collect money," that is wrong. Collection happens separately, through the [Payments](/billing/payments) flow, by sending an invoice payment link, or - for auto-renewing memberships - through the automated renewal engine described in [Automated membership renewals and dunning](#automated-membership-renewals-and-dunning). Do not confuse the two.
 
-## Overview
+## When to use it
 
-From **Revenue > Bill runs** you can:
+A bill run gives every member a dated invoice for what they owe or have paid, without you creating invoices one by one. You choose the period and filters, preview the result, and the run skips anything already invoiced.
 
-- Run a bill run on demand for a chosen period, with optional filters and a live preview before you commit.
-- Group transactions one invoice per contact, or a single combined invoice, based on your organization's billing preference.
-- Schedule recurring bill runs (daily, weekly, or monthly) and trigger any saved schedule with **Run now**.
-- Review every past run and the invoices it produced.
-- Delete a run without deleting the invoices it created.
+Typical uses:
 
-Automated collection of recurring membership dues is a **separate** system - see [Automated membership renewals and dunning](#automated-membership-renewals-and-dunning). Do not confuse it with bill runs.
+- **Monthly invoice documents** - a yoga studio schedules a bill run on the 1st so every member on a monthly plan has a dated invoice for their records, while the renewal engine does the charging.
+- **One invoice for a corporate account** - a boxing gym whose ten fighters are sponsored by a company filters a run to those ten contacts and, with the `single` billing preference, sends the company one combined invoice.
+- **A catch-up run** - a climbing gym whose scheduled run skipped a plan runs a one-off manual bill run for that period, filtered to the affected plan.
+
+See [Worked examples](#worked-examples) for the details of each.
 
 ## What counts as billable
 
@@ -52,6 +52,8 @@ Every created invoice gets:
 After invoices are written, each included transaction is marked `isInvoiced = true` so it won't be picked up again.
 
 ## Running a bill run manually
+
+Bill runs live at **Revenue > Bill runs**, where you can also review every past run and the invoices it produced.
 
 1. Go to **Revenue > Bill runs** and click the **Bill run** action (or **Add** from the Invoices page).
 2. Give the run a **Name**. It defaults to `<Month Year> Bill Run`.

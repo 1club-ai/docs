@@ -28,5 +28,6 @@ Thank you for your interest in contributing to our documentation! This guide wil
 - **Address the reader directly**: Use "you" instead of "the user"
 - **Keep sentences concise**: Aim for one idea per sentence
 - **Lead with the goal**: Start instructions with what the user wants to accomplish
+- **Explain the concept before the configuration**: Open a feature page with what it is, why a gym would use it, and a few use cases, then cover screens and settings (see "Page structure" in `AGENTS.md`)
 - **Use consistent terminology**: Don't alternate between synonyms for the same concept
 - **Include examples**: Show, don't just tell

@@ -31,6 +31,24 @@
 - Never use em dashes or en dashes (—, –). Always use a single hyphen (-) instead, in both prose and code.
 - Don't start sentences with "In a nutshell".
 
+## Page structure
+
+Feature pages start with the concept and its value, not the screens. A reader should know what a feature is, what it's for, and whether they need it before any setup detail.
+
+Sections come in this order. Choose heading wording that fits the page (for example "When to use it", "Common use cases", "How it works"):
+
+1. **What it is** - the opening paragraph, with no heading. One to three sentences on what the feature is and who uses it (owner, front desk, instructor, member).
+2. **Why use it and use cases** - the value it provides and two to four concrete gym situations it solves (for example "sell a one-off workshop with VIP and general tickets"). Write scenarios, not a list of features: a bullet list of capabilities under `## Overview` doesn't count as this section.
+3. **How it works** (optional) - the key concepts, the lifecycle, and how it compares with nearby features. A comparison table is a good fit here (see "Events vs classes" in `operations/events.mdx`).
+4. **Setup, screens, and settings** - where it lives in the admin, then how to create or configure it and the fields on each screen.
+5. **Reference and troubleshooting** (optional) - edge cases, limits, permissions, FAQs.
+
+Keep sections 1-3 short, a few short paragraphs in total, so setup is never buried. Keep the tone plain: no marketing superlatives.
+
+Where this does not apply: section landing pages (`*/overview.mdx`, which orient the reader across a section), API reference pages, `changelog.mdx`, and pure lookup pages (for example lists of MCP tools).
+
+When you edit an existing page that doesn't follow this order, restructure the opening if your change touches it. Don't rewrite pages you aren't otherwise changing.
+
 ## Content boundaries
 
 <!-- Define what should and shouldn't be documented -->

@@ -20,6 +20,31 @@ See [Worked examples](#worked-examples) for the settings behind the first three.
 
 If you're picking a model for the first time, read [Check-in Models](/reference/check-in-models) before configuring.
 
+## Rules for members, warnings for staff
+
+Most booking rules exist to shape what a member may book or do for themselves. They apply in full wherever members act on their own: the portal, the mobile app, your website, the marketplace, the kiosk, and the check-in app.
+
+Staff are not held to them. When an admin, manager, front desk, or instructor books or checks someone in from the admin dashboard or the instructor portal, these rules never refuse them. A short note names the rule, the button stays the same, and the first click goes through. The same applies to bookings made by the in-app assistant and booking imports.
+
+The rules that work this way:
+
+- **Min. notice** and **Max. ahead** (including a repeating booking that reaches past **Max. ahead**)
+- **Min. booking slot**, **Max. booking slot**, and **Booking duration step**
+- The working hours of the gym or the area
+- Who an area type or class type is open to
+- A deposit rule that restricts new bookings when a member's wallet is short
+- **Enforce payment** (at booking or at check-in), and **Allow walk-ins**
+- The **Waitlist claim window**
+- The check-in window (from 1 hour before the start until the end of the day)
+- A plan's **Require payment upfront**, when staff sell or renew a membership
+
+Nothing is recorded as an override for these, because nothing was overridden. A balance the rule would have collected still stays owed, so you can collect it later.
+
+Two kinds of rule still apply to staff:
+
+- **Staff-only switches.** **Allow anonymous bookings** and **Allow anonymous check-ins** decide whether staff may book or check in someone with no contact at all. Only staff can do either, so they stay enforced.
+- **Facts about the schedule.** A coach on time off, on a break, or outside their hours, a blocked area, and a court or coach that is already taken. The booking dialog names these before you save, and you book past them with the same click when your role allows it. See [Bookings](/operations/bookings#warnings-and-scheduling-conflicts).
+
 ## Managing booking policies
 
 ### Viewing all policies
@@ -40,14 +65,18 @@ This is the heart of the policy. Every toggle and field below lives in the **Boo
 
 ### Min/max booking slot
 
-- **Min. booking slot (minutes)** - Minimum booking duration. Shorter bookings are rejected.
-- **Max. booking slot (minutes)** - Maximum duration. Longer bookings are rejected.
+- **Min. booking slot (minutes)** - Minimum booking duration. Members can't book anything shorter.
+- **Max. booking slot (minutes)** - Maximum duration. Members can't book anything longer.
 - **Booking duration step (minutes)** - Booking duration must be the minimum plus a multiple of this step (e.g. min 60 \+ step 60 → only 60, 120, 180 min are allowed).
+
+Staff booking a slot outside these limits see a note such as "Members book on a 60 min grid" and can still book it.
 
 ### Booking window
 
 - **Min. notice** (hours) - Members must book at least this many hours ahead. Leave blank for no limit.
 - **Max. ahead** (days) - Members can only see and book up to this many calendar days ahead. Leave blank for no limit.
+
+Staff can book outside the window. The booking dialog shows a note such as "Members book up to 7 days ahead", and **Add** books it on the first click.
 
 #### Max. ahead and repeating bookings
 
@@ -63,9 +92,9 @@ inside the window and is created normally.
 
 Two things to know:
 
-- **Staff can override it.** The refusal offers **Book anyway** to anyone with
-  manage-level booking permission, and the override is recorded on the individual
-  occurrences that actually fell outside the window - not on the whole series.
+- **Staff are not held to it.** A series staff create from the admin dashboard is
+  created in full, and the confirmation says it reaches further ahead than members can
+  book.
 - **Repeating with no end is exempt.** A series set to **Never** has no last occurrence to
   measure, and it is written a rolling eight weeks at a time, so each occurrence lands
   inside the window when it is created. Use **Never** for a standing weekly booking at a
@@ -75,17 +104,19 @@ Two things to know:
 
 When a spot opens 2-12 hours before a class, the first person on the waitlist has this many minutes to claim it. The default is 15. Leave empty to use 15.
 
+The window binds the member claiming the spot. Staff can still turn an entry into a booking after its window has passed - see [Waitlists](/operations/waitlists).
+
 ### Enforce payment
 
 A single dropdown that decides when payment is enforced. Pick one of three options:
 
-- **At booking** - Members must pay in the portal before the booking is confirmed. Any booking that still has unpaid transactions is also blocked at check-in.
-- **At check-in** - Members can create bookings without paying in advance, but reception cannot complete the check-in until the payment is collected (or an active membership / external program covers the visit).
+- **At booking** - Members must pay in the portal before the booking is confirmed. A booking that still has unpaid transactions can't be self-checked-in at the kiosk or in the check-in app.
+- **At check-in** - Members can create bookings without paying in advance, but they can't check themselves in until the payment is collected (or an active membership / external program covers the visit).
 - **None** - Payment is not enforced. Members can be checked in even if they still have unresolved payments. The front desk uses judgment to follow up.
 
 Pick **At booking** when you sell classes online and want guaranteed revenue per booking, or when you don't want the front desk to chase payment at the door.
 
-Pick **At check-in** when bookings can happen without immediate payment but the front desk must collect payment before letting the member through the door. This is the typical drop-in or walk-in model.
+Pick **At check-in** when bookings can happen without immediate payment and you collect payment at the door. This is the typical drop-in or walk-in model.
 
 Pick **None** for community gyms, martial-arts schools, kids' programs, and other settings where staff log attendance on the spot and handle payment separately.
 
@@ -94,7 +125,7 @@ Pick **None** for community gyms, martial-arts schools, kids' programs, and othe
 </Note>
 
 <Note>
-  **Admin override** - When an admin creates a booking from the admin dashboard, the **At booking** enforcement is bypassed so staff can record bookings that will be paid later. Check-in still respects the policy: if the balance is unpaid when the member arrives, the check-in is blocked until the payment is collected.
+  **At the front desk** - Staff are not held to **Enforce payment**. A booking created from the admin dashboard is confirmed without payment, so you can record bookings that will be paid later. At check-in, the dialog says the gym asks for payment at check-in, and staff can still let the member in: without a payment, the amount stays owed. One exception remains: a booking with no entrance method still needs one picked (membership, external program, or direct payment) before check-in, whatever the policy says.
 </Note>
 
 ### Upsell available plans
@@ -126,7 +157,7 @@ When on, the system automatically checks the member in at the booking start time
 
 Use this when admins need to book for someone who doesn't have a 1club profile yet - for example, a phone caller asking for a personal-training session before they've signed up. The booking is recorded without a contact link; you can attach a contact later if the person creates a profile.
 
-This setting only affects what admins can do in the admin dashboard. It does not let members book anonymously from the public portal.
+This setting only affects what admins can do in the admin dashboard. It does not let members book anonymously from the public portal. Because only staff can book with no contact, this is one of the rules staff are still held to.
 
 ### Allow guest bookings
 
@@ -205,7 +236,7 @@ The **Product categories offered with the bookings** field let you allow specifi
 
 ### Drop-in yoga studio
 
-You want walk-ins to be welcome but the front desk must collect payment.
+You want walk-ins to be welcome, and payment collected at the door.
 
 - **Enforce payment** - At check-in
 - **Allow anonymous bookings** - off
@@ -230,7 +261,7 @@ You let admins book PT for callers who haven't signed up yet.
 
 - Scope the policy to your _Personal Training_ class type or instructor type.
 - **Allow anonymous bookings** - on
-- **Enforce payment** - your call (At check-in if you collect when the client arrives, At booking if you charge a card-on-file). Admins can always create the booking even with **At booking** selected; the balance is then collected before check-in.
+- **Enforce payment** - your call (At check-in if you collect when the client arrives, At booking if you charge a card-on-file). Staff can always create the booking, even with **At booking** selected; the balance stays owed until you collect it.
 
 ## Tips & best practices
 
@@ -243,15 +274,15 @@ You let admins book PT for callers who haven't signed up yet.
 
 **Issue**: Member can't book - system says payment required.
 
-**Solution**: The matching policy has **Enforce payment** set to **At booking**. Either pay through the booking flow, or switch the policy to **At check-in** (or **None**) if upfront payment isn't your intent. Note that admins booking from the admin dashboard are not blocked by **At booking** - they can record the booking and collect the balance before check-in.
+**Solution**: The matching policy has **Enforce payment** set to **At booking**. Either pay through the booking flow, or switch the policy to **At check-in** (or **None**) if upfront payment isn't your intent. Staff booking from the admin dashboard are not blocked by **At booking** - they can record the booking and collect the balance later.
 
-**Issue**: Front desk can't check the member in - payment blocked.
+**Issue**: A member can't check themselves in - payment blocked.
 
-**Solution**: The policy has **Enforce payment** set to **At check-in** (or **At booking** with an outstanding balance). Have reception collect payment, confirm the member's active membership, or apply an external program before completing the check-in. See [Check-in Models](/reference/check-in-models) for entrance methods.
+**Solution**: The policy has **Enforce payment** set to **At check-in** (or **At booking** with an outstanding balance), so the kiosk and the check-in app wait for payment. Collect it, confirm the member's active membership, or apply an external program. The front desk can also check the member in from the admin dashboard and leave the amount owed. See [Check-in Models](/reference/check-in-models) for entrance methods.
 
 **Issue**: I want to require payment at booking _and_ block check-in on overdue balances.
 
-**Solution**: Set **Enforce payment** to **At booking**. The check-in is still blocked automatically when a booking has unpaid transactions, so the at-check-in safeguard is already covered.
+**Solution**: Set **Enforce payment** to **At booking**. Members can't check themselves in while a booking has unpaid transactions. Staff checking someone in at the front desk see that the gym asks for payment and can still admit them, with the amount left owed.
 
 **Issue**: Two policies seem to apply to the same booking 
 
@@ -260,8 +291,9 @@ You let admins book PT for callers who haven't signed up yet.
 **Issue**: A repeating booking is refused for being too far in advance, but its first session is next week.
 
 **Solution**: **Max. ahead** measures the series' last occurrence, not its first. Shorten
-the series (an earlier end date or fewer repeats), raise **Max. ahead**, set it to
-repeat with no end, or use **Book anyway** if you hold manage-level booking permission.
+the series (an earlier end date or fewer repeats), raise **Max. ahead**, or set it to
+repeat with no end. Staff creating the series from the admin dashboard are not held to
+**Max. ahead**.
 
 **Issue**: Cancellations are giving full refunds when I expected partial 
 

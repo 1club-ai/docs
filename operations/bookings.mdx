@@ -38,26 +38,31 @@ The booking dialog has three sections:
 
 The price breakdown appears below the type section. It shows the line item (area price per hour, instructor price, or class price), any promotion or manual price adjustment, and the total. If membership benefits or external programs cover the booking, that's reflected here.
 
-At the bottom of the create dialog, **Send confirmation email** controls whether the member gets the confirmation. It's checked by default; uncheck it when you're recording a booking that's already been communicated out-of-band. The checkbox is only on create - editing an existing booking does not re-send confirmation.
+At the end of the create form, **Send confirmation email** controls whether the member gets the confirmation. It's checked by default; uncheck it when you're recording a booking that's already been communicated out-of-band. The checkbox is only on create - editing an existing booking does not re-send confirmation.
 
-Admin-created bookings bypass the **At booking** payment enforcement so you can record a reservation that will be paid later. The balance is still collected before check-in unless the policy is set to **None**. See [Booking policies](/operations/booking-policies) for the three enforcement modes.
+Bookings created from the admin dashboard are confirmed without payment, whatever **Enforce payment** says, so you can record a reservation that will be paid later. The balance stays owed until you collect it. See [Booking policies](/operations/booking-policies) for the three enforcement modes.
 
-## Overriding a scheduling conflict
+## Warnings and scheduling conflicts
 
-When you try to book a court, coach, or instructor that's already taken, 1club tells you why - and if you have permission, lets you go through with it anyway. There are two kinds of refusal:
+The booking dialog tells you what a slot crosses before you save, on one line on the left of the footer, next to **Add**. The footer stays in view while you scroll, so the note is there when you click. There are three kinds of note.
 
-- **A policy guard** - the instructor is outside their working hours, on a break, or on time off; the area is blocked; or the booking falls outside the policy's duration, notice, or advance-booking limits. Save relabels itself to **Book anyway**, and choosing it resubmits immediately with no extra step.
+- **A rule for members** - the slot is outside the [booking policy](/operations/booking-policies)'s notice, advance-booking, duration, or grid limits, outside the working hours, outside who the area or class is open to, or the member's deposit is short of a deposit rule. These rules bind members booking for themselves, not staff. The note reads like "Members book up to 7 days ahead", the button stays **Add**, and the first click books it. The working hours, the audience, and the deposit are checked when you save, so the confirmation names them if they apply.
+- **The coach's schedule or a blocked area** - the instructor is on time off, on a break, or outside their working hours, or the area is blocked. The note reads like "Instructor on time off", and **Add** books past it on the first click. The booking records the override: who made it, and what it went past.
 - **A genuine conflict** - the court or the coach is already booked for that time. This opens a dialog that names exactly what's being overlapped (an existing booking, a class, a blocked period, time off, or a break) and requires a note before you can save. The note is stored on the booking and shown on its calendar card, so anyone glancing at the schedule can see the overlap was deliberate - useful for something like two half-court groups sharing one tennis court, or a one-off exception the team has agreed to.
 
-A live event taking over an area or an instructor is never overridable, at either tier - that stays a hard stop.
+A live event taking over an area or an instructor is never overridable - that stays a hard stop.
 
 <Note>
-  Only staff who can manage bookings (**Full access** on the Booking module,
-  Club scope or higher) see either override. Front Desk and Instructor hold
-  create/view access by default, not manage, so they get the plain refusal
-  with no override option. The same split applies to classes, gated by the
-  Classes module instead. See [Roles and permissions](/reference/roles-permissions).
+  Who can book past what:
+
+  - **The coach's schedule** - anyone who can create bookings, including Front Desk and Instructor.
+  - **A blocked area, or an already-taken slot** - only staff who can manage bookings (**Full access** on the Booking module, Club scope or higher). The same split applies to classes, gated by the Classes module instead.
+  - **A slot that has already ended** - only staff who can create bookings at Organization scope, so a past session can be recorded.
+
+  When your role can't book past something, the note in the footer turns red and says so before you save, rather than after. See [Roles and permissions](/reference/roles-permissions).
 </Note>
+
+If something changes after the dialog checked the slot - time off entered a moment ago, say - and your role can book past it, the save still goes through and the confirmation names what it booked past. You are never asked to press the same button twice.
 
 ## The booking detail page
 
@@ -133,7 +138,7 @@ A member paid cash at the desk for a drop-in yoga class. Create a **Class** book
 
 ## Tips & best practices
 
-- **Use admin bookings for phone and walk-in reservations.** They bypass upfront-payment enforcement, so you can record the booking now and collect at check-in - the policy still protects you at the door.
+- **Use admin bookings for phone and walk-in reservations.** They are not held to upfront-payment enforcement, so you can record the booking now and collect at check-in.
 - **Check the price breakdown before saving.** It's the fastest way to confirm a membership or external program is covering the visit, or that a promotion applied.
 - **Pay multi-transaction bookings from the right place.** For a single balance, use **Add payment**; for individual lines of a recurring series or multi-line order, use the **Transactions** tab.
 - **Cancel with a reason.** The reason and refund are recorded and the member is notified automatically, which keeps disputes clean.
@@ -141,9 +146,9 @@ A member paid cash at the desk for a drop-in yoga class. Create a **Class** book
 
 ## Troubleshooting
 
-**Issue**: I can't complete a check-in - payment is blocked.
+**Issue**: The check-in dialog says the gym asks for payment at check-in.
 
-**Solution**: The matching [booking policy](/operations/booking-policies) enforces payment at check-in (or at booking with an outstanding balance). Take payment with **Add payment**, confirm an active membership, or apply an external program, then check the member in.
+**Solution**: The matching [booking policy](/operations/booking-policies) enforces payment at check-in (or at booking with an outstanding balance). That rule binds members checking themselves in, not you. Take payment with **Add payment**, confirm an active membership, or apply an external program - or check the member in anyway and the amount stays owed.
 
 **Issue**: The booking price is 0 and I expected a charge.
 
@@ -161,9 +166,9 @@ A member paid cash at the desk for a drop-in yoga class. Create a **Class** book
 
 **Solution**: **Send confirmation email** is only offered on create, and editing never re-sends it. If it was unchecked, notify the member from **Notify participants** or [Compose](/messaging/compose).
 
-**Issue**: I get "This area is already booked for this slot" (or the instructor equivalent) with no option to book anyway.
+**Issue**: I get "This area is already booked for this slot" (or the instructor equivalent) and can't save over it, or the footer says a blocked area can't be booked.
 
-**Solution**: Overriding a scheduling conflict needs **Full access** on Booking (or Classes, for a class) at Club scope or higher - Front Desk and Instructor don't have it by default. Grant it in the [permissions editor](/reference/roles-permissions), or make the change from a Manager or Admin account.
+**Solution**: Booking into an already-taken slot or a blocked area needs **Full access** on Booking (or Classes, for a class) at Club scope or higher - Front Desk and Instructor don't have it by default. Grant it in the [permissions editor](/reference/roles-permissions), or make the change from a Manager or Admin account.
 
 ## Related
 

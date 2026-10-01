@@ -12,11 +12,11 @@ keywords:
   - anonymous check-in
 ---
 
-1club supports the three industry-standard ways members enter a gym. An owner or admin picks the model that matches how the front desk runs and configures a small set of booking-policy settings to enforce it; the front desk then works to that model at every check-in. The model is not a single switch - it is the combination of when you enforce payment and whether staff can check in people without a booking.
+1club supports the three industry-standard ways members enter a gym. An owner or admin picks the model that matches how the front desk runs and configures a small set of booking-policy settings to enforce it; the front desk then works to that model at every check-in. The model is not a single switch - it is the combination of when you enforce payment and whether people can be checked in without a booking.
 
 ## Why the model matters
 
-Every gym has its own front-desk culture. Some require members to book and pay before they set foot in the building. Others welcome walk-ins as long as the member has a paid membership or pays at the door. A third group - community gyms, martial-arts schools, kids' programs - log attendance on the spot and trust staff to handle payment separately. The model decides whether reception can admit someone without a booking, and whether they must confirm a membership, an external program, or a direct payment first. How members identify themselves at the door (QR code, access card, PIN) is a separate question, covered by [Access control](/settings/access-control).
+Every gym has its own front-desk culture. Some require members to book and pay before they set foot in the building. Others welcome walk-ins as long as the member has a paid membership or pays at the door. A third group - community gyms, martial-arts schools, kids' programs - log attendance on the spot and trust staff to handle payment separately. The model decides whether someone can check in without a booking, and whether a membership, an external program, or a direct payment must be confirmed first. How members identify themselves at the door (QR code, access card, PIN) is a separate question, covered by [Access control](/settings/access-control).
 
 ### The three check-in models
 
@@ -31,9 +31,9 @@ Every gym has its own front-desk culture. Some require members to book and pay b
 A check-in model is the combination of two things, and both live on the **booking policy** that matches the booking or visit. See [Booking policies](/operations/booking-policies) for how to create and scope policies.
 
 - **Enforce payment** - a single dropdown with three options: **At booking**, **At check-in**, or **None**. This decides when payment is required.
-- **Allow walk-ins** and **Allow anonymous check-ins** - two toggles that decide whether staff can check someone in without an underlying booking.
-  - **Allow walk-ins** (`Settings > Booking Policies`) - "When enabled, staff can check in a contact without an existing booking." Use this for members who arrive without reserving.
-  - **Allow anonymous check-ins** - "When enabled, staff can check in visitors with no contact at all." Use this for guests and trial visitors who have no profile yet. It is independent of walk-ins.
+- **Allow walk-ins** and **Allow anonymous check-ins** - two toggles that decide whether someone can be checked in without an underlying booking.
+  - **Allow walk-ins** (`Settings > Booking Policies`) - "Check in a contact who has no booking." Use this for members who arrive without reserving.
+  - **Allow anonymous check-ins** - "Check in a visitor with no contact record." Use this for guests and trial visitors who have no profile yet. It is independent of walk-ins.
 
 <Note>
   These two toggles live on the booking policy, alongside **Enforce payment**.
@@ -75,6 +75,16 @@ To configure:
 - Turn **Allow walk-ins** on so staff can log attendance without a booking.
 - Turn **Allow anonymous check-ins** on if you want to record guests and trial visitors who have no profile.
 
+## At the front desk
+
+**Enforce payment** and **Allow walk-ins** are rules for members checking themselves in - at the kiosk, in the check-in app, or at a scanner. They don't refuse staff. When an admin, manager, front desk, or instructor checks someone in from the admin dashboard or the instructor portal:
+
+- **Payment** - the dialog says when the gym asks for payment at check-in. Staff can still let the member in; without a payment, the amount stays owed.
+- **Walk-ins** - staff can check in a known contact who has no booking even when **Allow walk-ins** is off. The dialog notes that walk-ins are turned off for members.
+- **The check-in window** - staff can check in outside the hour-before-to-end-of-day window. See [Attendance](/members/attendance#check-in-window).
+
+**Allow anonymous check-ins** is different. Only staff can check in someone with no contact at all, so it stays enforced for them: with it off, the check-in needs a contact.
+
 ## Entrance methods at check-in
 
 When the front desk checks a member in, they pick how the member is entering. Three entrance methods exist:
@@ -83,7 +93,7 @@ When the front desk checks a member in, they pick how the member is entering. Th
 - **External program** - the member enters via a third-party program (a partner curriculum, a corporate-wellness benefit, a federation pass), optionally with an extra per-visit fee. See [External programs](/settings/external-programs).
 - **Direct payment** - the member pays for this single visit at the front desk.
 
-Which entrance methods are required at check-in depends on the matching booking policy. If **Enforce payment** is set to **At check-in** (or to **At booking** with an outstanding balance on the booking), staff must select one of the three before the system records the check-in. If **Enforce payment** is **None**, the front desk can record the check-in without selecting a method. Free classes never require a payment method.
+A booking that was made without an entrance method needs one picked before check-in, whatever the policy says - otherwise there is nothing to record the visit against. Beyond that, the matching booking policy decides how hard payment is asked for. If **Enforce payment** is set to **At check-in** (or to **At booking** with an outstanding balance on the booking), members can't check themselves in until it's paid, and the front desk is reminded to collect but can still admit them. If **Enforce payment** is **None**, payment is never asked for. Free classes never require a payment method.
 
 Because check-in reuses the booking pipeline, membership consumption, external-program accounting, and direct-payment transactions are recorded identically whether the member booked ahead or walked in.
 
@@ -158,17 +168,17 @@ A local employer sponsors sessions for its staff.
 
 ## Troubleshooting
 
-**Issue**: Front desk can't check a member in - the system asks for a payment method.
+**Issue**: Front desk can't check a member in - the system asks for an entrance method.
 
-**Cause**: The matching policy has **Enforce payment** set to **At check-in**, or to **At booking** with an outstanding balance on the booking.
+**Cause**: The booking was made without an entrance method, so there is nothing yet to record the visit against.
 
 **Fix**: Have reception pick an entrance method - confirm the member's **Membership**, apply an **External program**, or take a **Direct payment** - then complete the check-in.
 
-**Issue**: Staff can't check in a member who has no booking.
+**Issue**: A member can't check themselves in without a booking.
 
-**Cause**: **Allow walk-ins** is off on the matching booking policy.
+**Cause**: **Allow walk-ins** is off on the matching booking policy. It binds members checking themselves in; the front desk can still check them in from the admin dashboard.
 
-**Fix**: Turn **Allow walk-ins** on in `Settings > Booking Policies` for the policy that applies to that club or class.
+**Fix**: Turn **Allow walk-ins** on in `Settings > Booking Policies` for the policy that applies to that gym or class.
 
 **Issue**: Can't check in a trial visitor who has no profile.
 

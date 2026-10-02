@@ -22,10 +22,10 @@ A **message** is human-authored correspondence between a club and a member, addr
 Every message carries a `type` that fixes its channel. The Inbox lists all three side by side.
 
 - **Email** - The default for new manual sends. Uses a block editor (subject plus body), supports templates, variables, and file attachments. Delivered through SendGrid.
-- **SMS** - Plain text, no subject, no formatting. Delivered through Twilio. This is a paid-plan channel because it carries a direct carrier cost.
+- **SMS** - Plain text, no subject, no formatting. Sent from your gym's own sender name, or its own toll-free number in the US and Canada, once it is set up under [SMS](/settings/sms). This is a paid-plan channel because it carries a direct carrier cost.
 - **WhatsApp** - Sent through a per-organization WhatsApp Business connection (WhatsApp Cloud API). Requires a connected WhatsApp number and a paid plan. A `+` badge in the conversation row marks contacts whose WhatsApp number is verified.
 
-A new manual message goes out as **email**. SMS and WhatsApp appear in the Inbox as inbound conversations and as replies: when you reply inside an SMS or WhatsApp thread, the reply stays on that same channel. Automations can also send on any of the three channels.
+A new manual message goes out as **email** by default; pick **SMS** or **WhatsApp** in the composer once that channel is set up. WhatsApp also arrives in the Inbox as inbound conversations: when you reply inside a WhatsApp thread, the reply stays on WhatsApp. SMS is outbound only. Automations can also send on any of the three channels.
 
 App notifications, which cover the notification center and alerts on a member's devices, exist in the platform too, but they are emitted by transactional triggers (booking confirmed, waitlist promotion), not composed from the Inbox.
 
@@ -65,7 +65,7 @@ The governing permissions are `messages.read.own` / `messages.read.club` for vie
 Each channel is gated differently at send time:
 
 - **Email** requires a verified [sending domain](/settings/email-sending) during trial, and counts against your plan's email quota. Hitting the quota returns `PLAN_LIMIT_EXCEEDED` with the daily and monthly figures, surfaced as a dialog rather than a generic toast.
-- **SMS** is available on paid plans only. On a trial or locked plan the send returns `PLAN_FEATURE_LOCKED` with an upgrade prompt.
+- **SMS** is available on paid plans only. On a trial or locked plan the send returns `PLAN_FEATURE_LOCKED` with an upgrade prompt. Without an approved sender the send returns `SMS_NOT_CONFIGURED`; members in a country your gym has no ready sender for are skipped, and if Twilio refuses every text the send returns `SMS_DELIVERY_FAILED`. See [SMS](/settings/sms).
 - **WhatsApp** is also paid-only and additionally requires a connected WhatsApp Business number. A missing connection returns `WHATSAPP_NOT_CONNECTED`; a carrier delivery failure returns `WHATSAPP_DELIVERY_FAILED`.
 
 ## Worked examples

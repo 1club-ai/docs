@@ -92,7 +92,7 @@ Drag steps from the palette onto the canvas to build the workflow. Steps run in 
 
 Send an App, email, SMS, or WhatsApp notification to the contact.
 
-- **Channels** - Pick one or more delivery channels. **App** covers the notification center and an alert on the contact's devices. Email, SMS, and WhatsApp require the corresponding integration to be configured (see [Integrations](/settings/integrations)).
+- **Channels** - Pick one or more delivery channels. **App** covers the notification center and an alert on the contact's devices. Email and WhatsApp require the corresponding integration (see [Integrations](/settings/integrations)); SMS requires a sender set up under [SMS](/settings/sms). A text that can't go out (for example no sender for the member's country) doesn't fail the step: its other channels are still sent.
 - **Content** - Either write content inline (subject + body) or bind to a [message template](/messaging/templates). Bound content is snapshotted when you save the automation, so later edits to the template do not change what the automation sends.
 
 ### Send AI message
@@ -302,7 +302,7 @@ You want reviews from players who actually showed up, without nagging regulars.
 | A suggested blueprint never appears | Its gating prerequisite isn't met (no classes/areas, no plans, or Stripe not connected), or your gym isn't on the Grow plan | Set up the missing piece, or upgrade to Grow. Providable tags are created for you and never block a suggestion. |
 | The **Add Automation** button or blueprint accept is blocked | Custom automations require an active Grow subscription | Upgrade the plan under **Revenue**, then retry. |
 | You can't accept a blueprint a second time | Blueprints are one-per-gym - you already own an automation from it | Open the existing automation from **Your automations** and edit that instead. |
-| An automation is active but nothing sends | The email or SMS channel has no integration configured, or entry conditions exclude everyone | Configure the provider under [Integrations](/settings/integrations); loosen or clear the entry conditions. |
+| An automation is active but nothing sends | The email channel has no integration configured, the SMS channel has no sender for the member's country, or entry conditions exclude everyone | Configure the provider under [Integrations](/settings/integrations) or the sender under [SMS](/settings/sms); loosen or clear the entry conditions. |
 | Messages arrive a minute late | The step worker polls every minute | Expected - build in a small buffer rather than relying on second-level timing. |
 | A built-in automation won't let you add steps | Built-in (auto-provisioned) automations have a fixed structure | Edit the timing, channels, and content in place; build a separate custom automation for extra steps. |
 | A member got two messages from one event | Two automations share the trigger | Add non-overlapping entry conditions (membership type or tag) so only one applies. |
@@ -314,4 +314,5 @@ You want reviews from players who actually showed up, without nagging regulars.
 - [Messaging overview](/messaging/overview) - Inbox, AI drafts, and one-off sends.
 - [Member list](/members/member-list) - Tags and segments used in entry conditions and Modify contact steps.
 - [Analytics: marketing](/analytics/marketing) - Automation run history and cross-feature performance.
-- [Integrations](/settings/integrations) - Configure email and SMS providers before using those channels.
+- [Integrations](/settings/integrations) - Configure email and WhatsApp before using those channels.
+- [SMS](/settings/sms) - Set up your gym's SMS sender before using the SMS channel.

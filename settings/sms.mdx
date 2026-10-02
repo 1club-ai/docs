@@ -1,0 +1,193 @@
+---
+title: "SMS"
+description: "Text members from the Inbox and automations, from your gym's own sender name or toll-free number. Set up business details, a sender name, country registrations and a US or Canadian number, and handle opt-outs."
+keywords:
+  [
+    sms,
+    text message,
+    sender name,
+    sender id,
+    alphanumeric sender,
+    toll-free,
+    toll-free verification,
+    us,
+    canada,
+    registration,
+    opt-out,
+    stop,
+    twilio,
+    segments,
+    character count,
+    inbox,
+    automations,
+  ]
+---
+
+SMS lets your gym text members from the [Inbox](/messaging/compose) and from [automations](/marketing/automations), the same way you already send email and WhatsApp. Every text leaves from your gym's own sender: your gym's name in Europe, and your gym's own toll-free number in the US and Canada. An owner or admin sets it up once under **Settings > Communication > SMS**, and from then on anyone who sends messages can pick **SMS** when they compose.
+
+## When to use it
+
+SMS reaches members who don't read email and haven't installed the app, and it arrives on any phone without an account or a connection. It is the channel for short, time-sensitive news.
+
+- **A class moves at the last minute** - the coach is ill and the 18:00 yoga class moves to Studio 2. The front desk texts everyone booked, and they read it before they leave home.
+- **Reminders that people actually see** - a padel gym adds an SMS step to its booking reminder automation, so members who ignore email still get "Your court is at 19:00 tomorrow".
+- **Members abroad or in a second location** - a climbing gym in Sofia texts its Bulgarian members by name once the name is registered there, and its Canadian members from its own toll-free number.
+
+## How it works
+
+SMS has no single identity that works everywhere. Each country's carriers decide what a business may text from, so 1Club picks the sender by the country of the **member's phone number**, not by where your gym is.
+
+| Member's phone number                                                         | What they see as the sender     | What you need first                                                      |
+| ----------------------------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------ |
+| Germany, France, United Kingdom, Portugal, Italy, Netherlands, Greece, Poland | Your gym's sender name          | An approved sender name                                                  |
+| Bulgaria, Spain, Czechia, Austria, Ireland                                    | Your gym's sender name          | An approved sender name, registered for that country (two to four weeks) |
+| United States, Canada                                                         | Your gym's own toll-free number | A verified toll-free number (about three business days)                  |
+| Any other country                                                             | Not texted                      | Not supported yet                                                        |
+
+There is no fallback sender. If your gym has no ready sender for a member's country, that member is skipped and the send tells you why, so nobody ever gets a text from a name or number that isn't yours.
+
+A few rules shape everything below:
+
+- **Every sender name is checked by 1Club before it is used.** All gyms text through one shared SMS account, so a name that isn't your gym's own brand (another business, a bank) would put everyone's texts at risk. We usually review a name within one business day.
+- **A sender name can't be replied to.** Members see the name instead of a number and have nothing to answer. Texts from your toll-free number can be answered, but only with the opt-out keywords (see [Opt-outs](#opt-outs)). Replies don't arrive in the Inbox.
+- **Texts from your toll-free number start with your gym's name**, for example "Sofia Climbing: Your class moved to Studio 2." US and Canadian carriers expect the business to be named in the message. Texts from a sender name don't need it, because the name already says who is texting.
+- **SMS is a paid-plan feature.** On the Free plan and during the trial, the SMS page can't be set up and the composer doesn't offer SMS.
+
+## Set up SMS
+
+Open **Settings > Communication > SMS**. The page has four cards, one per step. You need the **settings.manage.organization** permission to change anything; **settings.read.organization** is enough to see the status.
+
+<Steps>
+  <Step title="Add your business details">
+    Click **Add business details**. Carriers check these against the company register, so enter the legal entity behind your gym, not its brand.
+
+    - **Legal business name** and **Business type** (**Private company**, **Publicly traded company**, **Non-profit** or **Sole proprietor**).
+    - **Register**, **Registration number** and **Country of registration** - for example your VAT number, an EIN in the US, or a Business Number in Canada. A sole proprietor skips these.
+    - **Business address**.
+    - **Website**, **Privacy policy URL** and **Terms and conditions URL**. Carriers check that your website is live and that both policies are published on it.
+    - **Contact person** - someone the carriers can reach about your senders, with a **Mobile number** in international format (for example `+359888123456`).
+
+    The form starts from your organization's website and the legal details of your default [billing entity](/billing/billing-entities), so most fields are already filled. Check every one: a mismatch with the register is the most common reason a sender is rejected.
+
+  </Step>
+  <Step title="Choose a sender name">
+    Enter the name members should see and click **Submit for review**. A sender name must be:
+
+    - 3 to 11 characters long.
+    - Latin letters, digits, spaces and `- + _ &` only, with at least one letter.
+
+    The card shows **In review** until we decide, then **Active**. If we turn a name down, the reason appears on the card and you can submit another one. Once approved, the name sends straight away in Germany, France, the United Kingdom, Portugal, Italy, the Netherlands, Greece and Poland.
+
+    You can ask for a new name at any time. While it waits for review, your approved name keeps sending.
+
+  </Step>
+  <Step title="Register the name where carriers require it">
+    In **Countries that require registration**, tick the countries where you have members (Bulgaria, Spain, Czechia, Austria, Ireland) and click **Request registration**. We file the registration with the carriers for you and update the card when they answer, usually in two to four weeks. Each country shows **In review**, **Active** or the reason it was rejected; you can request a rejected country again.
+
+    Requesting a registration needs saved business details and an approved sender name.
+
+  </Step>
+  <Step title="Get a toll-free number for the US and Canada">
+    Only needed if you have members with US or Canadian phone numbers. In the **United States and Canada** card, click **Get a number** and tell the carriers how members agree to your texts:
+
+    - **Where members agree** - **Online sign-up form**, **Paper form at the club**, **Verbally at the front desk** or **QR code**.
+    - **Screenshot** - a link to a screenshot or photo of the form, page or sign where members agree to texts.
+    - **Texts a month** - roughly how many texts you expect to send.
+
+    Click **Submit for verification**. 1Club gets your gym its own toll-free number and submits it, with your business details, for verification, which usually takes about three business days. The card shows the number while it is verified, then **Active**. If the carriers reject it, the reason appears on the card: fix what they asked for and click **Correct and resubmit**. You keep the same number.
+
+    To stop texting US and Canadian members, click **Release number**. The number is given up and can't be recovered; you can get a new one later.
+
+  </Step>
+</Steps>
+
+<Note>
+  **Get a number** is only available when your gym is based in the US or Canada,
+  or has at least one contact with a US or Canadian (`+1`) phone number. A
+  toll-free number costs money every month whether or not it sends, so a gym
+  with nobody to text there doesn't get one.
+</Note>
+
+### Why not just use your gym's name?
+
+Because carriers only accept a short name in a limited alphabet. Most gym names are longer than 11 characters, and names in Cyrillic, Greek or with accents aren't accepted at all, so "Sofia Climbing Club" or "Йога Студио" can't be used as they are. Pick a short version members will recognize, such as `SofiaClimb` or `YogaStudio`.
+
+In the registration countries, carriers also register the exact name. Once you have requested a registration, the name can no longer change (unless every registration you asked for was rejected).
+
+## Send a text
+
+1. Open the **Inbox** and click **Compose**.
+2. Pick **SMS**. It only appears once your gym can text: a paid plan and at least one approved sender.
+3. Choose recipients manually or with a segment. The contact picker only lists contacts with a phone number who haven't opted out.
+4. Write the message and click **Send Message**.
+
+Under the text, a counter shows how long the message is and how many SMS it takes, for example "47 characters, sent as 1 SMS". Carriers bill per SMS, not per message:
+
+- A message in the standard SMS alphabet fits 160 characters in one SMS, and 153 per SMS once it is longer.
+- One character outside that alphabet (Cyrillic, most emoji) switches the whole message to 70 characters, and 67 per SMS once longer. A Bulgarian message of 100 characters is two SMS.
+- Variables such as a first name are counted as you wrote them, so the real text can be a little longer.
+- For texts from your toll-free number, the counter includes your gym's name at the start.
+
+If your sender for your own country is still being reviewed (for example the registration for Bulgaria is in progress), the composer says so above the recipients: members there are skipped until it is approved.
+
+### Who isn't texted, and why
+
+After a send, 1Club tells you who was skipped. If nobody could be texted, nothing is sent and the message names the reasons:
+
+- **Replied STOP** - the member opted out (see [Opt-outs](#opt-outs)).
+- **No usable phone number** - the number is missing or can't be read.
+- **Their country needs a sender your gym has not set up yet** - set it up, or wait for the review to finish.
+- **Their country isn't supported** - the number is from a country not in the table above.
+
+Phone numbers saved without a country code, such as `0888 123 456`, are read in your organization's country.
+
+### Automations and other texts
+
+- A **Send message** step in an [automation](/marketing/automations) can use the **SMS** channel. If the text can't go out for one of the reasons above, the step still completes and its other channels (email, app) are sent. If SMS is the step's only channel and the text fails to send, the step is retried.
+- Invitations sent by SMS, member notifications sent by SMS to members without an email address, and [staff alerts](/settings/notifications) by SMS also leave from your gym's sender, and follow the same rules.
+- Sign-in codes and phone verification codes are the only texts that come from 1Club itself.
+
+## Opt-outs
+
+A member who doesn't want texts any more is never texted again, from the Inbox, automations or notifications.
+
+- **Texts from your toll-free number** - the member replies **STOP** (also UNSUBSCRIBE, CANCEL, END, QUIT or STOPALL). They get a confirmation and are opted out. Replying **START** (or YES, UNSTOP) lets them be texted again.
+- **Texts from your sender name** - the member can't reply, so they tell you, at the desk, by email or by phone. Open their profile, click the **More actions** menu (**...**) and choose **Stop SMS**. Choose **Allow SMS again** if they change their mind.
+
+An opted-out contact shows a **No SMS** chip next to their phone number. An opt-out belongs to the phone number, not the person: every contact in your gym with the same number is opted out too, for example a parent whose number is on their child's profile.
+
+<Note>
+  A member who opted out by WhatsApp isn't texted either: a STOP on one
+  messaging channel is treated as a request to stop messaging them. **Allow SMS
+  again** doesn't override a STOP the member sent to your toll-free number -
+  they need to reply START themselves.
+</Note>
+
+## Permissions
+
+| Action                                                                          | Permission                                           |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| See the SMS page and its status                                                 | `settings.read.organization`                         |
+| Change business details, the sender name, registrations or the toll-free number | `settings.manage.organization`                       |
+| Send SMS from the Inbox                                                         | `messages.create.own` or broader                    |
+| **Stop SMS** and **Allow SMS again** on a profile                               | `members.update.club`                                |
+
+## Troubleshooting
+
+| Symptom                                                               | Likely cause                                                                | Fix                                                                                                 |
+| --------------------------------------------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| **SMS** isn't offered in the composer                                 | Your gym is on the Free plan or in its trial, or has no approved sender yet | Upgrade the plan, then set up a sender under **Settings > Communication > SMS**                     |
+| A member in Bulgaria, Spain, Czechia, Austria or Ireland isn't texted | The sender name isn't registered for their country yet                      | Request the registration, or wait until it shows **Active**                                         |
+| A US or Canadian member isn't texted                                  | Your toll-free number isn't verified yet                                    | Wait for **Active**, or correct and resubmit a rejected verification                                |
+| **Get a number** is disabled                                          | No business details yet, or nobody in your gym has a US or Canadian number  | Add business details; add the member's number with its `+1` code                                    |
+| The sender name field is locked                                       | A country registration was requested, so carriers hold the exact name       | Keep the name, or ask 1Club support if it has to change                                             |
+| "None of the texts could be sent"                                     | The carrier refused every text, usually because of invalid numbers          | Check the numbers and try again                                                                     |
+| A member says they get no texts                                       | They opted out (look for **No SMS** on their profile)                       | Choose **Allow SMS again** if they asked to receive texts; on the toll-free number they reply START |
+
+## Related
+
+- [Compose](/messaging/compose) - Writing and sending a message on any channel.
+- [Automations](/marketing/automations) - Send message steps that can text members.
+- [Email sending](/settings/email-sending) - The email counterpart: sending from your own domain.
+- [WhatsApp](/settings/integrations/whatsapp) - Two-way messaging on your own WhatsApp Business number.
+- [Notifications](/settings/notifications) - Staff alerts by SMS.

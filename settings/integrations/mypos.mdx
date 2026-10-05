@@ -53,11 +53,17 @@ If you prefer (or your store predates Easy Setup), enter the five values by hand
 | **RSA private key (PEM)** | The private half of your signing key pair, used to sign requests to myPOS. | Generated in myPOS and **shown only once** - store it securely. |
 | **myPOS public certificate (PEM)** | The certificate 1Club uses to verify notifications coming back from myPOS. It is unique to this Checkout Store. | Download it from your **Checkout Store's Integration tab**. |
 
+If your private key file is protected with a passphrase, also enter it in **Private key passphrase**. 1Club uses it once to decrypt the key and never stores it.
+
 <Note>
   The private key is displayed only once when you generate the key pair in myPOS. If you lose it, generate a new key pair (which produces a new key index and certificate) and update all three values here.
 </Note>
 
 For full details on stores, keys, and certificates, see the [myPOS Developers portal](https://developers.mypos.com/).
+
+### Terminal credentials
+
+The Checkout Store credentials above cover hosted checkout only. In-person card terminals need a separate pair of credentials, because 1Club sends terminal charges to your device through the **myPOS API Gateway**. To get them, create an application in your myPOS account and copy its **Merchant client ID** and **Merchant client secret**. You only need these if you turn on the **Terminal** capability (see [Capabilities](#capabilities)).
 
 ## Connect myPOS
 
@@ -67,9 +73,9 @@ For full details on stores, keys, and certificates, see the [myPOS Developers po
    - **Live** - reveals the credential fields described below.
 3. In live mode, supply your credentials one of two ways:
    - Paste your **Configuration Pack** into the **Configuration Pack** field. This fills in all five values and disables the manual fields.
-   - Or, under **Or enter credentials manually**, fill in **Store ID (SID)**, **Client number (Wallet number)**, **Key index**, **RSA private key**, and **myPOS public certificate**.
-4. Set your **Capabilities** (see [Capabilities](#capabilities)).
-5. Click **Validate configuration** to check that the stored values are well-formed.
+   - Or, under **Or enter credentials manually**, fill in **Store ID (SID)**, **Client number (Wallet number)**, **Key index**, **RSA private key**, and **myPOS public certificate**. Fill in **Private key passphrase** only if your key file has one.
+4. Set your **Capabilities** (see [Capabilities](#capabilities)). If you turn on **Terminal**, enter your **Merchant client ID** and **Merchant client secret**.
+5. Click **Validate configuration** to check your settings (see [Validate configuration](#validate-configuration)).
 6. Click **Save**.
 
 <Note>
@@ -87,7 +93,11 @@ For full details on stores, keys, and certificates, see the [myPOS Developers po
 | **Client number (Wallet number)** | Live | The wallet that receives funds. |
 | **Key index** | Live | Positive integer; the index of your signing key pair. |
 | **RSA private key (PEM)** | Live | Stored encrypted. Leave blank when editing to keep the current key. |
-| **myPOS public certificate (PEM)** | Live | Downloaded from your Checkout Store's Integration tab. Leave blank when editing to keep the current certificate. |
+| **Private key passphrase** | Live | Only if your key file is passphrase-protected. Used once to decrypt the key and never stored. |
+| **myPOS public certificate (PEM)** | Live | Downloaded from your Checkout Store's Integration tab. It is unique to that Checkout. Leave blank when editing to keep the current certificate. |
+| **Checkout form** | Both | Shown when **Online** is on. **Minimal** asks members for card details only. **Full** also collects name, address, and contact details. |
+| **Merchant client ID** | Both | Shown when **Terminal** is on. From the application you created in your myPOS account. |
+| **Merchant client secret** | Both | Shown when **Terminal** is on. Stored encrypted and never shown again. Leave blank when editing to keep the saved secret. |
 
 ## Test mode vs. live mode
 
@@ -101,15 +111,34 @@ Switching from **Live** back to **Test** does not delete your saved live credent
 The **Validate configuration** button checks that your saved credentials are well-formed (the private key and certificate are valid PEM, the key index is present, and the required server settings exist). It records the time of the last successful validation.
 
 <Note>
-  Validation runs locally and does **not** contact myPOS or move any money. It catches a malformed key or a missing field, but it cannot confirm that myPOS recognizes your SID or wallet. The first real proof that live credentials are correct is a successful test payment through hosted checkout.
+  For hosted checkout, validation runs locally and does **not** contact myPOS or move any money. It catches a malformed key or a missing field, but it cannot confirm that myPOS recognizes your SID or wallet. The first real proof that live credentials are correct is a successful test payment through hosted checkout.
 </Note>
+
+When **Terminal** is on, validation also checks your **Merchant client ID** and **Merchant client secret** with a real call to myPOS. On success it shows how many terminals myPOS has on the account. This call counts toward the same refusal limit as terminal payments, so validate only after you have double-checked the credentials (see [Terminal credential lockout](#terminal-credential-lockout)).
+
+## Terminal credential lockout
+
+myPOS locks your myPOS account after **three refused attempts** with the same terminal credentials. Only myPOS can unlock it. To make sure 1Club can never be the cause, 1Club stops trying after **two** refusals.
+
+When that happens, the myPOS page shows a warning and 1Club makes no further terminal attempts with those credentials. Each **Validate configuration** run with **Terminal** on counts as an attempt, the same as a payment.
+
+To recover:
+
+1. Check the **Merchant client ID** and **Merchant client secret** against the application in your myPOS account.
+2. Correct them and click **Save**.
+3. If the credentials were already right, contact myPOS first and ask them to confirm your account is not locked.
+4. Only after myPOS confirms the account is fine, click **Allow another attempt** on the warning and confirm.
+
+<Warning>
+  **Allow another attempt** clears the counter. If myPOS refuses the credentials again, that attempt could be the third refusal that locks your myPOS account. Never use it to "try again and see".
+</Warning>
 
 ## Capabilities
 
 The **Capabilities** section controls which payment surfaces the integration serves:
 
-- **Online** - hosted checkout for members on the web (portal, kiosk, and admin-initiated charges). Enabled by default.
-- **Terminal** - in-person card readers at your gyms. Marked **Coming soon** and currently disabled.
+- **Online** - hosted checkout for members on the web (portal, kiosk, and admin-initiated charges). Enabled by default. Under it, **Checkout form** sets how much the myPOS checkout page asks for: **Minimal** (card details only) or **Full** (name, address, and contact details too).
+- **Terminal** - in-person myPOS card terminals at your gyms. Turning it on reveals the **Merchant client ID** and **Merchant client secret** fields (see [Terminal credentials](#terminal-credentials)). Add and manage the devices themselves under **Billing > Payment terminals**, alongside any other providers you use.
 
 ## Send a myPOS payment link
 
@@ -140,15 +169,16 @@ Click **Deactivate** on the myPOS page and confirm. This removes the integration
 - **Validation fails** - confirm the **Store ID (SID)**, **Client number**, and **Key index** match your myPOS Checkout Store, and that the **RSA private key** is the one paired with the certificate for that key index. If you used a Configuration Pack, regenerate it in myPOS and paste the fresh pack.
 - **Customers see a signature error on the checkout page** - the public certificate registered with myPOS does not match the private key on file. Regenerate the key pair in myPOS, download the new public certificate from the Integration tab, and paste the new private key and certificate here.
 - **Payment succeeded on myPOS but the transaction stays unpaid in 1Club** - the IPN webhook did not reach 1Club. Confirm the notification URL is allowed in your myPOS store settings, then re-trigger the notification from myPOS.
+- **myPOS refused the terminal credentials and 1Club stopped trying** - see [Terminal credential lockout](#terminal-credential-lockout). Fix the client ID or secret, and use **Allow another attempt** only after myPOS confirms your account is not locked.
 - **Live payments fail but test mode works** - double-check you are in **Live** mode and that you entered live credentials (a Configuration Pack from your real store, not the sandbox).
 
 ## Worked examples
 
-**Squash club that already banks with myPOS.** A racket-sports club with an existing myPOS merchant account installs myPOS, opens its Checkout Store's **Easy Setup** screen, generates a **Configuration Pack**, and pastes it into 1Club. It validates the configuration, saves, then runs one real court booking to confirm hosted checkout settles the transaction. No Stripe account needed.
+**Squash club that already banks with myPOS.** A racket-sports club with an existing myPOS merchant account activates myPOS, opens its Checkout Store's **Easy Setup** screen, generates a **Configuration Pack**, and pastes it into 1Club. It validates the configuration, saves, then runs one real court booking to confirm hosted checkout settles the transaction. No Stripe account needed.
 
 **Boxing gym collecting an overdue membership fee.** A martial-arts gym has a member whose card on file was declined. Instead of chasing them at the front desk, staff open the overdue transaction under **Revenue → Transactions**, choose **Send myPOS payment link**, and the member pays on their own phone within the 7-day window. The IPN settles the transaction automatically.
 
-**Yoga studio rehearsing before launch.** A Pilates/Yoga studio without myPOS credentials yet installs myPOS in **Test** mode, walks through the full checkout with myPOS test cards, and confirms receipts and booking confirmations look right. When its myPOS store is ready it switches to **Live** and pastes its real Configuration Pack.
+**Yoga studio rehearsing before launch.** A Pilates/Yoga studio without myPOS credentials yet activates myPOS in **Test** mode, walks through the full checkout with myPOS test cards, and confirms receipts and booking confirmations look right. When its myPOS store is ready it switches to **Live** and pastes its real Configuration Pack.
 
 ## Tips & best practices
 
@@ -159,7 +189,7 @@ Click **Deactivate** on the myPOS page and confirm. This removes the integration
 
 ## Related
 
-- [Integrations](/settings/integrations) - the full integration catalog and how installs work.
+- [Integrations](/settings/integrations) - the full integration catalog and how activation works.
 - [Stripe](/settings/integrations/stripe) - the alternative card payment provider, with digital wallets and Stripe Connect.
 - [Transactions](/billing/transactions) - where payable transactions live and where you send a payment link.
 - [Payments](/billing/payments) - the payment records myPOS settles.

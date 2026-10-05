@@ -67,21 +67,22 @@ Additional templates (waitlist spot available, membership expiration reminder, r
 
 ## Message templates
 
-WhatsApp requires that any message you *start* (rather than reply to within the 24-hour window) use a template Meta has reviewed and approved. **1Club ships and manages this template set for you** - you do not write them.
+WhatsApp requires that any message you *start* (rather than reply to within the 24-hour window) use a template Meta has reviewed and approved. That covers booking confirmations, reminders, and automations. **1Club provisions and manages this template set for you** - you do not write them, and you cannot edit them in 1Club.
 
-On connect, 1Club installs its standard, member-facing template set into your WhatsApp Business account (booking confirmation, cancellation, reminder, change, waitlist spot available, membership expiration reminder, review request, and a general message), in each supported language. Meta then reviews each one independently.
+On connect, 1Club installs its standard, member-facing template set into your WhatsApp Business account (booking confirmation, cancellation, reminder, change, waitlist spot available, membership expiration reminder, review request, and a general message), in each supported language. Meta then reviews each one independently, usually within a few hours. A notification uses its template only once Meta has approved it.
 
 The template panel on the WhatsApp page is a **read-only status view**, not an editor. For each template and language you see:
 
 - **Approved** - ready to send.
 - **Pending Meta review** - submitted, awaiting Meta's approval.
 - **Rejected by Meta** - not approved; re-provision to resubmit.
-- **Not set up yet** - not yet installed for that language.
+- **Not set up yet** - the template does not exist in your WhatsApp account yet. Use **Re-provision** to create it.
+- **Doesn't match 1Club's template** - a template with the same name exists in your WhatsApp account, but its content differs from the one 1Club manages, so 1Club won't use it. Delete it in WhatsApp Manager, then select **Re-provision** to create 1Club's version.
 
 Two actions are available:
 
-- **Sync** - refresh the approval statuses from Meta so the panel is current.
-- **Provision** - reinstall the standard set (for example after a rejection or a reconnect). This is safe to run repeatedly.
+- **Sync status** - refresh the approval statuses from Meta so the panel is current. If Meta doesn't return a template's content, 1Club can't check it and leaves it exactly as it was. Try again shortly. If the refresh itself fails, the statuses shown may be out of date until you run **Sync status** again.
+- **Re-provision** - create every template from 1Club's standard set that is missing from your WhatsApp account, then refresh the statuses. Each newly created template goes to Meta for review before it can be used. This is safe to run repeatedly. It never overwrites a template that already exists under the same name, so to replace one that doesn't match 1Club's, delete it in WhatsApp Manager first, then select **Re-provision**.
 
 <Note>
   These WhatsApp templates are separate from the [Templates](/messaging/templates) feature under Settings > Communication, which holds your custom and system message *content* for email, SMS, and inbox sends. The WhatsApp templates here are the Meta-approved wrappers that let business-initiated messages leave the 24-hour window; they are code-defined and not editable.
@@ -114,7 +115,7 @@ Replies inside the 24-hour window are never blocked by this gate - if a member m
 
 ## Disconnect
 
-Use the disconnect action on the WhatsApp page to remove the connection. New inbound messages will no longer route to your inbox, and staff can no longer send from your number, until you reconnect.
+Click **Deactivate** on the WhatsApp page and confirm to remove the connection. New inbound messages will no longer route to your inbox, and staff can no longer send from your number, until you reconnect.
 
 ## Worked examples
 
@@ -128,7 +129,7 @@ Use the disconnect action on the WhatsApp page to remove the connection. New inb
 
 - Reply inside the 24-hour window whenever you can - free-form replies feel more personal and don't depend on template approval.
 - Share the same WhatsApp Business number on your website and social profiles so inbound messages land in the inbox and members opt in naturally.
-- After connecting, give Meta time to approve the templates. Use **Sync** to check status; business-initiated sends only work once the relevant template is **Approved**.
+- After connecting, give Meta time to approve the templates (usually a few hours). Use **Sync status** to check; business-initiated sends only work once the relevant template is **Approved**.
 - Use **Reconnect** rather than disconnecting and re-adding when you switch numbers or refresh access.
 
 ## Troubleshooting
@@ -138,12 +139,14 @@ Use the disconnect action on the WhatsApp page to remove the connection. New inb
 - **"Authorized, but the popup didn't return your WhatsApp account details"** - the Facebook popup finished without sending back the account information. Click **Connect with WhatsApp** and complete the flow again.
 - **Connection cancelled** - you closed or denied the popup. Retry from **Connect with WhatsApp**.
 - **Members message but nothing reaches the inbox** - confirm the status is **Active**. If it shows **Inactive**, use **Reconnect** to re-authorize the number.
-- **Notifications aren't going out over WhatsApp** - check that the relevant template shows **Approved** (use **Sync**), that the member is reachable (WhatsApp badge) and opted in, and that they haven't sent STOP.
-- **A template shows Rejected by Meta** - use **Provision** to resubmit the standard set for review.
+- **Notifications aren't going out over WhatsApp** - check that the relevant template shows **Approved** (use **Sync status**), that the member is reachable (WhatsApp badge) and opted in, and that they haven't sent STOP.
+- **A template shows Rejected by Meta** - use **Re-provision** to resubmit the standard set for review.
+- **A template shows Doesn't match 1Club's template** - the template in your WhatsApp account isn't the one 1Club manages, so it won't be used. Delete it in WhatsApp Manager, then select **Re-provision**.
+- **"Setup isn't finished, so templates can't be managed"** - the connection is missing its WhatsApp Business account details. Click **Reconnect** to finish setting it up.
 
 ## Related
 
-- [Integrations](/settings/integrations) - the full integration catalog and how installs work.
+- [Integrations](/settings/integrations) - the full integration catalog and how activation works.
 - [Inbox](/messaging/message-list) - where inbound WhatsApp messages arrive and staff reply.
 - [Compose](/messaging/compose) - sending messages, including on the WhatsApp channel.
 - [Automations](/marketing/automations) - reaching members on WhatsApp from event-driven workflows.

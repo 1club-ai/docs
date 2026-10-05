@@ -4,7 +4,7 @@ description: Connect the Hype POS through the Hype Exchange Service to fiscalize
 keywords: [hype, hype pos, fiscalization, kitchen display, point of sale, hype exchange service, service item, order sync, deferred settlement, api token]
 ---
 
-Hype is a point-of-sale and kitchen system. The Hype integration links 1Club to your Hype account through the Hype Exchange Service (HES) so that orders placed in 1Club are pushed to Hype for a compliant fiscal receipt and kitchen display, while your Hype menu (categories and products) syncs back into 1Club. An owner or admin installs it, and staff can then take payment for 1Club orders at the Hype counter or terminal.
+Hype is a point-of-sale and kitchen system. The Hype integration links 1Club to your Hype account through the Hype Exchange Service (HES) so that orders placed in 1Club are pushed to Hype for a compliant fiscal receipt and kitchen display, while your Hype menu (categories and products) syncs back into 1Club. An owner or admin activates it, and staff can then take payment for 1Club orders at the Hype counter or terminal.
 
 ## When to use it
 
@@ -18,7 +18,7 @@ Typical uses:
 
 ## Before you start
 
-The integration is provisioned in two hands: Hype support sets up the connection on their side and gives you an API token, and you install that token in 1Club. On the 1Club side the page is labelled **Hype POS**.
+The integration is provisioned in two hands: Hype support sets up the connection on their side and gives you an API token, and you enter that token in 1Club. On the 1Club side the page is labelled **Hype POS**.
 
 - You need a Hype account and an integration provisioned by **Hype support**. When they provision it, they give you an **API token** (a bearer token for the Hype Exchange Service). Without a provisioned integration there is nothing for the token to link to.
 - Configuring Hype requires the **settings.manage.organization** permission. Viewing status requires **settings.read.organization**. Admins and users with full settings management can reach this page; other roles cannot.
@@ -29,31 +29,32 @@ The integration is provisioned in two hands: Hype support sets up the connection
 
 ## Connect Hype
 
-1. Go to **Settings > Integrations** and click **Install** on the Hype card (or open the Hype POS page).
+1. Go to **Settings > Integrations** and click **Activate** on the Hype card (or open the Hype POS page).
 2. Enter your **API token** - the bearer token from the Hype Exchange Service that Hype support gave you.
 3. Leave **HES base URL** at its default, `https://es.hype-software.com` (production). Only change it if Hype told you to use another host on `hype-software.com` (for example the dev environment `https://es.dev.hype-software.com`).
-4. Click **Install**.
+4. Click **Activate**.
 
-Once installed, the page shows the connection status plus the extra controls: **Test connection**, **Poll queues now**, a **Service item** picker, and the **Synced mappings** panel. The API token is stored encrypted at rest and is never shown back to you - the field displays a masked placeholder, and leaving it blank when you save keeps the existing token.
+Once activated, the page shows the connection status plus the extra controls: **Test connection**, **Sync now**, a **Service item** picker, the **Send open tabs to Hype as they grow** switch, and the **Synced mappings** panel. The API token is stored encrypted at rest and is never shown back to you - the field displays a masked placeholder, and leaving it blank when you save keeps the existing token.
 
 <Note>
-  Installing Hype also creates a private **Hype POS** payment method for your organization. You do not create it by hand - it appears automatically and is what enables deferred settlement (see [Take payment at the Hype counter](#take-payment-at-the-hype-counter)).
+  Activating Hype also creates a private **Hype POS** payment method for your organization. You do not create it by hand - it appears automatically and is what enables deferred settlement (see [Take payment at the Hype counter](#take-payment-at-the-hype-counter)).
 </Note>
 
 ## Configuration fields
 
 | Field | Notes |
 | --- | --- |
-| **API token** | Bearer token from the Hype Exchange Service, provided by Hype support when the integration is provisioned. Required to install. Stored encrypted; leave blank when editing to keep the current token. |
+| **API token** | Bearer token from the Hype Exchange Service, provided by Hype support when the integration is provisioned. Required to activate. Stored encrypted; leave blank when editing to keep the current token. |
 | **HES base URL** | Defaults to `https://es.hype-software.com`. Restricted to `https://` hosts on `hype-software.com`. Use `https://es.dev.hype-software.com` only if Hype directs you to the dev environment. |
 | **Service item** | The Hype catalog product that every 1Club sale is fiscalized against. Only selectable after products have synced down from Hype. See [Set the service item](#set-the-service-item). |
+| **Send open tabs to Hype as they grow** | Off by default. Sends each round on an open tab to Hype as it is added. See [Send open tabs to Hype as they grow](#send-open-tabs-to-hype-as-they-grow). |
 
 ## Connection status
 
 The status chip on the configuration card reflects what Hype reports, not a state 1Club sets on its own:
 
-- **Not connected** - Hype is not installed yet.
-- **Inactive** - installed, but Hype has not yet run (or finished provisioning) the initial sync.
+- **Not connected** - Hype is not activated yet.
+- **Inactive** - activated, but Hype has not yet run (or finished provisioning) the initial sync.
 - **Syncing** - Hype's initial-sync pipeline is running. While it is syncing, the page refreshes on its own every couple of seconds.
 - **Active** - Hype reports the integration is ready. Orders push and settle normally.
 - **Error** - Hype aborted or errored. The most recent error message is shown under the form.
@@ -69,11 +70,11 @@ The last successful sync time is shown under the form as **Last sync**.
 - **Pipeline** - the provisioning pipeline status and, where available, the step number (for example "step 4 of 11").
 - **Failed queue jobs** - any jobs Hype could not process, with the entity, method, and Hype's error message. These usually point at the exact missing mapping or shape mismatch.
 
-If the token authenticates but no integration is linked yet, the panel says so - contact Hype support to provision one for the account.
+If the token authenticates but no integration is linked yet, the panel says the token works but Hype hasn't linked an integration. Only Hype can fix this - contact Hype support and ask them to provision an integration for the account.
 
-## Poll queues now
+## Sync now
 
-Hype drives the sync by putting tasks (create this category, create this product, this order changed) on queues that 1Club drains. A background poller drains them on a schedule; **Poll queues now** drains every queue immediately instead of waiting for the next tick. Use it after Hype support tells you provisioning has advanced, or when you want synced menu items to appear without waiting.
+Hype drives the sync by putting tasks (create this category, create this product, this order changed) on queues that 1Club drains. A background poller drains them on a schedule; **Sync now** drains every queue immediately instead of waiting for the next tick. Use it after Hype support tells you provisioning has advanced, or when you want synced menu items to appear without waiting.
 
 ## What syncs
 
@@ -95,14 +96,30 @@ Hype drives the sync by putting tasks (create this category, create this product
 
 ## Set the service item
 
-Hype fiscalizes against its own catalog, but 1Club sells bookings, memberships, and products that do not exist in Hype's catalog. The **Service item** solves this: you pick one Hype catalog product, and every 1Club sale is billed against it while the real line name and price are still sent to Hype.
+Hype fiscalizes against its own catalog, but 1Club sells bookings, memberships, and products that do not exist in Hype's catalog. The **Service item** solves this. It is a placeholder product in Hype that every 1Club sale is recorded under for the fiscal receipt. Bookings, memberships, and products all flow through it. Hype still receives the real line name and price, so the receipt shows what was actually sold, but bills it against this one placeholder.
 
-1. Make sure products have synced down from Hype (run **Poll queues now** if the picker is empty).
+1. Make sure products have synced down from Hype. If the picker is empty, select **Sync now**.
 2. Choose the placeholder product in the **Service item** dropdown.
 3. Click **Save**.
 
+### If you have no placeholder product yet
+
+The picker can only offer products that exist in Hype. If none of them is a good placeholder, or nothing has synced yet:
+
+1. In Hype's POS, add a product to use as the placeholder (for example "1Club sale").
+2. On the Hype POS page in 1Club, select **Sync now** so the new product syncs down.
+3. Pick it in the **Service item** dropdown and click **Save**.
+
 <Warning>
-  If no service item is set, orders are not pushed to Hype - the push is skipped. Set the service item before you expect fiscal receipts to appear.
+  Until a service item is set, every order is discarded before it reaches Hype. That means no fiscal receipt and no kitchen ticket. The page shows an "Orders are not being sent to Hype" warning until you pick one and save.
+</Warning>
+
+## Send open tabs to Hype as they grow
+
+By default, a tab rung up at the till reaches Hype once, when the tab is closed. Turn on **Send open tabs to Hype as they grow** to send each round to Hype as soon as it is added instead, so the kitchen sees it straight away.
+
+<Warning>
+  Before you turn this on, open the Hype back office and pair Hype's accepted order status with 1Club's **Accepted** status. 1Club relies on that status to know when Hype stops accepting changes to an order. Without it, 1Club cannot tell when it is safe to add more rounds.
 </Warning>
 
 ## Take payment at the Hype counter
@@ -122,7 +139,7 @@ Click **Deactivate** on the Hype POS page and confirm. This removes the integrat
 
 ## Worked examples
 
-**Padel club with a cafe.** A racket-sports club runs a cafe next to its courts. Hype support provisions the integration and sends an API token; the club installs it under **Settings > Integrations**, waits for the menu to sync (it runs **Poll queues now** to speed it up), and sees its drinks and snacks appear under **Synced mappings > Products**. It picks one of those products as the **Service item**. Court bookings and cafe sales now both push to Hype for a single compliant receipt.
+**Padel club with a cafe.** A racket-sports club runs a cafe next to its courts. Hype support provisions the integration and sends an API token; the club activates it under **Settings > Integrations**, waits for the menu to sync (it selects **Sync now** to speed it up), and sees its drinks and snacks appear under **Synced mappings > Products**. It picks one of those products as the **Service item**. Court bookings and cafe sales now both push to Hype for a single compliant receipt.
 
 **Climbing gym taking payment at the counter.** A climbing gym sells day passes and coffee at one desk. Staff add both to an order and choose the **Hype POS** payment method. The order goes to Hype unpaid, the member taps their card on the Hype terminal, and when Hype confirms it 1Club marks the order paid and confirms the day-pass booking - no second step in 1Club.
 
@@ -130,24 +147,24 @@ Click **Deactivate** on the Hype POS page and confirm. This removes the integrat
 
 ## Tips & best practices
 
-- Set the **Service item** as soon as products have synced. Orders are silently skipped until one is chosen.
+- Set the **Service item** as soon as products have synced. Until one is chosen, orders never reach Hype, so there is no fiscal receipt and no kitchen ticket.
 - Use **Test connection** to read Hype's pipeline step and failed jobs before assuming a sync is stuck - the error messages point at the exact missing mapping.
-- Run **Poll queues now** after Hype support tells you provisioning advanced, rather than waiting for the background poller.
+- Select **Sync now** after Hype support tells you provisioning advanced, rather than waiting for the background poller.
 - Leave the **API token** field blank when editing other settings - only paste a value when you are deliberately replacing the token.
 - Keep in mind that readiness is whatever Hype reports. If the status shows **Inactive** or **Syncing** for a long time, that is Hype's pipeline, not a 1Club setting you can flip.
 
 ## Troubleshooting
 
-- **The Service item dropdown is empty** - products have not synced from Hype yet. Run **Poll queues now**, or add a placeholder product in Hype's POS and sync again.
-- **Orders are not appearing in Hype** - confirm a **Service item** is set and the status is **Active**. Without a service item the push is skipped.
-- **Test connection says "no integration linked"** - the token authenticates, but Hype has not provisioned an integration for it. Contact Hype support.
+- **The Service item dropdown is empty** - products have not synced from Hype yet. Select **Sync now**, or add a placeholder product in Hype's POS and sync again (see [If you have no placeholder product yet](#if-you-have-no-placeholder-product-yet)).
+- **Orders are not appearing in Hype** - confirm a **Service item** is set and the status is **Active**. Without a service item every order is discarded before it reaches Hype.
+- **Test connection says the token works but no integration is linked** - the token authenticates, but Hype has not provisioned an integration for it. Contact Hype support.
 - **Status is stuck on Syncing or Inactive** - this reflects Hype's provisioning pipeline. Use **Test connection** to read the pipeline step and any failed queue jobs, and contact Hype support with those details. Resetting a stuck status is not exposed as a button on the page (see the note below).
-- **An order was paid at the POS but still shows unpaid in 1Club** - the **Completed** callback did not arrive. Run **Poll queues now** to drain the order queue, then re-check.
+- **An order was paid at the POS but still shows unpaid in 1Club** - the **Completed** callback did not arrive. Select **Sync now** to drain the order queue, then re-check.
 - **An order was cancelled at Hype after 1Club already settled it** - the collected payment and confirmed bookings are left in place and need a manual reversal; they are not automatically undone.
 
 ## Related
 
-- [Integrations](/settings/integrations) - the full integration catalog and how installs work.
+- [Integrations](/settings/integrations) - the full integration catalog and how activation works.
 - [Orders](/billing/orders) - the orders that are pushed to Hype for fiscalization.
 - [Products](/billing/products) - where the categories and products synced from Hype appear.
 - [Payment methods](/settings/payment-methods) - where the Hype POS payment method lives.

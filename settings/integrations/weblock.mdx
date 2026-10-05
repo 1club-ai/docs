@@ -18,6 +18,10 @@ Typical uses:
 
 ## How access is decided
 
+<Note>
+  This section and the **Group mapping** and **Devices mapping** sections below describe the earlier, plan-based WebLock setup. WebLock now works per gym and per area. See [Area-based access](#area-based-access) for the current screen and how to switch.
+</Note>
+
 When 1Club syncs a grant, it picks the WebLock group in this order:
 
 - **Memberships** use the group mapped to the member's plan.
@@ -46,6 +50,32 @@ Valnes API credentials are held at the platform level, so you do not enter a use
 5. Click **Save** to store any later changes.
 
 Once the connection tests successfully, the **Group mapping** and **Devices mapping** sections load your WebLock groups and readers and become editable.
+
+## Area-based access
+
+Door access is set for each gym separately. On the WebLock page, choose the gym under **Club**. The gym needs at least one active area first - if it has none, the page links you to **Manage areas**.
+
+For the gym, set:
+
+- **Business ID** - your WebLock business.
+- **Enable door access** - turns WebLock on for this gym.
+- **Access buffer (minutes)** - how long before a booking starts the door opens, and how long after it ends it stays open (0-120).
+- **Light buffer (minutes)** - how long before and after a booking the area's light devices are switched on (0-120).
+
+Then, under **Areas**, choose for each area:
+
+- **Door groups** - the WebLock door groups a booking in that area opens. An area with no door group opens no doors.
+- **Light devices (optional)** - the devices whose lights follow bookings in that area.
+
+Click **Save**. Use **Test connection** to check the Business ID, and **Sync now** to push access to WebLock straight away.
+
+### Switching to area-based access
+
+If your gym still runs on the earlier plan-based setup, the page shows a warning until you switch. 1Club pre-fills each area's door group and light device from your earlier area type, default booking group, and reader mappings where it safely can. Check every area before you save.
+
+<Warning>
+  Configure every area before you switch to area-based access. After the switch, a membership alone no longer opens the door: access comes from area access, such as a booking in that area. If several gyms share the same WebLock business, save every one of them on the new setup before you sync. 1Club refuses to sync a shared business until all of its gyms are switched.
+</Warning>
 
 ## Group mapping
 
@@ -105,7 +135,7 @@ A jiu-jitsu academy runs private sessions where only the coaching room should op
 
 ## Disconnect
 
-Click **Deactivate** on the integrations list. This stops 1Club from creating new grants in WebLock and clears the WebLock references stored on your contacts. Existing grants in WebLock are not retroactively removed - delete or expire them in the WebLock console if needed.
+WebLock is switched off per gym, not from the integrations list. On the WebLock page, choose the gym under **Club**, turn off **Enable door access**, and click **Save**. 1Club stops creating new grants in WebLock for that gym. To change a gym's Business ID, switch door access off first and let the access cleanup finish, including for any other gyms sharing that business.
 
 ## Related
 

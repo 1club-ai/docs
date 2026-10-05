@@ -1,7 +1,7 @@
 ---
 title: Organizations and clubs
 description: How 1Club's multi-tenant model works - organizations as the top-level tenant, clubs as locations, org and club switching, and how every record is scoped by organizationId.
-keywords: ["organization", "club", "multi-tenant", "tenant", "location", "venue", "org switcher", "club switcher", "all clubs", "organizationId", "data scope"]
+keywords: ["organization", "club", "multi-tenant", "tenant", "location", "venue", "org switcher", "club switcher", "all clubs", "organizationId", "data scope", "booking labels", "private training", "group activities", "rename booking card"]
 ---
 
 Every record in 1Club belongs to an **organization** - the top-level tenant that owns your members, bookings, plans, invoices, messages, and settings, and the unit of billing, branding, and permissions. An organization has one or more **clubs**, the physical locations (a gym, studio, court complex, or venue) where activity actually happens. A single user can belong to more than one organization, with a different role in each, and when they open the admin they work inside one organization at a time.
@@ -90,6 +90,38 @@ Editing uses a floating save bar: change any field and **Save** appears at the b
 - **Google Business Profile** - connect a club to import Google reviews, ratings, and business data. See [Google Business](/settings/integrations/google-business).
 - **OpenStreetMap** - connect to enrich the club with address, sports, amenities, opening hours, and contact details.
 - **Visibility** - a club can be Public or Private, controlling whether its public page is reachable.
+- **Booking labels** - your own names for the booking cards members choose from. See [Booking labels](#booking-labels).
+
+### Booking labels
+
+When members book, they first pick what they want to book: time with a coach, a place in a class, or a court or room. Each choice is a card, titled **Private training**, **Group activities**, and **Areas** by default. Booking labels let each gym give those cards its own names, so members read the words your gym actually uses.
+
+- **A tennis academy** renames **Private training** to "Lessons", because that is what its coaches sell.
+- **A boutique studio** renames **Group activities** to "Classes".
+- **A padel venue** whose courts have no area type renames **Areas** to "Courts".
+
+To set them, open **Settings > Clubs**, open the club, and expand **Booking labels** in the right-hand column, below **Google Business Profile** and **Daily summary**. The section starts collapsed because most gyms never change it. Type a name, then click **Save** on the save bar.
+
+| Field                         | Default card title | Where members see it                                                                                               |
+| ----------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| **Name for private training** | Private training   | The card for booking a coach's time                                                                                |
+| **Name for group activities** | Group activities   | The card that lists your classes                                                                                   |
+| **Name for areas**            | Areas              | The card for areas that have no area type of their own, and the single card shown when all areas are shown together |
+
+How the labels behave:
+
+- **Only the title changes.** The line under each card is always set by 1Club: a count such as "4 available", or, under group activities, the names of your class types.
+- **A named area type keeps its own name.** A card for an area type such as "Padel court" shows the area type's name, not your areas label. To change that card, rename the area type, which renames it everywhere it appears. See [Areas](/operations/areas).
+- **Each club has its own labels.** In an organization with several clubs, set each club separately, so two locations can sell different things under the same card.
+- **Up to 30 characters, on one line.** Each translation has the same limit.
+- **Leave a field blank to use the default.** The default titles are already translated into every language 1Club supports. Clearing a label also removes its translations.
+- **Changes are live as soon as you save**, on your website, the member portal, the mobile app, and 1club.me.
+
+To translate a label, click the **Translations** icon beside its field. Use **Auto Translate** to fill every language your organization offers, or type each one yourself. A member reading in a language with no translation sees the label as you wrote it.
+
+<Note>
+  AI assistants connected through [MCP](/mcp/tools) can set the same labels and their translations with `update_club_booking_labels`, which needs the `organization:write` scope (the same one that sets the languages your organization offers). Integrations can call `PATCH /v1/platform/clubs/{slug}` on the [Platform API](/api-reference/introduction).
+</Note>
 
 ### Switching club and "All clubs"
 

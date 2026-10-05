@@ -10,6 +10,8 @@ keywords:
     list_classes,
     create_booking,
     search_clubs,
+    list_class_types,
+    list_progression_tracks,
     find_availability,
     get_club,
     availability,
@@ -32,6 +34,11 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
 | `create_class`                   | Creates one class occurrence                                       | `classes:write`     |
 | `update_class`                   | Updates one class occurrence                                       | `classes:write`     |
 | `delete_class`                   | Deletes one class or this and future recurring occurrences         | `classes:write`     |
+| `list_class_types`               | Lists your class types, with sport, age group, level, and the track each counts toward | `classes:read` |
+| `get_class_type`                 | Opens one class type by id                                         | `classes:read`      |
+| `create_class_type`              | Adds a class type                                                  | `classes:write`     |
+| `update_class_type`              | Changes a class type, including its age group, level, and track    | `classes:write`     |
+| `list_progression_tracks`        | Lists your progression tracks and the class types counting toward each | `classes:read` |
 | `list_areas`                     | Lists your bookable areas                                          | `areas:read`        |
 | `get_platform_area_availability` | Checks when an area is free, for a date or a date range            | `areas:read`        |
 | `list_area_blocks`               | Lists area blocks overlapping a date range                         | `areas:read`        |
@@ -167,7 +174,7 @@ Each admin tool is a thin wrapper over the documented Platform API, so the reque
 | Tool                | What it does                                                                                         |
 | ------------------- | ---------------------------------------------------------------------------------------------------- |
 | `find_availability` | Free, priced court times across the marketplace in one call, each with a link that opens the booking |
-| `search_clubs`      | Finds gyms by name, sport, location, distance, price, rating, amenities, and date                     |
+| `search_clubs`      | Finds gyms by name, sport, location, distance, price, rating, amenities, date, and the age group and level of their classes |
 | `get_club`          | One club's profile and the menu of what it sells - courts by the hour, its classes, its passes        |
 
 Reach for `find_availability` for any "when can I play" question. It searches, prices and dates in one step, so there is no need to find clubs first and then look their availability up separately. Give it a `date` when someone names a day - without one it walks forward from today and may never reach the day they meant.

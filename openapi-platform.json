@@ -1572,7 +1572,7 @@
       },
       "PlatformWebsite": {
         "type": "object",
-        "description": "A website belonging to the organization. Page content, layout and theme tokens describe the **draft**. `url`, `published`, `activeReleaseVersion` and `lastPublishedAt` describe what the public is currently being served. `name` and `clubId` are live row fields - they take effect without a publish.",
+        "description": "A website belonging to the organization. Page content, layout and theme tokens describe the **draft**. `url`, `published`, `activeReleaseVersion` and `lastPublishedAt` describe what the public is currently being served. `name` and `clubId` are live row fields — they take effect without a publish.",
         "properties": {
           "id": {
             "type": "integer"
@@ -1742,6 +1742,15 @@
         "properties": {
           "error": {
             "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "description": "A stable, machine-readable reason, when the error has one (e.g. `CONTACT_EXISTS`)."
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Structured values behind the error. A 409 naming an existing record carries its id here, e.g. `contactId`."
           }
         }
       },
@@ -1806,7 +1815,7 @@
               "header",
               "paragraph"
             ],
-            "description": "`header` and `paragraph` store nothing - they structure and explain an editing panel."
+            "description": "`header` and `paragraph` store nothing — they structure and explain an editing panel."
           },
           "options": {
             "type": "array",
@@ -2080,6 +2089,11 @@
             "nullable": true,
             "description": "The event this booking attends, when it is an event booking"
           },
+          "maxPlayers": {
+            "type": "integer",
+            "nullable": true,
+            "description": "How many players the booking takes, the organizer included, when it differs from the area type's `defaultMaxPlayers`: `2` on a court booked for singles (area types with `allowsSingles`). `null` means the area type's own limit. Adding a player past it is refused."
+          },
           "instructorId": {
             "type": "integer",
             "nullable": true,
@@ -2106,6 +2120,315 @@
             ],
             "nullable": true,
             "description": "The booking's customer, identical to what GET /v1/platform/contacts/{id} returns. Present only when the request passes `include=customer`, which additionally requires the `contacts:read` scope; `null` when the booking has no contact. Use it to import a window of bookings without a contact lookup per row."
+          },
+          "money": {
+            "type": "object",
+            "description": "What the booking costs and how it was paid. Present only with `include=money`, which additionally requires the `transactions:read` scope. `billed` is always `paid + outstanding`, on the same basis as the admin's Booking audit: tax-inclusive, net of refunds, so a cancelled booking bills only the Cancellation Charge it kept.",
+            "properties": {
+              "billed": {
+                "type": "number"
+              },
+              "billedExTax": {
+                "type": "number"
+              },
+              "paid": {
+                "type": "number",
+                "description": "Money the club kept: collected, net of refunds."
+              },
+              "outstanding": {
+                "type": "number",
+                "description": "Still owed on the booking. A closed charge owes nothing."
+              },
+              "paymentState": {
+                "type": "string",
+                "description": "paid, partial, unpaid, refunded, covered or free."
+              },
+              "paymentStatus": {
+                "type": "string",
+                "nullable": true,
+                "description": "The charges' own payment statuses, `/`-joined."
+              },
+              "charges": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "transactionId": {
+                      "type": "integer"
+                    },
+                    "transactionType": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "payerContactId": {
+                      "type": "integer",
+                      "nullable": true,
+                      "description": "Who the charge is on: the organizer, or a player paying their own share."
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "paymentStatus": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "number",
+                      "description": "What the charge bills, after any cancellation credit against it."
+                    },
+                    "paidAmount": {
+                      "type": "number"
+                    },
+                    "refundedAmount": {
+                      "type": "number",
+                      "description": "Returned from its payments by a refund."
+                    },
+                    "outstandingAmount": {
+                      "type": "number"
+                    },
+                    "invoiceIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "orderId": {
+                      "type": "integer",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "credits": {
+                "type": "array",
+                "description": "Cancellation credits: what a cancellation took off a charge.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "transactionId": {
+                      "type": "integer"
+                    },
+                    "chargeTransactionId": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "amount": {
+                      "type": "number"
+                    },
+                    "paymentStatus": {
+                      "type": "string"
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              },
+              "payments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "paymentId": {
+                      "type": "integer"
+                    },
+                    "amount": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "method": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "reference": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "paidAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "transactionIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              },
+              "refunds": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "refundId": {
+                      "type": "integer"
+                    },
+                    "transactionId": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "paymentId": {
+                      "type": "integer"
+                    },
+                    "amount": {
+                      "type": "number"
+                    },
+                    "destination": {
+                      "type": "string",
+                      "enum": [
+                        "stripe",
+                        "wallet",
+                        "cash",
+                        "manual"
+                      ]
+                    },
+                    "reason": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "refundedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "cancellation": {
+            "type": "object",
+            "description": "The cancellation terms stamped on the booking and how it was cancelled. Present only with `include=cancellation`.",
+            "properties": {
+              "terms": {
+                "type": "object",
+                "nullable": true,
+                "description": "The terms the customer accepted with the booking - not the club's policy today, which may since have changed. `null` for an event ticket, whose event keeps its own terms, and for a booking accepted before terms were stamped.",
+                "properties": {
+                  "acceptedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "rules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "hoursInAdvance": {
+                          "type": "number"
+                        },
+                        "refundPercentage": {
+                          "type": "number"
+                        },
+                        "description": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "deadlines": {
+                    "type": "array",
+                    "description": "Every band that refunds something, as the moment to cancel by, widest notice first.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "until": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "refundPercentage": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "freeCancellationUntil": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true,
+                    "description": "The last moment a cancellation refunds in full; `null` when no band does."
+                  },
+                  "fullyCovered": {
+                    "type": "boolean",
+                    "description": "A membership or pass covered the whole booking."
+                  },
+                  "collectsFromWallet": {
+                    "type": "boolean",
+                    "description": "The Cancellation Charge is taken from the Wallet."
+                  },
+                  "waiver": {
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                      "at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "byUserId": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "reason": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "cancelled": {
+                "type": "object",
+                "nullable": true,
+                "description": "`null` while the booking is not cancelled.",
+                "properties": {
+                  "at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "by": {
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                      "userId": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "reason": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "noticeHours": {
+                    "type": "number",
+                    "description": "Hours between the cancellation and the start; negative when it came after the start."
+                  },
+                  "refundPercentage": {
+                    "type": "number",
+                    "nullable": true
+                  },
+                  "refundAmount": {
+                    "type": "number",
+                    "nullable": true
+                  },
+                  "policyWaived": {
+                    "type": "boolean"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
           },
           "payment": {
             "type": "object",
@@ -2305,6 +2628,460 @@
           }
         }
       },
+      "PlatformRevenueChange": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "percent": {
+            "type": "number",
+            "nullable": true,
+            "description": "Null when the comparison period had none."
+          }
+        }
+      },
+      "PlatformRevenueFigures": {
+        "type": "object",
+        "properties": {
+          "revenue": {
+            "type": "number",
+            "description": "Recognised ex-tax, net of refunds and Wallet-funded parts."
+          },
+          "collected": {
+            "type": "number",
+            "description": "The part of it already paid, on the same basis."
+          },
+          "uncollected": {
+            "type": "number"
+          },
+          "collectionRate": {
+            "type": "number",
+            "nullable": true,
+            "description": "`collected / revenue`, 0-1."
+          },
+          "sales": {
+            "type": "integer"
+          },
+          "averageSale": {
+            "type": "number",
+            "nullable": true
+          }
+        }
+      },
+      "PlatformRevenueBreakdown": {
+        "type": "object",
+        "properties": {
+          "revenue": {
+            "type": "number"
+          },
+          "collected": {
+            "type": "number"
+          },
+          "sales": {
+            "type": "integer"
+          },
+          "share": {
+            "type": "number",
+            "description": "Share of the period's revenue, 0-1."
+          },
+          "previousRevenue": {
+            "type": "number",
+            "description": "In the comparison period; absent without one."
+          },
+          "change": {
+            "$ref": "#/components/schemas/PlatformRevenueChange"
+          }
+        }
+      },
+      "PlatformRevenueReport": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "format": "date"
+              },
+              "to": {
+                "type": "string",
+                "format": "date"
+              },
+              "days": {
+                "type": "integer"
+              }
+            }
+          },
+          "timezone": {
+            "type": "string",
+            "description": "The clock the days are read on."
+          },
+          "currency": {
+            "type": "string"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/PlatformRevenueFigures"
+          },
+          "comparison": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "previous_period",
+                  "previous_year"
+                ]
+              },
+              "period": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              },
+              "totals": {
+                "$ref": "#/components/schemas/PlatformRevenueFigures"
+              },
+              "change": {
+                "type": "object",
+                "properties": {
+                  "revenue": {
+                    "$ref": "#/components/schemas/PlatformRevenueChange"
+                  },
+                  "collected": {
+                    "$ref": "#/components/schemas/PlatformRevenueChange"
+                  },
+                  "sales": {
+                    "$ref": "#/components/schemas/PlatformRevenueChange"
+                  }
+                }
+              }
+            }
+          },
+          "byStream": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/PlatformRevenueBreakdown"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "stream": {
+                      "type": "string",
+                      "enum": [
+                        "bookings",
+                        "memberships",
+                        "passes",
+                        "drop_ins",
+                        "products",
+                        "other"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "byClub": {
+            "type": "array",
+            "description": "Absent when the report is narrowed to one club.",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/PlatformRevenueBreakdown"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "clubId": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "clubName": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "byPaymentMethod": {
+            "type": "array",
+            "description": "What collected the money. A sale paid by several methods counts under the one that paid most; 'Unattributed' is collected with no real-money payment behind it.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "method": {
+                  "type": "string"
+                },
+                "channel": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "collected": {
+                  "type": "number"
+                },
+                "share": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "topItems": {
+            "type": "array",
+            "description": "What sold most: a class or court, a plan, a product.",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/PlatformRevenueBreakdown"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "stream": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "trend": {
+            "type": "object",
+            "properties": {
+              "granularity": {
+                "type": "string",
+                "enum": [
+                  "day",
+                  "week",
+                  "month"
+                ]
+              },
+              "points": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "start": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "revenue": {
+                      "type": "number"
+                    },
+                    "collected": {
+                      "type": "number"
+                    },
+                    "sales": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "movers": {
+            "type": "array",
+            "description": "The streams, clubs and items whose revenue moved most against the comparison period, largest move first. Empty without a comparison.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "dimension": {
+                  "type": "string",
+                  "enum": [
+                    "stream",
+                    "club",
+                    "item"
+                  ]
+                },
+                "label": {
+                  "type": "string"
+                },
+                "revenue": {
+                  "type": "number"
+                },
+                "previousRevenue": {
+                  "type": "number"
+                },
+                "change": {
+                  "$ref": "#/components/schemas/PlatformRevenueChange"
+                }
+              }
+            }
+          }
+        }
+      },
+      "PlatformContactWithOverview": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PlatformContact"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "overview": {
+                "type": "object",
+                "description": "What staff see on the contact's profile before serving them, present only with `include=overview`.",
+                "properties": {
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "error",
+                      "warning"
+                    ],
+                    "nullable": true,
+                    "description": "The loudest alert; null when there is nothing to say."
+                  },
+                  "alerts": {
+                    "type": "array",
+                    "description": "Most pressing first. `kind` is one of archived, access_suspended, amount_due (`amount`), deposit_shortfall (`held`, `required`, `shortfall`), rental_overdue / rental_out (`rentals[]`), required_document_unsigned / optional_document_unsigned / required_field_missing (`requirements[]`). `amount_due` is raised once some of what is owed is for something other than a visit still ahead; `money.amountDue` is the whole figure, upcoming visits included. Alerts inform; they never block a sale.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string"
+                        },
+                        "severity": {
+                          "type": "string",
+                          "enum": [
+                            "error",
+                            "warning"
+                          ]
+                        }
+                      },
+                      "additionalProperties": true
+                    }
+                  },
+                  "money": {
+                    "type": "object",
+                    "nullable": true,
+                    "description": "Null when the key lacks `transactions:read`.",
+                    "properties": {
+                      "currency": {
+                        "type": "string"
+                      },
+                      "amountDue": {
+                        "type": "number",
+                        "description": "Everything the contact still owes, as the profile shows it. Never reduced by Wallet credit."
+                      },
+                      "walletBalance": {
+                        "type": "number"
+                      },
+                      "deposit": {
+                        "type": "object",
+                        "properties": {
+                          "requiredAmount": {
+                            "type": "number"
+                          },
+                          "depositHeld": {
+                            "type": "number"
+                          },
+                          "availableToSpend": {
+                            "type": "number"
+                          },
+                          "shortfall": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "totalBilled": {
+                        "type": "number"
+                      },
+                      "totalPaid": {
+                        "type": "number"
+                      },
+                      "transactions": {
+                        "type": "integer",
+                        "description": "Every transaction on the contact, void and reversal rows included."
+                      }
+                    }
+                  },
+                  "activity": {
+                    "type": "object",
+                    "properties": {
+                      "lastVisitAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                      },
+                      "bookings": {
+                        "type": "integer",
+                        "description": "Bookings that are not cancelled."
+                      },
+                      "checkins": {
+                        "type": "integer"
+                      },
+                      "classCheckins": {
+                        "type": "integer"
+                      },
+                      "activeMemberships": {
+                        "type": "integer",
+                        "description": "Plans still worth acting on, of any kind."
+                      },
+                      "memberships": {
+                        "type": "integer",
+                        "description": "Recurring plans held, any status."
+                      },
+                      "passes": {
+                        "type": "integer"
+                      },
+                      "dropIns": {
+                        "type": "integer"
+                      },
+                      "documents": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "missingContactDetails": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "phone",
+                        "email"
+                      ]
+                    }
+                  },
+                  "withheld": {
+                    "type": "array",
+                    "description": "What was left out because the key lacks its scope.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "family": {
+                          "type": "string",
+                          "enum": [
+                            "money",
+                            "rentals"
+                          ]
+                        },
+                        "scope": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
       "PlatformContact": {
         "type": "object",
         "description": "A contact (customer) in the organization. Reference the `id` as `contactId` when creating a booking.",
@@ -2338,7 +3115,7 @@
           "type": {
             "type": "string",
             "nullable": true,
-            "description": "Derived contact type (e.g. contact, member, lead). `archived` marks a retired contact - hidden from the list and from search, but still readable by id."
+            "description": "Derived contact type (e.g. contact, member, lead). `archived` marks a retired contact — hidden from the list and from search, but still readable by id."
           },
           "createdAt": {
             "type": "string",
@@ -2348,7 +3125,7 @@
       },
       "PlatformArchiveIncomplete": {
         "type": "object",
-        "description": "A 409 with code `ARCHIVE_INCOMPLETE`. The contact IS archived - only the release of what it held is unfinished. Repeat the same DELETE (the same `Idempotency-Key` is fine, a partial result is never replayed) to reconcile what is listed.",
+        "description": "A 409 with code `ARCHIVE_INCOMPLETE`. The contact IS archived — only the release of what it held is unfinished. Repeat the same DELETE (the same `Idempotency-Key` is fine, a partial result is never replayed) to reconcile what is listed.",
         "properties": {
           "error": {
             "type": "string"
@@ -2700,6 +3477,800 @@
           "total": {
             "type": "integer",
             "description": "Total instructors matching the filters, ignoring pagination"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
+      },
+      "PlatformFormQuestion": {
+        "type": "object",
+        "description": "One question on a fill-in form, as read. Resend it with its `id` to keep it.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Keep this: answers are stored against it."
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "text",
+              "textarea",
+              "yes_no",
+              "select",
+              "boolean",
+              "date",
+              "number",
+              "email",
+              "phone",
+              "url",
+              "time"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "placeholder": {
+            "type": "string",
+            "nullable": true
+          },
+          "helpText": {
+            "type": "string",
+            "nullable": true
+          },
+          "sectionHeading": {
+            "type": "string",
+            "nullable": true,
+            "description": "Starts a new section above this question."
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The choices of a `select` question."
+          },
+          "contactCustomFieldId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "A member profile field this question's answer is also saved to, linked in the admin portal. Send it back unchanged (or leave it out) to keep the link, or null to remove it."
+          },
+          "translations": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "PlatformFormQuestionWrite": {
+        "type": "object",
+        "required": [
+          "label",
+          "type",
+          "required"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "An existing question of this form, to keep it. Leave out for a new question."
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "text",
+              "textarea",
+              "yes_no",
+              "select",
+              "boolean",
+              "date",
+              "number",
+              "email",
+              "phone",
+              "url",
+              "time"
+            ]
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether it must be answered. Always sent: there is no default."
+          },
+          "placeholder": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "helpText": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500
+          },
+          "sectionHeading": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "options": {
+            "type": "array",
+            "nullable": true,
+            "maxItems": 50,
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": "Required for `select`. Not translatable: the choice is also the stored answer."
+          },
+          "contactCustomFieldId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Keep or remove an existing link to a member profile field: send the value read from GET (or leave it out) to keep it, or null to remove it. Setting a new link is done in the admin portal (`FORM_QUESTION_LINK_NOT_SETTABLE`)."
+          },
+          "translations": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "description": "Per-locale wording. Translatable fields: label, placeholder, helpText, sectionHeading."
+          }
+        }
+      },
+      "PlatformFormQuestionsPut": {
+        "type": "object",
+        "required": [
+          "questions"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "questions": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/PlatformFormQuestionWrite"
+            },
+            "description": "Every question the form should ask, in order."
+          },
+          "removeQuestionIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Existing questions to delete. Every existing question must be either resent by id or listed here (`FORM_QUESTION_OMITTED`)."
+          }
+        }
+      },
+      "PlatformForm": {
+        "type": "object",
+        "description": "A form: a page people fill in, live at `publicUrl`.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "slug": {
+            "type": "string",
+            "description": "The last part of `publicUrl`. Fixed once the form exists."
+          },
+          "createsAccount": {
+            "type": "boolean",
+            "description": "true for a sign-up form (registers the person, can sell); false for a fill-in form (collects answers). Fixed once the form exists."
+          },
+          "publicUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "Where the form is filled in, on the organization's own website or member portal. It is live: anyone with the link can use it. null when the organization has neither switched on, so nothing can open the form until one is."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Internal name, shown to staff in the admin portal."
+          },
+          "title": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Heading at the top of the form. Blank or null falls back to the wizard's own wording."
+          },
+          "subtitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Sub-heading under the title. Blank or null falls back to the wizard's own wording."
+          },
+          "planStepTitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Heading above the plan picker (sign-up forms). Blank or null falls back to the wizard's own wording."
+          },
+          "classTypeStepTitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Heading above the class-type picker (sign-up forms). Blank or null falls back to the wizard's own wording."
+          },
+          "planIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 100,
+            "description": "Sign-up forms only. Plans the form sells, from GET /v1/platform/plans. Each must be active, publicly visible and not a season plan (`FORM_PLAN_NOT_SELLABLE` names each refused id and why). When any are set, the person must choose one to finish."
+          },
+          "classTypeIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 100,
+            "description": "Sign-up forms only. Class types offered as an interest, from GET /v1/platform/class-types. Nothing is booked."
+          },
+          "productIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 100,
+            "description": "Sign-up forms only. Products the form sells, from GET /v1/platform/products. Each must be active, publicly visible and sold as a product (`FORM_PRODUCT_NOT_SELLABLE`)."
+          },
+          "registrationFor": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "child",
+              "both"
+            ],
+            "description": "Who the form registers: the person filling it in, only their children, or both."
+          },
+          "signatureMethod": {
+            "type": "string",
+            "enum": [
+              "draw",
+              "type",
+              "check"
+            ],
+            "description": "How documents are signed: drawn, typed name, or a checkbox."
+          },
+          "collectsDocuments": {
+            "type": "boolean",
+            "description": "Whether the form asks for the organization's documents and a signature. Which documents is set by the organization's document rules."
+          },
+          "requiresAuthentication": {
+            "type": "boolean",
+            "description": "Fill-in forms only: the person must be signed in to fill it in. Refused on a sign-up form (`FORM_AUTHENTICATION_FILL_IN_ONLY`)."
+          },
+          "combineSelectionAndDetails": {
+            "type": "boolean",
+            "description": "Put the \"choose what to buy\" step and the details step on one page. Needs a form that sells something (`FORM_NOTHING_TO_COMBINE`)."
+          },
+          "displayMode": {
+            "type": "string",
+            "enum": [
+              "page",
+              "dialog"
+            ],
+            "description": "How a link to the form opens: as its own page, or as a dialog over the page it was opened from."
+          },
+          "videoUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500,
+            "description": "A Cloudinary video URL from the media library, shown as a step before review. null removes the video step."
+          },
+          "videoRequired": {
+            "type": "boolean",
+            "description": "The person cannot continue until the video has played to the end. Needs a video (`FORM_VIDEO_REQUIRED_WITHOUT_VIDEO`)."
+          },
+          "videoTitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Heading above the video. Blank or null falls back to the wizard's own wording."
+          },
+          "fieldOverrides": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": false,
+            "description": "Fill-in forms only (`FORM_FIELD_OVERRIDES_FILL_IN_ONLY`; an empty object is accepted and ignored on a sign-up form, which asks the organization's own sign-up fields instead). Which built-in contact fields the form asks: `required` asks it, `hidden` does not. A fill-in form cannot ask one optionally. `address` asks the whole postal address. On update the map is merged: the fields you send change and the rest stay as they are, so send `hidden` to stop asking one. null clears every override.",
+            "properties": {
+              "firstName": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "lastName": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "email": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "phone": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "dateOfBirth": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "gender": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "address": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              }
+            }
+          },
+          "translations": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "description": "Per-locale wording, as `{ \"es\": { \"title\": \"...\" } }`. Replaces the whole map. Translatable fields: title, subtitle, planStepTitle, classTypeStepTitle, videoTitle; any other key is refused (`INVALID_TRANSLATIONS`)."
+          },
+          "packageIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Read-only here: packages are added in the admin portal."
+          },
+          "submissionCount": {
+            "type": "integer",
+            "description": "How many people have completed it. The answers are not served by this API."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformFormQuestion"
+            },
+            "description": "In order. On a single-form read and on every write; not in the list."
+          }
+        }
+      },
+      "PlatformFormCreate": {
+        "type": "object",
+        "description": "Fields accepted when creating a form. Unknown fields are refused, and `packageIds`, `customFieldIds` and `showFamilyMembers` are refused by name with the reason. Set questions afterwards with PUT /v1/platform/forms/{id}/questions.",
+        "required": [
+          "name",
+          "createsAccount"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "createsAccount": {
+            "type": "boolean",
+            "description": "Required and permanent. true: a sign-up form, which registers whoever completes it and can sell plans and products. false: a fill-in form, which only collects answers."
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 120,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "description": "Optional; derived from the name when left out. A taken slug is a 409 (`FORM_SLUG_TAKEN`)."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Internal name, shown to staff in the admin portal."
+          },
+          "title": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Heading at the top of the form. Blank or null falls back to the wizard's own wording."
+          },
+          "subtitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Sub-heading under the title. Blank or null falls back to the wizard's own wording."
+          },
+          "planStepTitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Heading above the plan picker (sign-up forms). Blank or null falls back to the wizard's own wording."
+          },
+          "classTypeStepTitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Heading above the class-type picker (sign-up forms). Blank or null falls back to the wizard's own wording."
+          },
+          "planIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 100,
+            "description": "Sign-up forms only. Plans the form sells, from GET /v1/platform/plans. Each must be active, publicly visible and not a season plan (`FORM_PLAN_NOT_SELLABLE` names each refused id and why). When any are set, the person must choose one to finish."
+          },
+          "classTypeIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 100,
+            "description": "Sign-up forms only. Class types offered as an interest, from GET /v1/platform/class-types. Nothing is booked."
+          },
+          "productIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 100,
+            "description": "Sign-up forms only. Products the form sells, from GET /v1/platform/products. Each must be active, publicly visible and sold as a product (`FORM_PRODUCT_NOT_SELLABLE`)."
+          },
+          "registrationFor": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "child",
+              "both"
+            ],
+            "description": "Who the form registers: the person filling it in, only their children, or both."
+          },
+          "signatureMethod": {
+            "type": "string",
+            "enum": [
+              "draw",
+              "type",
+              "check"
+            ],
+            "description": "How documents are signed: drawn, typed name, or a checkbox."
+          },
+          "collectsDocuments": {
+            "type": "boolean",
+            "description": "Whether the form asks for the organization's documents and a signature. Which documents is set by the organization's document rules."
+          },
+          "requiresAuthentication": {
+            "type": "boolean",
+            "description": "Fill-in forms only: the person must be signed in to fill it in. Refused on a sign-up form (`FORM_AUTHENTICATION_FILL_IN_ONLY`)."
+          },
+          "combineSelectionAndDetails": {
+            "type": "boolean",
+            "description": "Put the \"choose what to buy\" step and the details step on one page. Needs a form that sells something (`FORM_NOTHING_TO_COMBINE`)."
+          },
+          "displayMode": {
+            "type": "string",
+            "enum": [
+              "page",
+              "dialog"
+            ],
+            "description": "How a link to the form opens: as its own page, or as a dialog over the page it was opened from."
+          },
+          "videoUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500,
+            "description": "A Cloudinary video URL from the media library, shown as a step before review. null removes the video step."
+          },
+          "videoRequired": {
+            "type": "boolean",
+            "description": "The person cannot continue until the video has played to the end. Needs a video (`FORM_VIDEO_REQUIRED_WITHOUT_VIDEO`)."
+          },
+          "videoTitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Heading above the video. Blank or null falls back to the wizard's own wording."
+          },
+          "fieldOverrides": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": false,
+            "description": "Fill-in forms only (`FORM_FIELD_OVERRIDES_FILL_IN_ONLY`; an empty object is accepted and ignored on a sign-up form, which asks the organization's own sign-up fields instead). Which built-in contact fields the form asks: `required` asks it, `hidden` does not. A fill-in form cannot ask one optionally. `address` asks the whole postal address. On update the map is merged: the fields you send change and the rest stay as they are, so send `hidden` to stop asking one. null clears every override.",
+            "properties": {
+              "firstName": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "lastName": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "email": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "phone": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "dateOfBirth": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "gender": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "address": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              }
+            }
+          },
+          "translations": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "description": "Per-locale wording, as `{ \"es\": { \"title\": \"...\" } }`. Replaces the whole map. Translatable fields: title, subtitle, planStepTitle, classTypeStepTitle, videoTitle; any other key is refused (`INVALID_TRANSLATIONS`)."
+          }
+        }
+      },
+      "PlatformFormUpdate": {
+        "type": "object",
+        "description": "Fields accepted when updating a form. Send only what changes. `slug` and `createsAccount` are refused by name: both are fixed once the form exists.",
+        "minProperties": 1,
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Internal name, shown to staff in the admin portal."
+          },
+          "title": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Heading at the top of the form. Blank or null falls back to the wizard's own wording."
+          },
+          "subtitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Sub-heading under the title. Blank or null falls back to the wizard's own wording."
+          },
+          "planStepTitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Heading above the plan picker (sign-up forms). Blank or null falls back to the wizard's own wording."
+          },
+          "classTypeStepTitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Heading above the class-type picker (sign-up forms). Blank or null falls back to the wizard's own wording."
+          },
+          "planIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 100,
+            "description": "Sign-up forms only. Plans the form sells, from GET /v1/platform/plans. Each must be active, publicly visible and not a season plan (`FORM_PLAN_NOT_SELLABLE` names each refused id and why). When any are set, the person must choose one to finish."
+          },
+          "classTypeIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 100,
+            "description": "Sign-up forms only. Class types offered as an interest, from GET /v1/platform/class-types. Nothing is booked."
+          },
+          "productIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 100,
+            "description": "Sign-up forms only. Products the form sells, from GET /v1/platform/products. Each must be active, publicly visible and sold as a product (`FORM_PRODUCT_NOT_SELLABLE`)."
+          },
+          "registrationFor": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "child",
+              "both"
+            ],
+            "description": "Who the form registers: the person filling it in, only their children, or both."
+          },
+          "signatureMethod": {
+            "type": "string",
+            "enum": [
+              "draw",
+              "type",
+              "check"
+            ],
+            "description": "How documents are signed: drawn, typed name, or a checkbox."
+          },
+          "collectsDocuments": {
+            "type": "boolean",
+            "description": "Whether the form asks for the organization's documents and a signature. Which documents is set by the organization's document rules."
+          },
+          "requiresAuthentication": {
+            "type": "boolean",
+            "description": "Fill-in forms only: the person must be signed in to fill it in. Refused on a sign-up form (`FORM_AUTHENTICATION_FILL_IN_ONLY`)."
+          },
+          "combineSelectionAndDetails": {
+            "type": "boolean",
+            "description": "Put the \"choose what to buy\" step and the details step on one page. Needs a form that sells something (`FORM_NOTHING_TO_COMBINE`)."
+          },
+          "displayMode": {
+            "type": "string",
+            "enum": [
+              "page",
+              "dialog"
+            ],
+            "description": "How a link to the form opens: as its own page, or as a dialog over the page it was opened from."
+          },
+          "videoUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500,
+            "description": "A Cloudinary video URL from the media library, shown as a step before review. null removes the video step."
+          },
+          "videoRequired": {
+            "type": "boolean",
+            "description": "The person cannot continue until the video has played to the end. Needs a video (`FORM_VIDEO_REQUIRED_WITHOUT_VIDEO`)."
+          },
+          "videoTitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "Heading above the video. Blank or null falls back to the wizard's own wording."
+          },
+          "fieldOverrides": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": false,
+            "description": "Fill-in forms only (`FORM_FIELD_OVERRIDES_FILL_IN_ONLY`; an empty object is accepted and ignored on a sign-up form, which asks the organization's own sign-up fields instead). Which built-in contact fields the form asks: `required` asks it, `hidden` does not. A fill-in form cannot ask one optionally. `address` asks the whole postal address. On update the map is merged: the fields you send change and the rest stay as they are, so send `hidden` to stop asking one. null clears every override.",
+            "properties": {
+              "firstName": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "lastName": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "email": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "phone": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "dateOfBirth": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "gender": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              },
+              "address": {
+                "type": "string",
+                "enum": [
+                  "required",
+                  "hidden"
+                ]
+              }
+            }
+          },
+          "translations": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "description": "Per-locale wording, as `{ \"es\": { \"title\": \"...\" } }`. Replaces the whole map. Translatable fields: title, subtitle, planStepTitle, classTypeStepTitle, videoTitle; any other key is refused (`INVALID_TRANSLATIONS`)."
+          }
+        }
+      },
+      "PlatformFormPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformForm"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total forms matching the filters, ignoring pagination"
           },
           "limit": {
             "type": "integer"
@@ -3453,9 +5024,16 @@
             "nullable": true,
             "description": "How many people a slot on this type normally takes."
           },
+          "allowsSingles": {
+            "type": "boolean",
+            "description": "Whether a booking on this type may be made for singles (2 players) instead of doubles. Only read when defaultMaxPlayers is 4; leave it off for padel."
+          },
           "maxConcurrentBookings": {
             "type": "integer",
             "description": "How many bookings may hold an area of this type at once. 1 for an ordinary court."
+          },
+          "bookingAudience": {
+            "$ref": "#/components/schemas/PlatformContactAudience"
           }
         }
       },
@@ -3512,12 +5090,20 @@
             "maximum": 1000,
             "description": "How many people a slot on this type normally takes."
           },
+          "allowsSingles": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether a booking on this type may be made for singles (2 players) instead of doubles. Only read when defaultMaxPlayers is 4; leave it off for padel."
+          },
           "maxConcurrentBookings": {
             "type": "integer",
             "minimum": 1,
             "maximum": 100,
             "default": 1,
             "description": "How many bookings may hold an area of this type at once. 1 for an ordinary court."
+          },
+          "bookingAudience": {
+            "$ref": "#/components/schemas/PlatformContactAudience"
           }
         }
       },
@@ -3572,12 +5158,20 @@
             "maximum": 1000,
             "description": "How many people a slot on this type normally takes."
           },
+          "allowsSingles": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether a booking on this type may be made for singles (2 players) instead of doubles. Only read when defaultMaxPlayers is 4; leave it off for padel."
+          },
           "maxConcurrentBookings": {
             "type": "integer",
             "minimum": 1,
             "maximum": 100,
             "default": 1,
             "description": "How many bookings may hold an area of this type at once. 1 for an ordinary court."
+          },
+          "bookingAudience": {
+            "$ref": "#/components/schemas/PlatformContactAudience"
           }
         }
       },
@@ -3634,6 +5228,40 @@
           },
           "bookingAudience": {
             "$ref": "#/components/schemas/PlatformContactAudience"
+          },
+          "sport": {
+            "type": "string",
+            "nullable": true,
+            "description": "The sport classes of this kind are for, a canonical sport id such as \"jiu-jitsu\". A default only: each class still carries its own `sport`. An unrecognised value is rejected."
+          },
+          "ageGroup": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "infant",
+              "child",
+              "junior",
+              "adult",
+              "senior",
+              "all_ages"
+            ],
+            "description": "Who a class of this kind is for: an age band (infant 0–4, child 5–12, junior 13–17, adult 18–64, senior 65+), the same bands the age smart tags use, or all_ages. Marketplace search filters on it."
+          },
+          "difficulty": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced",
+              "all_levels"
+            ],
+            "description": "How hard a class of this kind is. Marketplace search filters on it. Not a rank: see `progressionTrackId`."
+          },
+          "progressionTrackId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The progression track sessions of this kind count toward, from GET /v1/platform/progression-tracks. Once any class type points at a track, only those sessions count toward its ranks; a track nothing points at counts every session. Must be a track the organization uses."
           }
         }
       },
@@ -3688,6 +5316,40 @@
           },
           "bookingAudience": {
             "$ref": "#/components/schemas/PlatformContactAudience"
+          },
+          "sport": {
+            "type": "string",
+            "nullable": true,
+            "description": "The sport classes of this kind are for, a canonical sport id such as \"jiu-jitsu\". A default only: each class still carries its own `sport`. An unrecognised value is rejected."
+          },
+          "ageGroup": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "infant",
+              "child",
+              "junior",
+              "adult",
+              "senior",
+              "all_ages"
+            ],
+            "description": "Who a class of this kind is for: an age band (infant 0–4, child 5–12, junior 13–17, adult 18–64, senior 65+), the same bands the age smart tags use, or all_ages. Marketplace search filters on it."
+          },
+          "difficulty": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced",
+              "all_levels"
+            ],
+            "description": "How hard a class of this kind is. Marketplace search filters on it. Not a rank: see `progressionTrackId`."
+          },
+          "progressionTrackId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The progression track sessions of this kind count toward, from GET /v1/platform/progression-tracks. Once any class type points at a track, only those sessions count toward its ranks; a track nothing points at counts every session. Must be a track the organization uses."
           }
         }
       },
@@ -3814,6 +5476,75 @@
           },
           "bookingAudience": {
             "$ref": "#/components/schemas/PlatformContactAudience"
+          },
+          "sport": {
+            "type": "string",
+            "nullable": true,
+            "description": "The sport classes of this kind are for, a canonical sport id such as \"jiu-jitsu\". A default only: each class still carries its own `sport`. An unrecognised value is rejected."
+          },
+          "ageGroup": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "infant",
+              "child",
+              "junior",
+              "adult",
+              "senior",
+              "all_ages"
+            ],
+            "description": "Who a class of this kind is for: an age band (infant 0–4, child 5–12, junior 13–17, adult 18–64, senior 65+), the same bands the age smart tags use, or all_ages. Marketplace search filters on it."
+          },
+          "difficulty": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced",
+              "all_levels"
+            ],
+            "description": "How hard a class of this kind is. Marketplace search filters on it. Not a rank: see `progressionTrackId`."
+          },
+          "progressionTrackId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The progression track sessions of this kind count toward, from GET /v1/platform/progression-tracks. Once any class type points at a track, only those sessions count toward its ranks; a track nothing points at counts every session. Must be a track the organization uses."
+          }
+        }
+      },
+      "PlatformProgressionTrack": {
+        "type": "object",
+        "description": "A ladder of ranks in one discipline that the organization uses. Reference the `id` as `progressionTrackId` on a class type to make its sessions count toward these ranks.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sport": {
+            "type": "string",
+            "description": "Canonical sport id the ladder belongs to, e.g. \"jiu-jitsu\"."
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "custom": {
+            "type": "boolean",
+            "description": "True for the organization's own track, or its copy of a template; false for an enabled global template."
+          },
+          "levelCount": {
+            "type": "integer",
+            "description": "How many ranks the ladder has."
+          },
+          "classTypeIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Class types whose sessions count toward this track. Empty means every session counts; once any is linked, only sessions of the linked types do."
           }
         }
       },
@@ -4378,6 +6109,298 @@
             "type": "integer"
           }
         }
+      },
+      "PlatformInvoiceTotals": {
+        "type": "object",
+        "description": "Invoices in one currency, added up. Amounts in different currencies are never summed together.",
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "subtotal": {
+            "type": "number",
+            "description": "Before tax"
+          },
+          "taxAmount": {
+            "type": "number"
+          },
+          "totalAmount": {
+            "type": "number",
+            "description": "Tax included"
+          }
+        }
+      },
+      "PlatformInvoiceSummary": {
+        "type": "object",
+        "properties": {
+          "timezone": {
+            "type": "string",
+            "description": "The organization's timezone, whose calendar days the range is read on"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "billingEntityId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "invoiced": {
+            "type": "array",
+            "description": "One entry per currency; void and cancelled invoices excluded. Empty when nothing was invoiced.",
+            "items": {
+              "$ref": "#/components/schemas/PlatformInvoiceTotals"
+            }
+          },
+          "byStatus": {
+            "type": "array",
+            "description": "Every status present in the range, per currency, void and cancelled included",
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "integer"
+                },
+                "totalAmount": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "overdue": {
+            "type": "array",
+            "description": "Unpaid invoices in the range whose due date has passed, per currency",
+            "items": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "integer"
+                },
+                "totalAmount": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "byBillingEntity": {
+            "type": "array",
+            "description": "`invoiced`, split by the billing entity that issued each invoice",
+            "items": {
+              "type": "object",
+              "properties": {
+                "billingEntityId": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "invoiced": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlatformInvoiceTotals"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "PlatformInvoice": {
+        "type": "object",
+        "description": "A fiscal invoice. Pro-formas are never returned.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "invoiceNumber": {
+            "type": "string"
+          },
+          "invoiceDate": {
+            "type": "string",
+            "format": "date",
+            "description": "The calendar day the invoice belongs to, on the organization's clock"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "paid",
+              "void",
+              "failed",
+              "settled",
+              "overdue",
+              "partially_paid",
+              "refunded",
+              "cancelled"
+            ]
+          },
+          "overdue": {
+            "type": "boolean",
+            "description": "Unpaid and past its due date"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "number"
+          },
+          "taxAmount": {
+            "type": "number"
+          },
+          "totalAmount": {
+            "type": "number"
+          },
+          "sentAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "contact": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "billingEntity": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "PlatformInvoiceDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PlatformInvoice"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "lineItems": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string"
+                    },
+                    "quantity": {
+                      "type": "number"
+                    },
+                    "unitPrice": {
+                      "type": "number"
+                    },
+                    "totalAmount": {
+                      "type": "number"
+                    }
+                  }
+                }
+              },
+              "payments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "paymentDate": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PlatformInvoicePage": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PlatformInvoice"
+                }
+              },
+              "total": {
+                "type": "integer",
+                "description": "Total invoices matching the filters, ignoring pagination"
+              },
+              "limit": {
+                "type": "integer"
+              },
+              "offset": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "timezone": {
+                "type": "string"
+              },
+              "startDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "endDate": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          }
+        ]
       }
     },
     "responses": {
@@ -6140,11 +8163,10 @@
             "name": "include",
             "schema": {
               "type": "string",
-              "enum": [
-                "customer"
-              ]
+              "pattern": "^(customer|money|cancellation)(,(customer|money|cancellation))*$",
+              "example": "customer,money,cancellation"
             },
-            "description": "Embed each booking's customer as `customer`, identical to what GET /v1/platform/contacts/{id} returns - one request instead of a contact lookup per booking. Requires the `contacts:read` scope in addition to `bookings:read`, and is refused with 403 without it.\n"
+            "description": "Comma-separated expansions to embed on each booking, loaded once for the whole page. `customer` is the booking's customer, identical to what GET /v1/platform/contacts/{id} returns, and needs `contacts:read`. `money` is what the booking billed, what was paid and what is still outstanding, with the charges, cancellation credits, payments and refunds behind those figures, and needs `transactions:read`. `cancellation` is the cancellation terms stamped on the booking when it was accepted (with the deadlines they give, and until when it cancels for free) and, once cancelled, who cancelled it, when, why, with how much notice and at what refund. An expansion whose scope the key lacks is refused with 403 rather than left out.\n"
           },
           {
             "in": "query",
@@ -6186,7 +8208,7 @@
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `bookings:read` scope, or `include=customer` was sent without `contacts:read`",
+            "description": "API key is missing the required `bookings:read` scope, or an `include` was sent without the scope it needs",
             "content": {
               "application/json": {
                 "schema": {
@@ -6204,7 +8226,7 @@
     "/v1/platform/bookings/{id}/cancel": {
       "post": {
         "summary": "Cancel a booking",
-        "description": "Cancels the booking by its 1club id. Idempotent: cancelling an already-cancelled booking succeeds.\n\nWhich bookings are cancellable depends on the credential. An API key may cancel only the bookings it created (`source: api`); anything else is reported as not found. A staff member acting through an authorized 1club assistant may cancel any of the organization's bookings, as they can in the admin portal.\n\nRefunds follow the money. On a booking this API created, 1club never held the payment, so it moves none - but it records what you gave back, so the club's revenue matches yours. Cancelling with an API key records a refund of everything collected unless `refund.amount` says otherwise: send the amount you actually returned to keep a cancellation fee, or `0` if you kept it all, and your own refund id as `refund.reference`. Over a staff credential nothing is recorded unless `refund` is sent. On a booking taken through 1club (member portal, app, front desk), the club's own cancellation policy decides the refund, exactly as it does for a staff cancellation in the admin portal, and `refund` is ignored.\n\nA booking that has already been checked in cannot be cancelled (409) - voiding a check-in is an admin-portal action. One occurrence of a recurring booking is cancelled, not the series.\n",
+        "description": "Cancels the booking by its 1club id. Idempotent: cancelling an already-cancelled booking succeeds.\n\nWhich bookings are cancellable depends on the credential. An API key may cancel only the bookings it created (`source: api`); anything else is reported as not found. A staff member acting through an authorized 1club assistant may cancel any of the organization's bookings, as they can in the admin portal.\n\nRefunds follow the money. On a booking this API created, 1club never held the payment, so it moves none - but it records what you gave back, so the club's revenue matches yours. Cancelling with an API key records a refund of everything collected unless `refund.amount` says otherwise: send the amount you actually returned to keep a cancellation fee, or `0` if you kept it all, and your own refund id as `refund.reference`. Over a staff credential nothing is recorded unless `refund` is sent. On a booking taken through 1club (member portal, app, front desk), the club is the one cancelling: an unpaid booking owes nothing unless `keepCancellationCharge` is true. A paid booking the cancellation policy would keep money from needs an explicit `keepCancellationCharge` - `false` refunds it in full, `true` applies the policy - and without one the call is refused (409 `CANCELLATION_CHARGE_DECISION_REQUIRED`), exactly as the admin portal asks. `refund` is ignored there.\n\nA booking that has already been checked in cannot be cancelled (409) - voiding a check-in is an admin-portal action. One occurrence of a recurring booking is cancelled, not the series.\n",
         "tags": [
           "Bookings"
         ],
@@ -6231,9 +8253,18 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "Why the booking is cancelled, recorded on the cancellation and shown to staff wherever the booking's cancellation is (and returned by `include=cancellation`). Defaults to a note naming the API as the channel.\n"
+                  },
                   "notifyCustomer": {
                     "type": "boolean",
                     "description": "Tell the customer their booking was cancelled - email plus the in-app and WhatsApp notification. Defaults to off for a booking this API created, since callers normally send their own notice, and to on for a booking taken through 1club, whose customer expects to hear it from the club. The club's own staff alerts are sent either way.\n"
+                  },
+                  "keepCancellationCharge": {
+                    "type": "boolean",
+                    "description": "On a booking taken through 1club: `true` applies the club's cancellation policy, so a late cancellation keeps its charge; `false` refunds what was paid in full and forgives the rest. Left out, an unpaid booking owes nothing, and a paid one the policy would keep money from is refused with 409 `CANCELLATION_CHARGE_DECISION_REQUIRED`. Ignored on a booking this API created.\n"
                   },
                   "refund": {
                     "type": "object",
@@ -6300,7 +8331,7 @@
             "$ref": "#/components/responses/PlatformNotFound"
           },
           "409": {
-            "description": "The booking has already been checked in, so it cannot be cancelled (`BOOKING_ALREADY_CHECKED_IN`); or it is managed by another API key that owns its own records, so only that key may release it (`BOOKING_EXTERNALLY_MANAGED`, with the managing integration's name in `details.managedBy`).\n",
+            "description": "The booking was paid and the cancellation policy would keep some of it, so `keepCancellationCharge` must say what happens to the money (`CANCELLATION_CHARGE_DECISION_REQUIRED`, with the bookings in `details.bookingIds`); or it has already been checked in, so it cannot be cancelled (`BOOKING_ALREADY_CHECKED_IN`); or it is managed by another API key that owns its own records, so only that key may release it (`BOOKING_EXTERNALLY_MANAGED`, with the managing integration's name in `details.managedBy`).\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -6342,11 +8373,10 @@
             "name": "include",
             "schema": {
               "type": "string",
-              "enum": [
-                "customer"
-              ]
+              "pattern": "^(customer|money|cancellation)(,(customer|money|cancellation))*$",
+              "example": "customer,money,cancellation"
             },
-            "description": "Embed the booking's customer as `customer`, identical to what GET /v1/platform/contacts/{id} returns. Requires the `contacts:read` scope in addition to `bookings:read`, and is refused with 403 without it.\n"
+            "description": "Comma-separated expansions to embed on the booking. `customer` is the booking's customer, identical to what GET /v1/platform/contacts/{id} returns, and needs `contacts:read`. `money` is what the booking billed, what was paid and what is still outstanding, with the charges, cancellation credits, payments and refunds behind those figures, and needs `transactions:read`. `cancellation` is the cancellation terms stamped on the booking when it was accepted (with the deadlines they give, and until when it cancels for free) and, once cancelled, who cancelled it, when, why, with how much notice and at what refund. An expansion whose scope the key lacks is refused with 403 rather than left out.\n"
           }
         ],
         "responses": {
@@ -6355,7 +8385,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlatformBooking"
+                  "$ref": "#/components/schemas/PlatformBookingListItem"
                 }
               }
             }
@@ -6367,7 +8397,7 @@
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `bookings:read` scope, or `include=customer` was sent without `contacts:read`",
+            "description": "API key is missing the required `bookings:read` scope, or an `include` was sent without the scope it needs",
             "content": {
               "application/json": {
                 "schema": {
@@ -7827,7 +9857,7 @@
       },
       "post": {
         "summary": "Create a contact",
-        "description": "Creates a contact in the organization. At least one of `email` or `phone` is required so the person stays reachable and findable. Creating a contact whose email already exists returns 409 - search first, then reference the existing id. Supports the `Idempotency-Key` header.\n",
+        "description": "Creates a contact in the organization. At least one of `email` or `phone` is required so the person stays reachable and findable. Creating a contact whose email already exists returns 409 (`code` CONFLICT), and so does one whose phone number already belongs to a contact with the same name (`code` CONTACT_EXISTS; a shared number under a different name - a household - is accepted). Both name the existing contact in `details.contactId`. Search first, then reference the existing id. A `phone` is stored in international form (`+359877762016`) when it is a valid number for the organization's country, and as given otherwise. Supports the `Idempotency-Key` header.\n",
         "tags": [
           "Contacts"
         ],
@@ -7896,7 +9926,7 @@
     "/v1/platform/contacts/{id}": {
       "get": {
         "summary": "Get a contact",
-        "description": "Returns a single contact by its 1club id.",
+        "description": "Returns a single contact by its 1club id. With `include=overview` it also returns the contact's overview as `overview` - what staff see on the contact's profile before serving them: the alerts (an Amount Due, a Wallet below its Required Deposit, gear overdue, a required document unsigned, a required profile field missing, access suspended, archived), the money (Amount Due, Wallet balance, deposit, billed and paid to date), activity counts and the last visit, and the contact details the record lacks.\n\nMoney needs `transactions:read` and gear needs `products:read` on top of `contacts:read`. Without them the rest is still returned, and `withheld` names what was left out and the scope it needs, so a missing alert is never mistaken for nothing to report.\n",
         "tags": [
           "Contacts"
         ],
@@ -7914,6 +9944,17 @@
               "type": "integer"
             },
             "description": "1club contact id"
+          },
+          {
+            "in": "query",
+            "name": "include",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "overview"
+              ]
+            },
+            "description": "Embed the contact's overview as `overview`."
           }
         ],
         "responses": {
@@ -7922,7 +9963,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlatformContact"
+                  "$ref": "#/components/schemas/PlatformContactWithOverview"
                 }
               }
             }
@@ -8041,6 +10082,15 @@
               "type": "integer"
             },
             "description": "1club contact id"
+          },
+          {
+            "in": "query",
+            "name": "keepCancellationCharge",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Archiving cancels the contact's future bookings. For a paid one the cancellation policy would keep money from, say what happens to it: `false` refunds it in full, `true` applies the policy. Without it such an archive is refused (409 `CANCELLATION_CHARGE_DECISION_REQUIRED`) and nothing changes. Unpaid bookings owe nothing either way unless it is `true`.\n"
           }
         ],
         "responses": {
@@ -8074,7 +10124,7 @@
             "$ref": "#/components/responses/PlatformNotFound"
           },
           "409": {
-            "description": "Either the archive was refused outright (`CONFLICT` - the contact can reach the admin portal, their instructor profile still has upcoming assignments, or they are paying part of a split bill; resolve it in 1club, then retry), or the contact WAS archived and the release did not finish (`ARCHIVE_INCOMPLETE`; repeat the request to reconcile). Read `code` to tell them apart - one means nothing happened, the other means the archive did.\n",
+            "description": "Either the archive was refused outright (`CONFLICT` - the contact can reach the admin portal, their instructor profile still has upcoming assignments, or they are paying part of a split bill; resolve it in 1club, then retry; or `CANCELLATION_CHARGE_DECISION_REQUIRED` - a paid future booking needs `keepCancellationCharge`), or the contact WAS archived and the release did not finish (`ARCHIVE_INCOMPLETE`; repeat the request to reconcile). Read `code` to tell them apart - one means nothing happened, the other means the archive did.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -8707,6 +10757,368 @@
         }
       }
     },
+    "/v1/platform/forms": {
+      "get": {
+        "summary": "List forms",
+        "description": "The organization's forms, newest first. A form with `createsAccount: true` is a sign-up form: it registers whoever completes it and can sell plans and products. One with `createsAccount: false` is a fill-in form that only collects answers. `publicUrl` is where each one is filled in, and every form is live there. Questions are not included; read a single form for them.\n",
+        "tags": [
+          "Forms"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "description": "Match on name or slug, case-insensitive"
+          },
+          {
+            "in": "query",
+            "name": "createsAccount",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Only sign-up forms (`true`) or only fill-in forms (`false`)"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of forms",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformFormPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `forms:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a form",
+        "description": "Creates a form. It is **live immediately** at the returned `publicUrl`: there is no draft, so confirm the content with the club before creating one. `publicUrl` is null when the organization has neither a member portal nor a live website: the form is created, but nothing can open it until one is switched on.\n\n`createsAccount` is required and permanent. `true` makes a sign-up form, which registers whoever completes it and sells what it offers: completing one with a plan creates a real membership, or asks for payment when the plan is paid up front. Only active, publicly visible, non-season plans and active, publicly visible products can be offered; anything else is a 400 naming each refused id and why. `false` makes a fill-in form, which offers nothing, collects answers to its questions (set them with PUT /v1/platform/forms/{id}/questions), and creates a lead for a visitor it does not know.\n\n`slug` is optional and derived from the name when left out. A slug you name that is already taken is a 409 rather than a quiet `-2`. Read the `slug` and `publicUrl` from the response. Supports the `Idempotency-Key` header.\n\nNeeds the `forms:write` scope, which is new. An API key holding the `*` wildcard picks it up automatically; an OAuth connection made before it shipped has to be re-authorized.\n",
+        "tags": [
+          "Forms"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformFormCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Form created, and live",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformForm"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `forms:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The slug is already used by another form (`FORM_SLUG_TAKEN`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/forms/{id}": {
+      "get": {
+        "summary": "Get a form",
+        "description": "One form with its questions, in order. Keep each question's `id`: to change the questions you resend every one you are keeping by id. `submissionCount` is how many people have completed it; the answers themselves are not served by this API.\n",
+        "tags": [
+          "Forms"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "1club form id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The form",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformForm"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `forms:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a form",
+        "description": "Edits a form. Send only what changes; an omitted field is left alone. The change is live immediately.\n\n`slug` and `createsAccount` cannot be changed: the slug is the address people were given, and the kind decides what the form is. Offerings on a sign-up form are held to the same bar as on create, and a fill-in form offers nothing. There is no delete: deleting a form deletes every submission made through it, so it stays in the 1club admin portal.\n",
+        "tags": [
+          "Forms"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "1club form id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformFormUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated form",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformForm"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `forms:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/forms/{id}/questions": {
+      "put": {
+        "summary": "Set a fill-in form's questions",
+        "description": "Sets the questions of a fill-in form (`createsAccount: false`), in the order given. The change is live immediately.\n\nResend every question you are keeping **with its `id`**, and list the ones to delete in `removeQuestionIds`. A question is never deleted by being left out: a list that is missing an existing question is a 400 (`FORM_QUESTION_OMITTED`) naming it. The ids matter because answers are stored against them, so a question resent without its id is a new question and the answers already given stop being linked to it. Deleting a question keeps past submissions readable with the wording they were asked under.\n\nA sign-up form has no questions of its own (`FORM_QUESTIONS_FILL_IN_ONLY`).\n",
+        "tags": [
+          "Forms"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "1club form id"
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformFormQuestionsPut"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The form, with its new questions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformForm"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `forms:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
     "/v1/platform/instructor-types": {
       "get": {
         "summary": "List instructor types",
@@ -9280,6 +11692,232 @@
                 }
               }
             }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/invoices/summary": {
+      "get": {
+        "summary": "Summarize what was invoiced",
+        "description": "Totals of the organization's fiscal invoices over a range of calendar days on the organization's own clock (`timezone` in the response). Both bounds are inclusive `YYYY-MM-DD` dates; with neither, the range is today, and with one, it is that single day. A range may span at most 93 days.\n\nAn invoice belongs to the day its invoice date names: a date entered without a time files on that date, and an invoice raised from a sale files on the organization's local day. Pro-formas are never included.\n\n`invoiced` excludes `void` and `cancelled` invoices; `byStatus` lists every status, those included. Every amount is grouped by currency - totals in different currencies are never added together. `overdue` counts unpaid invoices in the range whose due date has passed. `byBillingEntity` splits `invoiced` by the company that issued each invoice.\n",
+        "tags": [
+          "Invoices"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "startDate",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "First day, inclusive. Defaults to endDate, or today."
+          },
+          {
+            "in": "query",
+            "name": "endDate",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Last day, inclusive. Defaults to startDate."
+          },
+          {
+            "in": "query",
+            "name": "billingEntityId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only invoices issued by this billing entity"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice totals for the range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformInvoiceSummary"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "Missing `invoices:read` scope"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/invoices": {
+      "get": {
+        "summary": "List invoices",
+        "description": "Lists the organization's fiscal invoices over a range of calendar days, newest first. The days are read exactly as `GET /invoices/summary` reads them, so for the same range and filters this returns the invoices the summary counted. Pro-formas are never included.\n",
+        "tags": [
+          "Invoices"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "startDate",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "First day, inclusive. Defaults to endDate, or today."
+          },
+          {
+            "in": "query",
+            "name": "endDate",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Last day, inclusive. Defaults to startDate."
+          },
+          {
+            "in": "query",
+            "name": "billingEntityId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "contactId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "paid",
+                "void",
+                "failed",
+                "settled",
+                "overdue",
+                "partially_paid",
+                "refunded",
+                "cancelled"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of invoices",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformInvoicePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "Missing `invoices:read` scope"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/invoices/{id}": {
+      "get": {
+        "summary": "Get an invoice",
+        "description": "One fiscal invoice with its line items and the payments recorded against it.",
+        "tags": [
+          "Invoices"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformInvoiceDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "Missing `invoices:read` scope"
           },
           "404": {
             "$ref": "#/components/responses/PlatformNotFound"
@@ -11862,6 +14500,177 @@
         }
       }
     },
+    "/v1/platform/progression-tracks": {
+      "get": {
+        "summary": "List progression tracks",
+        "description": "Returns the progression tracks the organization uses - its own and the global templates it has enabled - each a ladder of ranks in one discipline (a belt system, a swim-stage scheme). Resolve a track here, then pass its `id` as `progressionTrackId` when creating or updating a class type to make that type's sessions count toward its ranks.\n\nEach track lists the class types already counting toward it in `classTypeIds`. An empty list means every session counts; once any class type is linked, only sessions of the linked types do. Read-only: tracks and their levels are set up in the 1club admin dashboard. There is no paging: an organization has a handful of these. Carries the `classes` scopes rather than one of its own.\n",
+        "tags": [
+          "Classes"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Every progression track the organization uses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformProgressionTrack"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `classes:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/reports/revenue": {
+      "get": {
+        "summary": "Revenue report for a period",
+        "description": "What the organization earned over a period, and from what, where and how it compares - in one request rather than a walk of the transactions list.\n\nRevenue is recognised ex-tax on the day of the sale, on the organization's own clock, net of refunds and of anything Wallet credit paid for. `collected` is the part of it already paid, on the same basis, so `uncollected` is what the period sold that has not been paid yet. These are the figures of the admin's daily revenue chart for the same days.\n\nThe period is compared with the same number of days just before it (`compare=previous_period`, the default) or the same dates a year earlier (`previous_year`); every breakdown row then carries its revenue in that period and the change, and `movers` lists the streams, clubs and items that moved most. Breakdowns: by revenue stream (bookings, memberships, passes, drop-ins, products, other), by club (unless `clubId` narrows the report to one), by the payment method that collected the money, and the top items sold (a class or court, a plan, a product). `trend` buckets the period by day, week (starting Monday) or month - by default a month or less by day, up to six months by week, anything longer by month.\n\nAmounts are in the organization's `currency`. A period may span at most 366 days. Reports have their own limit of 20 requests a minute, on top of the platform's.\n",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "First day of the period (`YYYY-MM-DD`), on the organization's clock."
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Last day of the period, inclusive."
+          },
+          {
+            "in": "query",
+            "name": "clubId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only the revenue of this club - its bookings, plans, check-ins and the sales rung up there."
+          },
+          {
+            "in": "query",
+            "name": "billingEntityId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only the revenue of this selling company, for an organization that trades through more than one."
+          },
+          {
+            "in": "query",
+            "name": "compare",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "previous_period",
+                "previous_year",
+                "none"
+              ],
+              "default": "previous_period"
+            },
+            "description": "What to compare the period with."
+          },
+          {
+            "in": "query",
+            "name": "granularity",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ]
+            },
+            "description": "How `trend` buckets the period. Chosen from the period's length when omitted."
+          },
+          {
+            "in": "query",
+            "name": "topItems",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            },
+            "description": "How many items `topItems` lists."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The revenue report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformRevenueReport"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `transactions:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
     "/v1/platform/revenue-accounts": {
       "get": {
         "summary": "List revenue accounts",
@@ -12123,7 +14932,7 @@
     "/v1/platform/transactions": {
       "get": {
         "summary": "List transactions for the organization",
-        "description": "Returns transactions for the organization associated with the API token, filtered by transaction creation time and ordered by `createdAt` descending, then by id. Each bound is an ISO date-time, or a bare `YYYY-MM-DD` read as midnight UTC. `startDate` is inclusive and `endDate` is exclusive. When both are omitted, the window defaults to the last 24 hours (`endDate = now`, `startDate = now - 24h`); when only one is given, the other is derived from that same 24-hour span.\n\nA single request may span at most 93 days. Cover a longer range in consecutive windows, passing the previous window's `endDate` as the next one's `startDate` - because the upper bound is exclusive, that chains without counting a boundary transaction twice.\n\nNote that this endpoint returns a bare array with no total - a full page (`limit` rows) means there are probably more, so keep advancing `offset` until a short page comes back.\n\nOrdering is total (`createdAt` descending, then id), so `offset` paging is well defined for a fixed set of rows. It is not stable against concurrent writes: rows are ordered newest first, so a transaction created part-way through a walk lands on the first page and shifts every later row down by one, which can push an unread row past an `offset` already passed. Pass an explicit `endDate` in the past rather than relying on the `now` default - anything written after it falls outside the window and cannot shift the pages underneath you.\n",
+        "description": "Returns transactions for the organization associated with the API token, filtered by transaction creation time and ordered by `createdAt` descending, then by id. Each bound is an ISO date-time, or a bare `YYYY-MM-DD` read as midnight UTC. `startDate` is inclusive and `endDate` is exclusive. When both are omitted, the window defaults to the last 24 hours (`endDate = now`, `startDate = now - 24h`); when only one is given, the other is derived from that same 24-hour span.\n\nA single request may span at most 93 days. Cover a longer range in consecutive windows, passing the previous window's `endDate` as the next one's `startDate` - because the upper bound is exclusive, that chains without counting a boundary transaction twice.\n\nFiltering by `contactId`, `bookingId` or `membershipId` lists that record's transactions. With one of those and no `startDate`/`endDate`, there is no window at all: every transaction of the contact, booking or membership comes back, newest first. Send a bound to window it as usual.\n\nNote that this endpoint returns a bare array with no total - a full page (`limit` rows) means there are probably more, so keep advancing `offset` until a short page comes back.\n\nOrdering is total (`createdAt` descending, then id), so `offset` paging is well defined for a fixed set of rows. It is not stable against concurrent writes: rows are ordered newest first, so a transaction created part-way through a walk lands on the first page and shifts every later row down by one, which can push an unread row past an `offset` already passed. Pass an explicit `endDate` in the past rather than relying on the `now` default - anything written after it falls outside the window and cannot shift the pages underneath you.\n",
         "tags": [
           "Transactions"
         ],
@@ -12139,7 +14948,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Inclusive lower bound on transaction `createdAt`, as an ISO date-time or `YYYY-MM-DD`. Defaults to `endDate - 24h`."
+            "description": "Inclusive lower bound on transaction `createdAt`, as an ISO date-time or `YYYY-MM-DD`. Defaults to `endDate - 24h`, or to no bound when filtering by contact, booking or membership."
           },
           {
             "in": "query",
@@ -12147,7 +14956,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Exclusive upper bound on transaction `createdAt`, as an ISO date-time or `YYYY-MM-DD`. Defaults to `now`."
+            "description": "Exclusive upper bound on transaction `createdAt`, as an ISO date-time or `YYYY-MM-DD`. Defaults to `now`, or to no bound when filtering by contact, booking or membership."
           },
           {
             "in": "query",
@@ -12167,6 +14976,51 @@
               ]
             },
             "description": "Filter by payment status. When omitted, all statuses are returned."
+          },
+          {
+            "in": "query",
+            "name": "contactId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only transactions charged to this contact (the payer). Lifts the default window when no date bound is sent."
+          },
+          {
+            "in": "query",
+            "name": "bookingId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only this booking's transactions - its charge, and any cancellation credit against it. Lifts the default window when no date bound is sent."
+          },
+          {
+            "in": "query",
+            "name": "membershipId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only this membership's transactions - its sale, renewals, signup fee and adjustments. Lifts the default window when no date bound is sent."
+          },
+          {
+            "in": "query",
+            "name": "transactionType",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "booking_creation",
+                "booking_cancellation",
+                "membership_creation",
+                "membership_recurrence",
+                "membership_signup_fee",
+                "membership_price_adjustment",
+                "membership_cancellation",
+                "product_sale",
+                "external_program_entry",
+                "checkin_creation",
+                "settlement"
+              ]
+            },
+            "description": "Only transactions of this kind."
           },
           {
             "in": "query",
@@ -12786,7 +15640,7 @@
                   "clubId": {
                     "type": "integer",
                     "nullable": true,
-                    "description": "Club this website represents. When set, the header and footer use that club's logo instead of the organization's. `null` clears the binding. Takes effect immediately, like `name` - logos are branding assets rather than a published token.\n"
+                    "description": "Club this website represents. When set, the header and footer use that club's logo instead of the organization's. `null` clears the binding. Takes effect immediately, like `name` — logos are branding assets rather than a published token.\n"
                   },
                   "supportedLocales": {
                     "type": "array",
@@ -12953,7 +15807,7 @@
                           },
                           "deprecated": {
                             "type": "boolean",
-                            "description": "Retired - still stored and rendered, never offered for a new section."
+                            "description": "Retired — still stored and rendered, never offered for a new section."
                           },
                           "presets": {
                             "type": "array",
@@ -13024,7 +15878,7 @@
     "/v1/platform/website/theme-tokens": {
       "get": {
         "summary": "Get the design-token catalog",
-        "description": "Every design token the website accepts, what it means, what it falls back to when unset, and the named looks on offer.\nRead this before writing a theme. It is the machine-readable counterpart to `/section-types`: that one says what may go IN a page, this one says how the site LOOKS. Tokens are added over time, so read it rather than hardcoding the values.\nTwo things worth knowing before you write anything. **Unset is the normal state** - every token falls back to the organization's branding or to a value derived from the tokens above it, so a good theme sets the fewest tokens it needs and leaves the rest inherited. And **the tokens are only coherent in combinations**, which is what `presets` are for: start from one and adjust two or three tokens, rather than composing 32 from scratch.\n",
+        "description": "Every design token the website accepts, what it means, what it falls back to when unset, and the named looks on offer.\nRead this before writing a theme. It is the machine-readable counterpart to `/section-types`: that one says what may go IN a page, this one says how the site LOOKS. Tokens are added over time, so read it rather than hardcoding the values.\nTwo things worth knowing before you write anything. **Unset is the normal state** — every token falls back to the organization's branding or to a value derived from the tokens above it, so a good theme sets the fewest tokens it needs and leaves the rest inherited. And **the tokens are only coherent in combinations**, which is what `presets` are for: start from one and adjust two or three tokens, rather than composing 32 from scratch.\n",
         "tags": [
           "Website"
         ],
@@ -13052,7 +15906,7 @@
                           },
                           "type": {
                             "type": "string",
-                            "description": "The control - `color`, `select` or `boolean`."
+                            "description": "The control — `color`, `select` or `boolean`."
                           },
                           "group": {
                             "type": "string",
@@ -13091,7 +15945,7 @@
                     },
                     "presets": {
                       "type": "array",
-                      "description": "Named looks. Each `tokens` is a complete, coordinated set - apply one with `PUT /theme` and adjust from there.\n",
+                      "description": "Named looks. Each `tokens` is a complete, coordinated set — apply one with `PUT /theme` and adjust from there.\n",
                       "items": {
                         "type": "object",
                         "properties": {
@@ -13107,7 +15961,7 @@
                     },
                     "fonts": {
                       "type": "array",
-                      "description": "The families the site can load, with the category each belongs to - which is what a heading/body pairing is chosen on.\n",
+                      "description": "The families the site can load, with the category each belongs to — which is what a heading/body pairing is chosen on.\n",
                       "items": {
                         "type": "object",
                         "properties": {
@@ -13147,7 +16001,7 @@
     "/v1/platform/website/theme": {
       "get": {
         "summary": "Get the website's theme",
-        "description": "What the site has chosen, what that resolves to once the organization's branding and the declared defaults are applied, and which of the three supplied each value.\n`sources` is the field to read before changing anything: it tells you whether a colour is one the customer picked for this website (`site`), the organization's brand colour (`branding`), or a platform default. Overwriting a `branding` value is how a site quietly stops matching the rest of the customer's brand, so prefer leaving those alone unless asked.\nA token missing from `resolved` is one whose fallback is computed by the stylesheet from the palette - the surface, muted-text and border colours - rather than one that has no value.\n",
+        "description": "What the site has chosen, what that resolves to once the organization's branding and the declared defaults are applied, and which of the three supplied each value.\n`sources` is the field to read before changing anything: it tells you whether a colour is one the customer picked for this website (`site`), the organization's brand colour (`branding`), or a platform default. Overwriting a `branding` value is how a site quietly stops matching the rest of the customer's brand, so prefer leaving those alone unless asked.\nA token missing from `resolved` is one whose fallback is computed by the stylesheet from the palette — the surface, muted-text and border colours — rather than one that has no value.\n",
         "tags": [
           "Website"
         ],
@@ -13218,7 +16072,7 @@
       },
       "put": {
         "summary": "Set the website's design tokens",
-        "description": "Merges a flat token patch into the site's theme, optionally on top of a named preset. Read `GET /theme-tokens` first for the tokens, their allowed values and the presets.\n**This writes the draft**, like every other edit here - nothing a visitor sees changes until `POST /releases` publishes it. That is the point of tokens living on the website rather than on the organization's branding: a palette change is previewable, versioned in the release, and revertible.\nMerges field by field, so setting the heading font leaves the palette alone. Send `null` for a token to return it to what it inherits - from the organization's branding, from another token, or from the platform default. That is the only way back once a value has been written; there is no \"unset\" string.\nA `preset` is the exception to that merge: it REPLACES the look rather than adding to it. Every token any preset owns is cleared first, then the chosen preset's values are written. Otherwise switching from `night` to `editorial` would keep night's whole dark palette underneath and leave the site describing a hybrid nobody chose. Tokens no preset owns - a hand-picked brand colour - are untouched.\nWhen `preset` and `tokens` are both sent the preset is applied first and the tokens land on top, so \"use the editorial look but keep our heading font\" is one call.\nEvery problem with a patch is reported at once rather than one at a time. Tokens are validated against the catalog: an unknown key, a value outside a token's options, a font the site cannot load, or a colour that is not a hex are all refused rather than stored - a colour CSS cannot parse does not fall back, it paints the surface transparent.\n",
+        "description": "Merges a flat token patch into the site's theme, optionally on top of a named preset. Read `GET /theme-tokens` first for the tokens, their allowed values and the presets.\n**This writes the draft**, like every other edit here — nothing a visitor sees changes until `POST /releases` publishes it. That is the point of tokens living on the website rather than on the organization's branding: a palette change is previewable, versioned in the release, and revertible.\nMerges field by field, so setting the heading font leaves the palette alone. Send `null` for a token to return it to what it inherits — from the organization's branding, from another token, or from the platform default. That is the only way back once a value has been written; there is no \"unset\" string.\nA `preset` is the exception to that merge: it REPLACES the look rather than adding to it. Every token any preset owns is cleared first, then the chosen preset's values are written. Otherwise switching from `night` to `editorial` would keep night's whole dark palette underneath and leave the site describing a hybrid nobody chose. Tokens no preset owns — a hand-picked brand colour — are untouched.\nWhen `preset` and `tokens` are both sent the preset is applied first and the tokens land on top, so \"use the editorial look but keep our heading font\" is one call.\nEvery problem with a patch is reported at once rather than one at a time. Tokens are validated against the catalog: an unknown key, a value outside a token's options, a font the site cannot load, or a colour that is not a hex are all refused rather than stored — a colour CSS cannot parse does not fall back, it paints the surface transparent.\n",
         "tags": [
           "Website"
         ],
@@ -13251,6 +16105,7 @@
                     "type": "object",
                     "description": "Token key to value. `null` returns a token to what it inherits. See `GET /theme-tokens` for the keys.\n",
                     "additionalProperties": {
+                      "nullable": true,
                       "oneOf": [
                         {
                           "type": "string"
@@ -13258,8 +16113,7 @@
                         {
                           "type": "boolean"
                         }
-                      ],
-                      "nullable": true
+                      ]
                     }
                   }
                 }

@@ -1,10 +1,10 @@
 ---
 title: "Class types"
-description: "Reusable categories for classes that control multi-day scheduling, auto-cancellation on zero attendance, party size, and which revenue account classes book to."
-keywords: ["class type", "class category", "max party size", "auto cancel", "revenue account", "multi-day class"]
+description: "Reusable categories for classes that set the sport, age group, and level, the progression track sessions count toward, multi-day scheduling, auto-cancellation on zero attendance, party size, and which revenue account classes book to."
+keywords: ["class type", "class category", "age group", "kids classes", "difficulty", "class level", "beginner class", "progression track", "counts toward", "max party size", "auto cancel", "revenue account", "multi-day class"]
 ---
 
-A class type is a reusable category you assign to [classes](/operations/classes). It sets defaults and rules that apply to every class of that type: whether the class can span multiple days, whether it auto-cancels when nobody books, how many seats one member can reserve at once, and which revenue account the class books its income to. Owners and managers set up class types, and members and instructors see their rules on every class of that type.
+A class type is a reusable category you assign to [classes](/operations/classes). It says what the class is - its sport, who it is for (the age group), and how hard it is (the difficulty) - and which [progression track](/settings/progression) its sessions count toward. It also sets rules that apply to every class of that type: whether the class can span multiple days, whether it auto-cancels when nobody books, how many seats one member can reserve at once, and which revenue account the class books its income to. Owners and managers set up class types, and members and instructors see their rules on every class of that type.
 
 ## When to use it
 
@@ -12,6 +12,8 @@ Class types let you set a rule once for a whole program instead of on every clas
 
 Typical uses:
 
+- **Kids and adult classes side by side** - a tennis gym tags "Kids Tennis" as Kids and Beginner and "Tennis Squad" as Juniors and Intermediate. Parents see who each class is for on the schedule, and someone searching 1club.me for "kids tennis" finds the gym.
+- **Belts that count the right classes** - a jiu-jitsu academy links "BJJ Fundamentals" and "Advanced BJJ" to its adult belt track, so a strength class no longer moves anyone toward their next belt.
 - **A martial-arts school with program strands** - "BJJ Fundamentals", "Advanced BJJ", and "Kids Muay Thai", where an empty weekday session cancels itself 2 hours ahead and frees the coach.
 - **Padel clinics that allow groups** - a member books a spot for themselves and three friends in one booking, and clinics get their own cancellation window through a booking policy.
 - **Studio classes with their own revenue line** - "Reformer Pilates" books to its own revenue account, so equipment-class income is split from mat classes for tax and reporting, without changing how members book.
@@ -24,15 +26,21 @@ See [Worked examples](#worked-examples) for how to set up each of these.
 - **Party bookings** - the type's **Max party size** caps how many seats a member can book in one go (see [Classes](/operations/classes#party-bookings)).
 - **Booking policies** - scope a [booking policy](/operations/booking-policies) to a class type to give it its own payment and cancellation rules.
 - **Auto-cancellation** - the zero-attendance rule runs on the type, so every class of that type inherits it.
+- **Schedules and search** - the type's age group and difficulty show under each class on your schedules and can filter them, and they let people find your gym on 1club.me (see [Age group and difficulty](#age-group-and-difficulty)).
+- **Progression** - the type's **Counts toward** track decides which sessions count toward a member's next level (see [Counting toward a progression track](#counting-toward-a-progression-track)).
 
 ## Managing class types
 
-The list at **Settings > Class types** shows one row per type with its name, whether it allows multi-day, its description, and its max party size. Use **Add class type** to create one, the row menu to edit, and delete to remove a type that's no longer used.
+The list at **Settings > Class types** shows one row per type with its name, its sport, the track it counts toward, whether it allows multi-day, its description, and its max party size. Use **Add class type** to create one, the row menu to edit, and delete to remove a type that's no longer used.
 
 ### Fields
 
 - **Name** - required. Shown when creating a class and on the class detail chip.
 - **Description** - optional, for your own reference.
+- **Sport** - optional. New classes of this type start with this sport, so you don't pick it on every class. A class can still be set to another sport.
+- **Age group** - optional. Who the class is for: **Infants**, **Kids**, **Juniors**, **Adults**, **Seniors**, or **All ages**. See [Age group and difficulty](#age-group-and-difficulty).
+- **Difficulty** - optional. **Beginner**, **Intermediate**, **Advanced**, or **All levels**.
+- **Counts toward** - optional. The [progression track](/settings/progression) sessions of this type count toward. Leave it at **No track** if the class trains for no belt or level. See [Counting toward a progression track](#counting-toward-a-progression-track).
 - **Allow multi-day** - when on, classes of this type can start on one day and end on another. Off by default.
 - **Cancel if attendance is zero** - when on, a class of this type is automatically cancelled if it has no bookings by a set number of **hours in advance** of its start. Use it to avoid running empty sessions and to notify the assigned instructor early.
 - **Max party size** - the most seats one member can reserve for a single class of this type, including themselves. Defaults to **1**, which turns [party bookings](/operations/classes#party-bookings) off. Raise it to let members bring guests.
@@ -41,11 +49,52 @@ The list at **Settings > Class types** shows one row per type with its name, whe
 
 Names and descriptions can be translated per locale.
 
+## Age group and difficulty
+
+The age group and difficulty describe who a class is for. Members see them under each class name on your schedule - on 1club.me, in the member portal, and on your website - and on the **Book a session** list on your gym's 1club.me page, for example "Juniors · Intermediate". A label the class name already says is left out, so "Kids Tennis" shows only "Beginner" rather than "Kids · Beginner".
+
+The age groups are fixed bands, the same ones the [Age smart tags](/settings/smart-tagging#age-disabled-by-default) start from:
+
+| Age group | Ages |
+| --- | --- |
+| Infants | 0-4 |
+| Kids | 5-12 |
+| Juniors | 13-17 |
+| Adults | 18-64 |
+| Seniors | 65+ |
+| All ages | Anyone |
+
+They also work as filters:
+
+- **On your schedule** - the **Filters** menu offers **Age group** and **Level** sections, listing only the values your classes carry.
+- **On 1club.me search** - people can search for "kids tennis" or "advanced jiu jitsu", or pick an **Age group** and **Level** in the search filters. A gym matches only through an upcoming public class whose type has that age group or difficulty, and that is of the searched sport. A class type with no age group set doesn't match an age group search. Opening a gym from those results shows its schedule already narrowed to the matching classes.
+- **For AI assistants** - the `search_clubs` tool on the [discovery MCP server](/mcp/tools#discovery-server) takes the same age group and level.
+
+## Counting toward a progression track
+
+**Counts toward** decides which sessions move a member toward their next level on a [progression track](/settings/progression#sessions-to-the-next-level).
+
+- **A track with no class types linked counts every session** - a check-in or a completed booking of any kind. This is how every track starts.
+- **Once any class type is linked, only sessions of the linked types count** toward that track. Link "BJJ Fundamentals" and "Advanced BJJ" to "Adult BJJ Belts", and a strength class or an open mat of another type stops counting toward a belt.
+- **Linking or unlinking a type recounts everyone on the track.** Counts are worked out from attendance, not stored, so a member's "13 / 20 sessions" can change the moment you save. Check the counts before a grading if you have just changed the links.
+- **Bookings that are not a class seat** - a private lesson or a court booking - don't count toward a track that has class types linked, because only a class has a type. Leave the track unlinked if 1:1 lessons should count.
+
+Each track card under **Settings > CRM > Progression** shows which class types count toward it, or that all sessions count.
+
 ## Worked examples
+
+### Kids and adult tennis
+
+Create "Kids Tennis" with **Sport** tennis, **Age group** Kids, and **Difficulty** Beginner, and "Tennis Squad" with **Age group** Juniors and **Difficulty** Intermediate. Every class of those types shows its age group and level on your schedule, parents can filter the schedule to Kids, and your gym appears when someone searches 1club.me for "kids tennis".
+
+### Belts that count only the classes that train for them
+
+Enable or create an "Adult BJJ Belts" track, then set **Counts toward** to it on "BJJ Fundamentals" and "Advanced BJJ". Set "Kids BJJ" to count toward your kids belt track instead. Leave "Strength & Conditioning" at **No track**. Each student's session count now reflects only the classes that prepare them for their next belt.
+
 
 ### Martial arts program with belt levels
 
-Create class types for each program strand - "BJJ Fundamentals", "Advanced BJJ", "Kids Muay Thai". Turn on **Cancel if attendance is zero** (say 2 hours in advance) so an empty weekday session cancels itself and frees the coach. Keep **Max party size** at 1 for adult classes.
+Create class types for each program strand - "BJJ Fundamentals", "Advanced BJJ", "Kids Muay Thai" - and set each one's **Age group** and **Difficulty**. Turn on **Cancel if attendance is zero** (say 2 hours in advance) so an empty weekday session cancels itself and frees the coach. Keep **Max party size** at 1 for adult classes.
 
 ### Padel clinics that allow groups
 
@@ -57,7 +106,9 @@ Give "Reformer Pilates" its own **Revenue account** so equipment-class income re
 
 ## Tips & best practices
 
-- **Set up class types before creating classes.** The type controls party size, auto-cancel, and the revenue account, so classes inherit the right behavior from the start.
+- **Set up class types before creating classes.** The type controls the sport, party size, auto-cancel, and the revenue account, so classes inherit the right behavior from the start.
+- **Set an age group on every type that has one.** An untagged type never matches an age group search on 1club.me, so a kids class with no age group is invisible to parents searching for one.
+- **Link every type that trains for a track, or none.** Once one type counts toward a track, sessions of an unlinked type stop counting toward it.
 - **Use auto-cancel to protect instructor time**, but set the hours-in-advance long enough that members still have a fair chance to book.
 - **Match party size to the activity.** Court-based and social classes benefit from a higher party size; skill or safety-limited classes usually stay at 1.
 - **Give distinct programs distinct revenue accounts** if your accounting needs class income split out.
@@ -72,6 +123,14 @@ Give "Reformer Pilates" its own **Revenue account** so equipment-class income re
 
 **Solution**: Its class type has **Cancel if attendance is zero** on, and no one had booked by the cutoff. Turn it off for that type, or lengthen the hours-in-advance.
 
+**Issue**: My gym doesn't show up on 1club.me when someone searches for "kids tennis".
+
+**Solution**: Set **Age group** to Kids on the class type, and check the gym has an upcoming class of that type that is public and set to tennis (the class's own sport, or the type's sport when the class has none).
+
+**Issue**: A member's session count dropped after I edited a class type.
+
+**Solution**: You linked a class type to their track under **Counts toward**. Only sessions of linked types count from then on. Link every class type that trains for that track, or set them all back to **No track** to count every session again.
+
 **Issue**: I can't set a class to span two days.
 
 **Solution**: Turn on **Allow multi-day** for its class type first.
@@ -80,4 +139,6 @@ Give "Reformer Pilates" its own **Revenue account** so equipment-class income re
 
 - [Classes](/operations/classes) - Where class types are assigned and party bookings happen.
 - [Booking policies](/operations/booking-policies) - Scope payment and cancellation rules to a class type.
+- [Progression tracks](/settings/progression) - The tracks a class type's sessions count toward.
+- [Smart tagging](/settings/smart-tagging) - The Age tags use the same age bands as class types.
 - [Transactions](/billing/transactions) - How the revenue account records class income.

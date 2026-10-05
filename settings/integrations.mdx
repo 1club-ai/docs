@@ -8,7 +8,7 @@ Integrations connect 1Club with external services so your bookings, payments, ac
 
 ## When to use it
 
-Start with a payment provider if members should pay online, then add what your setup needs: a climbing gym opening its door for active members through WebLock, a gym syncing area bookings with Google Calendar, or a yoga studio tracking how many bookings its Instagram "Book now" link brings in. See [Worked examples](#worked-examples) for setups like these.
+Start with a payment provider if members should pay online, then add what your setup needs: a climbing gym opening its doors for booked members through WebLock, a gym syncing area bookings with Google Calendar, or a yoga studio tracking how many bookings its Instagram "Book now" link brings in. See [Worked examples](#worked-examples) for setups like these.
 
 ## The integrations page
 
@@ -42,7 +42,7 @@ You manage every integration from one place - **Settings → Integrations** - wh
     Load a Google Tag Manager container (and your own GA4 tags) on the member portal and CMS website.
   </Card>
   <Card title="WebLock" href="/settings/integrations/weblock">
-    Sync bookings and memberships to physical door access and per-usage PINs through WebLock (Valnes).
+    Open WebLock (Valnes) doors and area lights from bookings and check-ins, set up per gym and per area.
   </Card>
   <Card title="Impro" href="/settings/integrations/access-bridge">
     Open the doors of each gym's own Impro installation from bookings and check-ins.
@@ -74,7 +74,7 @@ Every catalog integration follows the same lifecycle, though the details differ 
 2. **Configure** - on the integration's own page, fill in credentials, mappings, or sync rules. Each integration has its own settings - see the per-integration pages above.
 3. **Test or validate** - WebLock exposes a **Test connection** action, myPOS has **Validate configuration** (a local check of your stored credentials), and Stripe and Google integrations validate during the OAuth or onboarding round-trip.
 4. **Use** - once active, the integration runs in the background. It appears under **Installed integrations** with its status, and you manage it from its **Configure** action.
-5. **Deactivate** - the **Deactivate** / **Remove** action removes the integration. Data already exchanged externally (events in Google, charges in Stripe, PIN grants in WebLock) is not retroactively deleted.
+5. **Deactivate** - the **Deactivate** / **Remove** action removes the integration. Data already exchanged externally (events in Google, charges in Stripe) is not retroactively deleted. Door access integrations are the exception: WebLock is switched off per gym, and Impro and Salto KS withdraw the access they granted before they are removed.
 
 <Note>
   Installing, configuring, and testing integrations requires the **settings.manage.organization** permission (admins and users with full settings management). Viewing the catalog needs only **settings.read.organization**. Existing integrations stay visible and removable even when the paid-plan lock is active, so you never lose access to a connection you already set up.
@@ -96,7 +96,7 @@ Every provider supports a test/sandbox mode so you can run the full checkout flo
 
 **Boxing gym in a myPOS region.** A martial-arts gym already banks with myPOS. It installs myPOS, pastes its Configuration Pack from the myPOS Checkout Store, validates the configuration, and starts collecting membership dues through hosted checkout - no second payment processor needed.
 
-**Climbing centre with door access.** A climbing gym installs WebLock so that an active membership or a confirmed booking opens the door, then maps its WebLock groups and readers to 1Club areas. It keeps Stripe installed in parallel for online payments.
+**Climbing centre with door access.** A climbing gym activates WebLock and links each of its areas to WebLock door groups and light devices, so a booking or check-in in an area opens that area's doors. It keeps Stripe installed in parallel for online payments.
 
 **Yoga studio marketing its schedule.** A yoga/Pilates studio uses the always-on Social Booking tool to generate a tagged "Book now" link for its Instagram bio, then checks **Analytics → Bookings by source** to see how many reformer bookings came from Instagram versus its website.
 
@@ -122,7 +122,7 @@ Every provider supports a test/sandbox mode so you can run the full checkout flo
 - [Google Calendar](/settings/integrations/google-calendar) - two-way booking sync.
 - [Google Business Profile](/settings/integrations/google-business) - import verified locations.
 - [Google Tag Manager](/settings/integrations/google-tag-manager) - analytics and tags on your public surfaces.
-- [WebLock](/settings/integrations/weblock) - door access and per-usage PINs.
+- [WebLock](/settings/integrations/weblock) - door access and area lights per gym and area.
 - [Impro](/settings/integrations/access-bridge) - door access through each gym's own Impro installation.
 - [Salto KS](/settings/integrations/salto) - door access with a phone digital key.
 

@@ -18,6 +18,10 @@ Typical uses:
 
 See [Worked examples](#worked-examples) for how to set up each of these. Sending email from your own domain is a separate setup, covered in [Email sending](/settings/email-sending).
 
+<Note>
+You don't need an inbox for members' replies to messages you send from 1Club. Those carry their own reply address and land in the Inbox on their own (see [Replies to your messages](/settings/email-sending#replies-to-your-messages)). An inbox is for the mail members send to your gym's address themselves.
+</Note>
+
 ## Adding a club inbox
 
 Inboxes live under **Settings > Email inboxes** (in the **Communication** category of Settings). Adding one takes three moves: create the inbox, forward your provider's mail to the address 1Club gives you, then verify.
@@ -38,11 +42,13 @@ The email address you enter cannot be changed after the inbox is created (the fi
 In your email provider (Gmail, Outlook, or similar), set the club address to forward incoming mail to the 1Club forwarding address you just copied. The in-app setup instructions summarize the same three steps:
 
 1. Create an inbox with your email address.
-2. Copy the forwarding address and set up forwarding in your email provider (Gmail, Outlook, etc.).
-3. Click the verification link in the email 1Club sends you to verify your setup.
+2. Copy the forwarding address and set up forwarding to it in your email provider (Gmail, Outlook, etc.).
+3. 1Club sends a verification email to your address. Once forwarding works, it reaches 1Club by itself and the inbox turns **Verified**. You can also click its link.
 
 <Tip>
-Most providers send their own confirmation code to the forwarding address before they will forward. Because that confirmation lands at `inbox.1club.ai` rather than a mailbox you can open, prefer providers or rules that let you enable forwarding without a round-trip code, or use a catch-all/alias rule. If your provider strictly requires a code you cannot retrieve, forward selectively with a filter instead.
+**Gmail** won't forward until you confirm the forwarding address, and it sends that confirmation to the forwarding address itself. While an inbox is being set up (in its first week, or after **Resend Verification**), 1Club emails your gym's address Gmail's confirmation link and code, so you can finish in Gmail's forwarding settings.
+
+**Microsoft 365** blocks automatic forwarding to outside addresses by default. Your administrator may need to allow it in the outbound spam policy before mail reaches 1Club.
 </Tip>
 
 ## Domain verification
@@ -54,9 +60,15 @@ There are two distinct "verifications" in play. Keep them separate:
 
 ### Verify the inbox (activate inbound capture)
 
-When you create an inbox (or resend verification), 1Club emails a verification link to the address you entered. Clicking it marks the inbox **Verified** and activates inbound capture.
+When you create an inbox (or resend verification), 1Club emails a verification message to the address you entered. It shows the forwarding address to set up. Either of two things marks the inbox **Verified** and activates inbound capture:
 
-- The link carries a one-time token that expires. If it lapses, use **Resend Verification** to get a fresh one.
+- **The email comes back through your forwarding.** Once forwarding works, the verification email reaches 1Club by itself. This also proves forwarding is set up correctly, so it's the better check.
+- **You click its link.**
+
+Notes:
+
+- The link is valid for 7 days. If it lapses, use **Resend Verification** to get a fresh one.
+- **Resend Verification** doubles as a forwarding test: if forwarding works, the new email verifies the inbox on its own.
 - Until an inbox is verified, inbound mail to its forwarding address is dropped - the webhook only accepts mail for a verified inbox.
 - An unverified inbox shows an **Unverified** status chip (amber). A verified inbox shows **Verified** (green).
 
@@ -76,10 +88,13 @@ The inbox forwarding address always uses the platform's `inbox.1club.ai` domain 
 
 When a member emails your club address and your provider forwards it to the 1Club forwarding address, 1Club receives it through a SendGrid Inbound Parse webhook and does the following:
 
-1. **Finds the inbox** by matching the forwarding address back to the organization and club. If no verified inbox matches, the mail is ignored.
-2. **Resolves the sender** by email. If no contact exists yet, a new contact is created from the sender's name and email; if the display name changed, the contact's name is updated.
-3. **Creates an inbound message** with `direction: inbound`, tagged to the inbox, storing the original club address as the recipient.
-4. **Threads replies** when the incoming mail carries `In-Reply-To` / `References` headers that match an existing message, or when the subject is a `Re:` of an earlier inbound message. Otherwise it starts a new conversation.
+1. **Finds the inbox** by the address the email was actually delivered to (your forwarding address), not by its To: line, which a forward leaves as your gym's own address. If no verified inbox matches, the mail is ignored.
+2. **Skips mail that isn't a member writing in**: out-of-office auto-replies, mail from your gym's own sending address, mail from your staff's sign-in addresses (an internal note to the shared mailbox, for example), and an email it has already filed.
+3. **Resolves the sender** by email. If no contact exists yet, a new contact is created from the sender's name and email. An existing contact keeps the name you gave them.
+4. **Creates an inbound message** with `direction: inbound`, tagged to the inbox, storing the original club address as the recipient.
+5. **Threads replies** when the incoming mail carries `In-Reply-To` / `References` headers that match an earlier email, or when the subject is a `Re:` of the same sender's earlier email. Otherwise it starts a new conversation.
+
+Staff are alerted about new inbound messages according to their [Notifications](/settings/notifications) settings.
 
 The result appears in the [Inbox](/messaging/message-list) as an inbound conversation you can open and reply to. Replies you send from the Inbox go out from the inbox's own address; see [Email sending](/settings/email-sending) for how that address is chosen and when it needs a verified domain.
 
@@ -119,7 +134,7 @@ Your jiu-jitsu and muay-thai academy runs everything through `info@northgatemma.
 
 ## Tips & best practices
 
-- **Verify before you rely on it.** Inbound mail is silently dropped for unverified inboxes. Send a test email to the club address and confirm it appears in the Inbox before announcing the address.
+- **Verify before you rely on it.** Inbound mail is silently dropped for unverified inboxes. Let the verification email come back through your forwarding rather than clicking its link, and the **Verified** chip proves forwarding works. Then send a test email to the club address from an outside account and confirm it appears in the Inbox.
 - **One inbox per real mailbox.** Don't point two clubs' forwarding at the same source address; capture is keyed on the forwarding address per club.
 - **Pair inbox capture with a verified sending domain.** Members reading a reply from your own domain trust it more, and deliverability is better. See [Email sending](/settings/email-sending).
 - **Keep the club address stable.** Because the address can't be edited, choose the mailbox you intend to keep before creating the inbox.
@@ -132,11 +147,15 @@ Your jiu-jitsu and muay-thai academy runs everything through `info@northgatemma.
 
 **Issue**: The verification link says it is invalid or expired.
 
-**Cause / fix**: Verification tokens expire. Open the inbox and click **Resend Verification** (or use the row action) to send a fresh link, then click it promptly.
+**Cause / fix**: Verification links last 7 days. Open the inbox and click **Resend Verification** (or use the row action) to send a fresh one. If forwarding already works, the new email verifies the inbox without a click.
 
-**Issue**: My provider won't enable forwarding without confirming a code sent to the forwarding address.
+**Issue**: Gmail won't enable forwarding until I confirm a code sent to the forwarding address.
 
-**Cause / fix**: The forwarding address is a capture endpoint, not a readable mailbox, so provider confirmation codes sent there can't be retrieved. Use a forwarding method that doesn't require a returned code (a filter/rule or catch-all), or contact support.
+**Cause / fix**: While the inbox is being set up, 1Club emails your gym's address Gmail's confirmation link and code. If it's more than a week since you added the inbox, click **Resend Verification** first, then turn forwarding on in Gmail again.
+
+**Issue**: Mail stops at Microsoft 365 with a "forwarding is disabled" bounce.
+
+**Cause / fix**: Microsoft 365 blocks automatic forwarding to external addresses by default. Ask your administrator to allow it for this mailbox in the outbound spam filter policy.
 
 **Issue**: Replies I send from the Inbox come from a platform address, not my club's.
 

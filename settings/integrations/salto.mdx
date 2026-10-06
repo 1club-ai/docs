@@ -1,0 +1,131 @@
+---
+title: Salto KS
+description: Open Salto KS locks from 1Club bookings and check-ins, with each area as a Salto access group and a phone digital key members activate with their 1Club account.
+keywords: [salto, salto ks, access control, door access, digital key, bluetooth, access group, locks, site, access buffer, opening hours, subscription seats]
+---
+
+The Salto KS integration connects 1Club to Salto KS, Salto's cloud access control system. Each area in a gym becomes a Salto access group holding the locks you choose, and a booking or check-in puts the member in that group for its time window. Members open the lock with their phone, using a digital key they activate by signing in with their 1Club account. An owner or admin enters the Salto account once, then sets up each gym.
+
+## When to use it
+
+Use it when your gym's doors run on Salto KS locks and you want access to follow what members book, with no cards to hand out.
+
+Typical uses:
+
+- **Studio doors that open only for class time** - a yoga studio's room opens for each booked member shortly before class and closes again after, from the member's phone.
+- **Courts with no front desk** - a padel gym's court gates open for the players who booked the slot, and the gym's opening hours stay enforced even if the internet goes down.
+- **A large membership on a small Salto subscription** - only the members inside their booking window take a Salto seat, so thousands of members can share a subscription sized for the people actually in the building.
+
+## How it works
+
+- **Areas become access groups.** **Sync areas** creates a Salto access group for each area, holding the locks you choose.
+- **Access follows the schedule.** A booking or a check-in puts the member in the area's group for its own window plus the access buffer.
+- **Doors open from the phone.** Members activate a digital key in the 1Club mobile app by signing in with their 1Club account, then open the lock over Bluetooth.
+- **Seats follow who is inside.** A member takes a Salto subscription seat only while their access is open.
+
+### The access window
+
+The **Access buffer (minutes)** sets how early a member can get in before a booking starts, and how long they keep access after it ends. It can be 15-120 minutes.
+
+A check-in grants access immediately and keeps it until the end of the booking plus the buffer.
+
+### Opening hours backstop
+
+With **Limit access to opening hours** on, 1Club sends the gym's opening hours to Salto. The doors then refuse anyone outside those hours, even if 1Club can't be reached. It is on by default. The hours are sent when you click **Sync areas**, so sync again after you change the gym's opening hours or this switch.
+
+### Seats
+
+Salto counts everyone who has access right now against your subscription. Members outside their booking window don't take a seat, so a seat comes free as soon as a member's window closes. The **Status** panel shows how many seats are in use.
+
+1Club only manages the Salto users it created itself. Other integrators' users on the same Salto site are left alone.
+
+## Before you start
+
+- Salto KS is a **paid-plan** feature. On the Free plan and during the trial, its **Activate** and **Configure** buttons stay greyed out until you upgrade.
+- Configuring Salto KS requires the **settings.manage.organization** permission. Viewing its settings requires **settings.read.organization**.
+- You need the Salto KS account details Salto issued for 1Club: client ID and secret, a system user, and the SSO client ID for the digital key.
+- Each gym needs at least one active area. See [Areas](/operations/areas).
+- A gym can use only one door system at a time. If a gym already uses another provider, such as [Impro](/settings/integrations/access-bridge) or [WebLock](/settings/integrations/weblock), turn that one off for the gym first.
+- Members need a login email on their 1Club account. Salto links each member by that email, so a member without one can't be given access.
+
+## Activate and enter the Salto account
+
+The Salto account is entered once for the whole organization. The member digital key uses the same account.
+
+1. Go to **Settings > Integrations** and click **Activate** next to Salto KS, under **Access control**. 1Club adds Salto KS and opens its page. Once it is added, you reach the page from **Configure** under **Active Integrations**.
+2. Under **Salto KS account**, choose the **Salto environment**:
+   - **Acceptance (testing)** - stay here until Salto moves you to production.
+   - **Production** - for live use once Salto has moved you over.
+
+   The environment fills in both the **API address** and the **Identity server address**. If the addresses don't match either environment, the field shows **Custom addresses**.
+3. Enter the **Client ID** and **Client secret**.
+4. Enter the **System user email** and **System user password**.
+5. Enter the **SSO client ID**. This is the client Salto issued so members can activate their digital key by signing in with their 1Club account.
+6. Click **Save account**. The button is available once you have changed a field.
+
+**Save account** saves the details and tests them right away. The integration becomes active only when the test passes, and until then members are never offered a digital key. If the test fails, the saved details stay in place and the page shows **Salto KS connection failed.** with the reason.
+
+Once a secret or password is saved, leave its field blank to keep it.
+
+## Set up a gym
+
+1. Choose the gym under **Club**.
+2. Under **Connection**, choose the **Site**: the Salto site whose locks are this gym's doors. The list fills in once the account is saved.
+3. Set the **Access buffer (minutes)** (15-120).
+4. Leave **Limit access to opening hours** on unless you have a reason to turn it off.
+5. Click **Save**. **Save** stays greyed out until a site is chosen. The **Locks** lists load once the site is saved.
+6. Under **Areas**, choose the **Locks** each area opens.
+7. Turn on **Enable Salto KS for this club** and click **Save**.
+8. Click **Sync areas**.
+
+Each area shows **Access group ready** once it has been synced, or **Not synced** until then. An area opens no doors until you sync areas.
+
+Lock choices reach Salto only when you sync areas. Click **Sync areas** again whenever you change an area's locks, add or rename an area, or change the gym's opening hours.
+
+If the gym already has a Salto site for members' digital keys, door access must use the same site.
+
+Use **Test connection** to check the gym's connection, and **Sync now** to push access to Salto straight away instead of waiting for the next automatic pass. **Test connection**, **Sync areas**, and **Sync now** are available once the gym is saved, and only while there are no unsaved changes.
+
+## Status
+
+The **Status** panel shows:
+
+- **Pending access updates** - changes 1Club still has to send to Salto.
+- **Subscription seats in use** - for example "12 of 50 subscription seats in use". The count turns red when every seat is taken.
+- Any members whose access couldn't be updated, with the reason.
+
+If Salto refuses a member because the subscription has no free seat, free a seat or ask your installer to enlarge the subscription.
+
+## Change a gym's site or turn Salto off
+
+Turning off **Enable Salto KS for this club** and saving withdraws the gym's access in Salto. Access granted at one site can only be withdrawn at that site, so to move a gym to a different site, turn Salto off for the gym first and let the access cleanup finish.
+
+## Deactivate
+
+Deactivating removes the Salto account and every gym's Salto KS setup. Because the Salto account is the only way to reach any of your sites, access has to be withdrawn first:
+
+1. Turn off **Enable Salto KS for this club** for every gym, and save each one.
+2. Wait until **Pending access updates** reaches zero, so Salto no longer holds access for any member.
+3. Click **Deactivate** at the top of the Salto KS page.
+4. The confirmation, **Deactivate Salto KS?**, says that Salto KS stops working and its settings are deleted, so you'd need to set it up again to use it. Click **Deactivate** to confirm.
+
+Once it is deactivated, you return to **Settings > Integrations**.
+
+Deactivation is refused while any gym still has Salto KS on, or while Salto still holds access for a member. The dialog says which one applies.
+
+## Troubleshooting
+
+- **The page asks you to create an area first** - the gym has no active area. Use **Manage areas** to add one.
+- **The Site list is empty** - the Salto account isn't saved yet, or its test failed. Check the account details and click **Save account** again.
+- **Members aren't offered a digital key** - the account test hasn't passed yet. Fix the details under **Salto KS account** and save again.
+- **An area opens no doors** - check that it shows **Access group ready**. If it shows **Not synced**, click **Sync areas**.
+- **Turning a gym on is refused** - either the Salto account isn't saved, or the gym already uses another door system. Save the account, or turn the other provider off for this gym.
+- **A member can't be given access** - make sure the member has a login email on their 1Club account.
+
+## Related
+
+- [Integrations](/settings/integrations) - every integration and how activation works.
+- [Impro](/settings/integrations/access-bridge) - door access through each gym's own Impro installation.
+- [WebLock](/settings/integrations/weblock) - door access through WebLock (Valnes).
+- [Areas](/operations/areas) - the areas that become Salto access groups.
+- [Organization and clubs](/reference/organization-clubs) - where each gym's opening hours and details live.

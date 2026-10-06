@@ -1,7 +1,7 @@
 ---
 title: Physical access control
 description: How 1Club's native access control turns memberships and bookings into physical door access - doors and door groups, credentials, access grants, auto-grant, access events, and edge gateway sync.
-keywords: [physical access control, door, door group, credential, RFID, NFC, QR code, PIN, access grant, auto-grant, access event, edge gateway, WebLock, reconciliation, door hardware]
+keywords: [physical access control, door, door group, credential, RFID, NFC, QR code, PIN, access grant, auto-grant, access event, edge gateway, WebLock, Impro, Salto KS, reconciliation, door hardware]
 ---
 
 Physical access control is the native 1Club feature that opens real doors. It links a member's [credential](/members/member-cards) (an access card, QR code, or PIN) to a time-bound **access grant** derived from their membership or booking, syncs those grants to door hardware through an **edge gateway**, and records every tap as an **access event**. You turn it on per gym, staff enroll members' credentials, and members tap, scan, or type their credential at the door. This is the hardware side of the platform: locks, readers, and controllers.
@@ -32,7 +32,7 @@ The physical access control system is made of five moving parts:
 - **Access events** - the audit trail of every attempt at a door, reconciled against grants to flag discrepancies.
 - **Edge gateway** - the on-site bridge that pulls grants down to your controllers and pushes events back up.
 
-Grants are the single source of truth. Whether you run 1Club's own edge gateway or the [WebLock (Valnes)](/settings/integrations/weblock) vendor integration, both read the same access grants.
+Grants are the single source of truth. 1Club's own edge gateway reads them, and so do the door access integrations: [WebLock (Valnes)](/settings/integrations/weblock), [Impro](/settings/integrations/access-bridge), and [Salto KS](/settings/integrations/salto).
 
 ## Turning on access control
 
@@ -157,14 +157,14 @@ Grants are pulled on an interval (30 seconds by default) and queued events are f
 Gateway provisioning, token rotation, and event ingestion are access-control API operations (they require an operations-manage permission or the gateway's own token). There is no admin form to provision a gateway in the current product - it is set up during hardware onboarding.
 </Note>
 
-### Native gateway vs. WebLock
+### Native gateway vs. door access integrations
 
-There are two ways door hardware consumes grants, and they share the same grant records:
+There are two ways door hardware consumes grants:
 
 - **Native edge gateway** - 1Club's own gateway talking to generic controllers, as described above.
-- **[WebLock (Valnes)](/settings/integrations/weblock)** - a cloud-to-cloud vendor integration where grants are pushed into the Valnes WebLock system, with plan-to-group and area-to-reader mappings, per-usage PINs, and booking-driven light rules.
+- **Door access integrations** - [WebLock (Valnes)](/settings/integrations/weblock), [Impro](/settings/integrations/access-bridge), and [Salto KS](/settings/integrations/salto). Each is set up per gym on its own integration page, where you link the gym's areas to that system's doors.
 
-If you run WebLock, configure it on its own integration page. The grant model on this page is what feeds it.
+The door access integrations work from **area access**: a grant for one member, one area, and one time window. It comes from a booking or a check-in in that area, or from staff adding access by hand, and the integration widens it by the gym's access buffer. A membership alone does not open a door through them. Each integration keeps its own system in step with that access, and withdraws it when the access ends. Only one door access integration can be on for a gym at a time.
 
 ## Worked examples
 
@@ -228,7 +228,7 @@ A climbing gym has a public entrance, a bouldering area, and a lead-climbing zon
 
 - [Access control](/settings/access-control) - check-in modes and how members identify themselves at the front desk (the non-hardware side).
 - [Access cards](/members/member-cards) - enroll, assign, revoke, and delete the credentials that back door grants.
-- [WebLock](/settings/integrations/weblock) - the Valnes WebLock vendor integration that consumes access grants.
+- [WebLock](/settings/integrations/weblock), [Impro](/settings/integrations/access-bridge), and [Salto KS](/settings/integrations/salto) - the door access integrations that read area access grants.
 - [Memberships](/members/memberships) - the memberships that generate long-running door grants.
 - [Bookings](/operations/bookings) - the bookings that generate per-session door grants.
 - [Check-in models](/reference/check-in-models) - how members get into your club and how entrance methods work.

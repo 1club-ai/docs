@@ -1,20 +1,38 @@
 ---
 title: DatecsPay
 description: Accept card payments through DatecsPay (BORICA) hosted checkout, with a BORICA-backed test gateway and a live production environment
-keywords: [datecspay, datecs pay, borica, hosted checkout, payment provider, 3-d secure, terminal id, merchant id, test mode, live mode]
+keywords:
+  [
+    datecspay,
+    datecs pay,
+    borica,
+    hosted checkout,
+    payment provider,
+    3-d secure,
+    terminal id,
+    merchant id,
+    test mode,
+    live mode,
+    billing entity,
+  ]
 ---
 
-DatecsPay is a card payment provider you can use instead of Stripe or myPOS, built on BORICA's hosted checkout. When a customer pays for a booking, class, membership, or outstanding balance, they are redirected to BORICA's secure page to enter their card details (with EMV 3-D Secure), then bounced back to 1Club once the payment completes. An owner or admin connects it once with your gym's own BORICA credentials.
+DatecsPay is a card payment provider you can use instead of Stripe or myPOS, built on BORICA's hosted checkout. When a customer pays for a booking, class, membership, or outstanding balance, they are redirected to BORICA's secure page to enter their card details (with EMV 3-D Secure), then return to 1Club once the payment completes. An owner or admin sets it up once with your gym's own BORICA credentials.
 
 <Note>
-If you invoice through more than one company, each connects its own account. Pick the company at the top of this page before you connect or edit credentials, and money for its sales settles into that account. See [Billing entities](/billing/billing-entities).
+  If your organization trades through more than one company, each company
+  connects its own BORICA terminal. Pick the company under **Billing entity** at
+  the top of the DatecsPay page before you save or deactivate anything. The line
+  under the picker reminds you that payments for that company's gyms settle to
+  the account you are setting up. The picker only appears when you have more
+  than one billing entity. See [Billing entities](/billing/billing-entities).
 </Note>
 
 ## When to use it
 
-DatecsPay suits a gym whose bank or acquirer has provisioned a BORICA terminal. Card data never touches 1Club servers, and every request is signed with your own RSA key. Payment status comes back on its own - through the cardholder's browser on return, a signed BORICA notification, and a reconciliation sweep that catches anyone who closes the tab early.
+DatecsPay suits a gym whose bank or acquirer has provisioned a BORICA terminal. Card data never touches 1Club servers, and every request is signed with your own RSA key. Payment status comes back on its own: through the cardholder's browser on return, a signed BORICA notification, and a reconciliation sweep that catches anyone who closes the tab early.
 
-Unlike Stripe and myPOS, DatecsPay has no free shared sandbox. Both the **Test** and **Live** environments run against BORICA with your own credentials - only the terminal and gateway differ between them.
+Unlike Stripe and myPOS, DatecsPay has no free shared sandbox. Both the **Test** and **Live** environments run against BORICA with your own credentials. Only the terminal and gateway differ between them.
 
 Typical uses:
 
@@ -24,72 +42,86 @@ Typical uses:
 
 ## Before you start
 
-- **A paid plan.** Like myPOS, DatecsPay is a paid-plan integration - the Free plan and the Grow trial cannot activate it.
-- **BORICA credentials for the environment you want.** Both Test and Live need a **Terminal ID (TID)**, a **Merchant ID (MID)**, your **RSA private key**, and **BORICA's public certificate**. The TID and certificate differ between test and production, so keep the two sets separate.
-- **A free card-checkout slot.** If myPOS is already active, disconnect it first - only one hosted-checkout provider can run at once.
+- **A paid plan.** DatecsPay is a paid-plan integration. On the Free plan and during the free trial, **Activate** is greyed out until you upgrade.
+- **BORICA credentials for the environment you want.** Both Test and Live need a **Terminal ID (TID)**, a **Merchant ID (MID)**, your **RSA private key**, and **BORICA's public certificate**. BORICA issues a separate set for each environment, so keep the two sets apart.
+- **A free hosted-checkout slot.** Each company can run only one hosted-checkout provider at a time. If myPOS hosted checkout is active for the company, deactivate myPOS first, or untick its **Online** capability if you only use it for terminals.
 
 <Note>
-  Configuring DatecsPay requires the **settings.manage.organization** permission. Admins and users with full settings management can reach this page; managers and other roles cannot. Viewing the catalog needs only **settings.read.organization**.
+  Configuring DatecsPay requires the **settings.manage.organization**
+  permission. Viewing its settings requires **settings.read.organization**.
 </Note>
 
 ## Where to get your DatecsPay credentials
 
 DatecsPay credentials come from **BORICA** (through your bank or acquirer), not from 1Club. When your DatecsPay/BORICA terminal is provisioned you receive:
 
-| Credential | What it is |
-| --- | --- |
-| **Terminal ID (TID)** | The identifier of your BORICA terminal. You get a separate TID for the test gateway and for production. |
-| **Merchant ID (MID)** | Your BORICA merchant identifier. |
-| **RSA private key (PEM)** | The private half of your signing key pair, used to sign requests to BORICA. You generate the key pair and register the public half with BORICA. |
-| **BORICA public certificate (PEM)** | BORICA's certificate, used to verify the responses coming back from the gateway. The test and production certificates are different. |
+| Credential                          | What it is                                                                                                                                      |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Terminal ID (TID)**               | The identifier of your BORICA terminal. You get a separate TID for the test gateway and for production.                                         |
+| **Merchant ID (MID)**               | Your BORICA merchant identifier.                                                                                                                |
+| **RSA private key (PEM)**           | The private half of your signing key pair, used to sign requests to BORICA. You generate the key pair and register the public half with BORICA. |
+| **BORICA public certificate (PEM)** | BORICA's certificate, used to verify the responses coming back from the gateway. The test and production certificates are different.            |
 
 Generate your key pair and register it with BORICA before you configure 1Club, and download the matching BORICA certificate for the environment you are setting up.
 
-## Connect DatecsPay
+## Activate DatecsPay
 
-1. Go to **Settings → Integrations** and click **Install** on the DatecsPay card.
-2. On the DatecsPay page, choose an **Environment**:
-   - **Test** - validates against BORICA's test gateway.
+1. Go to **Settings > Integrations**.
+2. Under **Payments**, click **Activate** next to DatecsPay. 1Club opens the DatecsPay page. Nothing is saved until you click **Save**.
+3. Choose an **Environment**:
+   - **Test** - runs against BORICA's test gateway.
    - **Live** - processes real payments against BORICA production.
-3. Enter your **Terminal ID (TID)** and **Merchant ID (MID)**.
-4. Check the **Merchant name** and **Merchant website** - 1Club pre-fills these from your organization details, but you can edit them if BORICA registered a different name or URL.
-5. Paste your **Merchant private key (PEM)** and **BORICA public certificate (PEM)**.
-6. Click **Test configuration** to check that the stored key and certificate are well-formed.
-7. Click **Save**.
+
+   BORICA gives you different credentials for each environment, so enter the set that matches the one you choose.
+
+4. Enter your **Terminal ID (TID)** and **Merchant ID (MID)**.
+5. Check the **Merchant name** and **Merchant website**. 1Club pre-fills these from your organization's name and website, but you can edit them if BORICA registered a different name or URL.
+6. Paste your **Merchant private key (PEM)** and **BORICA public certificate (PEM)**. If your key file is protected with a passphrase, enter it in **Private key passphrase**. 1Club uses it once to decrypt the key and never stores it.
+7. Click **Save**. The page shows **Active** and the environment, **Test** or **Live**, next to the title.
+8. Click **Test configuration** to check that the stored key and certificate are well-formed. The button is available once DatecsPay is saved.
 
 <Note>
-  The private key and certificate are stored encrypted and shown back to you as masked fields (`•••••• (saved - leave blank to keep)`). When you edit the configuration later, leave them blank to keep the existing values - only paste a value if you are replacing it.
+  The private key and certificate are stored encrypted and shown back to you as
+  masked fields (`•••••• (saved - leave blank to keep)`). When you edit the
+  configuration later, leave them blank to keep the existing values. Only paste
+  a value if you are replacing it.
 </Note>
 
-Your country and time-zone offset are not part of this form - 1Club derives them automatically from your organization settings and sends them to BORICA at checkout.
+Your country and time-zone offset are not part of this form. 1Club derives them automatically from your organization settings and sends them to BORICA at checkout.
 
 ## Configuration fields
 
-| Field | Required | Notes |
-| --- | --- | --- |
-| **Environment** | Yes | **Test** or **Live**. Your BORICA credentials differ between the two. |
-| **Terminal ID (TID)** | Yes | Your BORICA terminal identifier; differs per environment. |
-| **Merchant ID (MID)** | Yes | Your BORICA merchant identifier. |
-| **Merchant name** | No | Pre-filled from your organization name. Editable. |
-| **Merchant website** | No | Pre-filled from your organization website. Editable. |
-| **Merchant private key (PEM)** | On first save | Your RSA private key used to sign requests to BORICA. Stored encrypted. Leave blank when editing to keep the current key. |
-| **BORICA public certificate (PEM)** | On first save | BORICA's certificate used to verify gateway responses. Differs test vs production. Leave blank when editing to keep the current certificate. |
+| Field                               | Required                                       | Notes                                                                                                                                                 |
+| ----------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Environment**                     | Yes                                            | **Test** or **Live**. Your BORICA credentials differ between the two.                                                                                 |
+| **Terminal ID (TID)**               | Yes                                            | Your BORICA terminal identifier; differs per environment.                                                                                             |
+| **Merchant ID (MID)**               | Yes                                            | Your BORICA merchant identifier.                                                                                                                      |
+| **Merchant name**                   | No                                             | Pre-filled from your organization name. Editable.                                                                                                     |
+| **Merchant website**                | No                                             | Pre-filled from your organization website. Editable.                                                                                                  |
+| **Merchant private key (PEM)**      | On first save, and when you change environment | Your RSA private key used to sign requests to BORICA. Stored encrypted. Leave blank when editing to keep the current key.                             |
+| **Private key passphrase**          | No                                             | Only if your key file is passphrase-protected. Used once to decrypt the key and never stored.                                                         |
+| **BORICA public certificate (PEM)** | On first save, and when you change environment | BORICA's certificate used to verify gateway responses. Differs between test and production. Leave blank when editing to keep the current certificate. |
 
-Capabilities are limited to **online** hosted checkout, which is always on - there is no in-person terminal toggle.
+Capabilities are limited to **online** hosted checkout, which is always on. There is no in-person terminal option.
 
 ## Test vs. live environment
 
 - **Test** runs against BORICA's test gateway with your test terminal. No real money moves, so you can rehearse the full checkout flow.
 - **Live** runs against BORICA production with your live terminal. Real payments are processed and settled to your account.
 
-There is no credential-free sandbox: both environments need a full credential set, and the TID and certificate are different for each. Switching from **Live** back to **Test** does not delete your saved credentials - they stay on file so you can switch back without re-entering them.
+There is no credential-free sandbox. Both environments need a full credential set, and the TID, key, and certificate are different for each.
+
+DatecsPay keeps one credential set per company, for the environment you saved. When you switch **Environment**, the page clears the **Terminal ID (TID)**, key, passphrase, and certificate fields. To save, enter the TID, private key, and BORICA certificate issued for the new environment. If you leave the key or certificate blank, the page asks for the one issued for that environment. Your saved set for the old environment is replaced, so keep a copy if you plan to switch back.
 
 ## Test configuration
 
-The **Test configuration** button checks that your saved credentials are well-formed - that the private key and BORICA certificate are valid PEM and the gateway for your environment resolves. It records the time of the last successful check.
+The **Test configuration** button checks that your saved credentials are complete and well-formed: that the private key and BORICA certificate are valid and the gateway for your environment resolves. It records the time of the last successful check. On success it shows "DatecsPay configuration looks valid".
 
 <Note>
-  This check runs locally and does **not** contact BORICA or move any money. It catches a malformed key or a missing field, but it cannot confirm that BORICA recognizes your TID or merchant. The first real proof that credentials are correct is a successful test payment through hosted checkout.
+  This check runs locally and does **not** contact BORICA or move any money. It
+  catches a malformed key or a missing field, but it can't confirm that BORICA
+  recognizes your TID or merchant. The first real proof that credentials are
+  correct is a successful test payment through hosted checkout.
 </Note>
 
 ## What syncs
@@ -97,48 +129,55 @@ The **Test configuration** button checks that your saved credentials are well-fo
 - Payments created in 1Club open a BORICA hosted-checkout page that the customer is redirected to.
 - After payment, the status returns to 1Club through up to three paths, so a payment settles even if one path fails:
   1. **Browser return** - BORICA posts the signed result back through the cardholder's browser when they return to 1Club, and 1Club verifies the signature and settles the payment.
-  2. **Signed notification** - BORICA can also notify 1Club server-to-server; the notification's signature is verified against your BORICA certificate before it is processed.
-  3. **Reconciliation** - a background job runs every few minutes and confirms any payment still pending (for example because the customer closed the tab before returning) with a direct status check to BORICA.
+  2. **Signed notification** - BORICA can also notify 1Club server to server. The notification's signature is verified against your BORICA certificate before it is processed.
+  3. **Reconciliation** - a background job runs every 5 minutes and confirms any payment still pending (for example because the customer closed the tab before returning) with a direct status check to BORICA.
 - The payment status and BORICA transaction references are recorded on the 1Club payment, and any linked transactions and bookings are settled automatically.
 - Every path is matched to the same payment by a unique reference, so a redelivered notification or an overlapping reconciliation never double-charges or double-settles.
 
 ## Payment links
 
-DatecsPay has no shareable payment link. The **Send payment link** action on a transaction is myPOS-only, so on DatecsPay a member pays through the checkout in the portal, the app, or your website rather than from a link you send them. If sending a pay-by-link is central to how you collect, myPOS is the better fit today.
+DatecsPay has no shareable payment link. The **Send myPOS payment link** action on a transaction works with myPOS only, so on DatecsPay a member pays through the checkout in the portal, the app, or your website rather than from a link you send them. If sending a pay-by-link is central to how you collect, myPOS is the better fit.
 
 ## Refunds
 
 1Club does not push refunds to BORICA. Refund a DatecsPay payment from your BORICA/acquirer side, then reconcile the transaction in 1Club.
 
-## Disconnect
+## Deactivate
 
-Click **Deactivate** on the DatecsPay page and confirm. This removes the integration and clears your stored credentials for the organization. Pending hosted-checkout sessions already open on BORICA keep working until they expire; only new charges are stopped.
+1. Pick the company under **Billing entity**, if you have more than one.
+2. Click **Deactivate** at the top of the DatecsPay page.
+3. Confirm in the **Deactivate DatecsPay?** dialog. It says DatecsPay stops working and its settings are deleted. With more than one billing entity, it also says the change applies to the selected company only.
+
+You stay on the DatecsPay page afterwards, with the form reset. Your stored credentials for that company are cleared, so activating again means entering them again. If 1Club can't deactivate DatecsPay, the reason shows in the dialog.
 
 ## Troubleshooting
 
-- **Test configuration fails** - confirm the **RSA private key** and **BORICA public certificate** are valid PEM and that you pasted the certificate for the environment you selected (test and production certificates differ).
-- **Customers see a signature error on the checkout page** - the public key registered with BORICA does not match the private key on file, or the TID belongs to a different environment. Re-check the key pair registered with BORICA and confirm the TID matches your selected environment.
+- **Activate is greyed out** - your organization is on the Free plan or the free trial. Upgrade to a paid plan to activate payments.
+- **Test configuration fails** - confirm the **Merchant private key (PEM)** and **BORICA public certificate (PEM)** are valid PEM and that you pasted the certificate for the environment you selected (test and production certificates differ).
+- **Save asks for the key and certificate again** - you changed **Environment**. BORICA issues a separate set per environment, so paste the key and certificate for the environment you selected.
+- **Customers see a signature error on the checkout page** - the public key registered with BORICA doesn't match the private key on file, or the TID belongs to a different environment. Re-check the key pair registered with BORICA and confirm the TID matches your selected environment.
 - **Payment succeeded on BORICA but the transaction stays unpaid in 1Club** - this usually resolves on its own: the reconciliation job confirms pending checkouts within a few minutes. If it persists beyond that, re-check that your BORICA certificate is current.
 - **Live payments fail but test works** - confirm you are in the **Live** environment and entered live credentials (a production TID and the production BORICA certificate, not the test ones).
-- **"myPOS is already enabled"** - only one hosted-checkout card provider can be active at a time. Disconnect myPOS first, then activate DatecsPay.
+- **"myPOS is already enabled"** - only one hosted-checkout provider can be active per company. Deactivate myPOS for that company, or untick its **Online** capability, then save DatecsPay again.
 
 ## Worked examples
 
-**Bulgarian gym already banking with BORICA.** A fitness club whose bank issued it a BORICA e-commerce terminal generates an RSA key pair, registers the public key with BORICA, and downloads the production certificate. It installs DatecsPay, selects **Live**, enters its TID and MID, pastes the private key and certificate, runs **Test configuration**, and saves. One real court booking confirms hosted checkout settles the transaction.
+**Bulgarian gym already banking with BORICA.** A fitness gym whose bank issued it a BORICA e-commerce terminal generates an RSA key pair, registers the public key with BORICA, and downloads the production certificate. It activates DatecsPay, selects **Live**, enters its TID and MID, pastes the private key and certificate, saves, and runs **Test configuration**. One real court booking confirms hosted checkout settles the transaction.
 
-**A member who closes the tab mid-payment.** A member pays for a membership on BORICA's page but closes the browser before returning to 1Club, so the payment briefly shows as pending. Within a few minutes the reconciliation job checks the status with BORICA, confirms the charge, and settles the membership - no staff action needed.
+**A member who closes the tab mid-payment.** A member pays for a membership on BORICA's page but closes the browser before returning to 1Club, so the payment briefly shows as pending. Within a few minutes the reconciliation job checks the status with BORICA, confirms the charge, and settles the membership, with no staff action needed.
 
 ## Tips & best practices
 
-- Keep your test and production credential sets clearly separated. The TID and BORICA certificate differ per environment, and mixing them is the most common cause of signature errors.
-- Remember that **Test configuration** is a local check only - it cannot confirm BORICA recognizes your terminal. Always follow it with a real test payment.
+- Keep your test and production credential sets clearly separated. The TID, key, and BORICA certificate differ per environment, and mixing them is the most common cause of signature errors.
+- Remember that **Test configuration** is a local check only. It can't confirm BORICA recognizes your terminal, so always follow it with a real test payment.
 - Leave the masked private key and certificate fields blank when editing later. Only paste a value when you are deliberately replacing it.
-- Decide up front whether you are using DatecsPay or myPOS - you can only run one hosted-checkout provider at a time.
+- Decide up front whether each company takes online card payments through DatecsPay or myPOS. Only one hosted-checkout provider can run per company.
 
 ## Related
 
-- [Integrations](/settings/integrations) - the full integration catalog and how installs work.
-- [myPOS](/settings/integrations/mypos) - the other hosted-checkout card provider (mutually exclusive with DatecsPay).
+- [Integrations](/settings/integrations) - the full integration catalog and how activation works.
+- [Billing entities](/billing/billing-entities) - the companies you trade through, each with its own payment accounts.
+- [myPOS](/settings/integrations/mypos) - the other hosted-checkout provider (myPOS **Online** can't run alongside DatecsPay for the same company).
 - [Stripe](/settings/integrations/stripe) - card and wallet payments with test and live modes.
 - [Transactions](/billing/transactions) - where payable transactions live.
 - [Payments](/billing/payments) - the payment records DatecsPay settles.

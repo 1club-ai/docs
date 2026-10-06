@@ -1,235 +1,195 @@
 ---
-title: Physical access control
-description: How 1Club's native access control turns memberships and bookings into physical door access - doors and door groups, credentials, access grants, auto-grant, access events, and edge gateway sync.
-keywords: [physical access control, door, door group, credential, RFID, NFC, QR code, PIN, access grant, auto-grant, access event, edge gateway, WebLock, Impro, Salto KS, reconciliation, door hardware]
+title: Door access
+description: How 1Club opens your gym's doors for the people who booked or checked in - through WebLock, Impro or Salto KS, with an access grant per person, area and time window.
+keywords:
+  [
+    door access,
+    physical access control,
+    access grant,
+    area access,
+    access buffer,
+    credential,
+    access card,
+    PIN,
+    QR code,
+    WebLock,
+    Impro,
+    Salto KS,
+    check-in,
+    booking,
+    manual grant,
+  ]
 ---
 
-Physical access control is the native 1Club feature that opens real doors. It links a member's [credential](/members/member-cards) (an access card, QR code, or PIN) to a time-bound **access grant** derived from their membership or booking, syncs those grants to door hardware through an **edge gateway**, and records every tap as an **access event**. You turn it on per gym, staff enroll members' credentials, and members tap, scan, or type their credential at the door. This is the hardware side of the platform: locks, readers, and controllers.
+Door access opens your gym's doors for the people who are expected: members with a booking, members who checked in, and anyone staff let in by hand. 1Club works out who may enter which area, and when, and keeps your door system in step. The doors themselves run on the door system you connect for each gym: [WebLock](/settings/integrations/weblock), [Impro](/settings/integrations/access-bridge) or [Salto KS](/settings/integrations/salto).
 
 <Note>
-This page is different from [Access control](/settings/access-control), which covers **check-in modes** (walk-ins, anonymous check-ins, payment enforcement) and how members **identify themselves** at the front desk. That page is about the front-desk check-in flow. This page is about physical door hardware and the grants that drive it. The two share one thing: the identification methods (QR, access card, PIN) a member enrolls are the same credentials that back a door grant.
+  This page is about doors. [Access control](/settings/access-control) covers
+  the front desk: check-in modes, walk-ins, and how members identify themselves
+  when they check in. The two meet in one place: the credentials a member uses
+  at the front desk (QR code, access card, PIN) are the ones sent to the door
+  system.
 </Note>
 
 ## When to use it
 
-Use physical access control when your doors should open based on what a member has paid for or booked, without staff updating the door system by hand. Grants are created and revoked as memberships and bookings change, and every attempt at a door is logged.
+Use door access when a door should open because someone booked or arrived, without staff updating the door system by hand.
 
 Typical uses:
 
-- **Door access that follows the membership** - a 24/7 strength gym where a member's fob opens the main door for as long as their membership is active, and stops working when it expires or is cancelled.
-- **Entry only for a booked session** - a reformer Pilates studio where a confirmed booking lets the member's QR code in from class start to class end, and a cancellation revokes it.
-- **An audit trail at the door** - a climbing gym that reviews flagged access events to catch tailgating, cloned cards, or misconfigured hardware.
-
-See [Worked examples](#worked-examples) for how to set up each of these.
+- **A studio door that opens only for class** - a Pilates studio's door opens for each booked member shortly before class and closes after it, and a cancellation takes the access away.
+- **A court gate for the booked slot** - a padel gym's court gate opens for the players who booked that hour, and for nobody else.
+- **A walk-in on a membership** - a member without a booking checks in at the front desk or from the app, picks the area they're going to, and the door opens for the rest of the day.
+- **A one-off visitor** - staff let a coach or a contractor into one area for an afternoon.
 
 ## How it works
 
-The physical access control system is made of five moving parts:
+- **Access belongs to an area.** Every door in your door system is linked to an [area](/operations/areas) in 1Club, on that system's integration page. Access is always to one area at one gym.
+- **An access grant says who may enter, where and when.** Each grant names one person, one area and a time window.
+- **Grants come from what happens in 1Club:**
+  - a **booking** in that area,
+  - a **check-in**,
+  - or a grant **staff add by hand**.
+- **A membership alone doesn't open a door.** A member with a membership gets access by booking or by checking in.
+- **The access buffer widens the window.** Each gym sets how early people can get in before a booking and how long they keep access after it ends.
+- **1Club keeps the door system in step.** A new or changed grant is sent straight away, and a full check runs every five minutes, so access that ends or is withdrawn is taken away again.
 
-- **Doors and door groups** - the physical endpoints (a turnstile, a studio door) and the logical groups you grant access to.
-- **Credentials** - the QR code, access card (RFID/NFC), or PIN a member presents at a reader. Managed on [Access cards](/members/member-cards).
-- **Access grants** - time-bound permissions that authorize one credential to enter, derived automatically from an active membership or a confirmed booking.
-- **Access events** - the audit trail of every attempt at a door, reconciled against grants to flag discrepancies.
-- **Edge gateway** - the on-site bridge that pulls grants down to your controllers and pushes events back up.
+Each gym uses one door system at a time.
 
-Grants are the single source of truth. 1Club's own edge gateway reads them, and so do the door access integrations: [WebLock (Valnes)](/settings/integrations/weblock), [Impro](/settings/integrations/access-bridge), and [Salto KS](/settings/integrations/salto).
+## Before you start
 
-## Turning on access control
+- The gym needs at least one active area. See [Areas](/operations/areas).
+- Activate a door system for the gym and link its doors to your areas:
+  - [WebLock](/settings/integrations/weblock)
+  - [Impro](/settings/integrations/access-bridge)
+  - [Salto KS](/settings/integrations/salto)
+- No grants are created at a gym until its door system is on.
+- Viewing grants requires the **operations.read.club** permission. Adding, revoking and restoring them requires **operations.manage.club**.
 
-Native access control is enabled per club. Until it is on for a club, no grants are created for that club's memberships or bookings, and no credentials are auto-provisioned.
+## Choose how members identify themselves
 
-1. Open the **Check-in & access control** settings page (see [Access control](/settings/access-control)).
-2. Turn on **Access control** for the club. This enables credential enrollment and switches on grant creation for that club.
-3. Choose the **Enabled identification methods** (QR Code, Access Card, PIN Code) you accept. These are the credential types members can enroll and that the system can auto-provision.
+Go to **Settings > Access Control > Settings**. Each gym has its own section.
 
-Access control is off by default for every club. Enabling it is what makes membership and booking activity flow through to door grants.
+1. Turn on **Access Control** for the gym. This lets members register access cards and PINs.
+2. Under **Enabled Identification Methods**, choose what the door system should accept:
+   - **QR Code** - the QR in the member's app. Every member already has one, so there is nothing to issue.
+   - **Access Card** - an RFID or NFC card or fob. Enroll cards on [Access cards](/members/member-cards).
+   - **PIN Code** - a number the member types at a keypad.
+3. Click **Save**.
 
-## Doors and door groups
-
-A **door** is a single physical access endpoint controlled by a reader and a controller. Each door belongs to a club and carries a name, an optional description and location, and the controller details (`controllerType`, `controllerId`) that tie it to hardware.
-
-A **door group** is a logical grouping of doors for one club, so you can grant access to a set of doors at once (for example, "Main entrance + locker rooms") instead of door by door. An access grant that is scoped to a club can target a door group; the grant then applies to every door in that group.
-
-<Note>
-There is no self-serve admin screen to create or edit doors and door groups. In the current product they are provisioned as part of hardware setup (and are copied when an organization is cloned from a template), then referenced by grants and events. If you need doors or groups configured, that happens during onboarding of your access hardware. Flag this to your implementation contact rather than looking for an admin page.
-</Note>
-
-## Credentials
-
-A credential is the token a member presents at a door. Three types exist:
-
-- **QR Code** (`qr`) - a code the member scans from their phone.
-- **Access Card** (`card`) - a physical RFID or NFC card or fob.
-- **PIN Code** (`pin`) - a numeric PIN typed at a keypad.
-
-You manage credentials on **Members > Access cards** (`/members/access-cards`), where you can enroll, assign, revoke, and delete them. See [Access cards](/members/member-cards) for the full management flow. A few facts that matter for door access:
-
-- **Identifiers are protected.** The raw card number or PIN is encrypted at rest and stored alongside a one-way hash. Readers and the gateway match on the hash, never the plaintext.
-- **A credential is assigned to a contact.** A credential assignment links the credential to a contact (and optionally to a specific membership or booking). A contact's **primary** credential is the one auto-grant uses.
-- **Credential lifecycle.** A credential is `active`, `suspended`, `revoked`, or `expired`. Only an `active` credential can back a working grant. Revoking a credential keeps it as an audit record; deleting is only allowed once it has no active assignments.
+Only the methods you enable are sent to the door system. When PIN is on and a member has no credential yet, 1Club creates a random 6-digit PIN for them the first time it sends them to the door system.
 
 <Note>
-When access control is on for a club but a member has no credential yet, the system auto-provisions a **primary** credential the first time it needs one for a grant. It prefers a PIN (a random 6-digit code) when PIN is an enabled method, otherwise it generates a QR code from the member's check-in code. If no identification method is enabled, no credential is created.
+  Salto KS doors open from the member's phone with a digital key instead. See
+  [Salto KS](/settings/integrations/salto).
 </Note>
 
 ## Access grants
 
-An access grant authorizes one credential to enter during a time window. Each grant records:
+Go to **Settings > Access Control > Access grants** to see every grant. The list shows:
 
-- The **credential** it applies to.
-- A **membership** or a **booking** as its source (exactly one is required).
-- An optional **club** and **door group** scope (a door group is only honored when a club is set).
-- **Valid from** and **valid until** timestamps, plus a timezone.
-- Optional **access windows** - recurring time-of-day rules (for example, `07:00`-`22:00`, days Monday-Friday) that further restrict when the grant works inside its overall validity.
-- A **status**: `active`, `expired`, `revoked`, or `suspended`.
+| Column                             | What it shows                                                                                                                                     |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ID**                             | The grant's number.                                                                                                                               |
+| **Sync**                           | Whether the door system has the grant: synced, pending or failed. A dash means nothing needs sending, for example a grant that has already ended. |
+| **Area** and **Club**              | Where the grant lets the person in.                                                                                                               |
+| **Contact**                        | Who it is for.                                                                                                                                    |
+| **Source**                         | **Booking**, **Check-in** or **Manual**. **Legacy** marks grants from the earlier setup.                                                          |
+| **Valid from** and **Valid until** | When the door opens for them, including the access buffer.                                                                                        |
+| **Status**                         | **Active**, **Expired** once the window has passed, or **Revoked**.                                                                               |
 
-You review grants on the **Access grants** list under Settings (route `/settings/access/grants`). The list is read-only and shows each grant's **Contact**, **Source** (Booking or Membership), **Valid from**, **Valid until**, and **Status**, with search by contact name and sorting by validity dates or status.
-
-Grants are created and revoked automatically (see below). Creating or revoking a grant by hand is an operations-permission action available through the API, not a form on the grants list.
-
-## How grants derive from memberships and bookings (auto-grant)
-
-You rarely create grants yourself. The auto-grant service watches membership and booking lifecycle events and keeps grants in step. It only acts when access control is enabled for the relevant club.
-
-### From a membership
-
-When a membership becomes **active**, 1Club creates a grant that is valid for the membership period:
-
-- **Valid from** the membership start date, **valid until** its end date (or one year out if the membership has no end date).
-- Scoped to the membership's club.
-- Backed by the member's primary credential, auto-provisioning one if needed.
-
-When the membership **expires or is cancelled**, its active grants are revoked.
+Times are shown in your device's timezone.
 
 ### From a booking
 
-When a booking is **confirmed**, 1Club creates a grant valid only for that session:
+A booking in an area creates a grant for that area. It opens the access buffer before the booking starts and closes the access buffer after it ends. For example, a class ending at 14:30 with a 15-minute buffer shows **Valid until** 14:45.
 
-- **Valid from** the booking start time, **valid until** its end time.
-- Scoped to the booking's club.
-- Backed by the booked member's primary credential (auto-provisioned if missing).
+If the booking moves, the grant moves with it. If the booking or its class is cancelled, the grant is revoked.
 
-If an active grant already exists for the booking, it is reused rather than duplicated. When the booking is **cancelled**, its active grants are revoked. Bookings that are not confirmed do not get a grant.
+### From a check-in
 
-<Note>
-Auto-grant needs a credentialed member. If a booking has no linked contact, or the club has access control disabled, or no identification method is enabled to provision from, no grant is created. The most common reason a member cannot get through a door is simply that they have no enrolled credential - fix it on [Access cards](/members/member-cards).
-</Note>
+A check-in for a booking or a class uses that booking's area and window. Only the buffer after the end applies, because the member is already inside.
 
-## Access events
+A check-in on a membership, without a booking, asks which area the member is going to:
 
-Every tap, scan, or PIN entry at a door produces an access event. Events flow in from the edge gateway and are stored with:
+- With one active area, it's chosen automatically.
+- With several, staff or the member choose one, or **No door access**.
+- With none, the member checks in without door access.
 
-- The **credential** and **door** involved.
-- An **event type** (`access_attempt`, `access_granted`, `access_denied`) and a **result** (`granted` or `denied`).
-- A **timestamp**, timezone, gateway, and controller reference.
-- A **denial reason** when access was refused.
+That access lasts from check-in until midnight, gym time. This works the same at the front desk, on the kiosk, on self-service check-in, and when members check themselves in from the app or the member portal.
 
-Events can be queried through the API by credential, door, date range, or result. Each event also carries a hash that chains to the previous event, so the log is tamper-evident.
+### Add a grant by hand
 
-### Reconciliation and discrepancies
+1. Click **Add access grant**.
+2. Choose the **Contact**, the **Club** and the **Area**.
+3. Set **Valid from** and **Valid until**.
+4. Click **Add grant**.
 
-After ingestion, events are reconciled against grants:
+A manual grant uses exactly the times you enter, with no access buffer.
 
-- A granted event that matches a valid grant is marked **reconciled**.
-- A denied event is reconciled as expected behavior.
-- An event is flagged as a **discrepancy** when the credential is unknown, when access was granted with no matching grant, when the grant was expired or not yet valid at the event time, or when entry happened at the wrong door group.
+### Revoke and restore
 
-If a reader reports a credential 1Club has never seen, the event is still recorded against a placeholder (revoked) credential and flagged as a discrepancy, so nothing is lost from the audit trail. You can pull the list of discrepancies for a date range to investigate tailgating, cloned cards, or misconfigured hardware.
+- Click **Revoke** on an active grant to take the access away. It stays revoked even if the booking or check-in behind it changes later.
+- Click **Restore** on a grant you revoked to give the access back. You can't restore a grant whose window has already passed.
 
-<Note>
-Access events and reconciliation are available through the access-control API. There is no dedicated admin screen for browsing the raw event log in the current product; front-desk attendance is reviewed on [Attendance](/members/attendance) instead. Treat the event log as an audit and integration surface.
-</Note>
-
-## Edge gateway sync
-
-An edge gateway is a small on-site service (shipped as a Docker container) that bridges your door controllers to the cloud. Each gateway belongs to one club and is provisioned with a long-lived gateway token.
-
-The sync loop is pull-based and offline-tolerant:
-
-1. **Pull grants.** The gateway periodically asks the cloud for grants for its club (plus org-wide grants), passing a `since` timestamp so it only fetches what changed. It receives the current grants, the IDs of any newly revoked grants, and a sync timestamp.
-2. **Provision controllers.** The gateway pushes those grants to each connected controller and removes the revoked ones, so the door itself can decide access even if the internet drops.
-3. **Report health.** The gateway sends a heartbeat with its version and status; the cloud records `lastSeenAt` and the sync status.
-4. **Push events.** Access events are queued locally and flushed to the cloud in batches, and re-queued if the upload fails.
-
-Grants are pulled on an interval (30 seconds by default) and queued events are flushed frequently (every few seconds). A gateway's token can be rotated, which immediately invalidates the previous token. A gateway is `active`, `suspended`, or `revoked`.
+Deleting a contact or an area deletes its grants, and the door system is cleaned up after it.
 
 <Note>
-Gateway provisioning, token rotation, and event ingestion are access-control API operations (they require an operations-manage permission or the gateway's own token). There is no admin form to provision a gateway in the current product - it is set up during hardware onboarding.
+  If the door system still lets someone in after their access was withdrawn, the
+  grants list warns you. It means the person is also in a group set up directly
+  in the door system. Remove them from that group there.
 </Note>
-
-### Native gateway vs. door access integrations
-
-There are two ways door hardware consumes grants:
-
-- **Native edge gateway** - 1Club's own gateway talking to generic controllers, as described above.
-- **Door access integrations** - [WebLock (Valnes)](/settings/integrations/weblock), [Impro](/settings/integrations/access-bridge), and [Salto KS](/settings/integrations/salto). Each is set up per gym on its own integration page, where you link the gym's areas to that system's doors.
-
-The door access integrations work from **area access**: a grant for one member, one area, and one time window. It comes from a booking or a check-in in that area, or from staff adding access by hand, and the integration widens it by the gym's access buffer. A membership alone does not open a door through them. Each integration keeps its own system in step with that access, and withdraws it when the access ends. Only one door access integration can be on for a gym at a time.
 
 ## Worked examples
 
-### 24/7 gym door access by membership
+### Pilates studio, door open only for class
 
-A strength-and-conditioning gym wants members to badge in at the main door any time their membership is active.
+- Create a **Studio** area for the gym and link the studio door to it on your door system's integration page.
+- Set the access buffer to 15 minutes.
+- Turn on **Access Control** for the gym and enable **QR Code**.
+- A member books the 18:00 class. Their QR opens the studio door from 17:45 until 15 minutes after class. If they cancel, the access is withdrawn.
 
-- Turn on **Access control** for the club and enable **Access Card** (and optionally **PIN**) as identification methods.
-- Enroll each member's fob on [Access cards](/members/member-cards) and mark it primary.
-- When you activate a member's plan, an access grant is created for the whole membership period, scoped to the club. When the plan lapses, the grant is revoked automatically.
-- Point the main-entrance door (or a "Main entrance" door group) at the club so the grant opens it.
+### Padel gym, court gates for the booked hour
 
-### Class door that opens only for the session
+- Create one area per court and link each court gate to its area.
+- A booking for Court 2 at 19:00 opens Court 2's gate for the players in that booking, from the buffer before 19:00 until the buffer after the hour ends. The other courts stay closed to them.
 
-A reformer Pilates studio wants the studio door to open only for members with a booking, and only during their class.
+### 24/7 gym, members walk in
 
-- Enable access control for the club and enable **QR Code** so members scan in from the app.
-- When a member's booking is confirmed, a grant is created that is valid from the class start to the class end.
-- The grant is scoped to the studio door group, so the front door stays members-only while the studio unlocks per session.
-- If the member cancels, the grant is revoked and the door will not open for them.
-
-### Climbing gym with zoned access
-
-A climbing gym has a public entrance, a bouldering area, and a lead-climbing zone that requires a certification add-on.
-
-- Model each zone as a door group and enable access control for the club.
-- Sell the lead-climbing entitlement as a separate plan or add-on membership so its grant can be scoped to the lead-climbing door group, while the base membership grant covers the entrance and bouldering groups.
-- Use **access windows** on the base grant (for example staffed hours only) if you do not want unsupervised entry, and leave a 24/7 plan without windows.
-- Review discrepancies periodically to catch anyone tailgating into the lead zone without a valid grant.
+- Create a **Gym floor** area and link the main door to it.
+- Enable **Access Card** and **PIN Code**, and enroll members' fobs on [Access cards](/members/member-cards).
+- A member checks in from the app when they arrive. With one area, it's chosen for them, and the main door opens for them until midnight.
 
 ## Tips & best practices
 
-- **Enable access control before you expect grants.** Grants and auto-provisioned credentials only start once the club toggle is on. Flipping it on does not backfill grants for memberships that were already active - re-save or renew if you need them created.
-- **Give every member a primary credential.** Auto-grant follows the primary credential. A member with several cards but no primary can end up without a grant on the card they actually tap.
-- **Prefer door groups over single doors.** Grouping doors keeps grants simple and lets you re-wire which physical doors belong to a zone without touching every grant.
-- **Use access windows for time-of-day rules, validity for date rules.** Validity (`valid from`/`valid until`) tracks the membership or booking period; access windows restrict the hours within it.
-- **Watch the gateway heartbeat.** A gateway that stops sending heartbeats has likely lost connectivity. Because sync is offline-tolerant, doors keep working on the last synced grants, but new grants and revocations will not land until it reconnects.
-- **Revoke, do not delete, a lost card.** Revoking keeps the audit trail intact and drops the grant; deleting is only for credentials that were never assigned.
+- **Link every door to an area first.** A door that isn't linked to an area never opens through 1Club.
+- **Keep area names unique within a gym.** Some door systems use the area name to find the matching zone.
+- **Use the buffer, not longer bookings.** The access buffer covers arriving early and leaving late, without changing the booking itself.
+- **Revoke, don't delete.** Revoking keeps the record and still takes the access away. Use **Restore** if you change your mind before the window ends.
+- **Watch the Sync column.** A grant stuck on pending or failed hasn't reached the door system yet. The check every five minutes retries it.
 
 ## Troubleshooting
 
-**Issue**: A member with an active membership cannot open the door.
-**Cause / fix**: Either access control is off for that club, or the member has no active primary credential. Confirm the club toggle on [Access control](/settings/access-control) and check the member's credential on [Access cards](/members/member-cards). If the credential is `suspended`, `revoked`, or `expired`, no working grant exists.
+**Issue**: A member with an active membership can't open the door.
+**Cause / fix**: A membership alone doesn't open a door. The member needs a booking in that area or a check-in for it. Check the **Access grants** list for an active grant in the right area.
 
-**Issue**: A booking was confirmed but no grant appeared.
-**Cause / fix**: Grants are only created for confirmed bookings at clubs with access control enabled, and only when the booked member has (or can be auto-provisioned) a credential. A booking with no linked contact, or a club with access control off, will not produce a grant.
+**Issue**: A booking was made but no grant appeared.
+**Cause / fix**: The booking's gym needs an active door system, and the booking needs an area. Check that the door system is on for the gym, and that the area is linked on its integration page.
 
-**Issue**: A grant exists but the door still will not open.
-**Cause / fix**: Check the grant's validity window and any access windows - the current time must fall inside both. Also confirm the door belongs to the door group the grant targets, and that the edge gateway has synced since the grant was created.
+**Issue**: A grant is active but the door doesn't open.
+**Cause / fix**: Check the **Sync** column. If it's pending or failed, the door system hasn't received it yet. Also check that the member's credential type is enabled under **Enabled Identification Methods**, and that the door is linked to the grant's area.
 
-**Issue**: The access event log shows an "access granted but no matching grant" discrepancy.
-**Cause / fix**: The reader let someone in without a corresponding grant. This usually means a manually configured door override, a credential enrolled directly on the hardware, or a grant that had already expired. Review the discrepancy and revoke or re-provision as needed.
+**Issue**: A walk-in checked in but got no door access.
+**Cause / fix**: When the gym has several areas, someone has to choose one at check-in. **No door access** checks the member in without opening any door.
 
-**Issue**: A tapped card shows up as an unknown credential.
-**Cause / fix**: The card was never enrolled in 1Club, so the event was recorded against a placeholder and flagged. Enroll the card on [Access cards](/members/member-cards) and assign it to the contact, or treat it as an unauthorized card.
-
-**Issue**: New grants are not reaching the door.
-**Cause / fix**: The edge gateway may be offline or its token may have been rotated. Check that it is still sending heartbeats and running the current token. Doors keep working on the last synced grants until it reconnects.
+**Issue**: The member's card isn't recognised.
+**Cause / fix**: Enroll the card on [Access cards](/members/member-cards) and make sure **Access Card** is enabled for the gym. For Impro, the card technology also has to match your readers. See [Impro](/settings/integrations/access-bridge).
 
 ## Related
 
-- [Access control](/settings/access-control) - check-in modes and how members identify themselves at the front desk (the non-hardware side).
-- [Access cards](/members/member-cards) - enroll, assign, revoke, and delete the credentials that back door grants.
-- [WebLock](/settings/integrations/weblock), [Impro](/settings/integrations/access-bridge), and [Salto KS](/settings/integrations/salto) - the door access integrations that read area access grants.
-- [Memberships](/members/memberships) - the memberships that generate long-running door grants.
-- [Bookings](/operations/bookings) - the bookings that generate per-session door grants.
-- [Check-in models](/reference/check-in-models) - how members get into your club and how entrance methods work.
-- [Attendance](/members/attendance) - review front-desk check-in records.
+- [Access control](/settings/access-control) - check-in modes and how members identify themselves at the front desk.
+- [Access cards](/members/member-cards) - enroll, assign and revoke cards and PINs.
+- [WebLock](/settings/integrations/weblock), [Impro](/settings/integrations/access-bridge) and [Salto KS](/settings/integrations/salto) - the door systems, and where you link doors to areas.
+- [Areas](/operations/areas) - the areas access is granted to.
+- [Bookings](/operations/bookings) - the bookings that open doors.
+- [Attendance](/members/attendance) - check-in records.

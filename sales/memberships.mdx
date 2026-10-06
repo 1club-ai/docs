@@ -82,7 +82,7 @@ Click **Add Membership**. The dialog lets you:
 3. **Adjust the start date.** The end date and renewal date are computed from the billing frequency, but you can override them.
 4. **Set auto-renew.** Only available for recurring frequencies; defaults from the plan.
 5. **Apply a discount (optional).** Enter a promotion code or pick a discount in the price section. The discount lowers the saved price, so recurring renewals inherit the reduced amount going forward. Only discount-type promotions apply here, not wallet vouchers.
-6. **Take payment (optional).** If the plan requires payment upfront, the payment section opens automatically. You can still save without a payment: the dialog notes that the plan is normally paid when sold, and the amount stays as an outstanding balance to collect from the member's profile. The signup fee is charged as a separate transaction and is not reduced by a discount.
+6. **Take payment (optional).** If the plan requires payment upfront, the payment section opens automatically. You can still save without a payment: the dialog notes that the plan is normally paid when sold, and the amount stays as an outstanding balance to collect from the member's profile. The signup fee is charged as a separate charge and is not reduced by a discount.
 
 ### Editing a membership
 
@@ -130,7 +130,7 @@ Either mode voids any pending future recurrence charges so the member is not bil
 
 ### Delete
 
-Deletion is only available to admins with the delete permission, and only when the membership has **no** transactions. To remove a membership that has been paid against, cancel it instead so financial history is preserved. Attempting to delete a membership with transactions is blocked with a clear error.
+Deletion is only available to admins with the delete permission, and only when the membership has **no** charges. To remove a membership that has been paid against, cancel it instead so financial history is preserved. Attempting to delete a membership with charges is blocked with a clear error.
 
 ## How usage is counted
 
@@ -163,7 +163,7 @@ You can edit the scope on an existing membership if the plan's snapshot is stale
 
 ## Auto-renew
 
-Recurring memberships can auto-renew. When the period ends, a renewal transaction is generated and charged against the member's saved payment method. Auto-renew is only available for active, used, or pending memberships, and defaults to the plan's default-auto-renewal setting. If a renewal charge is declined, the membership is deactivated until the payment settles, then reactivates and resumes its billing cycle from the failed period.
+Recurring memberships can auto-renew. When the period ends, a renewal charge is generated and collected from the member's saved payment method. Auto-renew is only available for active, used, or pending memberships, and defaults to the plan's default-auto-renewal setting. If a renewal charge is declined, the membership is deactivated until the payment settles, then reactivates and resumes its billing cycle from the failed period.
 
 A [season pass](/schedule/season-passes) never auto-renews. It is paid once for a fixed period, and the next season is a fresh sale at the new season's prices.
 
@@ -210,7 +210,7 @@ A jiu-jitsu gym runs an "Unlimited Monthly" plan. A member tears a ligament and 
 ## Tips & best practices
 
 - **Let the plan carry the defaults.** Configure price, use limits, scope, and default auto-renewal on the [plan](/sales/plans) so every sale snapshots consistent terms. Only override on the membership for genuine exceptions.
-- **Prefer cancel over delete.** Delete is blocked once any transaction exists, and cancelling preserves the financial trail. Reserve delete for memberships created in error before any charge.
+- **Prefer cancel over delete.** Delete is blocked once any charge exists, and cancelling preserves the financial trail. Reserve delete for memberships created in error before any charge.
 - **Use pause, not cancel, for temporary absences.** Pause preserves paid-for time and the member's history; cancelling and re-selling does not.
 - **Schedule the resume date when you know it.** A scheduled auto-resume keeps a paused membership showing a coherent renewal date and reactivates without staff action.
 - **Watch the Used tab for one-time packs.** Members on the **Used** tab have consumed their allowance and (for one-time packs) need a new membership, not a renewal.
@@ -239,13 +239,13 @@ A jiu-jitsu gym runs an "Unlimited Monthly" plan. A member tears a ligament and 
 
 **Cause**: The charge was raised before the pause, or the membership was edited rather than paused.
 
-**Fix**: Always use the **Pause** action - it voids pending recurrence charges. If a charge already settled, handle it through the refund flow in [Transactions](/sales/transactions).
+**Fix**: Always use the **Pause** action - it voids pending recurrence charges. If a charge already settled, handle it through the refund flow in [Charges](/sales/charges).
 
 **Issue**: The **Delete** action is missing or fails.
 
-**Cause**: Either you lack the delete permission, or the membership has transactions.
+**Cause**: Either you lack the delete permission, or the membership has charges.
 
-**Fix**: Cancel the membership instead to retain its financial records. Only transaction-free memberships can be hard-deleted.
+**Fix**: Cancel the membership instead to retain its financial records. Only charge-free memberships can be hard-deleted.
 
 **Issue**: A membership isn't offered as a payment option when booking a class.
 
@@ -258,5 +258,5 @@ A jiu-jitsu gym runs an "Unlimited Monthly" plan. A member tears a ligament and 
 - [Plans](/sales/plans) - the plan templates memberships are built from.
 - [Member profile](/members/member-profiles) - per-member memberships, on the member's Memberships tab.
 - [Attendance](/schedule/attendance) - check-ins, usage counting, and the pre-booked-versus-walk-in distinction.
-- [Transactions](/sales/transactions) - the invoices and payments memberships generate.
+- [Charges](/sales/charges) - the charges memberships generate, and how they are paid.
 - [Check-in models](/reference/check-in-models) - how memberships satisfy payment and access at the door.

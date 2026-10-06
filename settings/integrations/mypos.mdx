@@ -17,7 +17,7 @@ keywords:
   ]
 ---
 
-myPOS is a card payment provider you can use alongside or instead of Stripe. Online, customers are redirected to myPOS's hosted checkout page to enter their card details, then return to 1Club once the payment completes. In person, myPOS card terminals take payments at your front desk. An owner or admin sets it up, and staff can also email a member a myPOS payment link for an outstanding transaction.
+myPOS is a card payment provider you can use alongside or instead of Stripe. Online, customers are redirected to myPOS's hosted checkout page to enter their card details, then return to 1Club once the payment completes. In person, myPOS card terminals take payments at your front desk. An owner or admin sets it up, and staff can also email a member a myPOS payment link for an outstanding charge.
 
 <Note>
   If your organization trades through more than one company, each company
@@ -30,14 +30,14 @@ myPOS is a card payment provider you can use alongside or instead of Stripe. Onl
 
 ## When to use it
 
-myPOS suits a gym that already has, or wants, a myPOS merchant account. Card data never touches 1Club servers. All processing happens on myPOS's PCI-certified infrastructure, and the payment status returns automatically through a signed myPOS notification (IPN), settling linked transactions and bookings.
+myPOS suits a gym that already has, or wants, a myPOS merchant account. Card data never touches 1Club servers. All processing happens on myPOS's PCI-certified infrastructure, and the payment status returns automatically through a signed myPOS notification (IPN), settling linked charges and bookings.
 
 You can try hosted checkout end to end in **Test** mode against a shared sandbox without any credentials, then switch to **Live** mode with your own myPOS Checkout Store when you are ready to take real money.
 
 Typical uses:
 
 - **A gym that already banks with myPOS** - paste a **Configuration Pack** from your Checkout Store and take court bookings through hosted checkout, with no Stripe account needed.
-- **Collecting an overdue fee** - when a member's card on file is declined, send a **myPOS payment link** for the overdue transaction, and the member pays on their own phone within the 7-day window.
+- **Collecting an overdue fee** - when a member's card on file is declined, send a **myPOS payment link** for the overdue charge, and the member pays on their own phone within the 7-day window.
 - **A myPOS terminal at the front desk** - take card payments in person on a myPOS device, while your online payments keep running through Stripe.
 
 ## Before you start
@@ -181,10 +181,10 @@ myPOS **Online** and DatecsPay present the same "pay by card" checkout to member
 
 ## Send a myPOS payment link
 
-For an outstanding transaction, you can send the member a link to pay through myPOS instead of charging a saved card.
+For an outstanding charge, you can send the member a link to pay through myPOS instead of charging a saved card.
 
-1. Go to **Sales** > **Finance** > **Transactions** and find the transaction, or open it.
-2. From its actions, choose **Send myPOS payment link**. This is available only while myPOS is active and the transaction is still payable (pending, overdue, or partially paid).
+1. Go to **Sales** > **Finance** > **Charges** and find the charge, or open it.
+2. From its actions, choose **Send myPOS payment link**. This is available only while myPOS is active and the charge is still payable (pending, overdue, or partially paid).
 3. Check the amount and the member's name and email, then click **Send link**.
 
 The member receives an email with a link that opens myPOS hosted checkout for the exact amount due. Each link is valid for **7 days**. Sending payment links requires the **billing.manage.organization** permission.
@@ -192,12 +192,12 @@ The member receives an email with a link that opens myPOS hosted checkout for th
 ## What syncs
 
 - Payments created in 1Club open a myPOS hosted checkout URL that the customer is redirected to.
-- After payment, myPOS notifies 1Club through a signed webhook (IPN). The payment status, myPOS transaction reference, and order ID are recorded on the 1Club payment, and any linked transactions and bookings are settled automatically.
+- After payment, myPOS notifies 1Club through a signed webhook (IPN). The payment status, myPOS transaction reference, and order ID are recorded on the 1Club payment, and any linked charges and bookings are settled automatically.
 - If the IPN is redelivered, 1Club matches it to the same payment, so duplicate notifications don't double-charge or double-settle.
 
 ## Refunds
 
-1Club does not push refunds to myPOS. Refund a myPOS payment from your **myPOS account**, then reconcile the transaction in 1Club.
+1Club does not push refunds to myPOS. Refund a myPOS payment from your **myPOS account**, then reconcile the charge in 1Club.
 
 ## Deactivate
 
@@ -215,16 +215,16 @@ You stay on the myPOS page afterwards, with the form reset. Your saved credentia
 - **Validation fails** - confirm the **Store ID (SID)**, **Client number**, and **Key index** match your myPOS Checkout Store, and that the **RSA private key** is the one paired with the certificate for that key index. If you used a Configuration Pack, regenerate it in myPOS and paste the fresh pack.
 - **"DatecsPay is already enabled"** - only one hosted-checkout provider can be active per company. Deactivate DatecsPay for that company, or untick **Online** if you only need myPOS terminals.
 - **Customers see a signature error on the checkout page** - the public certificate registered with myPOS doesn't match the private key on file. Regenerate the key pair in myPOS, download the new public certificate from the Integration tab, and paste the new private key and certificate here.
-- **Payment succeeded on myPOS but the transaction stays unpaid in 1Club** - the IPN webhook didn't reach 1Club. Confirm the notification URL is allowed in your myPOS store settings, then re-trigger the notification from myPOS.
+- **Payment succeeded on myPOS but the charge stays unpaid in 1Club** - the IPN webhook didn't reach 1Club. Confirm the notification URL is allowed in your myPOS store settings, then re-trigger the notification from myPOS.
 - **myPOS refused the terminal credentials and 1Club stopped trying** - see [Terminal credential lockout](#terminal-credential-lockout). Fix the client ID or secret, and use **Allow another attempt** only after myPOS confirms your account is not locked.
 - **Save or Deactivate is refused because a payment is in progress on a card reader** - finish or cancel that payment on the reader, then try again.
 - **Live payments fail but test mode works** - double-check you are in **Live** mode and that you entered live credentials (a Configuration Pack from your real store, not the sandbox).
 
 ## Worked examples
 
-**Squash gym that already banks with myPOS.** A racket-sports gym with an existing myPOS merchant account activates myPOS, selects **Live**, opens its Checkout Store's **Easy Setup** screen, generates a **Configuration Pack**, and pastes it into 1Club. It saves, validates the configuration, then runs one real court booking to confirm hosted checkout settles the transaction. No Stripe account needed.
+**Squash gym that already banks with myPOS.** A racket-sports gym with an existing myPOS merchant account activates myPOS, selects **Live**, opens its Checkout Store's **Easy Setup** screen, generates a **Configuration Pack**, and pastes it into 1Club. It saves, validates the configuration, then runs one real court booking to confirm hosted checkout settles the charge. No Stripe account needed.
 
-**Boxing gym collecting an overdue membership fee.** A martial-arts gym has a member whose card on file was declined. Instead of chasing them at the front desk, staff open the overdue transaction under **Sales** > **Finance** > **Transactions**, choose **Send myPOS payment link**, and the member pays on their own phone within the 7-day window. The IPN settles the transaction automatically.
+**Boxing gym collecting an overdue membership fee.** A martial-arts gym has a member whose card on file was declined. Instead of chasing them at the front desk, staff open the overdue charge under **Sales** > **Finance** > **Charges**, choose **Send myPOS payment link**, and the member pays on their own phone within the 7-day window. The IPN settles the charge automatically.
 
 **Yoga studio rehearsing before launch.** A yoga studio without myPOS credentials yet activates myPOS in **Test** mode, walks through the full checkout with myPOS test cards, and confirms receipts and booking confirmations look right. When its myPOS store is ready it switches to **Live** and pastes its real Configuration Pack.
 
@@ -242,5 +242,5 @@ You stay on the myPOS page afterwards, with the form reset. Your saved credentia
 - [Billing entities](/settings/billing-entities) - the companies you trade through, each with its own payment accounts.
 - [Stripe](/settings/integrations/stripe) - card and digital wallet payments with Stripe Connect.
 - [DatecsPay](/settings/integrations/datecspay) - the other hosted-checkout provider, which can't run alongside myPOS **Online** for the same company.
-- [Transactions](/sales/transactions) - where payable transactions live and where you send a payment link.
+- [Charges](/sales/charges) - where payable charges live and where you send a payment link.
 - [Payments](/sales/payments) - the payment records myPOS settles.

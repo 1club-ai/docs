@@ -1,8 +1,8 @@
 ---
 title: Sales overview
 sidebarTitle: Overview
-description: How the Sales section is organized - Plans, Products, Promotions, Memberships, Orders, Finance, and Cash - and how plans, orders, transactions, invoices, and payments fit together.
-keywords: ["sales", "revenue", "billing", "finance", "cash", "transaction", "payment", "invoice", "bill run", "plan", "product", "package", "promotion", "membership", "order", "wallet"]
+description: How the Sales section is organized - Plans, Products, Promotions, Memberships, Orders, Finance, and Cash - and how plans, orders, charges, invoices, and payments fit together.
+keywords: ["sales", "revenue", "billing", "finance", "cash", "charge", "transaction", "payment", "invoice", "bill run", "plan", "product", "package", "promotion", "membership", "order", "wallet"]
 ---
 
 **Sales** is where you set up what your gym sells and follow the money it brings in. It replaces the old **Revenue** menu and also holds **Promotions** (formerly under **Marketing**) and **Memberships** (formerly under **Members**). Owners and managers set up the catalog here, and front-desk staff and bookkeepers use it to review orders, chase what is owed, and reconcile the till.
@@ -20,7 +20,7 @@ Go to **Sales** in the left rail (`/sales`). It opens on the first tab you can a
 | [Promotions](/sales/promotions) | Vouchers and discounts | Run trials, intro offers, and promo codes. |
 | [Memberships](/sales/memberships) | Every membership sold from your plans | Pause, renew, cancel, and track usage. |
 | [Orders](/sales/orders) | Every basket bought at the desk, in the portal, or through a booking | Review, complete, or cancel a purchase and everything it created. |
-| **Finance** | Money owed and collected, as tabs (see below) | Audit transactions, collect payments, issue invoices, and manage wallets. |
+| **Finance** | Money owed and collected, as tabs (see below) | Audit charges, collect payments, issue invoices, and manage wallets. |
 | [Cash](/sales/cash) | The cash drawer and expenses | Count the till and record what your gym spends. Only shown when the cash module is on. |
 
 ### Products sub-tabs
@@ -35,14 +35,14 @@ Go to **Sales** in the left rail (`/sales`). It opens on the first tab you can a
 
 ### Finance
 
-**Sales** > **Finance** (`/finance`) gathers everything about money that has moved into one tab, with its own sub-tabs. It opens on **Transactions**.
+**Sales** > **Finance** (`/finance`) gathers everything about money that has moved into one tab, with its own sub-tabs. It opens on **Charges**.
 
 | Sub-tab | What it lists |
 | --- | --- |
-| [Transactions](/sales/transactions) | Every obligation: what someone owes you |
-| [Payments](/sales/payments) | Every settlement: how money was collected, and who recorded it |
+| [Charges](/sales/charges) | Everything owed: what someone owes you, one row per thing sold |
+| [Payments](/sales/payments) | Every payment: how money came in, and who recorded it |
 | [Invoices](/sales/invoices) | Numbered invoice and pro-forma documents |
-| [Bill Runs](/sales/bill-runs) | Batches that sweep a period of transactions into invoices |
+| [Bill Runs](/sales/bill-runs) | Batches that sweep a period of charges into invoices |
 | [Wallet](/sales/wallet) | Each member's store-credit balance |
 | **Wallet movements** | Every credit and debit across all wallets |
 
@@ -54,35 +54,39 @@ Go to **Sales** in the left rail (`/sales`). It opens on the first tab you can a
 
 Sales is built on three concepts that are deliberately kept separate. Once you have the model in your head, every Finance screen lines up.
 
-- A **transaction** is what someone owes you. One row per obligation (a booking fee, a membership charge, a signup fee). Its `paymentStatus` is one of `pending`, `paid`, `overdue`, `void`, `partially_paid`, `refunded`, or `cancelled`.
-- A **payment** is how money was collected. One row per settlement event, linked to one or more transactions.
-- An **invoice** is a document that groups outstanding transactions for a contact, with a number and a due date. Invoices don't move money on their own.
+- A **charge** is what someone owes you for one thing: a booking, a membership period or signup fee, a product, a check-in, a cancellation charge, or a settlement. Charges were called transactions in earlier versions of 1Club.
+- A **payment** is money that came in. One charge can be paid by several payments (a deposit, then the rest at the desk), and one payment can pay several charges (a basket at checkout).
+- An **invoice** is a document issued over one or more charges for a contact, with a number and a due date. Not every charge is invoiced, and invoices don't move money on their own.
 
-This separation is why you can record a payment without ever issuing an invoice (for example, taking cash at the front desk for a single booking), and why an invoice can contain transactions from several different bookings or memberships.
+A charge's `paymentStatus` tells you whether it is still owed. `pending` (shown as **Unpaid**), `partially_paid`, `overdue`, and `failed` are unresolved, and together they make up the contact's amount due. `paid`, `settled`, `refunded`, `void`, and `cancelled` are closed.
+
+Three ways to take something back are kept apart too. A **refund** returns money from a payment. **Voiding** closes an unpaid charge that should never have been owed. A **reversal** is a negative charge that cancels all or part of another, for example when a booking is cancelled, so revenue reports stay balanced.
+
+This separation is why you can record a payment without ever issuing an invoice (for example, taking cash at the front desk for a single booking), and why an invoice can contain charges from several different bookings or memberships.
 
 ## How a charge usually flows
 
 The typical flow for a paid activity is:
 
-1. A booking, membership, or signup fee is created. 1Club writes a **transaction** with `paymentStatus = pending` (or `paid` if the amount is zero).
+1. A booking, membership, or signup fee is created. 1Club writes a **charge** with `paymentStatus = pending` (or `paid` if the amount is zero).
 2. Either the system or an admin collects payment. That can happen up front (Stripe Payment Element in the member portal, or an admin recording a manual payment), at check-in if the booking policy says so, or later from an invoice.
-3. When the payment succeeds, 1Club creates a **payment** row, links it to the transaction(s) via `payment_transactions`, and flips the transaction's status to `paid`. Pending bookings tied to that transaction are confirmed.
+3. When the payment succeeds, 1Club creates a **payment** row, links it to the charge(s), and flips the charge's status to `paid`. Pending bookings tied to that charge are confirmed.
 
 Invoices are optional. They get created when:
 
-- You manually invoice a transaction from its details page.
-- You run a [bill run](/sales/bill-runs), which sweeps every pending non-void transaction for a period and groups them into invoices.
+- You manually invoice a charge from its details page.
+- You run a [bill run](/sales/bill-runs), which sweeps every pending non-void charge for a period and groups them into invoices.
 - A scheduled bill run fires on a cron (configured under **Settings** > **Billing** > **Automated Billing**).
 
 ## Recurring memberships
 
 For recurring plans, an hourly job (`recurring-transactions`) does three things:
 
-- Creates the next `membership_recurrence` transaction when a billing period rolls over.
-- For memberships flagged **Require payment upfront**, it attempts to charge the contact's default Stripe payment method when the recurrence becomes due. If no default method is on file or the charge fails, the transaction stays `pending`.
-- Marks any `pending` transaction whose due date is in the past as `overdue`.
+- Creates the next `membership_recurrence` charge when a billing period rolls over.
+- For memberships flagged **Require payment upfront**, it attempts to charge the contact's default Stripe payment method when the recurrence becomes due. If no default method is on file or the card payment fails, the charge stays `pending`.
+- Marks any `pending` charge whose due date is in the past as `overdue`.
 
-It does not send invoices and it does not retry failed charges. Retries are manual: open the transaction or invoice and use **Charge** or **Add payment**. See [Plans](/sales/plans) for how a plan's fields drive this behavior.
+It does not send invoices and it does not retry failed charges. Retries are manual: open the charge or invoice and use **Charge saved card** or **Add payment**. See [Plans](/sales/plans) for how a plan's fields drive this behavior.
 
 ## Settings for Sales
 
@@ -97,7 +101,7 @@ Setup that you do once lives under **Settings**, in two categories:
 - [Plans](/sales/plans)
 - [Products](/sales/products)
 - [Orders](/sales/orders)
-- [Transactions](/sales/transactions)
+- [Charges](/sales/charges)
 - [Payments](/sales/payments)
 - [Invoices](/sales/invoices)
 - [Payment methods](/settings/payment-methods)

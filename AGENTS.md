@@ -16,8 +16,8 @@
 
 - When referring to sport clubs, use "gym" instead of "club". Exception: do not rename the "Club" / "Clubs" menu items in the UI - keep those as-is.
 - **Automations** is the current event-driven workflow feature (triggers, steps, runs). The previous **Campaigns** feature was decommissioned and removed from the product - do not document it. Reminders, review requests, and segment messaging are all built as automations now. See `marketing/automations.mdx`.
-- **Promotions** is the umbrella for both **vouchers** (wallet credit redeemed by code) and **discounts** (percentage or fixed at checkout). The two types share a single feature surface. See `marketing/promotions.mdx`.
-- **Events** are one-off ticketed happenings members book (workshops, tournaments, parties) - see `operations/events.mdx`. Not to be confused with the trigger "events" that start Automations; in prose, reserve the word "event" for the bookable feature and say "trigger" for automations.
+- **Promotions** is the umbrella for both **vouchers** (wallet credit redeemed by code) and **discounts** (percentage or fixed at checkout). The two types share a single feature surface. See `sales/promotions.mdx`.
+- **Events** are one-off ticketed happenings members book (workshops, tournaments, parties) - see `events/events.mdx`. Not to be confused with the trigger "events" that start Automations; in prose, reserve the word "event" for the bookable feature and say "trigger" for automations.
 
 ## Style preferences
 
@@ -39,7 +39,7 @@ Sections come in this order. Choose heading wording that fits the page (for exam
 
 1. **What it is** - the opening paragraph, with no heading. One to three sentences on what the feature is and who uses it (owner, front desk, instructor, member).
 2. **Why use it and use cases** - the value it provides and two to four concrete gym situations it solves (for example "sell a one-off workshop with VIP and general tickets"). Write scenarios, not a list of features: a bullet list of capabilities under `## Overview` doesn't count as this section.
-3. **How it works** (optional) - the key concepts, the lifecycle, and how it compares with nearby features. A comparison table is a good fit here (see "Events vs classes" in `operations/events.mdx`).
+3. **How it works** (optional) - the key concepts, the lifecycle, and how it compares with nearby features. A comparison table is a good fit here (see "Events vs classes" in `events/events.mdx`).
 4. **Setup, screens, and settings** - where it lives in the admin, then how to create or configure it and the fields on each screen.
 5. **Reference and troubleshooting** (optional) - edge cases, limits, permissions, FAQs.
 

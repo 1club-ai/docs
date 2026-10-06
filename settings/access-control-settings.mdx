@@ -62,7 +62,7 @@ A credential is the token a member presents at a door. Three types exist:
 - **Access Card** (`card`) - a physical RFID or NFC card or fob.
 - **PIN Code** (`pin`) - a numeric PIN typed at a keypad.
 
-You manage credentials on **Members > Access cards** (`/members/access-cards`), where you can enroll, assign, revoke, and delete them. See [Access cards](/members/member-cards) for the full management flow. A few facts that matter for door access:
+You manage credentials on **Members** > **Access cards** (`/members/access-cards`), where you can enroll, assign, revoke, and delete them. See [Access cards](/members/member-cards) for the full management flow. A few facts that matter for door access:
 
 - **Identifiers are protected.** The raw card number or PIN is encrypted at rest and stored alongside a one-way hash. Readers and the gateway match on the hash, never the plaintext.
 - **A credential is assigned to a contact.** A credential assignment links the credential to a contact (and optionally to a specific membership or booking). A contact's **primary** credential is the one auto-grant uses.
@@ -83,7 +83,7 @@ An access grant authorizes one credential to enter during a time window. Each gr
 - Optional **access windows** - recurring time-of-day rules (for example, `07:00`-`22:00`, days Monday-Friday) that further restrict when the grant works inside its overall validity.
 - A **status**: `active`, `expired`, `revoked`, or `suspended`.
 
-You review grants on the **Access grants** list under Settings (route `/settings/access/grants`). The list is read-only and shows each grant's **Contact**, **Source** (Booking or Membership), **Valid from**, **Valid until**, and **Status**, with search by contact name and sorting by validity dates or status.
+You review grants under **Settings** > **Access Control** > **Access grants** (route `/settings/access/grants`). The list is read-only and shows each grant's **Contact**, **Source** (Booking or Membership), **Valid from**, **Valid until**, and **Status**, with search by contact name and sorting by validity dates or status.
 
 Grants are created and revoked automatically (see below). Creating or revoking a grant by hand is an operations-permission action available through the API, not a form on the grants list.
 
@@ -137,7 +137,7 @@ After ingestion, events are reconciled against grants:
 If a reader reports a credential 1Club has never seen, the event is still recorded against a placeholder (revoked) credential and flagged as a discrepancy, so nothing is lost from the audit trail. You can pull the list of discrepancies for a date range to investigate tailgating, cloned cards, or misconfigured hardware.
 
 <Note>
-Access events and reconciliation are available through the access-control API. There is no dedicated admin screen for browsing the raw event log in the current product; front-desk attendance is reviewed on [Attendance](/members/attendance) instead. Treat the event log as an audit and integration surface.
+Access events and reconciliation are available through the access-control API. There is no dedicated admin screen for browsing the raw event log in the current product; front-desk attendance is reviewed on [Attendance](/schedule/attendance) instead. Treat the event log as an audit and integration surface.
 </Note>
 
 ## Edge gateway sync
@@ -229,7 +229,7 @@ A climbing gym has a public entrance, a bouldering area, and a lead-climbing zon
 - [Access control](/settings/access-control) - check-in modes and how members identify themselves at the front desk (the non-hardware side).
 - [Access cards](/members/member-cards) - enroll, assign, revoke, and delete the credentials that back door grants.
 - [WebLock](/settings/integrations/weblock), [Impro](/settings/integrations/access-bridge), and [Salto KS](/settings/integrations/salto) - the door access integrations that read area access grants.
-- [Memberships](/members/memberships) - the memberships that generate long-running door grants.
-- [Bookings](/operations/bookings) - the bookings that generate per-session door grants.
+- [Memberships](/sales/memberships) - the memberships that generate long-running door grants.
+- [Bookings](/schedule/bookings) - the bookings that generate per-session door grants.
 - [Check-in models](/reference/check-in-models) - how members get into your club and how entrance methods work.
-- [Attendance](/members/attendance) - review front-desk check-in records.
+- [Attendance](/schedule/attendance) - review front-desk check-in records.

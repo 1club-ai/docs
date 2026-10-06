@@ -1,0 +1,221 @@
+---
+title: Attendance
+description: "Record and review member check-ins in 1club - view the attendance log, add check-ins with the right entrance method, change or delete them, and handle anonymous walk-ins."
+keywords:
+  - attendance
+  - check-in
+  - check-ins
+  - entrance method
+  - walk-in
+  - anonymous check-in
+  - membership usage
+  - QR scan
+---
+
+Attendance is the record of every member visit to your gym. Each check-in captures who came in, when, at which club, and how they entered - against a booking, a membership, an external program, or a direct payment. The front desk records visits here as members arrive, and owners and managers review activity over any date range.
+
+## When to use it
+
+The attendance log keeps visits, membership usage, and payments in one place. Recording a check-in reuses the same pricing, payment, and membership-consumption logic as booking, so a walk-in is priced and debited exactly like a pre-booked session, and a limited plan's uses count down on their own. The activity chart shows your busy days and hours, and every check-in shows exactly what it was recorded against.
+
+Typical uses:
+
+- **A member arrives for a booking** - a padel player who booked and paid online is checked in against their booking, with nothing to charge.
+- **A walk-in on a pass** - a jiu-jitsu member with a 10-session pass turns up without a booking, and the visit takes one session off the pass.
+- **A trial visitor with no profile** - a yoga studio in flexible check-in mode logs an anonymous visit and collects the drop-in fee.
+- **Fixing how someone entered** - reception recorded a climber against their membership, but they paid at the door, so you change the entrance method and the session is restored.
+
+See [Worked examples](#worked-examples) for the steps behind each of these.
+
+<Note>
+Before you start: how strict your check-in flow is depends on your booking policy and access-control settings. Read [Check-in models](/reference/check-in-models) for an overview, then configure the rules in [Booking policies](/settings/booking-policies) and [Access control](/settings/access-control).
+</Note>
+
+## Viewing the attendance log
+
+<Note>
+Attendance lives under **Schedule** > **Attendance** (`/schedule/attendance`). The full list of check-ins is **Schedule** > **Check-ins** (`/schedule/checkins`), and individual check-in records open under it. Check-ins are not under Members.
+</Note>
+
+### Open the log
+
+1. Open **Schedule** in the left rail, then choose **Attendance** from the calendar's **More actions** menu.
+2. The log lists every check-in for your organization across the selected date range.
+3. Use the filter bar at the top to change the timeframe, pick a custom date range, or filter by club (the club filter appears only when you have access to more than one club).
+
+The selected timeframe and date range are stored in the URL, so you can bookmark or share a specific view.
+
+### Read the activity chart
+
+Above the grid, 1club shows a chart of check-in activity:
+
+- Over a multi-day range, a line chart plots check-ins per day.
+- When you narrow the range to a single day, the chart switches to an hourly bar chart bounded by that club's operating hours, so you can see your busy periods.
+
+### Read the grid
+
+Each row is one check-in. The columns are:
+
+- **Member** - Member name, avatar, and email. Rows without a member show **Anonymous**.
+- **Date** - The check-in date.
+- **Time** - The check-in time.
+- **Reference** - What the visit was recorded against: a class, a booking (class, area, or instructor), or a membership (with remaining usage). A row can show more than one, for example a booking plus the membership that covered it.
+- **Entry method** - How the member entered: **Direct Payment**, **Membership**, or **External Program**. Shown as `-` when none was recorded.
+- **Actions** - Delete the check-in (requires the `checkin.delete.club` permission).
+
+Click any row to open its [check-in detail page](#the-check-in-detail-page). Click a member's name to jump to their profile.
+
+## The check-ins list
+
+The **Attendance Log** answers "how busy have we been lately": it loads a date window and charts the trend. When you need to browse the whole record instead, use the **Check-ins** page at `/schedule/checkins`. Find it by searching for "Check-ins" in global search, or through the **Check-ins** breadcrumb on any check-in detail page.
+
+The check-ins list:
+
+- Shows every check-in in your organization, paged and searched on the server, so it stays fast however far back your history goes.
+- Sorts by the day the attendance is for, newest first, so a back-dated check-in sits on its own day rather than at the top.
+- Uses the same columns as the attendance grid (**Member**, **Date**, **Time**, **Reference**, **Entry method**), and a row opens the check-in detail page.
+- Has the same **Add Check-in** and **Scan QR** buttons, shown when you hold the `checkin.create.club` permission.
+
+Opening the page needs at least the `checkin.read.own` permission.
+
+## Recording a check-in
+
+From the attendance log, click **Add Check-in** (top right) to open the check-in dialog. What you see depends on the member's bookings and your booking policy.
+
+<Steps>
+  <Step title="Select the member">
+    Use the **Contact** picker to find the member. In a club that allows anonymous check-ins, this field is labelled **Contact (optional)** and you can leave it empty - see [Anonymous check-ins](#anonymous-check-ins).
+  </Step>
+  <Step title="Pick a booking or an entrance method">
+    If the member has a confirmed or pending booking for today, it appears as a selectable button - pick it to anchor the check-in to that booking. If there is no booking, choose an entrance method instead: **Use Membership**, **Pay Now** (direct payment), or **External Programs**.
+  </Step>
+  <Step title="Collect payment if required">
+    When the entrance method owes money (a Pay Now walk-in, a membership with an unpaid balance, or an external program with a per-visit fee), a payment section appears. Pick how the member pays (cash, card, POS terminal, or wallet), or record the visit without a payment and settle later. If your booking policy enforces payment at check-in, the dialog says so - that rule stops members checking themselves in, not the front desk - and without a payment the amount stays owed.
+  </Step>
+  <Step title="Add the check-in">
+    Click the confirm button. 1club records the check-in, decrements membership usage if the plan is limited, and settles any payment you collected - all in one atomic step.
+  </Step>
+</Steps>
+
+### Entrance methods
+
+When a check-in is not simply anchored to an already-paid booking, you pick how the member enters. The available methods and whether one is mandatory come from the matching booking policy (see [Check-in models](/reference/check-in-models)):
+
+- **Use Membership** - Counts the visit against one of the member's active memberships. Usage is decremented automatically if the plan has a limit. Only memberships eligible for this visit are selectable. Members can check in more than once per day - a morning and an evening session are both recorded; a quick re-scan at the door within a few minutes is treated as the same visit rather than a new one.
+- **Pay Now** - The member pays for this single visit at the front desk. You can apply a discount code to a class-anchored Pay Now walk-in before collecting payment.
+- **External Programs** - The member enters through a third-party program (a partner curriculum, a corporate-wellness benefit, a federation pass). If the program charges an additional per-visit fee, you collect it here. See [External programs](/settings/external-programs).
+
+<Note>
+**Pre-booked sessions honor the booking.** When a booking was created against a membership, that session was already debited from the membership at booking time. Checking the member in against that booking succeeds even if the membership has since become inactive or hit zero remaining uses - the booking is the receipt. This applies only to check-ins that select the booking. Walk-ins and entrance-method changes still require an active membership with remaining uses.
+</Note>
+
+### Check-in window
+
+Members checking themselves in at the kiosk or in the check-in app can do so from 1 hour before the booking starts until the end of the booking date. Staff can check a member in outside that window - early, or after the fact - and the dialog notes that it's outside the usual window.
+
+Checking in a booking that was already marked as a no-show is different: it can undo the no-show fee, so it stays with staff who have full check-in access across the organization (Admins by default).
+
+## The check-in detail page
+
+Click a row in the attendance grid or the check-ins list to open the check-in at **Schedule** > **Check-ins**. The detail page shows the date and time, when it was created, the entrance method, the member (or **Anonymous**), the club, and full references to the linked booking, class, area, and membership (with links to each and the membership's remaining usage).
+
+From here you can:
+
+- **Change Entrance Method** - Available on a booking-anchored check-in while the booking is still confirmed. Use it to correct how the member actually entered, for example switching a membership entry to a direct payment. Converting a paid entry to a different method triggers the appropriate refund or charge and warns you before you confirm.
+- **Delete** - Remove the check-in (see below).
+
+<Note>
+There is no general "edit" for a recorded check-in beyond changing its entrance method. To correct anything else, delete the check-in and record a new one.
+</Note>
+
+## Deleting a check-in
+
+Delete a check-in from the **Actions** column in the grid, or from the **Delete** action on its detail page. You need the `checkin.delete.club` permission. Confirm in the dialog to proceed.
+
+Deleting reverses everything the check-in did, in one all-or-nothing transaction:
+
+- Restores membership usage (credited back, capped at the plan's maximum) and reactivates a membership that had flipped to `used` or `expired`.
+- Voids any pending or zero-amount transactions attached to the check-in.
+- Reverses any discount redemption recorded for the visit.
+- Drops the external-program usage record so the program's counter stays accurate.
+- Reverts a linked booking out of `checked_in` back to `confirmed`.
+
+<Warning>
+You cannot delete a check-in that has a paid transaction attached. 1club blocks it with "Cannot delete a checkin with a paid transaction. Refund the transaction first." Refund the payment in [Payments](/sales/payments), then delete the check-in.
+</Warning>
+
+## Anonymous check-ins
+
+When a club runs in flexible check-in mode, you can log a visit without selecting a member - useful for trial visitors and guests who do not yet have a profile. The **Contact** field becomes optional (**Contact (optional)**), and leaving it empty records the check-in as **Anonymous** in the grid and on the detail page.
+
+Anonymous check-ins are controlled by the booking policy and the club's check-in mode in [Access control](/settings/access-control) - turn **Check-in Mode** to **Flexible** to allow them. See [Check-in models](/reference/check-in-models) for the full picture.
+
+## QR code check-in
+
+Click **Scan QR** on the attendance log to open the scanner. Scanning a member's check-in code validates it and checks the member in to the current club, so busy front desks can process arrivals without opening the full dialog.
+
+## Worked examples
+
+### Padel court booked and paid online
+
+A member books and pays for a padel court in advance. When they arrive, open **Add Check-in**, select the member, and pick their booking for today. Because payment was collected at booking, there is nothing to charge - confirm the check-in and the booking flips to attended.
+
+### Brazilian jiu-jitsu drop-in on a class pass
+
+A member with a 10-session BJJ pass walks in for the evening class without a booking. Select the member, choose **Use Membership**, pick the pass, and confirm. 1club decrements one session from the pass and records the visit against it.
+
+### Trial visitor at a yoga studio
+
+A prospective member turns up for a trial class. The studio runs flexible check-in mode, so leave the **Contact (optional)** field empty, pick the class, and choose **Pay Now** to collect the drop-in fee. The visit is logged as Anonymous.
+
+### Corporate-wellness member at a fitness gym
+
+A member enters through a corporate-wellness partner. Select the member, choose **External Programs**, and pick the program. If the program charges a per-visit top-up fee, collect it in the payment section; if it is fully covered, confirm without payment. See [External programs](/settings/external-programs).
+
+### Correcting a mis-recorded entry
+
+Reception checked a climber in against their membership, but the member actually paid at the door. Open the check-in from the attendance log, click **Change Entrance Method**, switch to **Pay Now**, and confirm. 1club restores the membership session and records the payment.
+
+## Tips & best practices
+
+- **Check members in promptly** - Record the visit as the member arrives so your attendance and busy-hour charts stay accurate.
+- **Watch usage on limited plans** - The Reference column shows remaining allowance for membership check-ins; keep an eye on members approaching their limit.
+- **Match the entrance method to reality** - Recording the true method (membership vs. pay now vs. external program) keeps revenue and usage reporting correct. If you get it wrong, use Change Entrance Method rather than deleting.
+- **Refund before deleting** - If a check-in collected a payment, refund it first, then delete. The system will not let you delete a paid check-in.
+- **Use QR scanning at peak times** - The Scan QR flow is faster than the full dialog when a queue forms.
+- **Narrow to a single day for busy-hour insight** - Selecting one day switches the chart to an hourly view bounded by your operating hours.
+
+## Troubleshooting
+
+**Issue**: A member does not appear in the contact picker.
+
+**Solution**: Confirm the member exists in your contacts. If you are checking in a guest without an account, the club must be in flexible mode to record an anonymous visit.
+
+**Issue**: The system says the membership has no remaining uses.
+
+**Solution**: The plan is limited and all sessions are consumed. If the member had already booked this session against the same membership, check them in through that booking - the session was debited at booking time and the check-in still succeeds. Otherwise select a different entrance method.
+
+**Issue**: The check-in is blocked asking for payment.
+
+**Solution**: The matching booking policy enforces payment at check-in (or at booking with an outstanding balance). Collect payment with a method in the payment section, confirm an active membership, or apply an external program. See [Booking policies](/settings/booking-policies).
+
+**Issue**: Check-in is not open yet, or is closed for the day.
+
+**Solution**: For non-admin roles, booking-anchored check-in opens 1 hour before the booking starts and closes at the end of the booking date. An owner or admin can check the member in outside that window.
+
+**Issue**: You cannot delete a check-in.
+
+**Solution**: Either you lack the `checkin.delete.club` permission, or the check-in has a paid transaction. Refund the payment in [Payments](/sales/payments) first, then delete.
+
+**Issue**: A new check-in is not in the list.
+
+**Solution**: Check the date range and club filter at the top - the check-in must fall inside the selected range. Rows are ordered by creation time, newest first.
+
+## Related
+
+- [Check-in models](/reference/check-in-models) - Book & pay, walk-in with payment, or flexible check-in.
+- [Booking policies](/settings/booking-policies) - Configure payment enforcement and check-in rules.
+- [Access control](/settings/access-control) - Per-club check-in mode and identification methods.
+- [External programs](/settings/external-programs) - Third-party entrance methods and per-visit fees.
+- [Memberships](/sales/memberships) - Plans, usage, and allowances that check-ins consume.
+- [Payments](/sales/payments) - Where check-in payments and refunds are recorded.

@@ -14,7 +14,7 @@ Typical uses:
 
 - **Remind members before they train** - turn on the built-in booking reminder so every booking gets an email and app notification 24 hours before it starts.
 - **Win back a member who cancels** - a jiu-jitsu gym tags the member **At risk** when they cancel, waits three days, then sends a reason to come back.
-- **Collect reviews without nagging regulars** - a padel gym asks players for a review two hours after a checked-in match, paced by sessions played, and offers a Google review link after a happy rating.
+- **Collect reviews without nagging regulars** - a padel gym asks players for a review two hours after a checked-in match, paced by sessions played, and invites everyone who leaves one to post it on Google too.
 - **Chase a failed payment** - notify your admins and managers, then ask the member to update their payment details.
 
 See [Worked examples](#worked-examples) for step-by-step versions of these, and [Blueprints](#blueprints-prebuilt-automations) for the ready-made workflows behind them.
@@ -31,7 +31,7 @@ You can see every run and step in the automation's history view, including times
 
 ## The automations list
 
-Use **Marketing > Automations** to view, edit, and create automations. The list is split into two sections:
+Use **Marketing** > **Automations** to view, edit, and create automations. The list is split into two sections:
 
 - **Built-in automations** - Seeded by 1club into every gym (the booking reminder and the membership-expiration reminder). You can adjust timing, channels, and entry conditions, but the step structure is fixed.
 - **Your automations** - Custom workflows you build from scratch, plus any suggested blueprints you have accepted. Available on the Grow plan.
@@ -93,13 +93,13 @@ Drag steps from the palette onto the canvas to build the workflow. Steps run in 
 Send an App, email, SMS, or WhatsApp notification to the contact.
 
 - **Channels** - Pick one or more delivery channels. **App** covers the notification center and an alert on the contact's devices. Email and WhatsApp require the corresponding integration (see [Integrations](/settings/integrations)); SMS requires a sender set up under [SMS](/settings/sms). A text that can't go out (for example no sender for the member's country) doesn't fail the step: its other channels are still sent.
-- **Content** - Either write content inline (subject + body) or bind to a [message template](/messaging/templates). Bound content is snapshotted when you save the automation, so later edits to the template do not change what the automation sends.
+- **Content** - Either write content inline (subject + body) or bind to a [message template](/settings/templates). Bound content is snapshotted when you save the automation, so later edits to the template do not change what the automation sends.
 
 ### Send AI message
 
 Generate the message content with AI at send time, using a rule and tone you provide.
 
-- **Mode** - **Auto** sends the AI-generated content directly. **Draft** saves it for staff review in the [Messaging](/messaging/overview) inbox before sending.
+- **Mode** - **Auto** sends the AI-generated content directly. **Draft** saves it for staff review in the [Inbox](/inbox/overview) before sending.
 - **Tone** - Set the voice of the generated message.
 
 ### Send review request
@@ -109,7 +109,7 @@ Send a post-booking review request with a one-tap link.
 - **Instructor chat bubble** - Optionally include a personal message from the instructor in a casual, professional, or motivational tone.
 - **Sessions between requests** - Ask again only after the member attends this many sessions, counted across every club in your organization since their last request. Set it to 1 to ask after every session. **Also ask after the member's first session** lets a brand new member hear from you right away instead of waiting out a full interval.
 - **Frequency limit** - Cap how often a single contact receives review requests (for example, at most once every 30 days). This is a ceiling on top of the session interval, and a request goes out only when both allow it.
-- **External review CTA** - After a positive in-app rating, optionally surface a Google review link.
+- **Enable Google review conversion** - After a member submits their review, invite them to share it on Google. Everyone who leaves a review is invited, whatever their rating. Only shown for gyms connected to a Google Business Profile.
 
 The two throttles cover opposite cases. The session interval paces the ask by how much a member actually trains, which is what protects infrequent visitors: someone who comes once a month never fills a 7-day window, so a time cap alone would ask them after every single visit. The frequency limit caps the member who trains daily and clears the session interval faster than you want to be asking.
 
@@ -221,13 +221,13 @@ So a brand-new gym with no classes, no plans, and no payments connected sees onl
 The **Send message** step's content picker draws from a template catalog so you don't have to write every message inline. The catalog combines:
 
 - **System templates** - a curated set of 1club-authored message templates that are eligible for automations. If your gym has customized one of these templates, the picker shows your customized version.
-- **Custom templates** - your own reusable [message templates](/messaging/templates).
+- **Custom templates** - your own reusable [message templates](/settings/templates).
 
 Content bound from a template is snapshotted into the step when you save the automation, so later edits to the template do not silently change what an existing automation sends.
 
 ## Building a custom automation
 
-1. Go to **Marketing > Automations**.
+1. Go to **Marketing** > **Automations**.
 2. Click **Add Automation**.
 3. Give it a name and description.
 4. Select a **trigger** and configure its options.
@@ -271,12 +271,12 @@ You want reviews from players who actually showed up, without nagging regulars.
 2. The first step is a **Wait** anchored to **booking end** (2 hours after the match), so the ask arrives once they've left the court.
 3. The **Send review request** step is set to ask every 10 sessions, with **Also ask after the member's first session** left on. A regular who plays four times a week hears from you about once a month; a player who books once a month is asked once after their first match and then not again for the better part of a year.
 4. The step also carries a frequency limit of one request per contact every 7 days, which caps the handful of players who train daily and would otherwise clear the 10-session interval every fortnight.
-5. Turn on the **External review CTA** so a happy in-app rating offers a Google review link.
+5. Turn on **Enable Google review conversion** so everyone who leaves a review is invited to post it on Google. The invitation goes to every reviewer, whatever their rating, because asking only happy members breaks Google's review policy.
 
 ### Birthday message for a yoga studio
 
 1. Accept the **Birthday celebration** blueprint. It fires on **Contact birthday**.
-2. The single **Send AI message** step is set to **Draft** and a **warm** tone, so each greeting is personalized but a staff member approves it in the [inbox](/messaging/message-list) before it sends.
+2. The single **Send AI message** step is set to **Draft** and a **warm** tone, so each greeting is personalized but a staff member approves it in the [inbox](/inbox/messages) before it sends.
 3. Prefer fully automatic? Switch the step to **Auto** mode once you trust the output.
 
 ### No-show win-back for a spinning studio
@@ -300,7 +300,7 @@ You want reviews from players who actually showed up, without nagging regulars.
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
 | A suggested blueprint never appears | Its gating prerequisite isn't met (no classes/areas, no plans, or Stripe not connected), or your gym isn't on the Grow plan | Set up the missing piece, or upgrade to Grow. Providable tags are created for you and never block a suggestion. |
-| The **Add Automation** button or blueprint accept is blocked | Custom automations require an active Grow subscription | Upgrade the plan under **Revenue**, then retry. |
+| The **Add Automation** button or blueprint accept is blocked | Custom automations require an active Grow subscription | Upgrade the plan under **Settings** > **Organization** > **Subscription**, then retry. |
 | You can't accept a blueprint a second time | Blueprints are one-per-gym - you already own an automation from it | Open the existing automation from **Your automations** and edit that instead. |
 | An automation is active but nothing sends | The email channel has no integration configured, the SMS channel has no sender for the member's country, or entry conditions exclude everyone | Configure the provider under [Integrations](/settings/integrations) or the sender under [SMS](/settings/sms); loosen or clear the entry conditions. |
 | Messages arrive a minute late | The step worker polls every minute | Expected - build in a small buffer rather than relying on second-level timing. |
@@ -309,9 +309,9 @@ You want reviews from players who actually showed up, without nagging regulars.
 
 ## Related
 
-- [Marketing overview](/marketing/overview) - How automations fit alongside promotions, pipeline, and the rest of the Marketing hub.
-- [Messaging templates](/messaging/templates) - Reusable content you can bind to Send message steps.
-- [Messaging overview](/messaging/overview) - Inbox, AI drafts, and one-off sends.
+- [Marketing overview](/marketing/overview) - How automations fit alongside the website, forms, reviews, and the rest of the Marketing section.
+- [Templates](/settings/templates) - Reusable content you can bind to Send message steps.
+- [Inbox overview](/inbox/overview) - Conversations, AI drafts, and one-off sends.
 - [Member list](/members/member-list) - Tags and segments used in entry conditions and Modify contact steps.
 - [Analytics: marketing](/analytics/marketing) - Automation run history and cross-feature performance.
 - [Integrations](/settings/integrations) - Configure email and WhatsApp before using those channels.

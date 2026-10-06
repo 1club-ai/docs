@@ -1,0 +1,116 @@
+---
+title: "Roster and time off"
+sidebarTitle: "Roster and time off"
+description: "Set instructor availability with reusable shifts and weekly rotations on the Staff > Roster page, and record absences under Staff > Time off."
+keywords: [roster, shifts, rotations, breaks, time off, availability, part-time, vacation]
+---
+
+The **Roster** and **Time off** tabs of the **Staff** section decide when an instructor is available. The roster sets regular working hours from reusable shifts and weekly rotations; time off records absences. Owners and managers maintain both, and members can only book an instructor inside the hours they leave open.
+
+## When to use it
+
+Fixed operating hours on the instructor profile suit coaches with a steady week. When hours change week to week, a roster saves you editing each profile, and time off blocks bookings for a holiday or sick day without touching the regular pattern.
+
+Typical uses:
+
+- **A Pilates studio on rotating shifts** - part-time instructors alternate mornings and evenings on a two-week rotation, and their bookable availability follows it.
+- **A lunch break nobody can book over** - a "Morning 06:00-14:00" shift carries a 12:00-13:00 break, so members can't book the coach over lunch.
+- **A coach's holiday** - you add a week of time off, and the dialog lists the lessons and classes it clashes with so you can reassign or cancel them in one go.
+
+## How it works
+
+There's no global on/off switch. An instructor uses their roster on any date they're rostered - a date covered by a rotation assignment, or one with a shift placed directly on it - and falls back to their [operating hours](/staff/instructors#creating-or-editing-an-instructor) on every other date. A rostered day with no shift reads as a day off.
+
+Time off sits on top of either: during a time-off entry the instructor can't be booked, and the entry shows as a grey block on their column on the [calendar](/schedule/calendar).
+
+## The Roster page
+
+Open **Staff** > **Roster**. The page has two parts: the **Scheduled shifts** grid at the top (one row per instructor, one column per day, with week navigation) and the **Shifts & rotations** panel below it, where you build the reusable pieces. Viewing needs **staff.read.organization**; creating and editing shifts, rotations, and assignments needs **staff.manage.organization**.
+
+## The building blocks
+
+- **Shifts** - reusable named time windows like "Morning 06:00-14:00", each with a color and optional standard **breaks** (e.g. lunch). Managed in the **Shifts** card.
+- **Rotations** - a weekly pattern that picks a shift for each day, repeating over a cycle of 1-12 weeks. Managed in the **Rotations** card.
+- **Assignments** - attach an instructor to a rotation for a date range; this is what generates their roster.
+- **Roster** - the generated list of individual shifts, shown in the Scheduled shifts grid and editable shift by shift. An assignment with an **Effective until** date generates the whole roster up to that date; an **Ongoing** one uses a rolling 8-week window. See [Repeating schedules](/reference/repeating-schedules).
+
+## Set up a rotating schedule
+
+<Steps>
+  <Step title="Create your shifts">
+    In the **Shifts** card, choose **Add shift**. Give it a name, a start and
+    end time, and a color, then add any standard **breaks** (name, start, end) -
+    for example a 12:00-13:00 lunch. Breaks must fall inside the shift window.
+    Repeat for each distinct pattern you run (e.g. "Morning", "Evening").
+  </Step>
+  <Step title="Build a rotation">
+    In the **Rotations** card, choose **Add rotation**. Set a **Cycle length**
+    (1-12 weeks) and a **Cycle start date** (the date week 1 begins). Then, for
+    each day of each week, pick one of your shifts or leave it **Off**. A
+    two-week cycle that alternates mornings and evenings, for instance, captures
+    a typical part-time pattern.
+  </Step>
+  <Step title="Assign an instructor">
+    In the **Scheduled shifts** grid, on the instructor's row, click their
+    rotation cell (**Set regular shifts**). Pick the rotation, the **Starting
+    week** (which week of the cycle they begin on), and the **Effective from** /
+    **Effective until** dates - leave the end open for an **Ongoing**
+    assignment. Their roster generates immediately: to **Effective until** when
+    you set one, so a coach contracted through June has their whole roster on the
+    grid, or a rolling 8 weeks when the assignment is ongoing.
+  </Step>
+  <Step title="Adjust the roster">
+    The grid now shows each instructor's generated shifts with their breaks.
+    Click any day cell to add a one-off shift or edit an existing one. Editing a
+    generated shift marks it as a **manual override**, so rotation regeneration
+    leaves it untouched; use **Cancel shift** to drop a single occurrence.
+  </Step>
+</Steps>
+
+<Note>
+  An assignment with an **Effective until** date generates its roster all the way
+  to that date. An **Ongoing** assignment is generated for a rolling 8-week
+  window and extended automatically. Either way, manual overrides and one-off
+  shifts survive regeneration; unedited rotation shifts are replaced when you
+  change the rotation.
+</Note>
+
+## Breaks
+
+Breaks are the unavailable windows inside a working shift - most commonly lunch. Define them on a shift (in the **Shifts** card) as a name plus a start and end time within the shift window.
+
+Once a shift is on the roster, its breaks:
+
+- **Block bookings** during their window, so nobody can book the instructor over lunch.
+- **Show on the roster grid** under each shift, as a `Break 12:00-13:00` line.
+- **Show on the Schedule calendar** as a muted, non-interactive card in the instructor's column, labeled with the break name.
+- **Are editable per shift** - open any shift from the roster grid to add, edit, or remove its breaks. One-off shifts can carry their own breaks too.
+
+## Working hours on the instructor profile
+
+On an instructor's details page, a read-only **Working hours** block shows the hours derived from their roster, with a **Manage shifts** link back to **Staff** > **Roster**.
+
+## Time off
+
+**Staff** > **Time off** lists every instructor time-off entry with **Instructor**, **Start time**, **End time**, **Status** (upcoming, active, or past), and **Note**, newest first. You can also add time off from the calendar (**Add** > **Time off**) and from an instructor's details page.
+
+To add an entry, click **Add time off** and fill in:
+
+- **Instructor** - who is away.
+- **Start time** and **End time** - the window. For a new entry it defaults to tomorrow's opening hours.
+- **Note** - optional, for example "Vacation".
+
+As soon as the instructor and window are set, the dialog checks for bookings and classes that overlap it and lists them under **Resolve scheduling conflicts**. For each one, pick an action, or use **Apply to all**:
+
+- **Keep as is** - leave it with this instructor.
+- **Reassign instructor** - pick a replacement in **Reassign to**.
+- **Leave unassigned** - remove the instructor and keep the booking or class.
+- **Cancel booking** or **Cancel class** - cancel it. Cancelling a booking waives the member's cancellation charge unless you turn on **Keep the cancellation charge**; cancelled classes follow their own cancellation flow.
+
+Click a row to edit an entry, or delete it from the row actions. Managing time off needs the **staff.manage.organization** permission.
+
+## Related
+
+- [Instructors](/staff/instructors) - Operating hours, the bookable flag, and the instructor profile.
+- [Calendar](/schedule/calendar) - Where shifts, breaks, and time off show on instructor columns.
+- [Repeating schedules](/reference/repeating-schedules) - How rotation assignments generate the roster.

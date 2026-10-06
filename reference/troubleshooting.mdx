@@ -4,7 +4,7 @@ description: Common issues you might hit using the 1Club admin - sign-in, permis
 keywords: ["troubleshooting", "can't sign in", "permission denied", "walk-in check-in", "stripe decline", "refund greyed out", "missing data", "wrong organization", "wrong club", "export limit"]
 ---
 
-This page collects the issues we see most often in practice. For anything that isn't on this list, contact support via the admin's help menu.
+This page collects the issues we see most often in practice. For anything that isn't on this list, contact support from the **Help & updates** menu.
 
 ## Sign-in and account
 
@@ -14,16 +14,16 @@ Check, in order:
 
 1. **The org URL is right**. Each organization has its own subdomain on the admin. If you're at the wrong subdomain, your credentials won't be recognized even when they're correct.
 2. **The email is the one your invite went to**. If you've been invited under a different email than you usually use, sign in with that one.
-3. **Your account is still active**. Ask an Admin in your org to open **Settings > Users** and confirm your row exists with status **Active**. If it shows **Invited** or **Expired**, the invitation never completed - have them resend it.
-4. **You're not signed into a different org**. The organization switcher in the sidebar might have you in another organization where this user doesn't exist. See [Organizations and clubs](/reference/organization-clubs).
+3. **Your account is still active**. Ask an Admin in your org to open **Settings** > **Organization** > **Users** and confirm your row exists with status **Active**. If it shows **Invited** or **Expired**, the invitation never completed - have them resend it.
+4. **You're not signed into a different org**. The organization switcher in the organization menu at the top of the left rail might have you in another organization where this user doesn't exist. See [Organizations and clubs](/reference/organization-clubs).
 5. **You're using the sign-in method tied to your account**. Google, Apple, Facebook, and email/password all resolve to one account by email. If "Continue with Google" doesn't recognize you, confirm that Google account uses the same email as your 1club account. See [Signing in](/reference/sign-in).
 
 ### Password reset email never arrives
 
 - Check spam/junk.
-- Confirm the email is the one on file (have an Admin verify under **Settings > Users**).
+- Confirm the email is the one on file (have an Admin verify under **Settings** > **Organization** > **Users**).
 - Try once more after 15 minutes - some mail providers delay first-time messages.
-- If you signed up with a Google, Apple, or Facebook OAuth provider and never set a local password, password reset won't apply. Ask an Admin to use **Set password** from **Settings > Users** instead.
+- If you signed up with a Google, Apple, or Facebook OAuth provider and never set a local password, password reset won't apply. Ask an Admin to use **Set password** from **Settings** > **Organization** > **Users** instead.
 
 ### Two-factor or session keeps logging you out
 
@@ -33,53 +33,53 @@ JWT tokens have a 7-day expiry. After they expire you'll be asked to sign in aga
 
 ### "Permission denied" or pages are missing from the menu
 
-Each module is gated by your role. Roles are fixed - **Admin**, **Manager**, **Front desk**, **Instructor**, **Member**. Pages you don't have access to are hidden from the navigation, not just disabled. See [Roles and permissions](/reference/roles-permissions) for the full module-by-module matrix.
+Each module is gated by the permissions your role grants. There are five roles - **Admin**, **Manager**, **Front Desk**, **Instructor**, **Member** - and an admin can change what each non-admin role grants. Pages you don't have access to are hidden from the navigation, not just disabled. Some sections also depend on a module being switched on, such as **Events** or the cash register. See [Roles and permissions](/reference/roles-permissions) for the full module-by-module matrix.
 
 If you should have access and don't:
 
-1. Ask an Admin to verify your role under **Settings > Users**.
+1. Ask an Admin to verify your role under **Settings** > **Organization** > **Users**.
 2. Sign out and back in to refresh your role claims.
-3. Check that you're in the right organization (organization switcher in the sidebar). Roles are granted per organization, so a role you hold in one org doesn't carry into another. See [Organizations and clubs](/reference/organization-clubs).
+3. Check that you're in the right organization (organization switcher in the organization menu). Roles are granted per organization, so a role you hold in one org doesn't carry into another. See [Organizations and clubs](/reference/organization-clubs).
 
 ### Custom roles don't exist
 
-1Club doesn't support custom roles. The five canonical roles cover the common admin shapes; there's no role builder, no per-permission toggle, and no way to scope an Admin to a subset of modules. If the existing roles don't fit, the usual answer is to use Manager (which is full operational access minus settings) or to give Admin temporarily and remove it later.
+You can't create a sixth named role or narrow the Admin role. You can change what Manager, Front Desk, and Instructor grant, module by module, in **Settings** > **Organization** > **Permissions**. See [Roles and permissions](/reference/roles-permissions#the-permissions-page).
 
 ## Organizations and clubs
 
 ### Members, bookings, or invoices you expect are missing
 
-All data is scoped by organization. Records created in one organization are invisible in another, even when the same person administers both. Confirm the active organization with the switcher in the sidebar, then re-check. If a location's activity looks empty, confirm the club switcher too - you may be on a different club, or an admin "All clubs" view that spreads the data across locations. See [Organizations and clubs](/reference/organization-clubs).
+All data is scoped by organization. Records created in one organization are invisible in another, even when the same person administers both. Confirm the active organization with the switcher in the organization menu, then re-check. If a location's activity looks empty, confirm the club in the breadcrumb too - you may be on a different club, or an admin "All clubs" view that spreads the data across locations. See [Organizations and clubs](/reference/organization-clubs).
 
 ### A club is missing from the switcher
 
-Only **Active** clubs appear in the club switcher and in members' booking choices. Open **Settings > Clubs**, open the club, and set its status to **Active**. A single active club means no switcher is shown at all - that's expected.
+The club switcher is the first crumb of the breadcrumb. It lists every **Active** and **Hidden** club; a **Closed** club leaves it. Members only see **Active** clubs. Open **Settings** > **Clubs** > **Clubs**, open the club, and check its status. With only one club running, no switcher is shown at all - that's expected.
 
 ### You can't delete a club
 
-A club that still has associated data (bookings, areas, members, and so on) is protected from deletion, and the admin blocks it with "Cannot delete club: it has associated data." Reassign or remove that data first, or set the club to **Inactive** to take it offline without deleting its history.
+A club that still has associated data (bookings, areas, memberships, and so on) is protected from deletion, and the admin blocks it with "Cannot delete club: it has associated data." Reassign or remove that data first, or set the club to **Closed** to retire it without deleting its history.
 
 ### Currency, time zone, or locale is wrong across the admin
 
-These are organization-level settings, not per-club. Update them under **Settings > Organization**; the change propagates to every page that reads org settings. See [Organization settings](/settings/organization).
+These are organization-level settings, not per-club. Update them under **Settings** > **Organization** > **Details**; the change propagates to every page that reads org settings. See [Organization settings](/settings/organization).
 
-## Dashboard and analytics
+## Home and analytics
 
 ### Widget or chart shows zero where you expect activity
 
 Three usual culprits:
 
-1. **Time zone**. Analytics use your organization's time zone (set under **Settings > Organization**). A booking that's "today" in your local time may be yesterday in the org's time zone.
-2. **Club filter**. Some dashboards have a club selector. If it's set to one gym, members and bookings from other gyms are excluded.
-3. **Permissions**. Front desk and Instructor have own-scope analytics. The page renders but the numbers are limited to data you're allowed to see.
+1. **Time zone**. Analytics use your organization's time zone (set under **Settings** > **Organization** > **Details**). A booking that's "today" in your local time may be yesterday in the org's time zone.
+2. **Selected club**. Most reports follow the club in the breadcrumb. If it's set to one gym, bookings and revenue from other gyms are excluded.
+3. **Permissions**. Front Desk has no analytics by default, and an Instructor sees only **My performance**, limited to their own data.
 
-### Engagement dashboard is empty
+### Member Engagement dashboard is empty
 
-Engagement scoring is disabled by default. Enable it under [Smart Tagging](/settings/smart-tagging) and let the background job run at least once before checking again.
+Engagement scoring is disabled by default. Enable it under **Settings** > **Members** > [**Smart tagging**](/settings/smart-tagging) and let the background job run at least once before checking again.
 
-### Billing dashboard says "no data"
+### Revenue dashboard says "no data"
 
-The billing dashboard requires both start and end dates in the filter bar. Without them the query doesn't run. Pick a range and the dashboard loads.
+Check the date range and the club selected in the breadcrumb, then the **Billing entity** filter if your organization has more than one. See [Revenue analytics](/analytics/billing).
 
 ## Bookings and check-ins
 
@@ -90,35 +90,35 @@ If the booking policy at this club has **Enforce payment** set to **At check-in*
 ### Booking doesn't appear in the calendar
 
 - The calendar filter has a date and (sometimes) an area/class filter. Confirm the booking falls inside both.
-- Confirm the booking didn't fail to create. The Bookings list under **Schedule > Bookings** is the source of truth.
+- Confirm the booking didn't fail to create. The bookings list under **Schedule** > **Bookings** is the source of truth.
 - Verify your role permits viewing other people's bookings. Instructors with own-scope can only see their own.
 - Confirm you're on the right club. A booking made against one club won't show while you're viewing another, or while an admin "All clubs" view spreads it among locations. See [Organizations and clubs](/reference/organization-clubs).
 
 ### An area is missing from the booking dialog or schedule
 
-The schedule and booking flow only show **Active** areas. Open **Resources > Areas** and check the area's status - Inactive and Maintenance areas are hidden. Also confirm its area type isn't hidden under **Settings > Operations > Schedule display**. See [Areas](/operations/areas).
+The schedule and booking flow only show **Active** areas. Open **Settings** > **Clubs** > **Areas** and check the area's status - Inactive and Maintenance areas are hidden. Also confirm its area type isn't hidden under **Settings** > **Bookings** > **Schedule Display**. See [Areas](/settings/areas).
 
 ### The booking price is zero or looks wrong
 
-The line total is seeded from the area's **Price per hour** multiplied by the booked duration, before discounts. If the total is zero, the area has no hourly price set - open the area under **Resources > Areas** and set one. If it's higher or lower than expected, check for a [promotion](/marketing/promotions) applied at checkout or a [booking policy](/operations/booking-policies) that changes payment timing. See [Areas](/operations/areas).
+The line total is seeded from the area's **Price per hour** multiplied by the booked duration, before discounts. If the total is zero, the area has no hourly price set - open the area under **Settings** > **Clubs** > **Areas** and set one. If it's higher or lower than expected, check for a [promotion](/sales/promotions) applied at checkout or a [booking policy](/settings/booking-policies) that changes payment timing. See [Areas](/settings/areas).
 
 ### Check-in isn't consuming a membership or credit
 
-Check-in runs through the same pipeline as booking, so a check-in only draws down a membership or package when the member actually has an entitlement that covers this activity. Confirm the member has an active [membership](/members/memberships) or remaining package credits for the class or area, that the membership hasn't expired, and that the booking policy's **Enforce payment** setting matches how you intend to collect. If there's no entitlement, the system falls back to collecting payment per the policy.
+Check-in runs through the same pipeline as booking, so a check-in only draws down a membership or package when the member actually has an entitlement that covers this activity. Confirm the member has an active [membership](/sales/memberships) or remaining package credits for the class or area, that the membership hasn't expired, and that the booking policy's **Enforce payment** setting matches how you intend to collect. If there's no entitlement, the system falls back to collecting payment per the policy.
 
 ## Payments
 
 ### Stripe charge declines
 
-This is almost always a card issue (insufficient funds, blocked by issuer, wrong CVV). The error message from Stripe is shown verbatim - read it carefully. If you're testing in **test mode**, the org uses 1Club's platform Stripe account directly; in **live mode**, it uses the connected merchant account. Make sure you're in the mode you intended (visible under **Settings > Integrations > Stripe**).
+This is almost always a card issue (insufficient funds, blocked by issuer, wrong CVV). The error message from Stripe is shown verbatim - read it carefully. If you're testing in **test mode**, the org uses 1Club's platform Stripe account directly; in **live mode**, it uses the connected merchant account. Make sure you're in the mode you intended (visible under **Settings** > **Integrations** > **Stripe**).
 
 ### Refund button is greyed out
 
-You can only refund a payment that's in the **Succeeded** state. Pending payments need to settle first; failed payments can't be refunded because nothing was captured. See [Payments](/billing/payments).
+You can only refund a payment that's in the **Succeeded** state. Pending payments need to settle first; failed payments can't be refunded because nothing was captured. See [Payments](/sales/payments).
 
 ### You can't take card payments at all
 
-If the card form won't load or every charge fails before it reaches the issuer, the organization's Stripe integration isn't connected for the mode you're in. A **live mode** org needs its own Stripe account connected via Stripe Connect; a **test mode** org uses 1Club's platform account. Check the connection and mode under **Settings > Integrations > Stripe**. See [Stripe](/settings/integrations/stripe).
+If the card form won't load or every charge fails before it reaches the issuer, the organization's Stripe integration isn't connected for the mode you're in. A **live mode** org needs its own Stripe account connected via Stripe Connect; a **test mode** org uses 1Club's platform account. Check the connection and mode under **Settings** > **Integrations** > **Stripe**. See [Stripe](/settings/integrations/stripe).
 
 ## Exports
 
@@ -128,7 +128,7 @@ This is a hard cap. Narrow the date range (a single quarter is usually enough) a
 
 ### QuickBooks export creates duplicate customers
 
-The `Display Name` in `invoices.csv` didn't match the customer name in QBO. Open `customers.csv` first, reconcile the names against existing QBO customers, then import invoices. See [Settings > Export](/settings/export) for the recommended QBO workflow.
+The `Display Name` in `invoices.csv` didn't match the customer name in QBO. Open `customers.csv` first, reconcile the names against existing QBO customers, then import invoices. See [Settings > Data Tools > Export](/settings/export) for the recommended QBO workflow.
 
 ## Performance
 
@@ -143,7 +143,7 @@ If a single page is consistently slow across browsers and machines, report it to
 
 ## Getting help
 
-The admin's help menu (top-right) has direct links to support and the AI assistant. When you contact support, include:
+The **Help & updates** panel in the left rail lets you email the 1Club team, ask 1club AI, or open the Help Center. When you contact support, include:
 
 - The page URL where the issue happens.
 - A screenshot or copy-paste of any error message.
@@ -156,6 +156,6 @@ The admin's help menu (top-right) has direct links to support and the AI assista
 - [Roles and permissions](/reference/roles-permissions) - The full permission matrix.
 - [Organizations and clubs](/reference/organization-clubs) - How org and club scoping decide what data you see.
 - [Check-in models](/reference/check-in-models) - How door check-ins relate to bookings and payments.
-- [Areas](/operations/areas) - Area status, pricing, and why an area might not show.
+- [Areas](/settings/areas) - Area status, pricing, and why an area might not show.
 - [Stripe](/settings/integrations/stripe) - Payment connection and test/live mode.
-- [Settings > Export](/settings/export) - Limits and behavior for CSV exports.
+- [Settings > Data Tools > Export](/settings/export) - Limits and behavior for CSV exports.

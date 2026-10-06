@@ -11,18 +11,19 @@ Every record in 1Club belongs to an **organization** - the top-level tenant that
 - **Opening a second location** - add it as another club in the same organization, so the two share memberships, billing, and branding while each keeps its own address, hours, sports, and amenities.
 - **Running two separate businesses** - keep them as two organizations under one login, each with its own Stripe account and member base, and move between them with the organization switcher.
 - **Comparing locations** - admins switch to **All clubs** for the org-wide picture, while front-desk staff work within one club.
-- **Data that seems to be missing** - most "missing data" reports are really the wrong organization or club selected in the sidebar switchers.
+- **A member visits two locations** - members belong to the organization, not to a club, so front desk at either location finds the same member record instead of creating a duplicate.
+- **Data that seems to be missing** - most "missing data" reports are really the wrong organization or club selected.
 
 ## Organizations
 
-An organization is your 1Club account. Its identity and account-wide settings live under **Settings > Organization** (see [Organization settings](/settings/organization)).
+An organization is your 1Club account. Its identity and account-wide settings live under **Settings** > **Organization** (see [Organization settings](/settings/organization)).
 
 The organization owns:
 
 - **Identity** - name, slug, and description used in emails, member portals, and admin headers. The organization **Email** is the fallback sender for organization-wide mail; see [Email sending](/settings/email-sending).
 - **Locale and formatting** - time zone, currency, supported locales, and default locale. The time zone is the default for every date-related feature: today/this-week widgets, recurring jobs, and exports.
 - **Billing and branding** - Stripe mode and connection, plan, and brand assets apply to the whole org and are shared by all of its clubs.
-- **People** - members, contacts, staff, and the users who can sign in to the admin.
+- **People** - members, contacts, staff, and the users who can sign in to the admin. A member belongs to the organization, not to one of its clubs: their memberships, bookings, check-ins, and orders each carry their own club.
 
 Because everything is scoped by `organizationId`, a member, booking, or invoice created in one organization is invisible in another - even if the same person administers both.
 
@@ -32,7 +33,7 @@ Because everything is scoped by `organizationId`, a member, booking, or invoice 
 
 ### Switching organization
 
-If your user belongs to more than one organization, an organization switcher appears in the admin sidebar. Selecting a different organization:
+If your user belongs to more than one organization, an organization switcher appears in the organization menu at the top of the left rail. Selecting a different organization:
 
 1. Calls the switch-organization flow, which reissues your session for the new org (the org context is carried in your JWT).
 2. Drops all cached queries so the previous organization's records cannot linger on screen.
@@ -46,7 +47,7 @@ Creating a new organization is a platform-level action available only to 1Club s
 
 ## Clubs
 
-A club is a physical location that belongs to an organization. Every organization has at least one club; multi-location businesses add more. Manage them under **Settings > Clubs**, which lists each club as a card showing its name, slug, address, contact details, status, and 1Club review rating.
+A club is a physical location that belongs to an organization. Every organization has at least one club; multi-location businesses add more. Manage them under **Settings** > **Clubs** > **Clubs**, which lists each club as a card showing its name, slug, address, contact details, status, and 1Club review rating.
 
 Bookings, areas, classes, and schedules are associated with a club, so the club you have selected determines which location's activity you are looking at.
 
@@ -59,7 +60,7 @@ Click **Add** on the Clubs list to create a club, or open a card to edit one. Th
 - **Club name** - the location's display name.
 - **Slug** - the URL-safe identifier used in public links (lowercase letters, numbers, and hyphens). Change it carefully; existing links break.
 - **Subtitle** and **Description** - short tagline and richer copy shown on public booking pages.
-- **Status** - **Active** or **Inactive**. Only active clubs appear in the club switcher and in members' booking choices, so set a club to Inactive to take a whole location offline without deleting it.
+- **Status** - **Active**, **Hidden**, or **Closed**. **Active** is visible to everyone. **Hidden** keeps the club fully open to your staff (schedule, bookings, and reports keep working) but takes it off your website, the member portal, and the 1Club marketplace. **Closed** retires it: it leaves the schedule, the club switcher, and every club picker. Use **Set closing date** on the club page to close it automatically on a given day.
 - **Club type** - an optional preset (for example a racket-sports or fitness template) that seeds sensible defaults.
 - **Club managers** - staff contacts who receive contact-form messages sent to this club. When empty, those messages fall back to organization-level staff.
 
@@ -76,7 +77,7 @@ Click **Add** on the Clubs list to create a club, or open a card to edit one. Th
 **Features**
 
 - **Sports** - the activities offered at this club. These feed area types, class setup, and marketplace discovery.
-- **Amenities** - club-wide services such as showers, parking, or a cafe. Amenities describe the whole location, distinct from per-area [attributes](/operations/areas) that describe an individual court or room.
+- **Amenities** - club-wide services such as showers, parking, or a cafe. Amenities describe the whole location, distinct from per-area [attributes](/settings/areas) that describe an individual court or room.
 
 **Operating hours**
 
@@ -100,7 +101,7 @@ When members book, they first pick what they want to book: time with a coach, a 
 - **A boutique studio** renames **Group activities** to "Classes".
 - **A padel venue** whose courts have no area type renames **Areas** to "Courts".
 
-To set them, open **Settings > Clubs**, open the club, and expand **Booking labels** in the right-hand column, below **Google Business Profile** and **Daily summary**. The section starts collapsed because most gyms never change it. Type a name, then click **Save** on the save bar.
+To set them, open **Settings** > **Clubs** > **Clubs**, open the club, and expand **Booking labels** in the right-hand column, below **Google Business Profile** and **Daily summary**. The section starts collapsed because most gyms never change it. Type a name, then click **Save** on the save bar.
 
 | Field                         | Default card title | Where members see it                                                                                               |
 | ----------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------ |
@@ -111,7 +112,7 @@ To set them, open **Settings > Clubs**, open the club, and expand **Booking labe
 How the labels behave:
 
 - **Only the title changes.** The line under each card is always set by 1Club: a count such as "4 available", or, under group activities, the names of your class types.
-- **A named area type keeps its own name.** A card for an area type such as "Padel court" shows the area type's name, not your areas label. To change that card, rename the area type, which renames it everywhere it appears. See [Areas](/operations/areas).
+- **A named area type keeps its own name.** A card for an area type such as "Padel court" shows the area type's name, not your areas label. To change that card, rename the area type, which renames it everywhere it appears. See [Areas](/settings/areas).
 - **Each club has its own labels.** In an organization with several clubs, set each club separately, so two locations can sell different things under the same card.
 - **Up to 30 characters, on one line.** Each translation has the same limit.
 - **Leave a field blank to use the default.** The default titles are already translated into every language 1Club supports. Clearing a label also removes its translations.
@@ -125,20 +126,20 @@ To translate a label, click the **Translations** icon beside its field. Use **Au
 
 ### Switching club and "All clubs"
 
-When an organization has more than one active club, a club switcher appears in the admin sidebar. Switching club re-scopes club-specific views (bookings, schedule, areas) to the selected location.
+When an organization has more than one club staff are running, the club is the first crumb of the breadcrumb at the top of each page (for example **All clubs** > **Sales** > **Finance** > **Invoices**). Click it to switch. Switching club re-scopes club-specific views (bookings, schedule, areas, and analytics) to the selected location. A **Hidden** club stays in the list with a badge, because staff still run it.
 
-Admins can also select **All clubs** to see aggregated data across every club in the organization at once - useful for comparing locations on dashboards and reports. Non-admin roles work within a single club. Your last selection is remembered per organization, so switching orgs and back returns you to where you were.
+Users with organization-wide operations access (admins by default) can also select **All clubs** to see aggregated data across every club at once - useful for comparing locations in analytics. Other roles work within a single club. Your last selection is remembered per organization, so switching orgs and back returns you to where you were.
 
 ### Deleting a club
 
-Deleting a club is available from the club detail page. A club that still has associated data cannot be deleted - the admin blocks it with "Cannot delete club: it has associated data. Remove or reassign it first." Prefer setting a club to **Inactive** when you simply want to stop new activity at a location while keeping its history.
+Deleting a club is available from the club detail page. A club that still has associated data cannot be deleted - the admin blocks it with "Cannot delete club: it has associated data. Remove or reassign it first." Prefer setting a club to **Closed** when you want to stop activity at a location while keeping its history, or **Hidden** when you only want members to stop seeing it.
 
 ## Why the split matters
 
 - **Permissions and access** - Roles (Admin, Manager, Front desk, Instructor, Member) are assigned per organization. When you invite a user you place them in an organization with a role; they see only that organization's data when it is selected. Permission scope (`organization` includes `club` includes `own`) then decides whether they see all clubs, one club, or only their own records. See [Roles and permissions](/reference/roles-permissions).
 - **Billing and branding** - Stripe, plan, branding, member portal, and marketplace listing are configured at the organization level, so every club under the org shares the same billing account and brand.
 - **Reporting** - Analytics can be broken down by club so you can compare locations, and admins can flip to "All clubs" for the org-wide picture. See [Clubs analytics](/analytics/clubs).
-- **Operations** - Bookings, areas, classes, and check-ins are club-scoped, so front-desk staff always act in the context of one location.
+- **Operations** - Bookings, areas, classes, and check-ins are club-scoped, so front-desk staff always act in the context of one location. Members are not: member permissions are always organization-scoped, so every location's desk sees the same member list.
 
 ## Worked examples
 
@@ -156,48 +157,48 @@ You own two legally separate businesses - a jiu-jitsu academy and a strength gym
 
 ### Yoga studio piloting a second room
 
-You run a yoga studio and open a second reformer Pilates space nearby. You add it as a second club rather than a second organization so the two share memberships, billing, and branding. During the soft-launch you leave the new club **Inactive** so it stays out of the member booking flow, then flip it to **Active** on opening day.
+You run a yoga studio and open a second reformer Pilates space nearby. You add it as a second club rather than a second organization so the two share memberships, billing, and branding. During the soft-launch you set the new club to **Hidden** so it stays off the website and member portal while staff set it up, then flip it to **Active** on opening day.
 
 ## Tips & best practices
 
 - **One org per brand and billing account.** Use separate organizations only when you need genuinely separate billing, branding, or member bases. Otherwise add clubs, which share plans and Stripe.
 - **Add clubs, do not clone orgs, for new locations.** Locations that share memberships and billing belong in the same organization as additional clubs.
 - **Set the time zone and currency at the org level early.** They drive dates and money everywhere; changing them later shifts how history is reported.
-- **Prefer Inactive over Delete for clubs.** A club with any associated data cannot be deleted anyway. Inactive removes it from the switcher and booking flow while preserving its history.
+- **Prefer Closed over Delete for clubs.** A club with any associated data cannot be deleted anyway. Closed removes it from the switcher and every club picker while preserving its history.
 - **Assign club managers** so contact-form messages route to the right people instead of falling back to org-level staff.
-- **Confirm the active org and club before you act.** Most "missing data" reports are really "wrong org or club selected." The sidebar switchers show where you are.
+- **Confirm the active org and club before you act.** Most "missing data" reports are really "wrong org or club selected." The organization menu and the breadcrumb show where you are.
 
 ## Troubleshooting
 
 **Issue**: A member, booking, or invoice you expect is missing.
 
-**Solution**: Confirm you are in the right organization. Data is scoped by `organizationId`, so records created in another org are invisible here. Use the organization switcher in the sidebar, then re-check.
+**Solution**: Confirm you are in the right organization. Data is scoped by `organizationId`, so records created in another org are invisible here. Use the organization switcher in the organization menu, then re-check.
 
 **Issue**: A club's bookings or schedule look empty.
 
-**Solution**: Check the club switcher. You may be viewing a different club, or an admin "All clubs" view that spreads the data across locations. Select the specific club.
+**Solution**: Check the club in the breadcrumb. You may be viewing a different club, or an admin "All clubs" view that spreads the data across locations. Select the specific club.
 
 **Issue**: A club is missing from the switcher or from members' booking choices.
 
-**Solution**: Only **Active** clubs appear. Open **Settings > Clubs**, and set the club's status to Active.
+**Solution**: Members only see **Active** clubs, and a **Closed** club leaves the staff switcher too. Open **Settings** > **Clubs** > **Clubs** and check the club's status.
 
 **Issue**: You can't delete a club.
 
-**Solution**: A club with associated data (bookings, areas, members, and so on) is protected from deletion. Reassign or remove that data first, or set the club to **Inactive** instead of deleting it.
+**Solution**: A club with associated data (bookings, areas, memberships, and so on) is protected from deletion. Reassign or remove that data first, or set the club to **Closed** instead of deleting it.
 
 **Issue**: A page or menu item disappeared after switching organization.
 
-**Solution**: Roles are per organization. Your role in the org you switched into may not grant that module. Check your role for that org under **Settings > Users** (an Admin can confirm it). See [Roles and permissions](/reference/roles-permissions).
+**Solution**: Roles are per organization. Your role in the org you switched into may not grant that module. Check your role for that org under **Settings** > **Organization** > **Users** (an Admin can confirm it). See [Roles and permissions](/reference/roles-permissions).
 
 **Issue**: The wrong currency or time zone shows across the admin.
 
-**Solution**: Those are organization settings, not per-club. Update them under **Settings > Organization**.
+**Solution**: Those are organization settings, not per-club. Update them under **Settings** > **Organization** > **Details**.
 
 ## Related
 
 - [Organization settings](/settings/organization) - Edit org identity, time zone, currency, and locales.
 - [Settings overview](/settings/overview) - Where organization and club settings live.
 - [Roles and permissions](/reference/roles-permissions) - How roles and permission scope decide what each user sees.
-- [Areas](/operations/areas) - Bookable spaces within a club.
+- [Areas](/settings/areas) - Bookable spaces within a club.
 - [Clubs analytics](/analytics/clubs) - Compare performance across locations.
 - [Signing in](/reference/sign-in) - How one login resolves across organizations.

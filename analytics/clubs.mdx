@@ -23,11 +23,11 @@ Open **Analytics** and pick the **Clubs** category to reach two dashboards:
 - **Today's performance** (`/analytics/clubs/today`) - A same-day snapshot of bookings, revenue, active members, and check-ins, broken down by hour. It refreshes on its own every five minutes.
 - **Performance trends** (`/analytics/clubs/historical`) - The same metrics plus resource utilization over a date range you pick, with daily trends and day-of-week patterns.
 
-Both dashboards carry a **club filter** at the top. Leave it on **All** to see the whole organization, or pick one location to scope every card and chart to it. Numbers are counted in your organization's time zone (set under **Settings > Organization**), so "today" means today where the gym is, not where you are.
+Both dashboards follow the club selected in the breadcrumb at the top of the admin. Leave it on **All clubs** to see the whole organization, or pick one location to scope every card and chart to it. Numbers are counted in your organization's time zone (set under **Settings** > **Organization** > **Details**), so "today" means today where the gym is, not where you are.
 
 ## Today's performance
 
-This is the live operations view. It shows the current date and the timestamp of the last completed hour at the top, and re-queries every five minutes so you can leave it open on a screen at the front desk. It has a club filter but no date filter, because it is always scoped to today.
+This is the live operations view. It shows the current date and the timestamp of the last completed hour at the top, and re-queries every five minutes so you can leave it open on a screen at the front desk. It has no date filter, because it is always scoped to today.
 
 ### KPI cards
 
@@ -52,7 +52,7 @@ The Today view focuses on activity and revenue by hour. For utilization rates (c
 
 ## Performance trends
 
-This is the historical view. Set a date range in the filter bar (it defaults to the last 30 days) and, optionally, a single club. The dashboard loads once both a start and end date are set. As the range widens, the trend charts automatically group points by day, week, or month so the chart stays readable.
+This is the historical view. Set a date range in the filter bar (it defaults to the last 30 days) and, optionally, pick a single club in the breadcrumb. As the range widens, the trend charts automatically group points by day, week, or month so the chart stays readable.
 
 ### KPI cards
 
@@ -73,7 +73,7 @@ Utilization compares what was booked against what was available, expressed as a 
 - **Area utilization** - Booked hours divided by the area's available hours, where availability comes from the area's (or club's) operating hours.
 - **Instructor utilization** - Booked instructor hours divided by the instructor's available hours from their operating hours.
 
-Because availability is driven by operating hours, keeping **Resources > Areas** and instructor schedules accurate directly affects whether these percentages are meaningful.
+Because availability is driven by operating hours, keeping **Settings** > **Clubs** > **Areas** and instructor schedules accurate directly affects whether these percentages are meaningful.
 
 ### Charts
 
@@ -85,11 +85,11 @@ Because availability is driven by operating hours, keeping **Resources > Areas**
 
 ### Comparing two padel locations
 
-You run two padel venues and want to know which courts are underused. Open **Performance trends**, set the range to the last 90 days, and note the **average area utilization** with the club filter on **All**. Then switch the filter to each venue in turn. If the downtown site sits at 78% area utilization and the suburban site at 41%, the suburban courts have slack. Cross-check the **day of week patterns** chart per site: if the suburban venue only fills on weekends, the fix is midweek programming or off-peak pricing rather than more courts.
+You run two padel venues and want to know which courts are underused. Open **Performance trends**, set the range to the last 90 days, and note the **average area utilization** with **All clubs** selected in the breadcrumb. Then switch to each venue in turn. If the downtown site sits at 78% area utilization and the suburban site at 41%, the suburban courts have slack. Cross-check the **day of week patterns** chart per site: if the suburban venue only fills on weekends, the fix is midweek programming or off-peak pricing rather than more courts.
 
 ### Spotting a revenue dip early
 
-A CrossFit box keeps **Today's performance** open at reception. Mid-afternoon the **revenue today** card is well below a normal day while **bookings created** looks normal. The **hourly trends** chart shows check-ins tracking as usual but revenue flat. That pattern points to unpaid or comped bookings rather than low attendance. Confirm it in the [bookings dashboard](/analytics/operations) or the booking audit, which highlights unpaid bookings.
+A CrossFit box keeps **Today's performance** open at reception. Mid-afternoon the **revenue today** card is well below a normal day while **bookings created** looks normal. The **hourly trends** chart shows check-ins tracking as usual but revenue flat. That pattern points to unpaid or comped bookings rather than low attendance. Confirm it in the [bookings dashboard](/analytics/schedule) or the bookings **Audit**, which highlights unpaid bookings.
 
 ### Checking capacity before adding a class
 
@@ -97,28 +97,28 @@ A yoga studio is considering a second morning reformer slot. On **Performance tr
 
 ## Tips and best practices
 
-- **Start with All clubs, then drill in.** Read the organization-wide numbers first, then switch the club filter to a single location to explain an outlier.
+- **Start with All clubs, then drill in.** Read the organization-wide numbers first, then switch the breadcrumb to a single location to explain an outlier.
 - **Set the date range once.** Both charts on Performance trends share the range from the filter bar, so you only set it once per visit.
 - **Leave Today open at the desk.** It refreshes every five minutes on its own, which makes it a good live board for front-of-house staff.
-- **Fix operating hours before trusting utilization.** Utilization percentages depend on operating hours for areas and instructors. If they look wrong, verify the schedule under **Resources > Areas** first.
+- **Fix operating hours before trusting utilization.** Utilization percentages depend on operating hours for areas and instructors. If they look wrong, verify the schedule under **Settings** > **Clubs** > **Areas** first.
 - **Use the legend to declutter.** On busy charts, click a series in the legend to hide it and focus on one metric.
 
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
-| Performance trends shows nothing | No date range is set | Pick both a start and end date in the filter bar. The dashboard only loads once the range is complete. |
-| Utilization percentages look far too low or too high | Operating hours for areas or instructors are missing or wrong, so available capacity is miscalculated | Check and correct operating hours under **Resources > Areas** and on instructor schedules. |
+| Performance trends shows nothing | No activity in the selected range or club | Widen the date range, or switch the breadcrumb to **All clubs**. |
+| Utilization percentages look far too low or too high | Operating hours for areas or instructors are missing or wrong, so available capacity is miscalculated | Check and correct operating hours under **Settings** > **Clubs** > **Areas** and on instructor schedules. |
 | Revenue is lower than the cash you expected | Net revenue excludes voided transactions, reversals, and any part of a sale paid from wallet credit | This is expected. Wallet-funded amounts are not new money in. Reconcile against [Analytics > Billing](/analytics/billing). |
-| Today's revenue looks stalled while check-ins keep rising | Bookings are being taken without payment or are comped | Review unpaid bookings in the booking audit under [Analytics > Operations](/analytics/operations). |
-| A club is missing from the filter | Your account only has access to certain locations, or the club is inactive | Confirm your access and the club's status under [Reference > Organization and clubs](/reference/organization-clubs). |
-| Today's numbers seem an hour or a day off | "Today" uses the organization's time zone, not your device's | Verify the time zone under **Settings > Organization**. |
+| Today's revenue looks stalled while check-ins keep rising | Bookings are being taken without payment or are comped | Review unpaid bookings in **Analytics** > **Bookings** > [**Audit**](/analytics/schedule#booking-audit). |
+| A club is missing from the breadcrumb | Your account only has access to certain locations, or the club is inactive | Confirm your access and the club's status under [Reference > Organization and clubs](/reference/organization-clubs). |
+| Today's numbers seem an hour or a day off | "Today" uses the organization's time zone, not your device's | Verify the time zone under **Settings** > **Organization** > **Details**. |
 
 ## Related
 
 - [Analytics overview](/analytics/overview) - How every dashboard is laid out and who can see what.
 - [Members analytics](/analytics/members) - Member growth, activity, and balances.
-- [Operations analytics](/analytics/operations) - Bookings and classes dashboards, including the booking audit.
-- [Billing analytics](/analytics/billing) - Revenue, payments, and invoices in detail.
-- [Resources > Areas](/operations/areas) - Manage areas, capacity, and operating hours that drive utilization.
+- [Schedule and instructor analytics](/analytics/schedule) - Check-ins, bookings, and classes dashboards, including the booking audit.
+- [Revenue analytics](/analytics/billing) - Revenue, payments, and invoices in detail.
+- [Settings > Clubs > Areas](/settings/areas) - Manage areas, capacity, and operating hours that drive utilization.
 - [Reference > Organization and clubs](/reference/organization-clubs) - How clubs and locations are set up.

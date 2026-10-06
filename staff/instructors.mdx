@@ -1,0 +1,120 @@
+---
+title: "Instructors"
+description: "Manage your coaching staff, their bookable rates, sports, types, and operating hours."
+---
+
+Instructors are the coaches, trainers, and class leads who teach classes or take one-on-one bookings. Owners and managers set up their profiles, rates, and availability, members book bookable instructors directly, and instructors who sign in see their own timetable and earnings.
+
+## When to use it
+
+An instructor profile decides whether members can book that person directly, when they are available, and how they are paid. The same profile fits a coach who sells private lessons, a guest who only leads classes, and part-time staff whose hours change week to week.
+
+Typical uses:
+
+- **A padel coach who takes private lessons** - members book one-on-one lessons from the portal at the coach's hourly rate, only within their working hours.
+- **A class-only martial-arts lead** - a visiting black belt leads the Saturday BJJ class without appearing in the booking selector or as a bookable column on the schedule.
+- **A Pilates studio on rotating shifts** - part-time instructors follow a weekly rotation that sets their bookable availability, with one-off swaps edited on the roster.
+- **Pay only for paid drop-ins** - coaches earn on memberships, fully-paid bookings, and paid-and-checked-in external-program visits, never on no-shows or unpaid seats.
+
+See [Worked examples](#worked-examples) for how to set up each of these.
+
+## The instructor list
+
+Instructors live under **Staff** > **Instructors**. The [calendar](/schedule/calendar) and the booking dialog both surface them.
+
+The list shows one row per instructor with a drag handle and these columns: **Instructor** (name and avatar), **Display name**, **Type**, **Status**, **System status**, **Sports** (up to three with a `+N` overflow), **Club**, and **Rate** (the hourly rate).
+
+Drag a row to reorder; the new order is what shows on the schedule and in selectors. The drag handle is disabled while a reorder request is in flight. If the server rejects the reorder, the list snaps back to the server order with a toast.
+
+Click a row to open the instructor profile, or **Add Instructor** to create one. The profile has tabs including **Pay rates**, **Time off**, and **Roster**, so you can manage one instructor's pay, absences, and shifts in one place.
+
+## Creating or editing an instructor
+
+The user dialog handles both inviting a new instructor (which creates the contact, user, and instructor profile in one shot) and editing an existing one. The instructor section asks for:
+
+- **Instructor type** - managed under **Settings** > **Clubs** > **Instructor Types**. Picking a type can default the max concurrent bookings.
+- **Hourly rate** - in your organization's currency. Used when a booking is created against this instructor; duration multiplied by this rate seeds the line total.
+- **Sports** - tag-style list. Used by the [public marketplace](https://1club.me) for filtering and on the list row.
+- **Experience** and **Certifications** - free-text fields shown on the profile.
+- **Bookable** toggle - when on, the instructor appears in the booking dialog's instructor selector and on the schedule as a bookable column. When off, the instructor can still be assigned to classes but cannot be booked directly.
+- **Max concurrent bookings** - only visible when bookable is on. How many overlapping one-on-one bookings the instructor accepts.
+- **Active instructor** toggle - inactive instructors are hidden from selectors but kept for historical bookings.
+- **Operating hours** - per-day working hours used by the booking dialog's availability checks.
+- **Give instructor access** - when on, the user is invited with the instructor role and can sign in and see their own classes and earnings on [Home](/home/overview).
+
+Per-instructor display colors used on the schedule are configured separately under **Settings** > **Bookings** > **Schedule Display**, not on the instructor dialog itself.
+
+## How instructors show up on the schedule
+
+The [Schedule](/schedule/calendar) page reads bookable instructors and renders one column per instructor in day view. A class assigned to an instructor produces a "teaching" mirror event on the instructor's column, so the instructor reads as busy during their classes (in addition to the class itself appearing under its class-type column).
+
+Instructor time off (added from the calendar with **Add** > **Time off**, or under **Staff** > **Time off**) renders as grey blocks on the instructor's column. When schedule **staff coloring** is enabled, blocks use the assigner's profile color instead of the resource color. The toggles are under **Settings** > **Bookings** > **Schedule Display**.
+
+## Shifts and time off
+
+For staff whose hours change week to week, drive an instructor's availability from a **shift roster** instead of fixed operating hours: build reusable shifts and weekly rotations under **Staff** > **Roster** and assign instructors to them. Record absences under **Staff** > **Time off**. See [Roster and time off](/staff/roster).
+
+## Rescheduling on the calendar
+
+On the **Schedule** calendar you can drag a booking or class to a new time. The move keeps the same resource (area, instructor, or class type) and the same duration - only the start and end time shift. Every drop asks you to confirm the old and new time, and for recurring events you choose whether the change applies to just that occurrence or to all future ones.
+
+## Pay rates and earnings
+
+What an instructor earns is set by pay rate policies under **Staff** > **Pay rates**, not by the **Hourly rate** (which is what members pay). Policies can pay per class, per attendee, per session, or a share of revenue, and can hold pay back until the booking is paid. Instructors who sign in see the result on their own **Earnings** page. See [Pay rates](/staff/pay-rates).
+
+## Mixed-role accounts
+
+A user who is both an instructor and an admin or manager has access to two schedule views. The org-wide schedule lives under the **Schedule** menu (see [Schedule](/schedule/calendar)). A personal "My teaching schedule" view, scoped to just their own classes and bookings, is reached through the instructor menu in the sidebar.
+
+## Worked examples
+
+### Padel coach who takes private lessons
+
+Create the coach, set their **Instructor type** to _Coach_, add padel and tennis to **Sports**, set the **Hourly rate**, turn on **Bookable**, and set **Max concurrent bookings** to 1 for one-on-one lessons. Their operating hours (or shift roster) then gate when members can book them from the portal.
+
+### Class-only martial-arts lead
+
+A visiting black belt leads the Saturday BJJ class but never takes private bookings. Add them, assign them to the class, and leave **Bookable** off. They appear on classes without cluttering the booking selector or the schedule with a bookable column.
+
+### Pilates studio on rotating shifts
+
+A studio with part-time instructors puts them on rotating shifts: it builds a "Morning 06:00-14:00" shift with a lunch break and assigns each instructor to a weekly rotation. The generated roster becomes their bookable availability; a one-off swap is edited directly on the roster and sticks as a manual override.
+
+### Pay only for paid drop-ins
+
+A gym that runs paid drop-in classes sets a pay rate policy with **Compensate for unpaid bookings** left off, so coaches earn on memberships, fully-paid bookings, and paid-and-checked-in external-program visits - never on no-shows or unpaid seats.
+
+## Tips & best practices
+
+- **Turn Bookable off for guest and class-only leads.** It keeps the booking selector and schedule focused on people members can actually book.
+- **Use a shift roster when hours vary week to week.** Fixed operating hours are simpler for steady schedules; rosters suit part-time and rotating staff.
+- **Gate pay on payment to avoid overpaying.** The paid-booking toggle stops payouts on unpaid or no-show visits, and each recurring occurrence is gated on its own charge.
+- **Set sports accurately.** They drive marketplace filtering, so a member searching for a padel coach only sees the right people.
+- **Deactivate, don't delete, departing staff.** Inactive instructors drop out of selectors but keep their history on past bookings.
+
+## Troubleshooting
+
+**Issue**: An instructor isn't in the booking dialog's selector.
+
+**Solution**: Only **bookable**, **active** instructors appear. Check the **Bookable** and **Active instructor** toggles on their profile.
+
+**Issue**: An instructor wasn't paid for a booking they delivered.
+
+**Solution**: Their pay rate policy likely has **Compensate for unpaid bookings** off, and the visit is unpaid or a no-show. Pay is recorded once the charge settles; for recurring bookings, each occurrence pays out only when it's charged.
+
+**Issue**: The instructor can't sign in to their dashboard.
+
+**Solution**: Access is only granted when **Give instructor access** was on at invite. Edit the instructor and enable it to send the invitation.
+
+**Issue**: A bookable instructor shows no availability.
+
+**Solution**: If the instructor is rostered for that date, availability comes from their **roster**, not their operating hours - and a rostered day with no shift is a day off. Assign them to a rotation or add roster shifts under **Staff** > **Roster** (see [Roster and time off](/staff/roster)).
+
+## Related
+
+- [Schedule](/schedule/calendar) - Where instructor columns and time off live.
+- [Classes](/schedule/classes) - Instructors are assigned to classes here.
+- [Bookings](/schedule/bookings) - One-on-one bookings against instructors.
+- [Roster and time off](/staff/roster) - Shifts, rotations, and absences that set availability.
+- [Pay rates](/staff/pay-rates) - What instructors earn.
+- [Roles and permissions](/reference/roles-permissions) - What the instructor role can and can't do.

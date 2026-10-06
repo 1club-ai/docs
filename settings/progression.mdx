@@ -28,7 +28,7 @@ A **track** has:
 - **Description** - optional context shown on the track card.
 - **Stripes per level** - the maximum number of stripes a member can earn within a single level, from 0 to 10. Set it to 0 to turn stripes off entirely; set it to 4 for the classic jiu-jitsu belt system.
 
-Which classes count toward a track is set on the class type, not the track: a [class type's](/operations/class-types#counting-toward-a-progression-track) **Counts toward** field links it to one track. Each track card shows the class types linked to it, or "All sessions count toward this track" when none are.
+Which classes count toward a track is set on the class type, not the track: a [class type's](/settings/class-types#counting-toward-a-progression-track) **Counts toward** field links it to one track. Each track card shows the class types linked to it, or "All sessions count toward this track" when none are.
 
 A **level** has:
 
@@ -40,7 +40,7 @@ A **level** has:
 
 ## Global templates vs org-owned tracks
 
-You manage tracks and levels under **Settings > CRM > Progression** in the admin. The Progression settings page shows every track visible to your organization as a card:
+You manage tracks and levels under **Settings** > **Members** > **Progression Levels** in the admin. The Progression settings page shows every track visible to your organization as a card:
 
 - **Global templates** are platform-wide and shared across organizations. They are read-only: you cannot edit their levels directly. Each global card has an enable/disable **toggle** and a **Customize** action.
 - **Org-owned (custom) tracks** belong only to your organization. They carry a **Custom** chip, are fully editable, and can be deleted. You get these either by creating a new track or by customizing (forking) a global template.
@@ -64,7 +64,7 @@ The result is a **Custom** track you fully control, seeded from the template so 
 
 ## Creating a track from scratch
 
-1. Go to **Settings > CRM > Progression**.
+1. Go to **Settings** > **Members** > **Progression Levels**.
 2. Click **Create track**.
 3. Fill in **Track name** and **Sport** (both required), an optional **Description**, and **Stripes per level** (0 to disable stripes).
 4. Save. The levels editor opens automatically so you can author the ladder.
@@ -109,12 +109,12 @@ Set **Sessions** on a level and 1Club counts how many sessions each member has a
 - **Per level, not a running total.** "Blue belt: 20" means 20 sessions at the level below Blue. The count starts again at every new level, so a later "Black belt: 60" means 60 sessions at the level just below it, not 60 since the member joined.
 - **What counts as a session.** A check-in, or a completed booking - the same count as the member's week streak on their account page, so the two never disagree. Cancelled bookings and no-shows never count. If your gym does not require check-in, a booking counts once the day is over even when the member did not show up, unless you mark it a no-show. Require check-in for an accurate grading count.
 - **When counting starts.** At midnight on your gym's clock, the day after the member earned their current level. The session where a belt is awarded belongs to the level it was earned at. Backdating a level, or correcting its date, recounts automatically.
-- **Which sessions count depends on the track's class types.** A track with no class types linked counts every session, so if you teach two disciplines a session in one counts toward both. Once you link class types to a track (with **Counts toward** on the [class type](/operations/class-types#counting-toward-a-progression-track)), only sessions of those types count toward it. Private lessons and court bookings have no class type, so they don't count toward a track that has class types linked.
+- **Which sessions count depends on the track's class types.** A track with no class types linked counts every session, so if you teach two disciplines a session in one counts toward both. Once you link class types to a track (with **Counts toward** on the [class type](/settings/class-types#counting-toward-a-progression-track)), only sessions of those types count toward it. Private lessons and court bookings have no class type, so they don't count toward a track that has class types linked.
 
 ### Where the count shows
 
 - **Member profile** - the **Progress** tile shows the count with a bar in the next level's color, for example "13 / 20 sessions to Blue belt", or **Eligible for promotion to Blue belt** once the member reaches it.
-- **Member account (portal and website)** - the **Your progression** card on **My account > Overview**, next to the week streak, and the progression section of the member's **Profile** show the same count and bar.
+- **Member account (portal and website)** - the **Your progression** card on **My account** > **Overview**, next to the week streak, and the progression section of the member's **Profile** show the same count and bar.
 
 ### Eligible is a signal, not a promotion
 
@@ -169,8 +169,8 @@ For a `muay-thai` program, author levels mirroring the prajioud armband colors (
 | "Cannot disable track: there are active member assignments" | The track still has members assigned to a level on it | Reassign or clear those members' assignments, then toggle the track off |
 | A track will not delete | The custom track has assigned members (the assignment history references its levels) | Remove the members' assignments first, then delete the track |
 | A level will not delete | A member is currently assigned to that level | Reassign those members to another level, then delete the level |
-| A member's session count dropped or jumped | A class type was linked to or unlinked from the track, which recounts every member's sessions | Expected. Link every class type that trains for the track under **Settings > Class types**, or unlink them all to count every session |
-| A track does not appear in the member assign dialog | The track is not enabled for your organization | Enable the global template, or confirm the custom track exists, under **Settings > CRM > Progression** |
+| A member's session count dropped or jumped | A class type was linked to or unlinked from the track, which recounts every member's sessions | Expected. Link every class type that trains for the track under **Settings** > **Clubs** > **Class Types**, or unlink them all to count every session |
+| A track does not appear in the member assign dialog | The track is not enabled for your organization | Enable the global template, or confirm the custom track exists, under **Settings** > **Members** > **Progression Levels** |
 | The Stripes selector is missing when assigning a level | The track's **Stripes per level** is set to 0 | Edit the track and set stripes per level to 1 or more |
 | The member sees no session count | The member has no current level, holds the top level, or the next level has no **Sessions** set | Set **Sessions** on the next level |
 | The session count looks lower than expected | Only sessions after the day the current level was earned count, and a booking only counts once it is completed | Check the level's earned date in the member's progression history |
@@ -181,5 +181,5 @@ For a `muay-thai` program, author levels mirroring the prajioud armband colors (
 
 - [Member profiles](/members/member-profiles) - where you assign, promote, and review a member's progression and history.
 - [Members analytics](/analytics/members) - reporting across your member base, including progression.
-- [Matches](/members/matches) - the 1club Rating system for objective, match-based skill ranking alongside progression tracks.
+- [Matches](/events/matches) - the 1club Rating system for objective, match-based skill ranking alongside progression tracks.
 - [Smart tagging](/settings/smart-tagging) - tag members who are eligible for promotion, close to it, stalled at their level or recently promoted.

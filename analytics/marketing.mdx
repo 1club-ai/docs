@@ -1,23 +1,23 @@
 ---
 title: Marketing analytics
-description: Track pipeline and deal conversion, email delivery and engagement, and promotion redemptions from the Marketing category in Analytics.
+description: The Marketing and Website and Apps analytics categories - lead conversion, email delivery, promotion redemptions, and web traffic.
 keywords:
   - marketing analytics
-  - sales funnel
-  - pipeline value
+  - lead pipeline
+  - lead conversion
   - conversion rate
   - email analytics
   - promotion redemptions
   - lead sources
 ---
 
-The **Marketing** category in Analytics reports on how your gym acquires and converts prospects, how your email sends perform, and how your promotions get redeemed. It reads from your deals pipeline, your sent emails, and your promotion redemptions, so the numbers reflect the same records you manage under **Marketing** and **Revenue**. Owners and managers use it to judge what their marketing brings in.
+The **Marketing** category in Analytics reports on how your gym acquires and converts prospects, how your email sends perform, and how your promotions get redeemed. It reads from your leads pipeline, your sent emails, and your promotion redemptions, so the numbers reflect the same records you manage under **Members** > **Leads**, **Marketing**, and **Sales** > **Promotions**. The **Website and Apps** category next to it reports on portal and website activity. Owners and managers use it to judge what their marketing brings in.
 
 ## When to use it
 
 Use it to see which marketing efforts turn into members: where leads come from and how they convert, whether your emails get delivered and opened, and who redeems your promotions. Typical questions it answers:
 
-- **Which lead channel converts best?** - a padel gym compares **Lead Sources** with **Win Rate** and the conversion tiles over 90 days, and finds ads bring the most leads while walk-ins convert better.
+- **Which lead channel converts best?** - a padel gym reads **Lead Sources** over 90 days and finds ads bring the most new leads while walk-ins convert more of theirs.
 - **Is an intro offer bringing in new members?** - a jiu-jitsu academy checks how many redeemers of its "first month free" voucher were **New Users**, not existing members.
 - **Did a win-back email land without costing you subscribers?** - a yoga studio reads **Delivered** and **Opened** against **Total Sent** for the week, and watches the **Unsubscribed Contacts** table.
 
@@ -27,48 +27,44 @@ See [Worked examples](#worked-examples) for how to read each of these.
 
 Open **Analytics** in the main nav and select the **Marketing** category to reach three dashboards:
 
-- **Marketing dashboard** (`/analytics/marketing/dashboard`) - sales funnel, lead sources, conversion rates, and pipeline value from your deals.
-- **Email analytics dashboard** (`/analytics/marketing/email-dashboard`) - delivery and engagement status for sent emails, plus unsubscribed contacts.
-- **Promotions** (`/analytics/marketing/promotions-dashboard`) - redemption volume, credit issued, discounts given, and per-promotion and per-member breakdowns.
+- **Marketing Dashboard** - new leads, conversions, how fast leads convert, the pipeline by stage, and conversion by source.
+- **Email Analytics Dashboard** - delivery and engagement status for sent emails, plus unsubscribed contacts.
+- **Promotions** - redemption volume, wallet funds added, discounts given, and per-promotion and per-member breakdowns.
 
-All three require the `analytics.read.club` permission. Each dashboard opens on a filter bar: a **Time range** selector and, where it applies, a club selector.
+All three require the `analytics.read.club` permission. Each dashboard opens on a filter bar with a date range.
 
 ### Filtering
 
 The filter bar at the top of each dashboard controls what the metrics cover:
 
-- **Time range** presets: **Today**, **Yesterday**, **Last 3 days**, **Last 7 days**, **Last 2 weeks**, **Last 30 days**, **Last 90 days**, **Last 6 months**, **Last year**, **This year**, **Previous year**, and **Custom date range**. Choosing **Custom** shows **Start date** and **End date** pickers.
-- **Club** filter: on the **Marketing dashboard** you can scope to a single club or leave it on all clubs. The **Email** and **Promotions** dashboards are organization-wide and have no club filter.
+- **Date range** - one field showing the selected days, with previous and next period arrows. Open it to pick a preset (**Today**, **Yesterday**, **This week**, **Last week**, **This month**, **Last month**, **Last 3 days** through **Last 365 days**, **This year**, **Previous year**) or a custom range on the calendar.
+- **Club** - there is no club control on the dashboard. **Promotions** follows the club selected in the breadcrumb at the top of the admin; the **Marketing Dashboard** and **Email Analytics Dashboard** are always organization-wide.
 
-Your last-used time range is remembered per dashboard, and preset ranges are reflected in the URL so you can bookmark or share a filtered view.
+Your last-used range is remembered per dashboard and carried in the URL, so you can bookmark or share a filtered view.
 
 ## Marketing dashboard
 
-This dashboard turns your [deals pipeline](/marketing/pipeline) into funnel and conversion metrics for the selected date range. The date range filters on when each deal was created.
+This dashboard shows how your [leads pipeline](/members/leads) converts. It reads by cohort: of the contacts who entered the pipeline in the selected range, how many converted, and how quickly. A lead converts on their first paid purchase after entering the pipeline, when they become a Member or Drop-in. There is no win rate: a cold lead may still buy next month, so no lead is ever counted as lost. The dashboard is always organization-wide.
 
 ### Summary metrics
 
-Two rows of cards summarize the pipeline:
-
 | Card | What it means |
 | --- | --- |
-| **Total Leads** | Count of deals created in the range. |
-| **Pipeline Value** | Sum of the `value` field across those deals. |
-| **Win Rate** | Won deals as a share of decided deals: `won / (won + lost)`. |
-| **Average Deal Value** | Pipeline value divided by the number of deals. |
-| **Qualified Leads** | Deals whose stage name contains "qualified". |
-| **Proposals** | Deals whose stage name contains "proposal". |
-| **Closed Won** | Deals whose stage name contains "won". |
-| **Closed Lost** | Deals whose stage name contains "lost". |
-
-Qualified, Proposals, Closed Won, and Closed Lost are derived by matching keywords in your **stage names**, not from a fixed status field. If your pipeline stages are not named with those words, these cards and the conversion rates below read 0 even when deals exist. See [Troubleshooting](#troubleshooting).
+| **New leads** | Contacts who entered the pipeline in the range. |
+| **Converted** | How many of those new leads have converted since. |
+| **Conversion rate** | Converted as a share of new leads. |
+| **Median time to convert** | The median number of days from entering the pipeline to converting, for the leads that converted. Shows `-` when none have. |
 
 ### Charts
 
-- **Sales Funnel** - a horizontal bar per pipeline stage, ordered by the stage sort order you set in your pipeline, showing the deal count in each stage.
-- **Lead Sources** - deal count grouped by [deal source](/marketing/pipeline). Deals with no source are grouped as **Unknown**.
-- **Lead Trends** - a line of deals created per day across the range, with empty days filled as 0.
-- **Conversion Rates** - four tiles: **Leads to Qualified**, **Qualified to Proposal**, **Proposal to Won**, and **Overall** (won as a share of total leads).
+- **Pipeline today** - a horizontal bar per pipeline stage, in your stage order and colors, counting the contacts in each stage right now. It does not depend on the date range.
+- **Converted within** - the share of the range's new leads that converted within **30 days**, **60 days**, and **90 days** of entering the pipeline.
+- **Lead Sources** - new leads and converted leads per source, so you can see which sources bring leads and which of those buy. Leads with no source get their own bar.
+- **Lead Trends** - new leads and conversions per week across the range.
+
+<Note>
+A lead who entered the pipeline near the end of the range has had little time to convert, so a recent range reads lower than an older one. Compare **Converted within 30 days** across ranges that are at least 30 days old.
+</Note>
 
 ## Email analytics dashboard
 
@@ -88,7 +84,7 @@ Only statuses with a non-zero count appear, so the cards adapt to what actually 
 
 ## Promotions
 
-This dashboard measures how your [promotions](/marketing/promotions) (vouchers and discounts) get redeemed. The date range filters on when each redemption happened, not when the promotion was created. Redemptions tied to a voided or refunded transaction are excluded, so the totals reflect settled activity only.
+This dashboard measures how your [promotions](/sales/promotions) (vouchers and discounts) get redeemed. The date range filters on when each redemption happened, not when the promotion was created. Redemptions tied to a voided or refunded transaction are excluded, so the totals reflect settled activity only.
 
 ### Summary metrics
 
@@ -96,24 +92,28 @@ This dashboard measures how your [promotions](/marketing/promotions) (vouchers a
 | --- | --- |
 | **Active Promotions** | Promotions currently within their start/end window, shown as `active / total`. |
 | **Total Redemptions** | Count of settled redemptions in the range. |
-| **Credit Issued** | Amount credited to member wallets by voucher redemptions. |
+| **Wallet funds added** | Amount added to member wallets by voucher redemptions. |
 | **Discounts Given** | Amount taken off orders at checkout, including vouchers applied as a booking discount rather than wallet credit. |
 | **Voucher redemptions** | Redemptions in the range for voucher-type promotions, with the configured voucher count in parentheses. |
 | **Discount redemptions** | Redemptions in the range for discount-type promotions, with the configured discount count in parentheses. |
 
-A voucher applied directly as money off a booking counts under **Discounts Given**, not **Credit Issued**, because no wallet was credited. Only a voucher that actually credits a wallet counts as credit issued.
+A voucher applied directly as money off a booking counts under **Discounts Given**, not **Wallet funds added**, because no wallet was credited. Only a voucher that actually credits a wallet counts there.
 
 ### Charts and tables
 
 - **Redemption Trend** - a dual-axis line chart of redemption **count** and redeemed **amount** per day.
 - **Per-Promotion Summary** - one row per promotion with its **code**, **Uses**, **Revenue** (total order value on redemptions), **Discount** (amount given), **New Users** (redeemers who joined within 30 days before redeeming), and **Avg Order**.
-- **Per-Member Summary** - one row per member with **Uses**, **Promotions Used** (distinct promotions), **Total Saved/Credited**, and **Last Redemption**. Redemptions with no member are grouped into a single **Anonymous** row.
+- **Per-Member Summary** - one row per member with **Uses**, **Promotions Used** (distinct promotions), **Total saved or added to wallets**, and **Last Redemption**. Redemptions with no member are grouped into a single **Anonymous** row.
 
 Both tables are capped at the top 200 rows, and the underlying aggregation reads the most recent 10,000 redemptions, so very high-volume ranges may not include the oldest redemptions.
 
+## Website and Apps
+
+The **Website and Apps** category has one report, **Web Traffic** (**Analytics** > **Website and Apps** > **Web Traffic**). It shows member and visitor activity across the member portal and your website: total events, unique visitors, and the split between portal and website events. Filter by event type and source next to the date range, then read the counts per event and the events by contact. It is organization-wide and not narrowed by club.
+
 ## Worked examples
 
-**Padel club measuring lead quality by channel.** A padel club runs paid ads, walk-in enquiries, and a website contact form. On the **Marketing dashboard** they set the range to **Last 90 days** and read **Lead Sources** to see which channel produces the most deals, then check **Win Rate** and the **Conversion Rates** tiles to confirm those leads actually convert. Ads may bring the most leads while walk-ins convert at a higher rate.
+**Padel club measuring lead quality by channel.** A padel club runs paid ads, walk-in enquiries, and a website contact form. On the **Marketing Dashboard** they set the range to **Last 90 days** and read **Lead Sources**: ads bring the most new leads, but walk-ins have the most converted bars relative to their leads. **Median time to convert** shows how long the follow-up should run before a lead is moved to the cold stage.
 
 **Jiu-jitsu academy validating an intro-offer voucher.** The academy issues a "first month free" voucher and wants to know whether it brings in new members rather than rewarding existing ones. On **Promotions**, the **Per-Promotion Summary** row for that voucher shows **New Users** alongside **Uses**, so they can see how many redeemers were genuinely new, and **Revenue** shows the order value those redemptions carried.
 
@@ -121,8 +121,8 @@ Both tables are capped at the top 200 rows, and the underlying aggregation reads
 
 ## Tips & best practices
 
-- Name your pipeline stages with the words the funnel expects ("Qualified", "Proposal", "Closed Won", "Closed Lost") so the conversion metrics populate. See [Pipeline](/marketing/pipeline).
-- Always set a **deal source** on new deals so the **Lead Sources** chart stays meaningful and the **Unknown** bucket stays small.
+- Set a source on every lead (forms can do it for you) so **Lead Sources** stays meaningful and the no-source bar stays small. See [Leads](/members/leads).
+- Judge conversion on ranges old enough for leads to have converted; a range that ended yesterday always looks weak.
 - Compare like-for-like ranges (for example **This year** versus **Previous year**) rather than mixing a preset with a custom span.
 - Read promotion **Revenue** and **Avg Order** together with **Uses**: a promotion with many uses but low revenue may be discounting members who would have paid full price.
 - Use the **Unsubscribed Contacts** table as a health check after every large send, not only when open rates drop.
@@ -131,9 +131,10 @@ Both tables are capped at the top 200 rows, and the underlying aggregation reads
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| **Qualified Leads**, **Proposals**, or the conversion tiles show 0 despite active deals | The metrics match keywords in stage names; your stages are not named "qualified", "proposal", "won", or "lost" | Rename your pipeline stages to include those words, or read the raw **Sales Funnel** counts instead. |
-| Many deals fall under a single **Unknown** lead source | Those deals have no deal source set | Set a source on each deal so sources break down correctly. |
-| **Credit Issued** looks lower than expected while **Discounts Given** is high | Vouchers applied as money off a booking count as discounts, not wallet credit | This is expected; only wallet-crediting voucher redemptions count as credit issued. |
+| **New leads** is 0 although the board has leads | The range counts leads that entered the pipeline in that range, not leads sitting in it | Widen the range, or read **Pipeline today** for where leads stand now. |
+| Many leads fall under the no-source bar | Those leads have no source set | Set a source on each lead, or have your forms set one. |
+| **Converted** looks low for a recent range | New leads have not had time to buy yet | Compare older ranges, or read **Converted within 30 days**. |
+| **Wallet funds added** looks lower than expected while **Discounts Given** is high | Vouchers applied as money off a booking count as discounts, not wallet credit | This is expected; only wallet-crediting voucher redemptions count there. |
 | Promotion totals seem to miss older redemptions in a wide range | The aggregation reads the most recent 10,000 redemptions | Narrow the date range so the window fits under the cap. |
 | A dashboard stays empty | No records match the range, or you lack `analytics.read.club` | Widen the time range; confirm your role grants the analytics read permission. |
 | Email counts differ from your send tool | Statuses use the effective per-recipient status (engagement over delivery over message status) | Read the per-status cards together rather than any single number. |
@@ -141,7 +142,6 @@ Both tables are capped at the top 200 rows, and the underlying aggregation reads
 ## Related
 
 - [Analytics overview](/analytics/overview) - All analytics categories and how the hub works.
-- [Pipeline](/marketing/pipeline) - The deals, stages, and sources behind the Marketing dashboard.
-- [Deals](/marketing/deals) - Individual deal records that feed the funnel.
-- [Promotions](/marketing/promotions) - Vouchers and discounts measured on the Promotions dashboard.
+- [Leads](/members/leads) - The pipeline board, stages, and sources behind the Marketing Dashboard.
+- [Promotions](/sales/promotions) - Vouchers and discounts measured on the Promotions dashboard.
 - [Automations](/marketing/automations) - Event-driven emails whose sends appear in the Email dashboard.

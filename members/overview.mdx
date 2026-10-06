@@ -1,40 +1,52 @@
 ---
 title: Members overview
-description: How contacts, members, memberships, accounts, and credentials fit together in 1Club, and where each Members page lives in the admin.
-keywords: [members, contacts, memberships, accounts, households, access cards, credentials, member list]
+description: How contacts, members, leads, accounts, and cards fit together in 1Club, and which pages make up the Members section of the admin.
+keywords: [members, contacts, leads, pipeline, memberships, accounts, households, access cards, credentials, member list]
 ---
 
-Everyone you track lives in one table: **contacts**. A contact becomes a **member** the moment you sell or assign them a membership. The same record may also be a lead, a drop-in, a dependent on a household account, or a staff member - the `type` field decides which bucket they show up in across the UI.
+Everyone you track lives in one table: **contacts**. A contact becomes a **member** the moment you sell or assign them a membership. The same record may also be a lead in your sales pipeline, a drop-in, a dependent on a household account, or a staff member - the `type` field decides which bucket they show up in across the UI.
 
-The **Members** section in the admin gives you that table, plus everything attached to it: memberships, accounts (households and companies), access credentials, sport ratings and matches, and document signatures. The day-to-day check-in log and attendance records live under **Schedule**, not here.
+The **Members** section in the admin gives you that table and what hangs off it: the sales pipeline, accounts (households and companies), access cards, and document signatures. Three related pages moved to other sections: memberships are under **Sales**, matches under **Events**, and attendance under **Schedule**.
 
 ## What's in this section
 
 <CardGroup cols={2}>
   <Card title="Member list" icon="users" href="/members/member-list">
-    The contacts grid. Tabs split it into members, drop-ins, leads, lapsed members, accounts, and unpaid. Filter by tag, plan, status, or progression level.
+    The contacts grid. Tabs split it into all, members, drop-ins, leads, unpaid, accounts, and lapsed. Filter by tag, plan, status, or progression level.
   </Card>
   <Card title="Member profile" icon="id-badge" href="/members/member-profiles">
-    A single contact's page: notes, memberships, bookings, check-ins, transactions, messages, documents, credentials, and account links.
+    A single contact's page: activity, bookings, memberships, check-ins, transactions, documents, cards, notes, and account links.
   </Card>
-  <Card title="Memberships" icon="card-membership" href="/members/memberships">
-    Every membership in the org. Filter by status (active, paused, pending, used, cancelled, expired) or billing frequency.
+  <Card title="Leads and pipeline" icon="filter" href="/members/leads">
+    The **Leads** tab: your sales pipeline as a board or a list, with stages, sources, and assignees.
   </Card>
   <Card title="Accounts" icon="people-roof" href="/members/accounts">
     Group contacts into households or companies for shared billing and acting-on-behalf-of permissions.
   </Card>
   <Card title="Access cards" icon="key" href="/members/member-cards">
-    QR codes, access cards, and PINs that members tap, scan, or punch in at a reader.
+    The **Cards** page: access cards and PINs members use at a reader or kiosk.
   </Card>
-  <Card title="Attendance" icon="clipboard-check" href="/members/attendance">
-    The check-in log. In the admin this lives under **Schedule > Attendance** and **Schedule > Check-ins**, not Members.
+  <Card title="Document signatures" icon="file-signature" href="/members/document-signatures">
+    The ledger of waivers and other documents members have signed.
   </Card>
 </CardGroup>
 
-Two more pages open from the Members header overflow menu (the three-dot button next to **Add member**):
+The section also covers:
 
-- **Matches** (`/members/matches`) - head-to-head match results that feed sport ratings. Only appears when ratings are enabled for your org.
-- **Document signatures** (`/members/document-signatures`) - the log of waivers and other documents members have signed.
+- [Assessments](/members/assessments) - instructor scorecards after a class or private lesson.
+- [Member authentication](/members/member-authentication) - how members sign in, and how you invite them.
+- [Suspend and archive](/members/suspend-and-archive) - pausing a member, or archiving the record.
+- [Member onboarding](/members/onboarding) - what a new member goes through when they sign up.
+
+### Pages that moved
+
+| Page | Now under | Docs |
+| --- | --- | --- |
+| **Memberships** | **Sales** > **Memberships** | [Memberships](/sales/memberships) |
+| **Matches** | **Events** > **Matches** | [Matches](/events/matches) |
+| **Attendance** | **Schedule** > **Attendance** | [Attendance](/schedule/attendance) |
+
+The overflow menu on the member list still links to **Memberships** and **Matches**, so you can reach them from Members too.
 
 ## Contact vs member
 
@@ -42,18 +54,25 @@ The two terms are not interchangeable in the data model, but the UI uses "member
 
 - A **contact** is any person record in your org. Type can be `contact`, `member`, `lead`, `drop_in`, `lapsed`, `staff`, or `archived` (the "deleted" disposition - records are soft-deleted, never removed).
 - A **member** is a contact with `type = member`, which typically means they have or had a membership.
+- A **lead** is a contact who has never been a customer and is in your [pipeline](/members/leads).
 - The page is labelled **Members**, but the underlying table is `contacts`. The admin URL is `/members/list`, while API calls hit `/contacts`.
 
-The Member list `type` column shows which bucket each contact is in. You can change a contact's type from their profile, and the change is recorded in the type history.
+The type follows what the contact actually holds and does, so you don't set it by hand. Click the type chip on a profile to see its type history.
+
+## A member belongs to the organization
+
+A contact belongs to your whole organization, not to one of its **Clubs**. Staff at every location see the same member, so a person registered at one location is not added again at another. Where a member trains is recorded on what they do: each membership, booking, check-in, and order records its own **Club**.
+
+Members permissions follow the same rule. Access to the member list and profiles is granted for the whole organization, and members access has no per-**Club** scope in [Permissions](/reference/roles-permissions).
 
 ## Plans vs memberships
 
 Plans are templates; memberships are instances:
 
-- A **plan** lives under [Revenue > Plans](/billing/plans). It defines price, billing frequency, signup fee, max uses per period, validity window, scope (which classes, areas, or instructors it covers), and whether it auto-renews.
-- A **membership** is what you assign to a specific contact when they sign up. It snapshots the plan's terms at the moment of sale, so editing the plan later does not retroactively change existing memberships.
+- A **plan** lives under [**Sales** > **Plans**](/sales/plans). It defines price, billing frequency, signup fee, max uses per period, validity window, scope (which classes, areas, or instructors it covers), and whether it auto-renews.
+- A **membership** is what you assign to a specific contact when they sign up. It snapshots the plan's terms at the moment of sale, so editing the plan later does not retroactively change existing memberships. Find them all under [**Sales** > **Memberships**](/sales/memberships).
 
-The same contact can hold more than one active membership at a time. A padel club, for example, might sell a member both a "Court access" plan and a separate "Group coaching" plan that run in parallel.
+The same contact can hold more than one active membership at a time. A padel gym, for example, might sell a member both a "Court access" plan and a separate "Group coaching" plan that run in parallel.
 
 ## Accounts roll up billing
 
@@ -64,9 +83,9 @@ The same contact can hold more than one active membership at a time. A padel clu
 
 Memberships stay attached to the individual contact. Invoices and transactions roll up to the account, and account roles control who can book or check in on behalf of whom.
 
-## Credentials are how members get in
+## Cards are how members get in
 
-If you run access control, members carry one or more [credentials](/members/member-cards): a QR code, a physical access card, or a PIN. Credentials are assigned to a contact, and one is marked **primary**.
+If you run access control, members carry one or more [cards](/members/member-cards): a physical access card or a PIN. One is marked as their main card. Members with a portal account also have a QR member code they can show from the portal or app.
 
 How strict the door is depends on your check-in mode. See [Access control](/settings/access-control) for the configuration and [Check-in models](/reference/check-in-models) for what each mode allows.
 
@@ -74,8 +93,8 @@ How strict the door is depends on your check-in mode. See [Access control](/sett
 
 - [Member list](/members/member-list) - find, filter, and bulk-act on contacts
 - [Member profile](/members/member-profiles) - the page a row click opens
-- [Memberships](/members/memberships) - the membership grid and lifecycle
+- [Leads and pipeline](/members/leads) - the sales pipeline on the Leads tab
+- [Memberships](/sales/memberships) - the membership grid and lifecycle, under Sales
 - [Accounts](/members/accounts) - households and companies
-- [Attendance](/members/attendance) - the check-in log (in-app under Schedule)
 - [Smart tagging](/settings/smart-tagging) - automatic tags driven by rules
-- [Revenue > Plans](/billing/plans) - the plan templates memberships are built from
+- [**Sales** > **Plans**](/sales/plans) - the plan templates memberships are built from

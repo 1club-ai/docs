@@ -1,6 +1,6 @@
 ---
 title: Member profile
-description: The per-contact page that pulls together a member's identity, balances, memberships, bookings, check-ins, transactions, messages, documents, notes, credentials, and account links.
+description: The per-contact page that pulls together a member's identity, balances, pipeline stage, memberships, bookings, check-ins, transactions, documents, notes, cards, and account links.
 keywords: [member profile, contact, notes, PIN, wallet balance, account balance, household, custom fields, activity timeline, portal invitation, credentials]
 ---
 
@@ -8,13 +8,13 @@ The member profile is the page for one contact: it pulls together their identity
 
 ## When to use it
 
-The profile answers the questions staff ask most at the desk - does this person owe anything, have they checked in today, how active are they - without opening a tab. From the same page you add a booking, membership, check-in, or voucher redemption, keep internal notes, and manage the member's portal account, credentials, and household or company links.
+The profile answers the questions staff ask most at the desk - does this person owe anything, have they checked in today, how active are they - without opening a tab. From the same page you add a booking, membership, check-in, or voucher redemption, keep internal notes, and manage the member's portal account, pipeline stage, cards, and household or company links.
 
 Typical uses:
 
 - **A padel member who owes money checks in** - the **Due from member** tile shows the outstanding court fee, so you record the visit and take payment in one place.
 - **Getting a new jiu-jitsu member onto the portal** - confirm their email and send the invitation from the **User Account** block.
-- **A door PIN for a climber** - add a PIN from the credentials block when access control is on.
+- **A door PIN for a climber** - add a PIN from the **Cards** block when access control is on.
 - **Belt progression for a martial-arts student** - assign their current belt from the **Level** tile so it stays visible to the front desk.
 
 See [Worked examples](#worked-examples) for the steps.
@@ -25,7 +25,7 @@ You land on the member profile after clicking a row in the [Member list](/member
 
 The page has two columns:
 
-- **Left sidebar** - the contact card: avatar, name, email, phone, accounts, custom fields, user-account section, credentials (when access control is on), integration links (Stripe, WebLock), payment methods, and a notes panel.
+- **Left sidebar** - the contact card: avatar, name, email, phone, accounts, custom fields, the **Pipeline** block, the user-account section, cards (when access control is on), integration links (Stripe, WebLock), payment methods, and a notes panel.
 - **Main column** - an info strip across the top, then the underlined tabs underneath.
 
 ## Info strip
@@ -39,16 +39,23 @@ Tiles at the top of the main column summarize the contact's current state. Three
 
 ## Header actions
 
-For an active contact the header has an **Add** menu plus **Message** and **Edit** actions, and a three-dot overflow menu holding **Suspend** and **Archive**. On narrow screens **Message** and **Edit** move into the same overflow menu. The **Add** menu creates:
+For an active contact the header has an **Add** menu, an **Edit** action, and a three-dot overflow menu holding **Suspend** (or **Reinstate**), **Stop SMS** (or **Allow SMS again**) when the contact has a phone number, and **Archive**. The **Add** menu creates, depending on your permissions and the features you use:
 
 - **Booking** - opens the schedule pre-filtered to this contact.
 - **Membership** - opens the membership dialog with the contact pre-selected.
 - **Check-in** - records a visit (against an existing booking or membership, or a new booking or membership in one step).
+- **Wallet** (or **Deposit** when a deposit is required) - tops up the member's wallet.
 - **Voucher** - redeems a voucher against this contact's account.
+- **Payment** - takes a payment toward what the member owes. Disabled while nothing is due.
+- **Card** - issues an access card, when access control is on. See [Access cards](/members/member-cards).
+- **Payment card** - saves a payment card to charge.
+- **Assessment** - adds an assessment card, when assessments are set up.
+- **Rental** - lends gear, when Rentals is on.
+- **Message** - opens a new message pre-addressed to the contact in the [Inbox](/inbox/overview).
 
-**Message** opens a new message pre-addressed to the contact. **Edit** opens the contact form. **Suspend** pauses the member without changing anything, and **Archive** removes them from active use. See [Suspend and archive](/members/suspend-and-archive) for which to reach for.
+**Edit** opens the contact form. **Suspend** pauses the member without changing anything, and **Archive** removes them from active use. See [Suspend and archive](/members/suspend-and-archive) for which to reach for.
 
-If the contact is archived, the header collapses to a single **Unarchive** action (visible to staff with the `members.update.club` permission). An **archived member** is retained for financial and legal history but is hidden from listings, has its memberships and future bookings cancelled, and cannot log in until an admin unarchives it.
+If the contact is archived, the header collapses to a single **Unarchive** action (visible to staff with the `members.update.organization` permission). An **archived member** is retained for financial and legal history but is hidden from listings, has its memberships and future bookings cancelled, and cannot log in until an admin unarchives it.
 
 A **suspended member** keeps everything - record, plan, bookings, staff role - but cannot book, check in, or sign in until someone reinstates them. The profile shows a banner with a **Reinstate** button while they are suspended.
 
@@ -60,27 +67,32 @@ Each tab shows a count badge and loads its own data on demand, so opening the pr
 
 | Tab | What it shows |
 |------|---------------|
-| **Overview** | Engagement gauge and activity timeline |
+| **Activity** | Engagement gauge and activity timeline |
 | **Bookings** | All bookings, including cancelled. Click through to the booking detail |
-| **Memberships** | Every membership ever assigned. Edit, pause, resume, renew, or cancel from here |
+| **Memberships** | Every membership ever assigned. Edit, pause, resume, renew, or cancel from here. Shown to staff who can read memberships |
 | **Check-ins** | Visit history |
 | **Transactions** | Invoices and payments tied to this contact |
-| **Messages** | Email and SMS sent to or received from the contact |
-| **Signatures** | Signed documents (waivers, contracts) |
+| **Documents** | Signed documents (waivers, contracts), form responses, and documents the member still owes |
+| **Notifications** | Which notifications the member receives, with any overrides of your defaults |
 | **Matches** | Match history, shown only when ratings are enabled |
+| **Rentals** | Gear the member has out, shown only when Rentals is on. The badge turns red while anything is overdue |
 
-### Overview tab
+### Activity tab
 
-The Overview tab stacks two elements:
+The **Activity** tab stacks two elements:
 
 - **Engagement gauge** - the member's engagement score and level. See [Engagement analytics](/analytics/engagement) for how the score is computed.
 - **Activity timeline** - a chronological feed of the member's bookings, check-ins, messages, and membership activity.
 
 ## Editing the contact
 
-Click **Edit** in the header. The form covers name, contact details, date of birth, type, profile image, address, and any custom fields configured under **Settings > Custom fields**. Contact **type** can be one of: member, staff, lead, contact, lapsed, or drop-in.
+Click **Edit** in the header. The form covers name, contact details, date of birth, profile image, address, and any custom fields configured under **Settings** > **Members** > **Contacts**. A contact has no **Club** of their own: they belong to your whole organization, and each membership or booking records its own.
 
-Changing the contact's type is logged. Click the type chip in the page header to open its type-change history.
+The contact's **type** (member, lead, drop-in, lapsed, contact, staff) is not edited here. It follows what the contact holds and does, and every change is logged. Click the type chip in the page header to open its type-change history.
+
+## Pipeline
+
+The **Pipeline** block on the contact card shows the contact's stage, source, and assigned staff member, each changed in place. For a contact who is not a customer and not yet in the pipeline, it offers **Add to pipeline**. See [Leads and pipeline](/members/leads).
 
 ## Notes
 
@@ -99,15 +111,14 @@ The overflow menu on this block offers, depending on state:
 - **Send invitation** / **Resend invitation** - re-sends a portal invitation while one is outstanding.
 - **Delete** - deletes an outstanding invitation, or removes the portal login link, for anyone but yourself.
 
-## Credentials and PIN
+## Cards and PIN
 
-When [access control](/settings/access-control) is enabled, a credentials block lists every QR code, access card, or PIN assigned to this contact. From here you can:
+When [access control](/settings/access-control) is enabled, the **Cards** block lists every access card, PIN, or QR code this contact holds, with a star on their main card. From here you can:
 
-- **Assign** an existing unassigned credential to the contact.
-- **Add** a new credential (manual enrollment - pick a type and enter its identifier).
-- Mark a credential **primary**, revoke it, or unassign it.
+- **Issue card** - scan a card on the reader (or type its code, or enter a PIN) to give it to this member. A card already on file as club stock is issued the same way.
+- **Remove from member** - takes a card off the member. It stops working right away, and scanning it again later issues it fresh.
 
-A **PIN** is a type of credential: a 4-10 character alphanumeric code the member uses at a kiosk or door. Adding a new PIN replaces any existing active PIN for the contact. See [Access cards](/members/member-cards) for credential types and lifecycle.
+A **PIN** is a number the member types at a kiosk or door. See [Access cards](/members/member-cards) for card types and how issuing works.
 
 ## Accounts panel
 
@@ -135,7 +146,7 @@ Saved cards and bank accounts on file appear in the sidebar. They are the same p
 
 1. Open the member from the [Member list](/members/member-list).
 2. The **Due from member** tile shows 30 in red - a court fee from last week.
-3. Use **Add > Check-in** to record today's visit against their membership.
+3. Use **Add** > **Check-in** to record today's visit against their membership.
 4. On the same profile, open the **Transactions** tab and take payment for the outstanding 30, or redeem a voucher from the **Due from member** tile if they have credit.
 
 ### Onboard a new jiu-jitsu member to the portal
@@ -146,15 +157,15 @@ Saved cards and bank accounts on file appear in the sidebar. They are the same p
 
 ### Give a climbing member a door PIN
 
-1. Make sure access control is enabled for your org.
-2. In the credentials block, click **Add**, choose **PIN**, and enter a 4-10 character code.
-3. The PIN becomes the member's primary credential. Adding another PIN later replaces this one.
+1. Make sure access control is enabled for your org, with PIN as an identification method.
+2. In the **Cards** block, click **Issue card**, choose **PIN code** as the card type, and enter the number. Leading zeros count.
+3. Turn on **Make this their main card** if the PIN should be the member's main card, and save.
 
 ### Track belt progression for a martial arts student
 
 1. Enable progression tracks so the **Level** tile appears in the info strip.
 2. Use the plus icon on the **Level** tile to assign the student's current belt.
-3. The Overview tab's activity timeline and the info strip keep the level visible for front-desk staff.
+3. The **Activity** tab's timeline and the info strip keep the level visible for front-desk staff.
 
 ## Tips & best practices
 
@@ -170,16 +181,17 @@ Saved cards and bank accounts on file appear in the sidebar. They are the same p
 |---------|-------|-----|
 | No **Invite** button in the User Account block | The contact has no email address | Click **Edit** and add an email, then reopen the block |
 | **Reset password** missing from the overflow menu | The account is not active, you are not an admin, or it is your own account | Have an admin reset it; you cannot reset your own password from another user's profile |
-| Credentials block not visible | Access control is not enabled for the org | Enable it under [access control settings](/settings/access-control) |
-| PIN rejected when adding | PIN is not 4-10 alphanumeric characters | Use only letters and digits, 4 to 10 characters long |
+| **Cards** block not visible | Access control is not enabled for the org | Enable it under [access control settings](/settings/access-control) |
+| **PIN code** missing from the card types | PIN is not an identification method enabled for the club | Enable it under [access control settings](/settings/access-control) |
 | Stripe or WebLock block missing | The integration is not installed or connected, or the contact has not been pushed yet | Connect the integration, then use **Sync** on the block once it appears |
-| Only an **Unarchive** button in the header | The contact is archived | Unarchive to restore active use (requires `members.manage.club`) |
+| Only an **Unarchive** button in the header | The contact is archived | Unarchive to restore active use (requires `members.update.organization`) |
 
 ## Related
 
 - [Member list](/members/member-list) - the grid this page opens from
-- [Memberships](/members/memberships) - the org-wide membership grid
+- [Memberships](/sales/memberships) - the org-wide membership grid
 - [Accounts](/members/accounts) - households and companies
-- [Attendance](/members/attendance) - check-in workflows
-- [Access cards](/members/member-cards) - credential and PIN management
+- [Attendance](/schedule/attendance) - check-in workflows
+- [Access cards](/members/member-cards) - cards and PIN management
+- [Leads and pipeline](/members/leads) - the Pipeline block and the Leads tab
 - [Engagement analytics](/analytics/engagement) - how the gauge is computed

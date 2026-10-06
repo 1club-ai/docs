@@ -1,0 +1,83 @@
+---
+title: Member onboarding
+description: How a new person becomes a member - the signup wizard, required fields, family members, verification, and passwordless guest signup.
+keywords: [onboarding, signup, registration, signup wizard, verification, guest booking, family members, contact fields]
+---
+
+Member onboarding is the path from a brand new person to a fully set-up member: they complete a signup form or book as a guest, verify their email, accept any required documents, and land in your member list with the right plan attached. New members, and parents signing up their children, go through it on your website and member portal. You design the form itself under [Forms](/marketing/forms); this page explains the experience a new member goes through and the settings that shape it.
+
+## When to use it
+
+A short signup that collects only what you need turns interest into a paying member in one sitting, with documents signed and the plan attached. The settings on this page decide how short that path is: which fields are asked, whether family members can join in the same flow, and whether a first booking can create the account on its own.
+
+Typical uses:
+
+- **Prospects from an ad** - someone who clicks a trial-plan ad picks the plan, fills in a few details, signs the waiver, and pays in one short flow.
+- **Parents enrolling kids** - a parent registers two children for a junior martial-arts program without becoming a member themselves, and each child gets their own record with a date of birth.
+- **A first-time drop-in** - a visitor books a class from your website with just their email and a one-time code, and ends up with a member account they can sign in to.
+
+See [Worked examples](#worked-examples) for the settings behind each of these.
+
+## The signup wizard
+
+New members complete signup through a step-by-step wizard (plan selection, details, optional documents and signature, review, and payment). The wizard guides them and validates as they go:
+
+- **Step intros** explain each step. For example, the details step shows "We'll use your email to create your account.", and the review step shows "Check that everything's correct before you submit."
+- **Inline validation on Next** - if a required field is missing, the wizard scrolls to and focuses the first invalid field instead of failing silently.
+- **Editable review** - each section on the review step has an **Edit** link that jumps back to that step.
+- **Already-registered email** - if the email is taken, the form shows "This email is already registered." with a "Sign in here" link, rather than a generic error.
+- **Guardian-only signups** - when the buyer is signing up family members but not themselves, the wizard shows "You'll manage this account but won't be a member yourself." The **I'm joining too** option appears only once at least one family member has been added.
+
+Drafts are saved in the member's browser as they go, so a half-finished signup survives a page refresh. Passwords and drawn signatures are never persisted in the draft.
+
+### Combine plan and details into one step
+
+Each signup form has a **Combine plan & user details into one step** toggle (off by default). Its help reads: "Show plan selection and the sign-up details together as the first step, instead of two separate steps." Turn it on to shorten the wizard to a single first step that shows plan selection and account details together.
+
+## Configuring which fields appear
+
+The visibility of optional system fields on the public signup form is set per organization under **Settings** > **Members** > **Contacts**. For each of **Phone**, **Date of birth**, and **Gender** you choose one of:
+
+- **Required** - the field is shown and must be filled in to submit.
+- **Optional** - the field is shown but can be left empty.
+- **Hidden** - the field is not shown at all.
+
+The server enforces these choices on submission - a hidden field cannot be back-filled by editing the request, and a required field that is empty rejects the signup.
+
+## Family members on signup
+
+The same **Settings** > **Members** > **Contacts** page has a **Show family members on signup** toggle:
+
+- **On** - the signup form shows a "Family members" section where the primary signer can add additional members (children, partner, etc.) in the same flow. Each family member submitted carries its own date of birth.
+- **Off** - the family-members section is hidden. The server rejects any request that includes family members with HTTP 400, which protects you against forged requests that try to enrol additional people while the feature is disabled.
+
+When **Date of birth** is set to **Required**, the requirement applies to **every** family member as well - submitting a family member without a date of birth fails the signup. The public website and member portal validate this before the request is sent, so the user sees an inline message rather than a server error.
+
+## Verification
+
+- **Email verification** - a new member verifies their email with a one-time code to confirm the address and activate the account.
+- **Browser check (Turnstile)** - signup is protected by a Cloudflare Turnstile check. If a privacy browser or ad blocker blocks it, the member sees an actionable message rather than a silent failure: "We couldn't verify your browser. If you use a privacy browser (like Brave) or an ad blocker, turn off its protection for this page or try a different browser, then try again." The same message appears on the public sign-in email form and in the portal.
+
+## Passwordless guest signup
+
+When a [booking policy](/settings/booking-policies) has **Allow guest bookings** turned on, a logged-out visitor can book from your public portal, website, or network without creating a password first. They enter their email, verify it with a one-time code, and complete the booking. 1Club then creates a passwordless member account and signs them in, so they can see and manage the booking. If the email already belongs to an active member, the visitor is routed to sign in instead. This turns a first booking into a member account with no extra signup step.
+
+## Worked examples
+
+- **Ad landing page** - share a signup form link that offers a single trial plan, with Phone optional and documents required, so prospects convert in one short flow.
+- **Junior program** - use a form set to register children under a guardian account, with Date of birth required for every child, so each junior is enrolled with their own record.
+- **Walk-in trial** - turn on guest bookings so a first-time visitor can book and pay for a drop-in without creating a password, then finish their profile later.
+
+## Tips & best practices
+
+- **Keep required fields minimal.** Every required field is a drop-off point; mark only what you truly need at signup and collect the rest later.
+- **Attach documents through rules, not the form.** The wizard automatically shows any [document rules](/settings/waivers) that target new members, so a waiver added once applies to every form.
+- **Test each form end to end** from a real signup before sharing the link.
+
+## Related
+
+- [Forms](/marketing/forms) - Build the form and its wizard steps.
+- [Memberships](/sales/memberships) - What a selected plan creates for the new member.
+- [Documents and waivers](/settings/waivers) and [Document signatures](/members/document-signatures) - The documents shown during signup.
+- [Member portal](/settings/member-portal) - Where the new member signs in afterward.
+- [Booking policies](/settings/booking-policies) - The guest-booking toggle behind passwordless signup.

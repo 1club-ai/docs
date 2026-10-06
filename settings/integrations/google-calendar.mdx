@@ -1,108 +1,139 @@
 ---
 title: Google Calendar
 description: Sync 1Club bookings with one or more Google calendars, mapped per area or per instructor, in either or both directions.
-keywords: ["google calendar", "calendar sync", "booking sync", "instructor calendar", "resource calendar", "bidirectional sync", "oauth", "ical"]
+keywords:
+  [
+    "google calendar",
+    "calendar sync",
+    "booking sync",
+    "instructor calendar",
+    "resource calendar",
+    "bidirectional sync",
+    "two-way sync",
+    "oauth",
+  ]
 ---
 
-The Google Calendar integration keeps 1Club bookings and Google Calendar events in step with each other. An owner or admin maps each area or instructor to a single Google calendar and chooses whether bookings flow to Google, come in from Google, or sync both ways, so staff and instructors see the schedule in the calendar they already use.
+The Google Calendar integration copies 1Club bookings into Google Calendar, and Google Calendar events into 1Club bookings. An owner or admin authorizes one Google account, then maps each area or instructor to one of that account's calendars and chooses whether bookings go to Google, come in from Google, or both. Staff and instructors then see the schedule in the calendar they already use.
 
 ## When to use it
 
-Each mapping is independent, so you can wire a studio area to a shared resource calendar and a personal trainer to their own calendar at the same time, with no limit on how many mappings you create. You connect once with a Google account - 1Club stores a refresh token and lists the calendars you can write to - and each mapping can also point at a Google Workspace resource calendar to publish an area's schedule to that room or asset.
+Each mapping is independent, so you can send a studio area to a shared calendar and sync a personal trainer's own calendar at the same time. There is no limit on how many mappings you create.
 
 Typical uses:
 
-- **Court bookings in the team calendar** - map each court to a Workspace resource calendar, outbound only, so staff see bookings in Google while stray Google events never turn into phantom court bookings.
-- **A personal trainer who can't be double-booked** - sync the instructor's own calendar both ways, so a block they add in Google comes back as a booking on their schedule and members can't book them during that time.
-- **A room schedule for someone outside the team** - map a studio area outbound to a calendar shared with the building manager, and use **Sync Now** after publishing a new timetable to push everything at once.
+- **Court bookings in the team calendar** - map each court to its own calendar, outbound only, so staff see bookings in Google while stray Google events never turn into court bookings.
+- **A personal trainer who also books outside 1Club** - sync the instructor's own calendar both ways, so a block they add in Google comes back as a booking on their schedule and members can't book them during that time.
+- **A room schedule for someone outside the team** - map a studio area outbound to a calendar shared with the building manager, and click **Sync now** after publishing a new timetable.
+
+## How it works
+
+- **Sync runs when you click Sync now.** Each mapping has a **Sync now** button. Nothing syncs on its own in the background, so click it after schedule changes.
+- **Outbound** - every booking for the mapped area or instructor is created in the Google calendar, or updated if it is already there.
+- **Inbound** - Google events in the next 30 days that 1Club hasn't seen yet become bookings for the mapped area or instructor.
+- **Nothing is deleted on the other side.** Cancelling a booking or deleting a Google event never removes its copy.
 
 ## Before you start
 
-Google Calendar is a paid-plan integration. Organizations on the Free plan or still in the Grow trial cannot connect it or create mappings until they upgrade. Once connected, viewing mappings and deleting them stays available regardless of plan.
+- Google Calendar isn't available on the Free plan. It works during the trial and on paid plans.
+- Authorizing Google, creating, editing and deleting mappings, and syncing require the **settings.manage.organization** permission. Viewing the page requires **settings.read.organization**.
+- You need a Google account that can see the calendars you want to sync. Use an account your team controls, not one that leaves with an employee.
+- To sync with a Google Workspace resource calendar (a room or court), add that calendar to the authorizing account's calendar list first. The dropdown only shows calendars in that list.
 
-- A Google account with permission to read and write the calendars you want to sync.
-- To sync to a Google Workspace resource calendar, the resource must already exist in your Workspace admin.
-- An upgraded plan (Grow trial and Free plans are blocked from connecting).
+## Activate and authorize Google
 
-## Connect Google Calendar
+1. Go to **Settings > Integrations** and click **Activate** on the Google Calendar card, under **Tools**. The Google Calendar page opens.
+2. Click **Authorize Google Calendar**.
+3. Sign in to Google and allow 1Club to view and manage your calendars.
+4. You return to the Google Calendar page. The **Google Calendar status** card shows **Active**, a chip with how many calendars were found, and an **Open Google Calendar** button.
 
-1. Go to **Settings → Integrations** and click **Activate** on the Google Calendar card.
-2. On the Google Calendar page, click **Authorize Google Calendar**.
-3. Sign in to Google and grant 1Club permission to view and manage your calendars.
-4. You return to 1Club with the connection status shown as **Active** and a chip listing how many calendars were found.
+Until you authorize, the status shows **Not activated**.
 
 ## Add a mapping
 
 Each mapping links one area or one instructor to one Google calendar.
 
-1. Click **Add Mapping**.
-2. In the **Create Calendar Mapping** dialog, choose either an **Area** or an **Instructor**. Selecting one clears the other - a mapping targets exactly one of them.
-3. Pick the **Google Calendar** to sync with from the dropdown. The primary calendar is tagged **(Primary)**.
-4. Pick a **Sync Direction**:
-   - **Bidirectional** - bookings created in 1Club go to Google, and events created in Google come back as bookings.
-   - **Outbound Only (Bookings → Google)** - 1Club bookings push to Google; Google events are ignored.
-   - **Inbound Only (Google → Bookings)** - Google events appear as bookings; 1Club bookings stay out of that calendar.
-5. Save. The new mapping appears as a card with a status chip and its sync direction.
+1. Click **Add mapping**.
+2. In the **Create calendar mapping** dialog, choose an **Area (optional)** or an **Instructor (optional)**. Choosing one clears the other, so a mapping targets exactly one of them.
+3. Choose the **Google Calendar** to sync with. The account's primary calendar is marked **(Primary)**.
+4. Choose a **Sync direction**:
+   - **Two-way** (the default) - bookings go to Google, and new Google events come back as bookings.
+   - **Outbound only (bookings → Google)** - bookings go to Google. Google events are ignored.
+   - **Inbound only (Google → bookings)** - new Google events come in as bookings. Bookings are not sent to Google.
+5. Click **Add**.
+
+The mapping appears as a card titled with the area or instructor name. It shows the gym (for an area) and the calendar name, the sync direction, and **Last sync** once it has synced.
+
+To change a mapping, click **Edit**, change the fields and click **Update**. To remove one, click **Delete** and confirm. Deleting a mapping leaves the events already in Google in place.
+
+An area or instructor can be mapped to the same calendar only once.
 
 ## What syncs
 
-- The Google event title is built from the area or instructor name plus the member's name (for example `Court 1 - Jane Doe`), and the event description carries the booking details, including any booking notes.
-- Booking start and end times map to the event times.
-- Inbound events become bookings for the mapped area or instructor, using the event summary and description.
-- Cancellations remove the event on the other side.
-- Edits propagate in the direction(s) you configured.
+Click **Sync now** on a mapping to run it. When it finishes, a **Sync complete** message says how many calendar entries were sent and received.
 
-Each mapping card shows a **Last sync** timestamp. Click **Sync Now** to run a full sync for that mapping immediately - useful after a bulk schedule change. The result reports how many outbound and inbound events were synced.
+### Bookings to Google
 
-## Multiple mappings
+- The event title is the area or instructor name plus the member's name, for example `Court 1 - Jane Doe`.
+- The event description lists the area, instructor, gym, member name and email, any booking notes, and the booking ID.
+- The member is added to the event as a guest when they have an email address.
+- The event uses the booking's start and end time.
+- A booking that isn't confirmed, for example a cancelled one, shows as a tentative event. The event isn't removed.
 
-There is no limit on mappings. Common setups:
+### Google events to 1Club
 
-- One mapping per court or studio area to dedicated resource calendars, outbound only, so the whole team sees the schedule in Google.
-- One mapping per instructor to that instructor's personal calendar, bidirectional, so they can block their own time off from Google and have it show up as unavailable in 1Club.
-- A mix - broadcast areas outbound only while instructors sync both ways.
+- Each new event in the next 30 days becomes a confirmed booking for the mapped area or instructor, at no charge.
+- The event's first guest becomes the booking's contact. 1Club matches them by email, or creates a new contact. An event with no guests is booked under the staff member who clicked **Sync now**.
+- The event description becomes the booking notes.
+- An event is only imported once. Later changes to it in Google don't update the booking, and deleting it doesn't cancel the booking.
 
 ## Worked examples
 
-### Padel club: publish court schedules to a shared team calendar
+### Padel gym: publish court schedules to the team calendar
 
-A four-court padel club wants front-desk and coaching staff to see court bookings inside the Google Workspace calendar they already live in. Create one mapping per court, each pointing at a Workspace resource calendar (Court 1, Court 2, and so on) with direction **Outbound Only**. Bookings taken in 1Club now populate those calendars, but stray events someone adds in Google never turn into phantom court bookings.
+A four-court padel gym wants front-desk and coaching staff to see court bookings in the Google Workspace calendar they already use. Create one mapping per court, each pointing at that court's resource calendar, with **Outbound only (bookings → Google)**. After each **Sync now**, bookings taken in 1Club appear in those calendars, and events someone adds in Google never become court bookings.
 
 ### Personal trainer: two-way sync to avoid double-booking
 
-An independent strength coach takes 1Club bookings but also schedules external clients in their personal Google calendar. Map the instructor to their Google calendar with direction **Bidirectional**. A block they add in Google (a dentist appointment, an off-site session) comes back into 1Club as a booking on their schedule, so members can't book them during that time; sessions booked in 1Club appear in their Google calendar automatically.
+An independent strength coach takes 1Club bookings but also schedules outside clients in their own Google calendar. Map the instructor to that calendar with **Two-way**. When you click **Sync now**, a block they added in Google for the next 30 days comes into 1Club as a booking on their schedule, so members can't book them during that time. Sessions booked in 1Club go to their Google calendar.
 
-### Yoga studio: mirror the room schedule for a landlord
+### Yoga studio: share the room schedule with a landlord
 
-A yoga studio that sublets its room reports the schedule to the building manager. Map the studio area to a calendar shared with the manager, direction **Outbound Only**, and use **Sync Now** after publishing the new term's timetable to push everything at once.
+A yoga studio that sublets its room reports the schedule to the building manager. Map the studio area to a calendar shared with the manager, with **Outbound only (bookings → Google)**, and click **Sync now** after publishing the new term's timetable.
 
 ## Tips and best practices
 
-- Use **Outbound Only** whenever the Google calendar is a display or reporting surface. It prevents accidental Google events from creating real bookings.
-- Reserve **Bidirectional** for calendars a person actively manages (usually an instructor), where blocking time in Google should reserve time in 1Club.
-- Point area mappings at Workspace resource calendars rather than personal calendars so access follows the resource, not one employee's account.
-- After a large timetable change, click **Sync Now** on the affected mappings instead of waiting for the next scheduled sync.
-- Authorize with a service or shared Google account the team controls, not a personal account that might leave with an employee.
+- Use **Outbound only** whenever the Google calendar is only for viewing. It stops stray Google events from creating real bookings.
+- Keep **Two-way** for calendars a person actively manages, usually an instructor's, where blocking time in Google should block time in 1Club.
+- Click **Sync now** after timetable changes and on a regular routine. Nothing syncs until you do.
+- Add guests to Google events you want imported, so the booking lands on the right contact.
 
 ## Troubleshooting
 
-| Symptom | Cause | Fix |
-| --- | --- | --- |
-| "OAuth authentication was denied" | You cancelled or declined the Google consent screen | Click **Authorize Google Calendar** again and accept the permissions |
-| "Invalid OAuth state" | The authorization round-trip took too long or used a stale tab | Start the flow fresh from the integration page |
-| "Google Calendar integration credentials are missing" | The platform OAuth client is not configured for your environment | Contact support |
-| Authorization fails with a plan message | Your organization is on Free or still in the Grow trial | Upgrade the plan, then reconnect |
-| No calendars in the dropdown | You authorized with an account that has no calendars you can write to | Re-authorize with the right Google account |
-| A booking shows up twice in Google | Two mappings point the same area or instructor at different calendars | Delete the duplicate mapping |
-| Google events aren't becoming bookings | The mapping is **Outbound Only** | Edit the mapping and set **Bidirectional** or **Inbound Only** |
+| Symptom                                                 | Cause                                                                    | Fix                                                                                   |
+| ------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| "Access was denied. Please try again."                  | You cancelled or declined the Google consent screen                      | Click **Authorize Google Calendar** again and allow access                            |
+| "Invalid OAuth state. Please try again."                | The sign-in took too long or came from a stale tab                       | Start again from the Google Calendar page                                             |
+| "OAuth authentication failed. Please try again."        | Google didn't complete the sign-in                                       | Try again. If it keeps failing, contact support                                       |
+| Authorizing fails with a plan message                   | Your organization is on the Free plan                                    | Upgrade the plan, then authorize again                                                |
+| A calendar is missing from the dropdown                 | It isn't in the authorizing account's calendar list                      | Add it to that account in Google Calendar, or authorize with the right account        |
+| New bookings or events aren't showing on the other side | The mapping hasn't been synced since the change                          | Click **Sync now** on the mapping                                                     |
+| Google events aren't becoming bookings                  | The mapping is **Outbound only**, or the event is more than 30 days away | Edit the mapping to **Two-way** or **Inbound only**, or sync again closer to the date |
+| An imported booking is on the wrong contact             | The event had no guests, or its first guest is someone else              | Add the member as the event's first guest before syncing                              |
+| A booking shows up twice in Google                      | Two mappings send the same area or instructor to different calendars     | Delete the mapping you don't need                                                     |
 
-## Disconnect
+## Deactivate
 
-Click **Deactivate** from the integrations list, or delete each mapping individually. Disconnecting revokes 1Club's access to your Google account. Events already created on Google stay there until you delete them in Google Calendar.
+1. Click **Deactivate** at the top of the Google Calendar page.
+2. Confirm in the **Deactivate Google Calendar?** dialog. It warns that the integration stops working and its settings are deleted.
+
+1Club deletes the stored Google connection and takes you back to **Settings > Integrations**. If the deactivation is refused, the reason shows inside the dialog.
+
+Events already created in Google stay there until you delete them in Google Calendar. Your calendar mappings are kept, so they come back if you activate and authorize again. Deactivating doesn't revoke access on Google's side. To do that, remove 1Club from the third-party access list in your Google Account.
 
 ## Related
 
 - [Bookings](/operations/bookings) - where the bookings that sync are created and managed.
 - [Areas](/operations/areas) - the areas you map to calendars.
 - [Instructors](/operations/instructors) - the instructors you map to calendars.
-- [Integrations overview](/settings/integrations) - the full integrations catalog.
+- [Integrations](/settings/integrations) - the full integration catalog and how activation works.

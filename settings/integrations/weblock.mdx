@@ -45,20 +45,20 @@ Changes reach WebLock within moments. A complete pass also runs every five minut
 
 ## Before you start
 
-WebLock is a paid-plan integration. Organizations on the Free plan or still in the Grow trial cannot configure or test it until they upgrade.
+WebLock is a paid-plan integration. On the Free plan and during the trial, its **Activate** and **Configure** buttons stay greyed out until you upgrade.
 
 - Configuring WebLock requires the **settings.manage.organization** permission. Viewing it requires **settings.read.organization**.
 - You need a WebLock (Valnes) account with a **Business ID**, and the door groups and light devices already set up in the WebLock console.
 - Each gym needs at least one active area. See [Areas](/operations/areas).
-- A gym can use only one door system at a time. If a gym already uses [Impro](/settings/integrations/access-bridge) or [Salto KS](/settings/integrations/salto), disable it for that gym first.
+- A gym can use only one door system at a time. If a gym already uses [Impro](/settings/integrations/access-bridge) or [Salto KS](/settings/integrations/salto), turn that one off for the gym first.
 
 Valnes API credentials are held at the platform level, so you do not enter a username or password in 1Club - only your Business ID.
 
 ## Set up a gym
 
-1. Go to **Settings → Integrations** and click **Activate** on the WebLock card.
+1. Go to **Settings > Integrations** and click **Activate** next to WebLock, under **Access control**. 1Club activates WebLock and opens its page. Once it is active, you reach the page from **Configure** under **Active Integrations**.
 2. On the WebLock page, choose the gym under **Club**. If the gym has no active area, the page asks you to create one and links to **Manage areas**.
-3. Enter your **Business ID** and click **Save**. The door group and light device lists load from WebLock once the Business ID is saved.
+3. Under **Connection**, enter your **Business ID** and click **Save**. **Save** stays greyed out until a Business ID is entered. The door group and light device lists load from WebLock once the Business ID is saved.
 4. Set the two buffers:
    - **Access buffer (minutes)** (0-120, default 15) - how long before a booking starts the door opens, and how long after it ends it stays open.
    - **Light buffer (minutes)** (0-120, default 5) - how long before and after a booking the area's lights are on.
@@ -116,11 +116,16 @@ A climbing group runs two gyms on one WebLock business. It sets up both gyms on 
 | Lights don't come on for a booking | No light device is linked to the area, or the **Light buffer** is shorter than expected | Pick a **Light device** for the area and check the **Light buffer** |
 | Syncing is refused for a shared business | Another gym on the same WebLock business is still on the earlier setup | Open that gym on the WebLock page and save it |
 | Changing the Business ID is refused | The gym still has door access on, or cleanup hasn't finished | Turn off **Enable door access**, wait for cleanup, then change it |
-| Configuring is blocked with a plan message | Your organization is on Free or still in the Grow trial | Upgrade the plan, then configure |
+| **Activate** or **Configure** is greyed out | Your organization is on the Free plan or still in the trial | Upgrade the plan, then configure |
 
-## Disconnect
+## Deactivate
 
-WebLock is switched off per gym, not from the integrations list. On the WebLock page, choose the gym under **Club**, turn off **Enable door access**, and click **Save**. 1Club then withdraws the access it granted through WebLock for that gym.
+The WebLock page has no **Deactivate** button, because WebLock is switched off per gym. To stop WebLock at a gym:
+
+1. On the WebLock page, choose the gym under **Club**.
+2. Turn off **Enable door access** and click **Save**.
+
+1Club then withdraws the access it granted through WebLock for that gym. Repeat for every gym that uses WebLock. WebLock stays listed under **Active Integrations**, so you can turn it back on for a gym at any time.
 
 ## Related
 
@@ -129,4 +134,4 @@ WebLock is switched off per gym, not from the integrations list. On the WebLock 
 - [Access cards](/members/member-cards) - the PINs and access cards members use at the door.
 - [Areas](/operations/areas) - the areas you link to door groups and light devices.
 - [Impro](/settings/integrations/access-bridge) and [Salto KS](/settings/integrations/salto) - the other door systems.
-- [Integrations overview](/settings/integrations) - the full integrations catalog.
+- [Integrations overview](/settings/integrations) - every integration and how activation works.

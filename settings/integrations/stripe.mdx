@@ -1,123 +1,184 @@
 ---
 title: Stripe
 description: Accept card and digital wallet payments through Stripe, starting in a test sandbox and going live with your own Stripe Connect account
-keywords: [stripe, stripe connect, test mode, live mode, payments, payouts, onboarding, payment links, connect account]
+keywords:
+  [
+    stripe,
+    stripe connect,
+    test mode,
+    live mode,
+    payments,
+    payouts,
+    onboarding,
+    payment links,
+    connect account,
+    billing entity,
+    capabilities,
+  ]
 ---
 
 Stripe powers card and digital wallet payments across 1Club: member checkout in the portal and kiosk, admin-initiated charges, payment links, and recurring billing. An owner or admin sets it up once, and members pay through it wherever they check out.
 
 <Note>
-If you invoice through more than one company, each connects its own account. Pick the company at the top of this page before you connect or edit credentials, and money for its sales settles into that account. See [Billing entities](/billing/billing-entities).
+  If your organization trades through more than one company, each company
+  connects its own Stripe account. Pick the company under **Billing entity** at
+  the top of the Stripe page before you activate, go live, or deactivate. The
+  line under the picker reminds you that payments for that company's gyms settle
+  to the account you are setting up. The picker only appears when you have more
+  than one billing entity. See [Billing entities](/billing/billing-entities).
 </Note>
 
 ## When to use it
 
-Stripe lets you rehearse payments before you have a Stripe account of your own, then take real money through your own account. You start in **test mode** against the 1Club sandbox, then switch to **live mode** to onboard your own Stripe Connect account and accept real money. Payment status flows back to 1Club automatically through webhooks - no webhook setup on your side. Live payments require a paid plan; the Free plan and the Grow trial can use test mode only.
+Stripe lets you rehearse payments in a sandbox, then take real money through your own Stripe account. You start in **test mode** against the 1Club sandbox, then turn on **Live mode** to onboard your own Stripe Connect account. Payment status flows back to 1Club automatically through webhooks, with no webhook setup on your side.
 
 Typical uses:
 
-- **Validating checkout before going live** - book a couple of courts in the portal with Stripe test cards, check the checkout, receipt, and booking confirmation, then upgrade, toggle **Live mode**, and complete onboarding.
-- **Memberships and drop-ins** - members pay recurring dues at checkout and drop-in visitors pay per session, while you watch the **Payouts** flag to confirm money is landing in your bank account.
-- **Rehearsing during the trial** - a new studio on the Grow trial keeps taking test payments to rehearse its flow, then upgrades and completes onboarding when it is ready to open.
+- **Validating checkout before going live** - book a couple of courts in the portal with Stripe test cards, check the checkout, receipt, and booking confirmation, then turn on **Live mode** and complete onboarding.
+- **Memberships and drop-ins** - members pay recurring dues at checkout and drop-in visitors pay per session, while you watch the **Payouts** capability to confirm money is landing in your bank account.
+- **Two companies, two payouts** - a group runs its gyms through two companies, and each company connects its own Stripe account so its sales pay out to its own bank account.
 
 ## Before you start
 
-- You don't need anything to try test mode - 1Club ships a sandbox you can use immediately.
-- To go live you need a paid 1Club plan and a Stripe account (which you can create during onboarding) with the business details, bank account, and identity documents Stripe requires for your country.
+- Stripe is a **paid-plan** integration. On the Free plan and during the free trial, **Activate** is greyed out until you upgrade.
+- Configuring Stripe requires the **settings.manage.organization** permission.
+- You don't need a Stripe account to try test mode. 1Club ships a sandbox you can use immediately.
+- To go live you need a Stripe account (you can create one during onboarding) with the business details, bank account, and identity documents Stripe requires for your country.
 
-## Enable Stripe (test mode)
+## Activate Stripe (test mode)
 
-Enabling Stripe on a new organization puts you straight into test mode against the 1Club sandbox. No Stripe account is created yet.
+Activating Stripe puts you straight into test mode against the 1Club sandbox. No Stripe account is created yet.
 
-1. Go to **Settings → Integrations**.
-2. On the Stripe card, click **Activate**.
-3. Stripe is now connected in test mode, using the 1Club sandbox. No real cards are charged. The page says test payments use the 1Club sandbox and shows a **Live mode** toggle.
+1. Go to **Settings > Integrations**.
+2. Under **Payments**, click **Activate** next to Stripe. 1Club opens the Stripe page.
+3. The **Stripe status** card shows **Active** and says test payments use the 1Club sandbox. No real cards are charged.
 4. Run a checkout in the member portal or kiosk using Stripe's [test card numbers](https://stripe.com/docs/testing) to confirm the flow end to end.
+
+**Activate** on the Integrations list sets up Stripe for your default company. To activate it for another company, open the Stripe page, pick the company under **Billing entity**, and click **Activate** in the **Stripe status** card.
 
 ## Go live (Stripe Connect onboarding)
 
 Real payments require your own Stripe Connect account. The **Live mode** toggle drives the whole transition:
 
-1. Make sure your organization is on a paid plan. Live mode is blocked on the Free plan and during the Grow trial.
-2. Turn the **Live mode** toggle on.
-3. If you have no Connect account yet, 1Club creates a Stripe Connect (Express) account and opens Stripe's hosted onboarding in a new tab. The toggle stays on test until onboarding is complete.
-4. Complete Stripe's onboarding form: business details, representative, bank account, and any identity documents Stripe asks for.
-5. When you return to 1Club, the page refreshes your account status automatically after a couple of seconds.
-6. Once Stripe reports that card payments are active and there are no blocking requirements, turning **Live mode** on succeeds and real charges start processing.
+1. Turn the **Live mode** toggle on.
+2. If you have no Stripe account yet, 1Club creates a Stripe Connect (Express) account and opens Stripe's onboarding in a new tab. You stay in test mode until onboarding is complete.
+3. Complete Stripe's onboarding form: business details, representative, bank account, and any identity documents Stripe asks for.
+4. Return to 1Club. The page refreshes your account status automatically after a couple of seconds.
+5. Once Stripe reports that card payments are active and nothing blocking is due, turn **Live mode** on again. This time it switches, and real charges start processing.
 
-If you close the onboarding tab early, click **Complete Setup** to reopen the same flow. Until you have a Stripe account, the page reminds you that turning on live mode is how you set one up and take real payments.
+If you close the onboarding tab early, click **Complete setup** in the **Stripe status** card to reopen the same flow. Until you have a Stripe account, the page reminds you that turning on live mode is how you set one up.
 
 <Note>
-  Stripe Connect accounts always live on the live side of Stripe. Test mode only changes which Stripe keys process your payments (the platform sandbox), not which account exists. That is why you can enable Stripe and take test payments long before you create a Connect account.
+  Stripe Connect accounts always live on the live side of Stripe. Test mode only
+  changes which Stripe keys process your payments (the platform sandbox), not
+  which account exists. That is why you can activate Stripe and take test
+  payments long before you create a Connect account.
 </Note>
 
 ## Test mode vs. live mode
 
 The **Live mode** toggle on the Stripe page controls where payments go:
 
-- **Test mode (off)** uses the 1Club sandbox on the platform's Stripe account. Real cards are not charged - use Stripe's test card numbers to simulate payments. No Connect account is required.
+- **Test mode (off)** uses the 1Club sandbox on the platform's Stripe account. Real cards are not charged. Use Stripe's test card numbers to simulate payments. No Connect account is required.
 - **Live mode (on)** uses your own Stripe Connect account. Customers are charged for real and payouts go to your bank account.
 
-Switching to live mode for the first time triggers Stripe onboarding if your Connect account is not complete. If your account is missing information, 1Club blocks the toggle and surfaces a **Complete Setup** action. Switching back to test mode is always allowed.
+A banner at the bottom of the page always says which mode you are in.
+
+If your Stripe account still needs information, turning on live mode is refused with "Complete Stripe onboarding before enabling live mode." and a **Complete setup** button. Switching back to test mode is always allowed.
+
+Saved cards belong to the Stripe account they were saved on. After you switch modes, cards saved in the other mode can't be charged until you switch back.
 
 <Warning>
-  Live mode is restricted to paying organizations. If you try to enable it on the Free plan or during the Grow trial, 1Club blocks the toggle and asks you to upgrade. This protects the platform's Stripe account from abuse - upgrade to a paid plan (or contact support) to accept live payments.
+  Live mode is restricted to organizations on a paid plan. If your plan doesn't
+  allow live payments, switching to live mode fails. Upgrade to a paid plan, or
+  contact support, to accept live payments.
 </Warning>
 
-## Account capabilities
+## Stripe status
 
-Once you have a Connect account, the page shows three flags pulled from Stripe under **Account Capabilities**:
+The **Stripe status** card at the top of the page shows a status chip:
 
-- **Charges** - whether Stripe will accept new payments on this account (`card_payments` capability active).
+- **Not activated** - Stripe isn't set up for this company. Click **Activate**.
+- **Active** - you are taking payments, either in test mode with the sandbox or through a Stripe account that is fully set up.
+- **Pending** or **Restricted** - you have a Stripe account, but Stripe still needs information or has limited it. Click **Complete setup**.
+
+Once you have a Stripe account, the card also shows your **Account ID: acct\_...** and these buttons:
+
+- **Complete setup** - reopens Stripe's onboarding. Shown until the account status is **Active**.
+- **View dashboard** - opens the Stripe Dashboard in a new tab.
+- **Refresh status** - pulls the latest account status from Stripe right away. The page also re-reads it every 30 seconds while it is open.
+
+### Account capabilities
+
+Once you have a Stripe account, the card lists what Stripe allows the account to do under **Account capabilities**, each with a status chip such as **Active**, **Pending**, **Restricted**, or **Inactive**:
+
+- **Charges** - whether Stripe will accept card payments on this account.
 - **Payouts** - whether Stripe will send money from your Stripe balance to your bank.
-- **Setup** - whether Stripe considers your account verification complete with no blocking requirements.
+- **Transfers** - whether the account can receive the money 1Club passes on to it from your sales.
+- **Setup** - **Completed** when Stripe needs nothing more from you, including documents it will only ask for later. Otherwise **Incomplete**.
 
-Click **Refresh Status** to re-pull these from Stripe. Click **View Dashboard** to open the Stripe Dashboard in a new tab.
+Below them, **Other capabilities** lists everything else Stripe has turned on or requested for your account, such as extra payment methods, grouped by status.
 
 ## Setup progress and requirements
 
-If Stripe still needs information from you, 1Club shows the outstanding items in two places:
+If Stripe still needs information before you can take payments, a **Setup progress** card appears below the status card:
 
-- **Setup Progress** (blocking) - lists items **Currently due** (charges or payouts will not work until submitted) and items in **Pending verification** (Stripe is reviewing documents you have already submitted). A progress bar tracks how many of the two capabilities are enabled.
-- **Pending Verification** (non-blocking) - appears once your account can already take payments but Stripe wants **Eventually due** documents to avoid future restrictions. A **Complete Verification** button reopens onboarding.
+- A warning says Stripe needs more information and asks you to select **Complete setup**.
+- A progress bar tracks the two money capabilities, **Charges** and **Payouts**, with a caption such as "1 of 2 capabilities enabled".
+- If Stripe has disabled the account, a **Disabled reason** line says why.
+- **Currently due** lists items that block payments until you submit them.
+- **Pending verification** lists documents you have already submitted that Stripe is still reviewing.
 
-The **Complete Setup** button reopens Stripe's hosted onboarding flow so you can submit the missing items.
+Once the account can take payments but Stripe will still want more documents later, a separate **Pending verification** card appears instead. It says payments work but Stripe will ask for more documents, lists them, and has a **Complete verification** button that reopens onboarding.
 
-## Disconnect
+## Payment terminals
 
-Click **Deactivate** on the Stripe page (the confirmation dialog is titled "Disconnect Stripe Account") to remove the integration. This stops 1Club from creating new charges on your Stripe account. Existing payments and payouts are unaffected on Stripe's side - manage refunds and disputes from the Stripe Dashboard.
+To take payments in person, set up card readers under **Billing > Payment terminals**. The Stripe page links there with a **Manage** button. Terminals from every provider you use are managed in one place.
+
+## Deactivate
+
+1. Pick the company under **Billing entity**, if you have more than one.
+2. Click **Deactivate** at the top of the Stripe page.
+3. Confirm in the **Deactivate Stripe?** dialog. It says Stripe stops working and its settings are deleted. With more than one billing entity, it also says the change applies to the selected company only, and your other companies stay connected.
+
+You stay on the Stripe page afterwards. If 1Club can't deactivate Stripe, the reason shows in the dialog.
+
+Deactivating stops 1Club from creating new charges on that Stripe account. Your Stripe account itself is not closed. Existing payments and payouts are unaffected on Stripe's side, so manage refunds and disputes from the Stripe Dashboard. If you activate Stripe again later, you start over in test mode, and going live runs Stripe onboarding again.
 
 ## What syncs
 
-- Charges, refunds, and disputes initiated from 1Club appear in your Stripe Dashboard.
-- Payment status updates from Stripe (succeeded, failed, refunded, disputed) flow back to 1Club through webhooks - no setup needed on your side.
+- Charges and refunds made in 1Club appear in your Stripe Dashboard.
+- Payment status updates from Stripe (succeeded, failed, refunded, disputed) flow back to 1Club through webhooks, with no setup needed on your side.
 - Payouts go from Stripe to the bank account you configured during onboarding. Schedule and currency are controlled in the Stripe Dashboard.
 
 ## Worked examples
 
-**Padel club validating checkout before going live.** A racket-sports club enables Stripe, leaves the **Live mode** toggle off, and books a couple of courts in the portal using Stripe test cards. Once the checkout, receipt, and booking confirmation all look right, the club upgrades to a paid plan, toggles **Live mode**, completes Stripe onboarding with its bank details, and starts collecting real court fees.
+**Padel gym validating checkout before going live.** A racket-sports gym activates Stripe, leaves **Live mode** off, and books a couple of courts in the portal using Stripe test cards. Once the checkout, receipt, and booking confirmation all look right, it turns on **Live mode**, completes Stripe onboarding with its bank details, turns **Live mode** on again, and starts collecting real court fees.
 
-**Martial-arts gym selling memberships and drop-ins.** A jiu-jitsu gym on a paid plan runs live Stripe. Members pay recurring dues at checkout and drop-in visitors pay per session. The gym watches the **Payouts: Enabled** flag to confirm money is landing in its bank account, and opens **View Dashboard** to reconcile a disputed charge.
+**Martial-arts gym selling memberships and drop-ins.** A jiu-jitsu gym runs live Stripe. Members pay recurring dues at checkout and drop-in visitors pay per session. The gym watches **Payouts** show **Active** to confirm money is landing in its bank account, and opens **View dashboard** to handle a disputed charge.
 
-**Studio blocked from going live.** A new Pilates studio on the Grow trial toggles **Live mode** and sees it blocked with an upgrade prompt. It keeps taking test payments to rehearse its flow, then upgrades and completes onboarding when it is ready to open.
+**A group trading through two companies.** A fitness group runs its city-centre gyms through one company and its suburban gyms through another. On the Stripe page it picks the first company under **Billing entity**, activates Stripe and goes live, then picks the second company and does the same. The Integrations list shows Stripe as connected for 2 of 2 billing entities, and each company's sales pay out to its own bank account.
 
 ## Tips & best practices
 
 - Do all your rehearsal in test mode. A successful test-card payment through the real portal checkout is the cleanest proof your setup works before real money is involved.
-- Clear **Currently due** items promptly. They block both charges and payouts, so the sooner they are submitted the sooner you can go live.
-- Treat **Eventually due** items as a checklist. They do not block payments today, but leaving them unresolved risks a later Stripe restriction.
-- After returning from Stripe onboarding, give the page a moment - it auto-refreshes - or click **Refresh Status** to pull the latest capability flags.
+- Clear **Currently due** items promptly. They block payments, so the sooner they are submitted the sooner you can go live.
+- Treat items in the **Pending verification** card as a checklist. They don't block payments today, but leaving them unresolved risks a later Stripe restriction.
+- After returning from Stripe onboarding, give the page a moment, or click **Refresh status** to pull the latest capabilities.
 
 ## Troubleshooting
 
-- **"Account needs additional information"** - open **Setup Progress** and submit everything under **Currently due**.
-- **Live mode toggle is blocked** - either your Connect account is not ready (click **Complete Setup** to finish onboarding) or your organization is not on a paid plan (upgrade to unlock live payments).
-- **Payments succeed in test mode but fail live** - confirm you are in live mode (the toggle is on) and that **Charges** is enabled on the account.
-- **Charge succeeded in Stripe but not visible in 1Club** - click **Refresh Status**. If the discrepancy persists, contact support with the Stripe payment intent ID.
+- **Activate is greyed out** - your organization is on the Free plan or the free trial. Upgrade to a paid plan to activate payments.
+- **"Stripe needs more information before you can take payments"** - open the **Setup progress** card and submit everything under **Currently due** through **Complete setup**.
+- **Live mode doesn't turn on** - either your Stripe account is not ready (click **Complete setup** to finish onboarding) or your plan doesn't allow live payments (upgrade to a paid plan).
+- **Payments succeed in test mode but fail live** - confirm **Live mode** is on and that **Charges** shows **Active**.
+- **Charge succeeded in Stripe but not visible in 1Club** - payment status arrives through Stripe's webhooks, usually within seconds. If it doesn't appear, contact support with the Stripe PaymentIntent ID.
 
 ## Related
 
 - [Integrations](/settings/integrations) - the full integration catalog and how activation works.
-- [myPOS](/settings/integrations/mypos) - the alternative card payment provider.
+- [Billing entities](/billing/billing-entities) - the companies you trade through, each with its own payment accounts.
+- [myPOS](/settings/integrations/mypos) - an alternative card payment provider with hosted checkout and in-person terminals.
+- [DatecsPay](/settings/integrations/datecspay) - hosted card checkout through BORICA.
 - [Transactions](/billing/transactions) - where individual charges are recorded.
 - [Invoices](/billing/invoices) - invoices you can attach a Stripe payment link to.

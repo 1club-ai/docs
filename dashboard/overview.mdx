@@ -1,56 +1,141 @@
 ---
-title: Dashboard
-description: Your home screen in the admin - a setup checklist plus eight widgets covering revenue, today's activity, bookings, classes, members, and pipeline.
+title: Home
+description: The first page you see in the admin - today's classes and to-dos, six overview metrics, your own earnings if you teach, and a checklist for growing your gym online.
+keywords:
+  - home
+  - dashboard
+  - today
+  - class roster
+  - online presence
+  - marketing
 ---
 
-The Dashboard is the first page you land on after signing into the admin. It pulls together the numbers you check most often (revenue, today's bookings, payment health, member growth, pipeline) into one scannable view, with a setup checklist at the top that disappears once you're fully configured.
+**Home** is the page you land on after signing in to the admin. It shows what needs attention today, how the gym is doing at a glance, and what is still left to set up to grow it. Owners, managers, front desk staff, and instructors all use the same page, and each person sees the sections their permissions allow.
 
-There's no "blank dashboard." All eight widgets are turned on by default, and you reorder them to match how you actually read the page.
+## When to use it
+
+- **Run the front desk.** Open **Today** in the morning to see every class still to come, the standalone court or area bookings, and who has already checked in. Open a class roster to check people in or add a walk-in without leaving the page.
+- **Catch problems early.** Memberships ending in the next two weeks and invoices past their due date appear in the same **Today** list, so you can follow up before a member lapses or a payment slips further.
+- **Check the numbers in one glance.** The overview metrics show revenue, today's activity, payments, bookings, customers, and website visitors, each with a small chart and a link to the full report.
+- **Finish setting up.** The **Grow** section lists the channels where members find and book your gym, and the marketing tools that bring them back, with a one-click next step on anything that is not live yet.
 
 ## What's on the page
 
-When you open **Dashboard**, you see two stacked sections:
+Sections appear top to bottom in this order. A section you can't see is left out entirely, so the page never shows empty placeholders.
 
-The **setup checklist** sits at the top while your organization still has required setup steps outstanding (Stripe connected, at least one gym created, branding configured, etc.). It shows progress and a list of what's left. Once everything is done, the checklist hides itself - you don't need to dismiss it manually.
+| Section | What it shows | Who sees it |
+| --- | --- | --- |
+| Greeting | Your first name and a one-sentence AI summary of the day | Everyone |
+| **Today** | Today's classes, standalone bookings, expiring memberships, and overdue invoices | Staff who can read classes, bookings, memberships, or invoices, and instructors |
+| Overview metrics | Six small charts: revenue, today's performance, payments, bookings, customer growth, and website visitors | Staff who can read gym analytics, once the gym has revenue or members |
+| **Monthly earnings** | What you earned teaching this month | Instructors who can see their own pay |
+| **Grow** | The **Online presence** and **Marketing** cards | Staff who can read organization settings, members, or marketing |
 
-Below the checklist, the **widget grid** lays out the eight dashboard widgets. The grid is responsive: one column on narrow screens, two columns on tablet widths, three columns on wider screens. Each widget pulls its own data, so a slow widget never blocks the rest of the page from rendering.
+The overview metrics sit three across on a wide screen, then two, then one as the window narrows. The **Grow** cards sit side by side on wide screens and stack on narrow ones. For what each overview chart measures, see [Home metrics](/dashboard/metrics).
 
-For a widget-by-widget breakdown of what each one shows and how it's wired, see [Dashboard widgets](/dashboard/widgets).
+### Greeting and day summary
 
-## Reordering widgets
+The line under **Hello** is a one-sentence AI summary of today: classes, bookings, check-ins, and anything worth a look, such as overdue invoices. It is scoped to you, so an instructor gets a summary of their own day, and it only includes money and membership figures you have permission to read.
 
-Click **Edit** in the top-right of the page to enter edit mode. The widgets become draggable. Pick one up and drop it where you want it. Click **Done** when you're finished and your layout sticks.
+If your organization has no revenue, members, or activity yet, the line reads **Let's set up your account.** instead. For the other AI features in the admin, see [AI assistants](/reference/ai-assistants).
 
-Two things to know about how the order is saved:
+## Today
 
-The order is stored **per browser, per device** in your local browser storage. It does not sync between your laptop and phone, and it does not follow your account if you sign in from a different browser. This is intentional - the dashboard is a personal view, and people generally want their work and home browsers configured differently.
+**Today** lists what is happening at the gym today, in time order. The section header shows how many standalone bookings there are today, and the details link next to it opens the [Schedule](/operations/schedule).
 
-When we ship a new widget, it slots in at its intended position in the grid (not at the end). You don't need to re-edit your layout to see new widgets - they show up the next time you open the page.
+Each row starts with an icon and a time, then a name and a short detail. Click a row to open the record behind it.
 
-You can't currently hide or remove widgets. If a widget isn't useful for your workflow, drag it to the bottom so it falls below the fold.
+| Row | What it shows | Click opens |
+| --- | --- | --- |
+| **Class** | Start time, class name, and spots taken out of capacity (for example `8/12`). A **View** button opens the roster. | The class |
+| **Booking** | Start time, the member, the area, and the amount charged | The booking |
+| **N more bookings** | Shown when there are more than five standalone bookings today | The bookings list |
+| **Expiring** | A membership that ends in the next 14 days, with the member, plan, and end date | Memberships |
+| **Overdue** | An unpaid invoice past its due date, with the member and the amount in red | The invoice |
 
-## What different roles see
+Classes and bookings drop off the list once they have ended, and cancelled bookings are not listed. When nothing is left, the list reads **Nothing scheduled for today**.
 
-Most users see the Dashboard described above. Two cases are different:
+The list is built from what you are allowed to read. Front desk staff who can read classes but not invoices, for example, see the timetable and bookings without the **Overdue** rows.
 
-**Instructor-only accounts** see a streamlined view focused on their classes, bookings, and earnings instead of the organization-wide widgets. The setup checklist and widget editing aren't shown - those are administrative tools.
+### Club and My classes
 
-**Mixed-role accounts** (someone who is both an instructor and a manager or admin) see a small toggle at the top of the page: **All** vs **My Activities**. **All** shows the full organization dashboard; **My Activities** shows the instructor-focused view. The toggle preference is per-session.
+If you teach classes and also have access to the whole gym's day, a **Club** / **My classes** switch appears in the **Today** header.
 
-## When numbers look off
+- **Club** shows the full list described above.
+- **My classes** shows only the classes you teach and the bookings assigned to you. Each row shows a status such as **Starts in 1h 30m**, **In progress**, or **Completed**, and opens your own performance page for that class or booking.
 
-Widget data is fetched live each time you open the page. There is no manual refresh button - reloading the page (or switching away and back) refetches everything.
+Your choice is remembered in this browser. Instructors who can only see their own schedule get the **My classes** list without a switch.
 
-If a widget shows zero where you expect activity, the usual culprits are:
+### Class roster
 
-- **Time zone**. "Today" and "this week" widgets use your organization's time zone, not your browser's. A booking that's "tomorrow" in your local time may already be "today" in the org's time zone (or vice versa).
-- **Club scoping**. Some widgets (Today's Performance, in particular) accept a club filter. If you've set it to a specific club, members or bookings at other clubs are excluded.
-- **Permissions**. Roles below admin may not be able to read the data behind certain widgets. The widget renders, but the numbers are blank.
+Click **View** on a class row to open its roster in a side panel. The header keeps the class name and time in view and counts arrivals, for example **6 of 12 checked in**. The roster lists everyone in the class: members who booked, and walk-ins who were checked in without a booking. Members move to the bottom as they check in, so the people still to arrive stay at the top.
 
-If you've ruled those out and the data still looks wrong, check the underlying report (most widgets link out to a full Analytics page) - the report shows the same query unfiltered and is the source of truth.
+Each attendee shows their name, what covers their place (a membership or plan name, or **Drop In**), and an indicator when they owe money or still need to sign a required waiver. Row actions:
+
+- **Check In** - records the member's arrival. You can check people in from one hour before the class starts until the end of the gym's day, unless your role may check in at any time.
+- **Cancel check-in** - click the checked-in mark to take a check-in back. If you recorded it yourself, you can undo it for a short time afterwards. Staff with permission to delete check-ins can take one back at any time, but a check-in that took a payment has to be refunded by a manager first.
+- **Assess** - opens the member's score card for this session. See [Assessments](/members/assessments).
+- **Send message** - writes to the member.
+- **Cancel** - cancels the member's booking. Bookings made through a partner platform can't be cancelled here.
+
+Use **Search members…** to find someone on a long roster, and **Add attendee** to sell a place to a walk-in. **Add attendee** is unavailable when the class is full or outside the check-in window.
+
+Which actions you see depends on your permissions. Instructors get the same roster for the classes they teach.
+
+## Monthly earnings
+
+Instructors who can see their own pay get a **Monthly earnings** section. It shows what you earned teaching this month and never the gym's revenue, so a manager who also teaches sees their own pay here and the gym's numbers in the overview metrics.
+
+The card shows the month's total and one bar per day. The solid part of each bar is paid and the pale part on top is still pending, so a bar's height is the work you did and its color is the money collected so far. Today's bar is drawn wider. Below the chart are four figures: **Classes**, **Standalone bookings**, **Days worked**, and **Avg / day**.
+
+Use the arrows to move between months. Click a day's bar to open **Payment details**, which lists the classes and bookings behind that day with each one's amount and whether it is paid, pending, or partly paid.
+
+## Grow
+
+The **Grow** section holds two checklist cards. Each row is one channel or tool, with a status chip when it is live and one next step: open it when it is live, or set it up when it is not. Rows that are not live yet look muted.
+
+### Online presence
+
+**How members find you**
+
+- **AI visibility report** - the score out of 100 from your latest [business audit](/marketing/business-audit), and when it was checked. Click **View report** to open it, or the re-run button to check again. If you have never run one, click **Check**, find your gym by name, and click **Analyze**.
+- **Marketplace** - whether your gyms are listed on the [1club Marketplace](/marketing/marketplace). With several gyms, the row shows how many are listed; expand it to see each gym's status. Click **Publish** to list the rest.
+
+**Where they book**
+
+- **Website** - your [website](/content/website) address once it is published. Click **Publish** if you have a draft, or **Set up** if you have no website yet.
+- **Member portal** - the [member portal](/settings/member-portal) address once it is on, or **Set up** to turn it on.
+- **Mobile app** - your members book in the 1club app. The details link opens the app's settings.
+
+If you can see the AI visibility report but not the other channels, the card is titled **AI visibility report** and shows only that row.
+
+### Marketing
+
+**Your reputation**
+
+- **Reviews** - your average rating, the number of reviews, and how many are verified. The details link opens [Reviews](/content/reviews).
+- **Review request** - whether members are asked for a review two hours after they check in. Click **Turn on** to switch it on: the review request automation is created if needed, turned on, and opened so you can see its steps. If your plan doesn't include custom automations, the button reads **Go to automations** instead. If no [booking policy](/operations/booking-policies) checks members in automatically, a note under the row reminds you to turn on auto check-in, since a request is only sent after a check-in.
+
+**Bring members back**
+
+- **Promotions** - opens [Promotions](/marketing/promotions).
+- **Automations** - how many of your own [automations](/marketing/automations) are running. Built-in system automations are not counted.
+
+Staff who can read marketing but not manage it only see the **Review request** row once requests are already on.
+
+## Troubleshooting
+
+**A section is missing.** Sections follow your permissions. The overview metrics need permission to read gym analytics, and only appear once the organization has revenue or members. **Monthly earnings** needs your user to be linked to an instructor and allowed to see their own pay. See [Roles and permissions](/reference/roles-permissions).
+
+**Today looks shorter than expected.** Classes and bookings that have already ended are removed from the list, and rows you aren't allowed to read, such as overdue invoices, are left out.
+
+**Today starts or ends at the wrong time.** "Today" follows your organization's time zone, not your computer's.
+
+**Numbers don't update.** **Today's performance** refreshes every five minutes. Everything else reflects the moment the page loaded, so reload the page to fetch fresh data.
 
 ## Related
 
-- [Dashboard widgets](/dashboard/widgets) - What each widget shows and how it's configured.
-- [Analytics overview](/analytics/overview) - The full reports the widgets link out to.
+- [Home metrics](/dashboard/metrics) - What each of the six overview charts shows.
+- [Schedule](/operations/schedule) - The rest of the day and beyond.
+- [Analytics overview](/analytics/overview) - The reports the overview metrics link to.
 - [Roles and permissions](/reference/roles-permissions) - Who can see what.

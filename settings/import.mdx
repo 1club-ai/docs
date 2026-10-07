@@ -1,12 +1,12 @@
 ---
 title: Data import
-description: Import members, memberships, plans, classes, bookings, invoices, and transactions from CSV under Settings > Data Tools > Import, with AI-assisted column mapping, a validated preview, and a controlled execute step.
+description: Import members, memberships, plans, classes, bookings, invoices, and charges from CSV under Settings > Data Tools > Import, with AI-assisted column mapping, a validated preview, and a controlled execute step.
 keywords: [data import, CSV import, import members, AI import, field mapping, bulk import, migrate from legacy system, preview import]
 ---
 
 Data import brings your existing records into 1Club from CSV files - usually when you move your gym over from another system or a spreadsheet. It runs as a four-step wizard: pick what you are importing, upload the file, review a validated preview, then execute. An AI analyzer can detect the record type and map your columns for you, so a file exported from another system usually imports without hand-editing the headers.
 
-You can import seven record types: members (contacts), memberships, plans, classes, bookings, invoices, and transactions. Files must be CSV and up to 10 MB.
+You can import seven record types: members (contacts), memberships, plans, classes, bookings, invoices, and charges. Files must be CSV and up to 10 MB.
 
 ## When to use it
 
@@ -17,7 +17,7 @@ Typical uses:
 - **Migrating members with their memberships** - a padel and tennis gym imports one members file that also creates each member's session-based membership, with sessions already used, and adds children as household dependents.
 - **Plans first, then the people on them** - a martial-arts gym imports its belt-progression plans, then a members file that references those plans by name so each student lands on the right package.
 - **Carrying over class credits** - a Pilates studio imports one-time class-pack memberships with the pack size, so their remaining class credits carry over.
-- **Bringing in past sales** - a climbing gym imports its past day-pass transactions, keyed by the member's email.
+- **Bringing in past sales** - a climbing gym imports its past day-pass charges, keyed by the member's email.
 
 See [Worked example: migrating from a legacy system](#worked-example-migrating-from-a-legacy-system) and [Other vertical examples](#other-vertical-examples) for the details.
 
@@ -36,7 +36,7 @@ Because records reference each other, import them in dependency order. The wizar
 5. Bookings
 6. Invoices
 
-Transactions can be imported on their own or created as part of a chained member import. Before importing, make sure your **Clubs**, **Areas**, and **Instructors** already exist, because classes and bookings reference them by name or email.
+Charges can be imported on their own or created as part of a chained member import. Before importing, make sure your **Clubs**, **Areas**, and **Instructors** already exist, because classes and bookings reference them by name or email.
 
 ### Step 1 - Select entity
 
@@ -50,7 +50,7 @@ You have two paths on this step.
 
 If the detection looks right, continue and the mapping is applied automatically. If it is off, you can still pick the record type manually below.
 
-**Manual selection.** Choose one of the record-type cards (Members, Plans, Memberships, Classes, Bookings, Invoices, Transactions). Each card shows a short description of what it imports.
+**Manual selection.** Choose one of the record-type cards (Members, Plans, Memberships, Classes, Bookings, Invoices, Charges). Each card shows a short description of what it imports.
 
 ### Step 2 - Upload file
 
@@ -68,7 +68,7 @@ Invalid rows are never imported. Only valid rows are written when you execute, s
 
 Executing writes the valid rows to your organization. The results screen reports **Total Rows**, **Imported**, **Skipped**, and **Errors**, and lists the first several row-level errors if any occurred. Use **Import another** to start a fresh import.
 
-For **membership** imports, executing first opens a short dialog asking whether to mark the associated transactions as paid. If you tick **Mark as paid**, you choose a payment type: **Cash**, **Check**, **Bank Transfer**, or **Other**.
+For **membership** imports, executing first opens a short dialog asking whether to mark the associated charges as paid. If you tick **Mark as paid**, you choose a payment type: **Cash**, **Check**, **Bank Transfer**, or **Other**.
 
 ## Field mapping and templates
 
@@ -82,7 +82,7 @@ Each record type has a fixed set of expected fields. The template download gives
 | Classes | `clubName`, `instructorEmail`, `name`, `description`, `price`, `maxCapacity`, `startTime`, `endTime`, `sport`, `status`, `isFree` |
 | Bookings | `contactEmail`, `clubName`, `areaName`, `className`, `startTime`, `endTime`, `status`, `totalPrice`, `notes` |
 | Invoices | `contactEmail`, `invoiceNumber`, `invoiceDate`, `dueDate`, `status`, `subtotal`, `taxAmount`, `totalAmount`, `notes`, `description`, `quantity`, `unitPrice` |
-| Transactions | `contactEmail`, `amount`, `date`, `description`, `paymentStatus`, `transactionType`, `currency`, `taxAmount`, `totalAmount` |
+| Charges | `contactEmail`, `amount`, `date`, `description`, `paymentStatus`, `transactionType`, `currency`, `taxAmount`, `totalAmount` |
 
 Useful conventions the importer follows:
 
@@ -90,13 +90,13 @@ Useful conventions the importer follows:
 - **Custom fields** - for member imports, any column whose header starts with `custom_` is treated as a contact custom field automatically. Do not map those to standard fields.
 - **Tags** - `tags` takes a comma-separated list, for example `Open day, Lead`. A tag that does not exist yet is created as a manual tag, so you do not have to set your tags up before importing. To tag a whole upload at once, put the same value in the `tags` column of every row.
 - **Dates** - accepted formats are `dd.MM.yyyy`, `dd.MM.yyyy HH:mm:ss`, `yyyy-MM-dd`, `yyyy-MM-dd HH:mm:ss`, and ISO-8601. A row with an unparseable date is flagged in the preview.
-- **Transactions default to paid**, using your organization currency when none is given.
+- **Charges default to paid**, using your organization currency when none is given.
 
 ## Chained member import
 
 A member import is more than contacts. When the extra columns are present on a member row, the same row can also create related records in one pass:
 
-- **A transaction** - `transactionAmount`, `transactionDate`, `transactionDescription`, `transactionPaymentStatus`, `transactionType`, `transactionCurrency`, `transactionTaxAmount`, `transactionTotalAmount`.
+- **A charge** - `transactionAmount`, `transactionDate`, `transactionDescription`, `transactionPaymentStatus`, `transactionType`, `transactionCurrency`, `transactionTaxAmount`, `transactionTotalAmount`.
 - **A membership** - `planName`, `membershipStartDate`, `membershipEndDate`, `membershipStatus`, `membershipPrice`, `membershipBillingFrequency`, `membershipAutoRenew`, `membershipSignupFee`, plus session totals `membershipMaxUses`, `membershipUsed`, `membershipUsesRemaining`.
 - **A wallet credit** - `wallet`, a decimal amount credited to the member's wallet.
 - **Household dependents** - `dependent`, a comma-separated list of dependent names (for example children or minors) added under this member's household.
@@ -106,7 +106,7 @@ A member import is more than contacts. When the extra columns are present on a m
 Members are matched by email within your organization. If a row's email already exists:
 
 - The existing member is reused, not recreated.
-- The transaction, wallet credit, notes, tags, and custom fields on that row are skipped, so re-running an import does not double-charge or double-note anyone. This also means an import cannot add tags to members who are already in your organization - tag those from their profile instead.
+- The charge, wallet credit, notes, tags, and custom fields on that row are skipped, so re-running an import does not double-charge or double-note anyone. This also means an import cannot add tags to members who are already in your organization - tag those from their profile instead.
 - A membership or dependents on that row are still attached to the existing member. This is how you deliberately import several rows for the same member (one per membership) or add family members to an existing account.
 
 Memberships themselves are de-duplicated by member, plan, and start date, so the same membership row imported twice is not duplicated.
@@ -148,7 +148,7 @@ Because members were matched by email, running the same file again would reuse e
 | Rows flagged as invalid dates | The date is not in a supported format | Use `dd.MM.yyyy`, `yyyy-MM-dd`, a variant with time, or ISO-8601 |
 | Member rows rejected for no name | Neither `name` nor `firstName` is present | Provide `name` (full) or `firstName` (and optionally `lastName`) |
 | Fewer records imported than expected | Invalid rows are skipped on execute | Fix the rows flagged in the preview and re-import |
-| Re-import did not re-add transactions | The member already exists (matched by email) | Expected behavior - existing members are reused and their transactions and notes are not re-run |
+| Re-import did not re-add charges | The member already exists (matched by email) | Expected behavior - existing members are reused and their charges and notes are not re-run |
 | The `tags` column did not tag anyone | Those members already existed, so the row's tags were skipped | Tags apply only to members the import creates. Add the tags from the member's profile, or use a smart tag rule for an ongoing group |
 | Contact import blocked | Bulk contact import requires a paid plan (trials are allowed) | Upgrade your 1Club plan, or import during your trial |
 | Membership import blocked | It would exceed your active-member quota | Free up capacity or upgrade your 1Club plan |

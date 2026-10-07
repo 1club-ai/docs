@@ -1,0 +1,347 @@
+---
+title: Charges
+description: What each payer owes for every booking, membership, signup fee, and product sale, and how charges relate to payments and invoices - charge saved cards or add payments in bulk, send myPOS links, refund what was paid, and void what was not.
+keywords:
+  [
+    charge,
+    charges,
+    transaction,
+    transactions,
+    amount due,
+    reversal,
+    ledger,
+    batch charge,
+    add payment,
+    bulk payment,
+    void,
+    bulk void,
+    void tab,
+    refund,
+    outstanding balance,
+    myPOS payment link,
+    overdue,
+    payment status,
+  ]
+---
+
+A charge is what a payer owes for one thing: a booking, a membership period or signup fee, a product, a check-in, a cancellation charge, or a settlement. Every chargeable event in 1Club writes exactly one charge. Money that comes in is recorded separately as a [payment](/sales/payments), so one charge can be paid by several payments (a deposit then a balance), and one payment can pay several charges at once.
+
+<Note>
+  Charges were called **Transactions** in earlier versions of the admin and
+  member apps. The [Platform API](/api-reference/introduction) and the
+  [MCP tools](/mcp/tools) still call this record a transaction
+  (`/v1/platform/transactions`, `list_transactions`).
+</Note>
+
+## When to use it
+
+**Charges** lists everything owed across the organization, filterable by status, contact, membership, booking, revenue account, and date range. Each row shows what is still owed after succeeded payments, so you always know the real figure to collect. Owners and staff who handle billing use it to collect balances one by one or in bulk, wrap a charge into an invoice, void what should never have existed, and add an ad-hoc charge that has no booking or membership behind it.
+
+Typical uses:
+
+- **Charging a clinic roster after the session** - a padel gym selects every pending booking from its weekly clinic and charges each player's saved card in one batch.
+- **Recording cash for a group of drop-ins** - a jiu-jitsu gym settles six open-mat visitors who paid cash at the desk with a single manual payment action.
+- **Collecting from a member with no card on file** - a yoga studio emails a myPOS payment link for a membership started over the phone, and the charge is paid when the member pays.
+- **Clearing charges nobody paid** - after a rained-off tournament, you void thirty unpaid entry charges in one go and refund the few members who had already paid.
+
+See [Worked examples](#worked-examples) for the steps behind each of these.
+
+## Charges, payments, invoices, and reversals
+
+These are different records, and the distinction drives everything on this page:
+
+- A **charge** is what is owed: it says a contact owes an amount for one thing. It carries a **Payment status** but never moves money on its own.
+- A **payment** is money that came in: it says money was collected (or refunded), how, and when. One charge can be paid by several payments, and one payment can pay several charges.
+- An **invoice** is a document issued over one or more charges, with a number and a due date. Not every charge is invoiced.
+- A **reversal** is a negative charge that cancels all or part of another charge, for example when a booking is cancelled. It is different from a refund, which returns money from a payment, and from voiding, which closes an unpaid charge that should never have been owed.
+
+So "recording a payment" and "the charge becoming paid" are two steps: you record a payment, and its outcome then drives the charge's status (see [How payment status flows](#how-payment-status-flows)). This is why a charge can sit at `partially_paid`, and why voiding a charge does not touch any money that was already collected against it.
+
+The unresolved statuses (`pending`, `partially_paid`, `overdue`, and `failed`) add up to the contact's amount due. The closed statuses are `paid`, `settled`, `refunded`, `void`, and `cancelled`.
+
+## Anatomy of a charge
+
+Open the page at **Sales** > **Finance** > **Charges** (`/billing/charges` in the admin; the old `/billing/transactions` address redirects there). The grid pages on the server and is tab-filtered into **All**, **Pending**, **Overdue**, **Paid**, and **Void**, with a live count badge on each tab.
+
+**Void has its own tab, and voided rows are excluded from All.** Voided charges are not owed and not revenue, so leaving them in the default view inflated every count and total you read off the page. They are still there for audit whenever you need them - just one tab across.
+
+Each row carries:
+
+- **Date** of the obligation.
+- **Type** (`booking_creation`, `booking_cancellation`, `membership_creation`, `membership_recurrence`, `membership_signup_fee`, `membership_cancellation`, `product_sale`, `external_program_entry`, `checkin_creation`).
+- **Description** describing what was billed.
+- **Contact** the charge is against.
+- **Amount**, **Tax amount**, **Total amount**, and **Currency** (the organization currency at the time of creation).
+- **Payment status**: `pending` (shown as **Unpaid**), `paid`, `void`, `failed`, `settled`, `overdue`, `partially_paid`, `refunded`, or `cancelled`.
+- **Remaining balance** - what is still owed after succeeded payments and any mid-flight membership discount are subtracted. This is the number the Add payment dialog defaults to, so the column and the dialog agree row for row.
+- **Invoiced** flag. Once a charge has been wrapped into an invoice (manually or by a bill run), this is `true` and the obligation will not be picked up by future bill runs.
+- Optional foreign keys to a **booking**, **membership**, **product**, **external program**, **tax rate**, and **revenue account**.
+- Optional **parent / child** links, used to chain related entries together (for example a `booking_cancellation` reversal referencing the original `booking_creation` charge).
+
+Zero-amount charges are auto-marked `paid` at creation, so a free booking still produces a charge but it never blocks anything.
+
+## How charges get created
+
+Most of the time you won't create charges by hand. They arrive when:
+
+- Someone is **booked** into a class, an area, or with an instructor. The booking flow writes the charge at the price implied by the membership or the override.
+- Someone **buys a plan**. You get `membership_creation` plus, when applicable, `membership_signup_fee`.
+- A **recurring membership period rolls over**. The hourly `recurring-transactions` job writes the next `membership_recurrence` charge, and (when the plan requires payment upfront and a default card exists) attempts to charge it.
+- A booking is **cancelled** with a refund or charge policy. You get a `booking_cancellation` reversal linked to the original charge.
+- A **product** is sold through the Point of Sale.
+
+### Creating one by hand
+
+To record an ad-hoc charge that doesn't correspond to a booking or membership:
+
+1. On **Sales** > **Finance** > **Charges**, click **Add** in the page header.
+2. Pick the **Contact**, enter the **Amount**, and optionally a **Description** and **Revenue account**.
+3. Save. The charge is created `pending` (unless the amount is zero, which auto-marks it `paid`).
+
+## Row actions
+
+Open a row's action menu (or use the details page) for the following. Which actions appear depends on the charge's status:
+
+- **Add payment** - available while the charge is still collectible: `pending`, `overdue`, `partially_paid`, or `failed`. Opens the payment dialog, where you pick a payment method (manual or Stripe) and record the settlement. The default amount is the row's remaining balance.
+- **Refund** - available once money has been collected. Returns it to the card, the member's wallet, or by hand. See [Refunds](/sales/payments#refunds).
+- **Send myPOS payment link** - available when myPOS is connected for the organization AND the status is `pending`, `overdue`, or `partially_paid`. Emails the customer a secure link. See [Sending a myPOS payment link](#sending-a-mypos-payment-link).
+- **Add invoice** - available when the charge hasn't been invoiced yet, has a contact, and isn't `void`. Wraps the single charge into a new one-line invoice and navigates to the invoice page.
+- **Void** - available only while **nothing has been collected**: `pending`, `overdue`, or `failed`. Marks the charge `void` so it stops showing as owed and stops being picked up by bill runs. Voiding is a soft delete - the row remains for audit.
+- **View** - opens the details page.
+
+### Which action applies at which status
+
+Collect and void are governed by two deliberately different lists. Void is the narrower one, because voiding a charge that took money would erase a real sale and strand the customer's funds.
+
+| Status           | Add payment | Void | Refund |
+| ---------------- | ----------- | ---- | ------ |
+| `pending`        | yes         | yes  | no     |
+| `overdue`        | yes         | yes  | no     |
+| `failed`         | yes         | yes  | no     |
+| `partially_paid` | yes         | no   | yes    |
+| `paid`           | no          | no   | yes    |
+| `refunded`       | no          | no   | no     |
+| `settled`        | no          | no   | no     |
+| `cancelled`      | no          | no   | no     |
+| `void`           | no          | no   | no     |
+
+`failed` stays collectible on purpose: a charge attempt that failed leaves the balance owed, and retrying it or taking cash instead is exactly what you do next.
+
+`settled` rows are closed and reconciled. Some of them are reversals carrying a negative amount, so they are kept out of the collectible list to stop anyone recording a payment against a reversal.
+
+## Batch actions
+
+Select rows with the checkboxes in the grid to unlock the header batch actions. All three are best-effort: a per-row failure is reported in the results and does not block the other rows.
+
+Every batch action reports why each skipped row was skipped, using a consistent set of reasons: **Charge not found**, **Belongs to another organization**, **Already paid**, **Void**, **No remaining balance**, **Already voided**, **Paid - refund it instead of voiding**, and **Closed - nothing owed**.
+
+### Charge saved card (Stripe)
+
+**Charge saved card** calls Stripe for every selected charge's contact, charging their **default saved payment method**. A confirmation dialog first warns that this will charge the default payment method on file for each customer.
+
+For each selected row the batch:
+
+- **Skips** rows that are not collectible, rows with no contact, rows that already have a `pending`/`processing` payment in flight, and rows where the contact has no default payment method on file.
+- **Charges the outstanding balance**, not the gross amount. A partially paid charge is collected only for what remains, so a member who has already paid half is not billed the full amount again.
+- Uses an idempotency key built from the charge ID and the current date (`batch-charge-txn-<id>-<date>`), so rerunning the batch on the same day won't double-charge.
+
+When it finishes, a **Batch Payment Results** dialog summarizes how many succeeded, failed, and were skipped, with the reason for each failure (no payment method, charge declined, and so on).
+
+<Note>
+  Batch **Charge saved card** only works for customers who have a saved Stripe card. For
+  customers without one, use **Send myPOS payment link** (so they pay on their
+  own device) or collect at the desk and use **Add payment**.
+</Note>
+
+### Add payment
+
+**Add payment** opens the payment dialog for every eligible selected charge. The dialog shows how many charges across how many contacts, the **Total to record**, and how many selected rows will be skipped (already paid or void). What it records depends on the selection:
+
+- **One contact, one currency** - a single payment for the combined remaining balance. The amount is fixed to that total, and you pick any payment method the contact can pay with, such as cash, a saved card, or their wallet.
+- **Several contacts or currencies** - one payment per charge, each for that charge's own remaining balance, because a payment has one payer and one currency. Only manual payment methods (cash, bank transfer, etc.) are offered.
+
+1. Select the charges and click **Add payment**.
+2. Check the summary and the **Total to record**.
+3. Pick the **Payment method**. A manual method also asks for the **Payment date**.
+4. Click **Save**.
+
+Rows are skipped and counted in the result when the charge is not found, belongs to another organization, is already paid, is void or otherwise closed, or has no remaining balance. To charge several customers' saved cards at once, use **Charge saved card** instead.
+
+### Void
+
+**Void** closes out every selected charge that has taken no money. The confirmation is explicit about the consequences:
+
+> Void {count} selected charges? Voided charges are excluded from revenue and bill runs, and this cannot be undone.
+
+Rows that have been paid are **skipped, not voided**, and the dialog tells you before you confirm:
+
+> {count} selected charges will be skipped: they have been paid, so they need a refund instead of a void.
+
+A **Void results** dialog then lists what happened per row. Use this for a batch of charges that should never have existed - a duplicated import, a clinic that was cancelled before anyone paid. For anything already collected, refund it instead.
+
+## Sending a myPOS payment link
+
+When your organization has [myPOS](/settings/integrations/mypos) connected, you can email a customer a secure link to pay a charge on their own device instead of charging a card yourself. This is ideal when there's no card on file and the customer isn't at the desk.
+
+The **Send myPOS payment link** row action appears only when myPOS is active and the charge status is `pending`, `overdue`, or `partially_paid`. Closed states (`paid`, `void`, `refunded`, `cancelled`, `failed`, `settled`) don't offer it.
+
+1. From the charge's action menu, choose **Send myPOS payment link**.
+2. The dialog shows the reference (the description, or `#<id>`), the amount, and the contact's name and email.
+3. Click **Send link**. 1Club generates a link and emails it to the contact's address on file.
+
+Behind the scenes, sending is a two-step call: the server first generates a stateless link (a JWT-backed `/pay/<token>` URL on your member-facing site) and then emails it. The customer opens the link on any device and pays through myPOS hosted checkout; the myPOS notification (IPN) marks the charge paid. The link is **valid for 7 days**.
+
+For the link to generate, the charge must be payable (not paid or void), have a positive total amount, and resolve a currency from the charge or the organization. For the email to send, the contact must have an email address on file.
+
+## Charge details
+
+The **Charge Details** page opens at `/billing/charges/<id>`. Beyond the same fields shown in the grid, the details page exposes:
+
+- A **payments** list: each payment linked to this charge with amount, status, and date, each linking to the payment.
+- The full tax breakdown when a tax rate applied (rate name, percentage, description).
+- **Recurrence info** for `membership_recurrence` charges: auto-renew flag, billing frequency, and the period start/end dates.
+- The linked **booking** or **membership** as a clickable card.
+- A **Related charges** card showing the parent and any children, so you can trace a cancellation reversal back to the original booking charge or follow a chain of recurring periods.
+
+## How payment status flows
+
+When a payment is recorded, its outcome determines the charge's new status:
+
+| Payment outcome      | Charge status    |
+| -------------------- | ---------------- |
+| `succeeded`          | `paid`           |
+| `failed`             | `pending`        |
+| `cancelled`          | `pending`        |
+| `refunded`           | `refunded`       |
+| `partially_refunded` | `partially_paid` |
+
+A successful payment also flips any pending booking on that charge to `confirmed`.
+
+The hourly job that processes recurring memberships also runs a sweep that flips any `pending` charge with a date in the past to `overdue` (start of UTC day). `overdue` is treated as a flavor of `pending` when invoice status is derived.
+
+## Worked examples
+
+### Batch-charging a padel clinic roster
+
+You run a weekly paid padel clinic. Everyone who booked has a card on file, and you charge the group after the session.
+
+1. On **Sales** > **Finance** > **Charges**, open the **Pending** tab and search for the clinic by description (or filter by the class).
+2. Select all the roster's `booking_creation` rows with the checkboxes.
+3. Click **Charge saved card** and confirm.
+4. Read the **Batch Payment Results**: successes flip to `paid`, and any "No payment method on file" or "charge declined" rows tell you exactly who to follow up with.
+
+If you rerun the batch later the same day to retry the failures, the idempotency key prevents double-charging anyone who already succeeded.
+
+### Recording cash for a jiu-jitsu drop-in cohort
+
+A group of visitors dropped in for an open-mat jiu-jitsu session and paid cash at the desk. Their bookings created `pending` charges.
+
+1. Select the drop-in charges in the grid.
+2. Click **Add payment**.
+3. Confirm the summary (for example "6 charges across 6 contacts" and "Total to record: 90.00"), pick **Cash** as the **Payment method**, set today's **Payment date**, and click **Save**.
+
+Because the drop-ins are different contacts, each eligible row gets its own payment for its full remaining balance, in one action. Any already-paid rows in your selection are safely skipped and counted.
+
+### Sending a myPOS link for a yoga membership balance
+
+A member started a Pilates/Yoga plan over the phone but has no card on file. Their `membership_creation` charge is `pending`.
+
+1. Open the charge's action menu and choose **Send myPOS payment link**.
+2. Confirm the amount and the member's email, then click **Send link**.
+3. The member gets an email, taps the link on their phone, and pays through myPOS. The charge is marked paid automatically when myPOS confirms - no further action at the desk.
+
+### Voiding an erroneous charge
+
+A front-desk error created a duplicate signup fee for a new climbing member.
+
+1. Open the charge. If nothing was collected, **Void** is offered in the row action menu; if money was taken, it is not, and **Refund** is the correct action instead.
+2. Choose **Void** and confirm.
+3. The charge moves to `void`: it stops counting as owed, is excluded from bill runs and revenue, and drops out of the **All** tab. Find it later under the **Void** tab - the row stays in the ledger for audit.
+
+### Clearing a batch of charges nobody paid
+
+A rained-off tournament left thirty unpaid entry charges on the ledger.
+
+1. Filter to the **Pending** tab and select the affected rows.
+2. Click **Void** in the header and read the confirmation: any row that has been paid is listed as skipped, needing a refund instead.
+3. Confirm. The **Void results** dialog shows what was voided and what was skipped, so you can refund the handful of members who had already paid.
+
+## Tips & best practices
+
+- **Filter before you batch.** Use the **Pending** and **Overdue** tabs plus search to select exactly the right rows. Batch actions act on your whole selection.
+- **Pick the right collection tool.** Card on file -> **Charge saved card**. Customer not present, no card -> **Send myPOS payment link**. Paid in person -> **Add payment**.
+- **Trust the remaining balance column.** It already nets out succeeded payments and mid-flight membership discounts, so it is the true figure to collect - not the gross total.
+- **Retry failures the same day freely.** The batch charge idempotency key is scoped to the charge and the date, so a same-day rerun only charges rows that haven't succeeded yet.
+- **Void what was never paid, refund what was.** Voiding preserves the audit trail and is only offered while nothing has been collected. The moment money has moved, **Refund** is the only correct action - and 1Club will not let you void your way around it.
+- **Read totals off a tab, not off All.** Void rows are excluded from **All** so the counts and totals you see are real. If a figure looks short, check whether you are expecting voided charges to be in it.
+- **Reconcile through invoices when a customer needs a document.** Use **Add invoice** on a single row, or a [bill run](/sales/bill-runs) to sweep many pending charges at once.
+
+## Troubleshooting
+
+**Issue**: Batch **Charge saved card** skipped a customer with "No payment method on file."
+
+**Cause**: That contact has no default saved Stripe card. Batch charge can only use a stored default method.
+
+**Fix**: Ask the customer to add a card, use **Send myPOS payment link** so they pay on their own device, or collect at the desk and use **Add payment**.
+
+**Issue**: A batch charge row failed with "charge declined."
+
+**Cause**: Stripe declined the card (insufficient funds, expired, etc.).
+
+**Fix**: Follow up with the customer to update their card, then rerun the batch (same-day reruns won't double-charge the ones that succeeded).
+
+**Issue**: The **Send myPOS payment link** action isn't showing on a charge.
+
+**Cause**: Either myPOS isn't connected for the organization, or the charge isn't in a payable state (`pending`, `overdue`, or `partially_paid`).
+
+**Fix**: Confirm myPOS is connected under [**Settings** > **Integrations** > **myPOS**](/settings/integrations/mypos). If the charge is `paid`, `void`, `refunded`, or `cancelled`, there is nothing to collect.
+
+**Issue**: Sending a myPOS link failed with an email error.
+
+**Cause**: The contact has no email address on file.
+
+**Fix**: Add an email to the contact's profile, then resend. To generate a link, the charge also needs a positive amount and a resolvable currency.
+
+**Issue**: **Add payment** shows no payment methods to pick for a selection.
+
+**Cause**: The selection spans several contacts or currencies, so each charge gets its own manual payment, and no manual-channel payment method (cash, bank transfer, etc.) is configured. To charge saved cards across several customers, use **Charge saved card**.
+
+**Fix**: Configure a manual payment method in settings, then retry.
+
+**Issue**: **Void** isn't offered on a charge I want to write off.
+
+**Cause**: Money has been collected against it. Voiding a charge that took money would erase a real sale and leave the customer's funds stranded, so it is blocked once the status is `partially_paid` or `paid`.
+
+**Fix**: Use **Refund** instead and choose where the money goes. See [Refunds](/sales/payments#refunds).
+
+**Issue**: A bulk void skipped some of my selected rows.
+
+**Cause**: Those rows have been paid. The confirmation dialog lists them before you commit: "they have been paid, so they need a refund instead of a void."
+
+**Fix**: Void the unpaid rows, then refund the paid ones individually.
+
+**Issue**: My **All** tab total is lower than I expected.
+
+**Cause**: Voided charges are deliberately excluded from **All**, because they are neither owed nor revenue.
+
+**Fix**: Check the **Void** tab if you need to see them. If a figure genuinely looks wrong, confirm you are not expecting voided charges to be counted.
+
+**Issue**: **Add payment** isn't available on a `settled` charge.
+
+**Cause**: `settled` rows are closed and reconciled, and some are reversals with a negative amount. They are kept out of the collectible list so nobody can record a payment against a reversal.
+
+**Fix**: If money is genuinely owed, add it as a new charge.
+
+**Issue**: A `cancelled` charge still appears to be owed somewhere.
+
+**Cause**: The member-facing outstanding charges query treats anything not `paid` as payable, so a `cancelled` row can surface until it's explicitly excluded.
+
+**Fix**: Void the row if it should stop counting as owed, or ignore it in outstanding views.
+
+## Related
+
+- [Payments](/sales/payments) - the money that came in to pay charges.
+- [Invoices](/sales/invoices) - how to issue a sendable document over charges.
+- [Bill runs](/sales/bill-runs) - sweeping pending charges into invoices in bulk.
+- [myPOS](/settings/integrations/mypos) - connect myPOS hosted checkout to enable payment links.
+- [Booking policies](/settings/booking-policies) - decides when a booking's charge is created and when it must be paid.

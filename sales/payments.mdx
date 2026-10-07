@@ -19,7 +19,7 @@ keywords:
   ]
 ---
 
-The **Payments** tab is the record of every payment your organization has taken - manual payments logged by staff, card payments captured by a provider, and wallet credit applied at checkout. Use it to see what has been collected, which method was used, who recorded it, and to issue refunds. A payment settles one or more [transactions](/sales/transactions); the payment carries an amount, a method, a status, and a link to the transactions it paid. Front-desk staff record the money they take at the counter, and owners and admins review payments and issue refunds.
+The **Payments** tab is the record of every payment your organization has taken - manual payments logged by staff, card payments captured by a provider, and wallet credit applied at checkout. Use it to see what has been collected, which method was used, who recorded it, and to issue refunds. A payment pays one or more [charges](/sales/charges) (what is owed); the payment carries an amount, a method, a status, and a link to the charges it paid. Front-desk staff record the money they take at the counter, and owners and admins review payments and issue refunds.
 
 ## When to use it
 
@@ -36,7 +36,7 @@ See [Worked examples](#worked-examples) for the details of each.
 
 ## The payment list
 
-Use **Sales** > **Finance** > **Payments** to review payments, filter by status, and drill into a single payment. A payment's details show its amount, method, status, the linked transactions, the **Created by** admin, and any provider references (for example a Stripe payment intent).
+Use **Sales** > **Finance** > **Payments** to review payments, filter by status, and drill into a single payment. A payment's details show its amount, method, status, the linked charges, the **Created by** admin, and any provider references (for example a Stripe payment intent).
 
 Open **Sales** > **Finance** > **Payments**. The grid shows these columns:
 
@@ -52,10 +52,9 @@ Tabs across the top filter by status: **All**, **Succeeded**, **Pending**, and *
 The **Created by** column shows the admin who recorded the payment. For payments captured automatically by a provider (online checkout, automatic membership renewals), the column is empty - those are system-recorded. For manually recorded payments (front desk, phone, bank transfer logged by staff), it shows the admin's name.
 
 <Note>
-  The standalone **Transactions** column has been removed from the payments
-  grid. To see the transactions linked to a payment, open the payment details.
-  The full transaction history is still available on
-  [Transactions](/sales/transactions).
+  The payments grid has no column for linked charges. To see the charges a
+  payment paid, open the payment details. Every charge is listed under
+  [Charges](/sales/charges).
 </Note>
 
 ## Payment status
@@ -76,9 +75,9 @@ Most manual payments are recorded as part of a flow rather than from a blank for
 
 - **Amount** - How much is being paid.
 - **Payment method** - Which configured method the money came in on (see [Payment methods](/settings/payment-methods)).
-- **What it settles** - A transaction, several transactions, or an invoice.
+- **What it settles** - A charge, several charges, or an invoice.
 
-For example, completing a draft order opens the **Complete order** dialog, where you pick a payment method; 1Club then records a payment against each of the order's unpaid transactions with that method. See [Orders](/sales/orders).
+For example, completing a draft order opens the **Complete order** dialog, where you pick a payment method; 1Club then records a payment against each of the order's unpaid charges with that method. See [Orders](/sales/orders).
 
 <Note>
   Payments handled entirely by a provider's own checkout (for example an online
@@ -102,8 +101,8 @@ The method shown on a payment tells you where the money physically came from, wh
 
 You do not have to settle a balance in one payment.
 
-- **Partial payment (one transaction)** - Record less than the full amount against a single transaction. The transaction moves to **partially paid** and keeps an outstanding balance you can collect later.
-- **Settling several transactions at once** - You can record one payment against multiple transactions, but only when the payment covers all of them in full. A single lump sum cannot be split partially across several transactions, so a multi-transaction payment must equal the sum of their outstanding balances.
+- **Partial payment (one charge)** - Record less than the full amount against a single charge. The charge moves to **partially paid** and keeps an outstanding balance you can collect later.
+- **Settling several charges at once** - You can record one payment against multiple charges, but only when the payment covers all of them in full. A single lump sum cannot be split partially across several charges, so a multi-charge payment must equal the sum of their outstanding balances.
 - **Dividing a booking between its players** - Give each player on a booking their own share and their own way of paying it. See [Splitting a booking across its players](#splitting-a-booking-across-its-players).
 
 ### Splitting a booking across its players
@@ -130,7 +129,7 @@ Two rules are enforced on save: no share may be negative, and everyone holding a
 
 #### Collecting each share
 
-Each player's share becomes their own charge, so you collect them independently from the players list on the booking, or from [Transactions](/sales/transactions) like any other charge. A player who has settled is marked as such even while others still owe.
+Each player's share becomes their own charge, so you collect them independently from the players list on the booking, or from [Charges](/sales/charges) like any other charge. A player who has settled is marked as such even while others still owe.
 
 This also drives entry: the check-in gate asks whether **this player** has paid their own share, so three players who have paid are admitted while the fourth is still outstanding.
 
@@ -153,12 +152,12 @@ The amount drawn from a wallet is always capped at the member's balance and the 
 
 ## Refunds
 
-Refunds are issued from the **transaction**, not from the payment, and you choose where the money goes. Open the charge in [Transactions](/sales/transactions) and use **Refund**.
+Refunds are issued from the **charge**, not from the payment, and you choose where the money goes. Open the charge in [Charges](/sales/charges) and use **Refund**.
 
 ### Issuing a refund
 
-1. Open the transaction from **Sales** > **Finance** > **Transactions**.
-2. Click **Refund**. The **Refund transaction** dialog opens.
+1. Open the charge from **Sales** > **Finance** > **Charges**.
+2. Click **Refund**. The **Refund charge** dialog opens.
 3. Answer **Where should the money go?** (see the destinations below). Each option shows its own ceiling, because they differ.
 4. Set **Amount to refund**. It defaults to everything still refundable, and cannot exceed the ceiling for the destination you picked.
 5. Optionally add a **Reason**.
@@ -177,7 +176,7 @@ Refunds require the **billing manage** permission at the organization level.
 
 Only options the original payment supports are offered. **Back to the card** appears only for payments taken through Stripe: money collected through myPOS, DatecsPay, or Hype cannot be reversed through those providers from 1Club yet, so return it as **Wallet credit** or by hand at the till.
 
-The ceilings differ per destination because they are calculated per payment. A transaction settled partly by card and partly from the wallet can return only the card portion to the card.
+The ceilings differ per destination because they are calculated per payment. A charge settled partly by card and partly from the wallet can return only the card portion to the card.
 
 ### Card refunds are not instant
 
@@ -189,7 +188,7 @@ Some card refunds settle asynchronously, so you may see a refund reported as **a
 
 > Refund sent to Stripe - awaiting confirmation. It is not back with the member yet.
 
-That is a normal intermediate state, not a failure. The amount is confirmed once the provider settles it, and the transaction's status updates then. A partial confirmation reads as "X refunded, Y sent to Stripe and awaiting confirmation" - treat only the confirmed part as money the member has back.
+That is a normal intermediate state, not a failure. The amount is confirmed once the provider settles it, and the charge's status updates then. A partial confirmation reads as "X refunded, Y sent to Stripe and awaiting confirmation" - treat only the confirmed part as money the member has back.
 
 <Note>
   Refunding to **Wallet credit** is immediate and never has a pending state,
@@ -203,11 +202,11 @@ Enter any amount up to the ceiling. Each refund is recorded individually with it
 
 ### Nothing to refund
 
-If no money was ever collected on the transaction, **Refund** tells you so:
+If no money was ever collected on the charge, **Refund** tells you so:
 
-> Nothing was collected on this transaction, so there is nothing to refund. Void it instead if it should never have been charged.
+> Nothing was collected on this charge, so there is nothing to refund. Void it instead if it was raised by mistake.
 
-See [Voiding a transaction](/sales/transactions#row-actions) for that path.
+See [Voiding a charge](/sales/charges#row-actions) for that path.
 
 ### Automatic wallet-credit refunds
 
@@ -220,7 +219,7 @@ Some flows refund a member automatically by crediting their **wallet** rather th
 
 <Note>
   Cancellation refunds always go to wallet credit. To return that money to the
-  member's card instead, refund the transaction from the billing page and choose
+  member's card instead, refund the charge from the billing page and choose
   **Back to the card**.
 </Note>
 
@@ -238,8 +237,8 @@ The launcher also reflects the link's state, for example:
 - "Payment cancelled"
 
 <Note>
-  Payment links for transactions (such as a booking or membership charge) show
-  the transaction's reference. Only genuine invoices are labelled "Invoice #".
+  Payment links for charges (such as a booking or membership charge) show
+  the charge's reference. Only genuine invoices are labelled "Invoice #".
 </Note>
 
 ## Deleting a payment
@@ -255,7 +254,7 @@ Attempting it tells you:
 
 > Only manually recorded payments can be deleted. This one was collected through a payment provider or the wallet, so refund it instead.
 
-A manual payment may settle **several** transactions at once - a multi-line invoice, a booking split across a court and an instructor, a point-of-sale order. Deleting it recalculates every affected transaction back to paid, partially paid, or pending based on what remains, so you do not have to unpick them yourself.
+A manual payment may settle **several** charges at once - a multi-line invoice, a booking split across a court and an instructor, a point-of-sale order. Deleting it recalculates every affected charge back to paid, partially paid, or pending based on what remains, so you do not have to unpick them yourself.
 
 Deletion requires the **billing delete** permission at the organization level.
 
@@ -272,7 +271,7 @@ Deletion requires the **billing delete** permission at the organization level.
 
 A member books a court and pays half at the desk, settling the rest when they arrive.
 
-- Record a **partial payment** for half against the booking transaction; it moves to **partially paid**.
+- Record a **partial payment** for half against the booking charge; it moves to **partially paid**.
 - On arrival, record a second payment for the remainder to bring it to **paid**.
 
 ### Boxing gym monthly fee split across card and wallet
@@ -293,7 +292,7 @@ A climber cancels a booked session within the free-cancellation window.
 
 Staff logged a cash payment against the wrong member.
 
-- Cash is a **manual** method, so **delete** the payment. Every transaction it touched recalculates automatically, even if it settled several at once.
+- Cash is a **manual** method, so **delete** the payment. Every charge it touched recalculates automatically, even if it settled several at once.
 - Record the payment again against the right member.
 - Had it been a card payment, deletion would be refused - **refund** it and re-take it instead.
 
@@ -309,7 +308,7 @@ Four members book a court for 60.00 and each wants to pay separately.
 
 A member paid 40.00 by card for a tournament that you then cancel outright.
 
-- Open the entry charge in **Sales** > **Finance** > **Transactions** and click **Refund**.
+- Open the entry charge in **Sales** > **Finance** > **Charges** and click **Refund**.
 - Choose **Back to the card**, leave the amount at the full 40.00, and add a reason.
 - The refund is sent to Stripe and may read as awaiting confirmation for a few days. Tell the member it typically lands on their statement within 5-10 days.
 - Had you wanted to keep the money with the gym, **Wallet credit** would have returned it instantly as credit instead.
@@ -328,7 +327,7 @@ A member paid 40.00 by card for a tournament that you then cancel outright.
 
 **Issue**: I cannot find a **Refund** action on the payment.
 
-**Solution**: Refunds are issued from the transaction, not the payment. Open the charge in **Sales** > **Finance** > **Transactions** and use **Refund** there. You also need the **billing manage** permission at the organization level.
+**Solution**: Refunds are issued from the charge, not the payment. Open the charge in **Sales** > **Finance** > **Charges** and use **Refund** there. You also need the **billing manage** permission at the organization level.
 
 **Issue**: **Back to the card** is not offered as a destination.
 
@@ -340,15 +339,15 @@ A member paid 40.00 by card for a tournament that you then cancel outright.
 
 **Issue**: **Refund** says there is nothing to refund.
 
-**Solution**: No money was ever collected on that transaction. If it should never have been charged, void it instead - see [Transactions](/sales/transactions).
+**Solution**: No money was ever collected on that charge. If it should never have been charged, void it instead - see [Charges](/sales/charges).
 
 **Issue**: The **Delete** action is refused on a payment.
 
 **Solution**: Only manually recorded payments (the **manual** channel: cash, terminal, bank transfer) can be deleted. Provider-collected and wallet payments must be refunded. A manual payment carrying a provider reference is also refused.
 
-**Issue**: A multi-transaction payment is rejected.
+**Issue**: A multi-charge payment is rejected.
 
-**Solution**: A single payment can settle several transactions only when it covers them all in full. Record separate payments, or record a partial payment against each transaction individually.
+**Solution**: A single payment can settle several charges only when it covers them all in full. Record separate payments, or record a partial payment against each charge individually.
 
 **Issue**: The wallet toggle is missing at the point of sale.
 
@@ -360,8 +359,8 @@ A member paid 40.00 by card for a tournament that you then cancel outright.
 
 ## Related
 
-- [Orders](/sales/orders) - Complete an order to record payment against its transactions.
-- [Transactions](/sales/transactions) - The charges a payment settles.
+- [Orders](/sales/orders) - Complete an order to record payment against its charges.
+- [Charges](/sales/charges) - The charges a payment settles.
 - [Invoices](/sales/invoices) - Invoices generate payments when paid.
 - [Payment methods](/settings/payment-methods) - Configure which payment methods your organization accepts.
 - [myPOS](/settings/integrations/mypos) - The provider behind payment links and terminal payments.

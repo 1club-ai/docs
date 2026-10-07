@@ -74,10 +74,10 @@ Pass `instructorId` when the session is coached rather than a bare court hire. T
 
 ### How payment is recorded
 
-- `paid` - 1Club records a paid booking transaction, settled against a dedicated **External / API** payment method (manual channel, no card charged). Counts as revenue and paid.
-- `unpaid` - 1Club records the transaction as outstanding. Counts as accrued revenue with nothing paid.
+- `paid` - 1Club records the booking's charge as paid (a Charge in the 1Club admin, a `transaction` in the Platform API), settled against a dedicated **External / API** payment method (manual channel, no card charged). Counts as revenue and paid.
+- `unpaid` - 1Club records the booking's charge as outstanding. Counts as accrued revenue with nothing paid.
 
-The `payment.status` you get **back** can also be `no_charge`, which means nothing was ever owed - a free area, or an explicit amount of `0`. There is no transaction to settle in that case, so it is reported as `no_charge` rather than as whichever of `paid` or `unpaid` you sent.
+The `payment.status` you get **back** can also be `no_charge`, which means nothing was ever owed - a free area, or an explicit amount of `0`. There is no charge to settle in that case, so it is reported as `no_charge` rather than as whichever of `paid` or `unpaid` you sent.
 
 You keep ownership of collection and refunds. 1Club never charges a card for these bookings.
 
@@ -156,7 +156,7 @@ contact automatically, as a by-product of booking sync. Sync is one-way:
     `details.conflicts` - see [Conflicts](#conflicts).
   </Step>
   <Step title="Record revenue & respond">
-    Record the transaction (`paid` → settled, `unpaid` → outstanding) and return
+    Record the booking's charge (`paid` → settled, `unpaid` → outstanding) and return
     `201` with `{ bookingId, status, payment }`.
   </Step>
 </Steps>

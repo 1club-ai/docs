@@ -1,7 +1,7 @@
 ---
 title: Member profile
 description: The per-contact page that pulls together a member's identity, balances, pipeline stage, memberships, bookings, check-ins, charges, documents, notes, cards, and account links.
-keywords: [member profile, contact, notes, PIN, wallet balance, account balance, household, custom fields, activity timeline, portal invitation, credentials]
+keywords: [member profile, contact, notes, PIN, wallet balance, account balance, due now, upcoming charges, amount due, household, custom fields, activity timeline, portal invitation, credentials]
 ---
 
 The member profile is the page for one contact: it pulls together their identity, balances, memberships, history, and integration links into one view. A **contact** is your organization's own copy of a person's record - name, email, phone, plus their memberships, invoices, and signatures. Front desk staff open it when a member is at the desk, and managers use it to fix records, set up access, and follow up on money owed.
@@ -12,7 +12,7 @@ The profile answers the questions staff ask most at the desk - does this person 
 
 Typical uses:
 
-- **A padel member who owes money checks in** - the **Due from member** tile shows the outstanding court fee, so you record the visit and take payment in one place.
+- **A padel member who owes money checks in** - the **Due now** tile shows last week's unpaid court fee, so you record the visit and take payment in one place.
 - **Getting a new jiu-jitsu member onto the portal** - confirm their email and send the invitation from the **User Account** block.
 - **A door PIN for a climber** - add a PIN from the **Cards** block when access control is on.
 - **Belt progression for a martial-arts student** - assign their current belt from the **Level** tile so it stays visible to the front desk.
@@ -32,10 +32,26 @@ The page has two columns:
 
 Tiles at the top of the main column summarize the contact's current state. Three tiles always show, and a fourth appears when progression tracking or assessments are enabled:
 
-- **Due from member** - the amount this member currently owes. It turns red when the balance is negative (money is owed). A **Credit balance** sub-line shows any wallet credit on the account. Due and credit are shown separately and never netted against each other: a member who owes 100 and holds 100 in credit still shows 100 due. Use the redeem icon in this tile to redeem a voucher against the account.
+- **Due now** - what this member owes that has already fallen due. It turns red when anything is due. Underneath, **Upcoming** shows unpaid charges that are not due yet, such as a pay-on-arrival court booked for tomorrow or a membership that starts next month. Upcoming charges are never added to **Due now** - see [What counts as due now](#what-counts-as-due-now). A **Wallet** sub-line shows any wallet credit. What is due and the credit are shown separately and never netted against each other: a member who owes 100 and holds 100 in credit still shows 100 due now. Use the redeem icon in this tile to redeem a voucher against the account.
 - **Total paid** - lifetime amount paid, with an "of X billed" sub-line so you can see paid versus billed at a glance.
 - **Attendance** - a sparkline of recent check-ins. The dot lights up when the member has already checked in today. Use the overflow icon to change the window: **Last 4 weeks**, **Last 12 weeks**, **Last 6 months**, **Last 12 months**, or **All time**. Your choice is remembered for the next profile you open.
 - **Level** / **Progress** - current progression level, shown when progression tracks are enabled, and the member's overall assessment average (for example "Tennis juniors: 3.5/5") once your organization has an assessment template and you may view assessments club-wide. The tile is titled **Progress** when both are on. When the next level sets a number of sessions, the tile also shows the member's count toward it (for example "13 / 20 sessions to Blue belt") or **Eligible for promotion** - see [Sessions to the next level](/settings/progression#sessions-to-the-next-level). The plus icon assigns a level or adds an assessment; clicking the average opens the member's full [assessment history](/members/assessments#reviewing-a-members-assessments).
+
+### What counts as due now
+
+**Due now** adds up the member's unpaid [charges](/sales/charges) that have fallen due. A charge that is not due yet counts as **Upcoming** instead:
+
+- **Bookings** - a booking's charge (a court, an instructor session, a class, an event, or one session of a recurring booking) is upcoming until the visit starts. It falls due when the visit starts or the member checks in, whichever comes first. If the booking is cancelled or marked as a no-show, any cancellation charge is due at once.
+- **Everything else** - other charges fall due on their date. A membership's charge, its renewals, and its signup fee are dated at the start of the period they pay for, so a membership that starts next month stays upcoming until then. Products and walk-in visits are due when sold.
+
+The same **Due now** figure appears wherever staff see what a member owes: the red marker next to their name in the bookings, check-ins, and attendance lists, the card that opens when you hover over it (which also shows **Upcoming**), the point of sale, and booking details. The marker only shows while something is due now.
+
+### Notices above the info strip
+
+Two kinds of notice can appear between the header and the info strip:
+
+- **Alerts** (red, or orange for warnings only) - what to resolve with the member before serving them: a required document still unsigned, a missing required field, a wallet below its required deposit, gear out or overdue. What the member owes is not repeated here, because the **Due now** tile already shows it.
+- **Missing details** (blue) - a contact detail your gym requires that the record lacks, with a **Fix** button that opens the contact form. The notice names the phone number or email only when that field is required under **Settings** > **Members** > **Contacts**, on the staff form or at signup. Out of the box only email is required, so a contact without a phone number is not flagged unless you make the phone field required.
 
 ## Header actions
 
@@ -46,7 +62,7 @@ For an active contact the header has an **Add** menu, an **Edit** action, and a 
 - **Check-in** - records a visit (against an existing booking or membership, or a new booking or membership in one step).
 - **Wallet** (or **Deposit** when a deposit is required) - tops up the member's wallet.
 - **Voucher** - redeems a voucher against this contact's account.
-- **Payment** - takes a payment toward what the member owes. Disabled while nothing is due.
+- **Payment** - takes a payment toward what the member owes, upcoming charges included, so a member can pay ahead. Disabled while the member owes nothing.
 - **Card** - issues an access card, when access control is on. See [Access cards](/members/member-cards).
 - **Payment card** - saves a payment card to charge.
 - **Assessment** - adds an assessment card, when assessments are set up.
@@ -145,9 +161,9 @@ Saved cards and bank accounts on file appear in the sidebar. They are the same p
 ### Front-desk check-in for a padel member who owes money
 
 1. Open the member from the [Member list](/members/member-list).
-2. The **Due from member** tile shows 30 in red - a court fee from last week.
+2. The **Due now** tile shows 30 in red - a court fee from last week.
 3. Use **Add** > **Check-in** to record today's visit against their membership.
-4. On the same profile, open the **Charges** tab and take payment for the outstanding 30, or redeem a voucher from the **Due from member** tile if they have credit.
+4. On the same profile, open the **Charges** tab and take payment for the outstanding 30, or redeem a voucher from the **Due now** tile if they have credit.
 
 ### Onboard a new jiu-jitsu member to the portal
 
@@ -172,7 +188,7 @@ Saved cards and bank accounts on file appear in the sidebar. They are the same p
 - Read the info strip before every front-desk interaction: it answers "do they owe anything?", "have they checked in today?", and "how active are they?" without opening a tab.
 - Keep sensitive context (injuries, disputes, access notes) in the **Notes** panel, not in message threads - notes stay internal.
 - Prefer **Archive** over deletion when a member leaves: archiving preserves their financial and legal history and can be reversed with **Unarchive**.
-- Redeem vouchers and add wallet credit from the **Due from member** tile so the credit balance updates in place.
+- Redeem vouchers and add wallet credit from the **Due now** tile so the credit balance updates in place.
 - When a family shares billing, create the household from the paying member's profile so they are set as the owner automatically.
 
 ## Troubleshooting
@@ -180,6 +196,8 @@ Saved cards and bank accounts on file appear in the sidebar. They are the same p
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | No **Invite** button in the User Account block | The contact has no email address | Click **Edit** and add an email, then reopen the block |
+| **Due now** shows nothing, but the member has an unpaid booking | The booking has not started yet, so its charge is upcoming | Check **Upcoming** under **Due now**. To collect it ahead of time, use **Add** > **Payment** |
+| No "No phone number" notice for a contact without a phone | Your gym does not require a phone number | Make the phone field required under **Settings** > **Members** > **Contacts** |
 | **Reset password** missing from the overflow menu | The account is not active, you are not an admin, or it is your own account | Have an admin reset it; you cannot reset your own password from another user's profile |
 | **Cards** block not visible | Access control is not enabled for the org | Enable it under [access control settings](/settings/access-control) |
 | **PIN code** missing from the card types | PIN is not an identification method enabled for the club | Enable it under [access control settings](/settings/access-control) |

@@ -1,6 +1,6 @@
 ---
 title: Charges
-description: What each payer owes for every booking, membership, signup fee, and product sale, and how charges relate to payments and invoices - batch charge, record manual payments, send myPOS links, refund what was paid, and void what was not.
+description: What each payer owes for every booking, membership, signup fee, and product sale, and how charges relate to payments and invoices - charge saved cards or add payments in bulk, send myPOS links, refund what was paid, and void what was not.
 keywords:
   [
     charge,
@@ -11,7 +11,8 @@ keywords:
     reversal,
     ledger,
     batch charge,
-    record manual payment,
+    add payment,
+    bulk payment,
     void,
     bulk void,
     void tab,
@@ -149,19 +150,22 @@ When it finishes, a **Batch Payment Results** dialog summarizes how many succeed
 <Note>
   Batch **Charge saved card** only works for customers who have a saved Stripe card. For
   customers without one, use **Send myPOS payment link** (so they pay on their
-  own device) or collect at the desk and use **Record manual payment**.
+  own device) or collect at the desk and use **Add payment**.
 </Note>
 
-### Record manual payment
+### Add payment
 
-**Record manual payment** logs a non-card settlement (cash, bank transfer, etc.) against every eligible selected charge, for each row's **full remaining balance**, using a single manual payment method.
+**Add payment** opens the payment dialog for every eligible selected charge. The dialog shows how many charges across how many contacts, the **Total to record**, and how many selected rows will be skipped (already paid or void). What it records depends on the selection:
 
-1. Select the charges and click **Record manual payment**.
-2. The dialog shows a summary: how many eligible charges across how many contacts, the **Total to record**, and how many selected rows will be skipped (already paid or void).
-3. Pick the **Payment method** (only methods configured as manual channel appear) and the **Payment date**.
-4. Click **Record payment**.
+- **One contact, one currency** - a single payment for the combined remaining balance. The amount is fixed to that total, and you pick any payment method the contact can pay with, such as cash, a saved card, or their wallet.
+- **Several contacts or currencies** - one payment per charge, each for that charge's own remaining balance, because a payment has one payer and one currency. Only manual payment methods (cash, bank transfer, etc.) are offered.
 
-Rows are skipped and counted in the result when the charge is not found, belongs to another organization, is already paid, is void or otherwise closed, or has no remaining balance. Only manual payment methods are accepted here - card charging goes through **Charge saved card**.
+1. Select the charges and click **Add payment**.
+2. Check the summary and the **Total to record**.
+3. Pick the **Payment method**. A manual method also asks for the **Payment date**.
+4. Click **Save**.
+
+Rows are skipped and counted in the result when the charge is not found, belongs to another organization, is already paid, is void or otherwise closed, or has no remaining balance. To charge several customers' saved cards at once, use **Charge saved card** instead.
 
 ### Void
 
@@ -233,10 +237,10 @@ If you rerun the batch later the same day to retry the failures, the idempotency
 A group of visitors dropped in for an open-mat jiu-jitsu session and paid cash at the desk. Their bookings created `pending` charges.
 
 1. Select the drop-in charges in the grid.
-2. Click **Record manual payment**.
-3. Confirm the summary (for example "6 charges across 6 contacts, Total to record: 90.00"), pick **Cash** as the **Payment method**, set today's **Payment date**, and click **Record payment**.
+2. Click **Add payment**.
+3. Confirm the summary (for example "6 charges across 6 contacts" and "Total to record: 90.00"), pick **Cash** as the **Payment method**, set today's **Payment date**, and click **Save**.
 
-Every eligible row is settled for its full remaining balance in one action. Any already-paid rows in your selection are safely skipped and counted.
+Because the drop-ins are different contacts, each eligible row gets its own payment for its full remaining balance, in one action. Any already-paid rows in your selection are safely skipped and counted.
 
 ### Sending a myPOS link for a yoga membership balance
 
@@ -265,7 +269,7 @@ A rained-off tournament left thirty unpaid entry charges on the ledger.
 ## Tips & best practices
 
 - **Filter before you batch.** Use the **Pending** and **Overdue** tabs plus search to select exactly the right rows. Batch actions act on your whole selection.
-- **Pick the right collection tool.** Card on file -> **Charge saved card**. Customer not present, no card -> **Send myPOS payment link**. Paid in person -> **Record manual payment**.
+- **Pick the right collection tool.** Card on file -> **Charge saved card**. Customer not present, no card -> **Send myPOS payment link**. Paid in person -> **Add payment**.
 - **Trust the remaining balance column.** It already nets out succeeded payments and mid-flight membership discounts, so it is the true figure to collect - not the gross total.
 - **Retry failures the same day freely.** The batch charge idempotency key is scoped to the charge and the date, so a same-day rerun only charges rows that haven't succeeded yet.
 - **Void what was never paid, refund what was.** Voiding preserves the audit trail and is only offered while nothing has been collected. The moment money has moved, **Refund** is the only correct action - and 1Club will not let you void your way around it.
@@ -278,7 +282,7 @@ A rained-off tournament left thirty unpaid entry charges on the ledger.
 
 **Cause**: That contact has no default saved Stripe card. Batch charge can only use a stored default method.
 
-**Fix**: Ask the customer to add a card, use **Send myPOS payment link** so they pay on their own device, or collect at the desk and use **Record manual payment**.
+**Fix**: Ask the customer to add a card, use **Send myPOS payment link** so they pay on their own device, or collect at the desk and use **Add payment**.
 
 **Issue**: A batch charge row failed with "charge declined."
 
@@ -298,9 +302,9 @@ A rained-off tournament left thirty unpaid entry charges on the ledger.
 
 **Fix**: Add an email to the contact's profile, then resend. To generate a link, the charge also needs a positive amount and a resolvable currency.
 
-**Issue**: **Record manual payment** shows no payment methods to pick.
+**Issue**: **Add payment** shows no payment methods to pick for a selection.
 
-**Cause**: No manual-channel payment methods are configured. Only manual methods (cash, bank transfer, etc.) can be used for manual recording; card charging goes through **Charge saved card**.
+**Cause**: The selection spans several contacts or currencies, so each charge gets its own manual payment, and no manual-channel payment method (cash, bank transfer, etc.) is configured. To charge saved cards across several customers, use **Charge saved card**.
 
 **Fix**: Configure a manual payment method in settings, then retry.
 

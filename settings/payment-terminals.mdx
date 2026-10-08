@@ -1,0 +1,85 @@
+---
+title: Payment terminals
+description: Register the card readers at your front desks, check whether each one is online, and retire readers you no longer use.
+keywords: ["payment terminal", "card reader", "card terminal", "Stripe Terminal", "myPOS terminal", "in-person payment", "tap to pay", "pairing code", "serial number", "retire terminal", "terminal offline"]
+---
+
+A payment terminal is a card reader at one of your gyms that staff can send a sale to. The customer taps, inserts, or swipes their card on the reader, and 1Club records the payment automatically. Owners and admins register the readers here; front-desk staff then pick a reader when they take a card payment.
+
+## Why use it
+
+Without a connected reader, the front desk types the amount into a standalone card machine and then records the payment by hand, which invites typos and payments recorded against the wrong sale. A connected reader receives the exact amount from 1Club and settles the sale on its own.
+
+Typical uses:
+
+- **A reader at reception** - a padel gym registers one Stripe reader at the front desk, and staff charge court bookings and day passes on it from the till.
+- **Two providers in one building** - a gym takes cards at reception on a Stripe reader and runs a myPOS device at the bar. Both appear in the same list, each named for where it sits.
+- **Spotting a dead reader before the rush** - the front desk checks the list in the morning, sees a reader marked **Offline**, and fixes its power or network before members arrive.
+
+## How it works
+
+Readers come from your payment providers. 1Club supports **Stripe Terminal** and **myPOS terminal** readers, and you can mix them across your gyms. Before you can add a reader, the provider has to be connected for the company that bills for that gym:
+
+- **Stripe** - connect it under [Stripe](/settings/integrations/stripe). Stripe sells readers only in some countries, and in some of them only for one currency.
+- **myPOS** - connect it under [myPOS](/settings/integrations/mypos) and turn on its **Terminal** capability.
+
+Each reader belongs to one gym, and it charges through the payment account of the company that bills for that gym. If you trade through more than one company, see [Billing entities](/settings/billing-entities#connect-each-companys-payment-accounts).
+
+Card payments taken on a registered reader are recorded against that provider's terminal payment method, which appears in your [payment methods](/settings/payment-methods) list once you have an active reader for it.
+
+## Open the list
+
+Go to **Settings** > **Sales** > **Payment terminals**. The Stripe and myPOS integration pages link here with a **Manage** button.
+
+If no connected provider can take in-person payments yet, the page says so and offers **Set up an integration**, which opens **Settings** > **Integrations**. If a provider is connected but can't be used for readers, for example because Stripe does not sell readers in your country or currency, a warning names the provider and the reason.
+
+The list shows each reader's:
+
+- **Name** - with its serial number underneath, when known.
+- **Provider** - Stripe Terminal or myPOS terminal.
+- **Club** - the gym the reader sits at.
+- **Billing entity** - the company its card payments settle to. Shown only when you have more than one company.
+- **Device** - the reader model, when the provider reports it.
+- **Status** - **Online**, **Offline**, or **Unknown**. Hover it to see when the reader was last seen.
+
+Status is not refreshed on its own. Click **Refresh status** to ask the providers for the latest state of every reader.
+
+## Add a reader
+
+1. Click **Add payment terminal**.
+2. Give it a **Name** that tells staff where it is, such as _Front desk_ or _Bar_.
+3. Choose the **Provider**.
+4. Choose the **Club** the reader sits at. Once you pick a gym, only the providers connected for the company that bills for it are offered.
+5. Enter the **Pairing code or serial number**:
+   - For **Stripe Terminal**, the pairing code shown on the reader's screen, or the serial number on the box.
+   - For **myPOS terminal**, the terminal ID (TID) or serial number printed on the device. The device must already be on your myPOS account.
+6. Click **Register**.
+
+If the provider refuses the reader, for example because a pairing code expired or the gym is missing an address, the reason is shown so you can fix it and try again.
+
+## Retire a reader
+
+Open the row's menu, choose **Delete**, and confirm with **Retire**. The reader stops accepting payments, and the payments it already took keep their history, so you can still tell which device took a payment months later.
+
+Retire every reader at a gym before you point that gym at a different company. A reader belongs to one payment account, so 1Club refuses to move a gym to another company while it still has readers registered. Register them again afterwards.
+
+## Permissions
+
+Adding, refreshing, and retiring readers needs permission to manage organization settings. Staff who can read settings, billing, or the point of sale can see the list, which is how the till offers a reader to send a sale to. See [Roles and permissions](/reference/roles-permissions).
+
+## Troubleshooting
+
+| What you see | Why | What to do |
+| --- | --- | --- |
+| The page says no provider supports in-person terminals | Neither Stripe nor myPOS terminals are set up for your organization. | Connect Stripe, or connect myPOS and turn on its **Terminal** capability. |
+| A provider you connected isn't offered when you add a reader | It isn't connected for the company that bills for the gym you picked. | Connect the provider for that company, or pick a gym that bills through a connected company. |
+| A reader shows **Offline** | The provider can't reach it, usually power or network. | Check the reader's power and connection, then click **Refresh status**. |
+| A reader shows **Unknown** | Its status hasn't been refreshed, or the provider reported a state 1Club doesn't recognize. | Click **Refresh status**. |
+| You can't change which company a gym bills through | The gym still has readers registered. | Retire its readers, change the company, then register them again. |
+
+## Related
+
+- [Point of sale](/pos/point-of-sale) - where staff send a sale to a reader.
+- [Stripe](/settings/integrations/stripe) and [myPOS](/settings/integrations/mypos) - connect the providers your readers use.
+- [Payment methods](/settings/payment-methods) - the terminal payment methods your readers record against.
+- [Billing entities](/settings/billing-entities) - which company a reader's payments settle to.

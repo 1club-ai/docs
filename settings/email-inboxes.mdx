@@ -1,10 +1,10 @@
 ---
 title: "Email inboxes"
-description: "Route inbound member emails into the 1Club Inbox by forwarding your club's address to a verified forwarding inbox."
+description: "Route inbound member emails into the 1Club Inbox by forwarding your gym's address to a verified forwarding inbox."
 keywords: [email inbox, inbound email, forwarding, verification, SendGrid, inbox, reply, domain verification, sending domain]
 ---
 
-An email inbox connects a club's real email address (for example `hello@yourclub.com`) to the 1Club **Inbox** so that messages members send to that address show up as inbound conversations your staff can read and reply to in one place. You set it up once, and members keep writing to the address they already know. You forward mail from your provider to a 1Club forwarding address, verify the inbox once, and from then on every inbound email threads into the [Inbox](/inbox/messages) alongside your outbound messages.
+An email inbox connects one of your gym's real email addresses (for example `hello@yourgym.com`) to the 1Club **Inbox** so that messages members send to that address show up as inbound conversations your staff can read and reply to in one place. You set it up once, and members keep writing to the address they already know. You forward mail from your provider to a 1Club forwarding address, verify the inbox once, and from then on every inbound email threads into the [Inbox](/inbox/messages) alongside your outbound messages.
 
 ## When to use it
 
@@ -22,13 +22,13 @@ See [Worked examples](#worked-examples) for how to set up each of these. Sending
 You don't need an inbox for members' replies to messages you send from 1Club. Those carry their own reply address and land in the Inbox on their own (see [Replies to your messages](/settings/email-sending#replies-to-your-messages)). An inbox is for the mail members send to your gym's address themselves.
 </Note>
 
-## Adding a club inbox
+## Adding an inbox
 
 Inboxes live under **Settings** > **Communication** > **Email Inboxes**. Adding one takes three moves: create the inbox, forward your provider's mail to the address 1Club gives you, then verify.
 
 1. Click **Add Inbox** in the top right.
 2. Choose the **Club** this inbox belongs to.
-3. Enter the **Email address** members already write to (for example `frontdesk@yourclub.com`). This is the address you own and want to capture mail from.
+3. Enter the **Email address** members already write to (for example `frontdesk@yourgym.com`). This is the address you own and want to capture mail from.
 4. Click **Add**. 1Club creates the inbox and shows a green **Inbox created successfully!** panel containing the **forwarding address** to use in the next step.
 
 The forwarding address is generated for you in the form `{organization-slug}_{club-slug}@inbox.1club.ai`. Copy it with the copy button - you will paste it into your email provider.
@@ -39,7 +39,7 @@ The email address you enter cannot be changed after the inbox is created (the fi
 
 ### Set up forwarding at your provider
 
-In your email provider (Gmail, Outlook, or similar), set the club address to forward incoming mail to the 1Club forwarding address you just copied. The in-app setup instructions summarize the same three steps:
+In your email provider (Gmail, Outlook, or similar), set your gym's address to forward incoming mail to the 1Club forwarding address you just copied. The in-app setup instructions summarize the same three steps:
 
 1. Create an inbox with your email address.
 2. Copy the forwarding address and set up forwarding to it in your email provider (Gmail, Outlook, etc.).
@@ -72,11 +72,11 @@ Notes:
 - Until an inbox is verified, inbound mail to its forwarding address is dropped - the webhook only accepts mail for a verified inbox.
 - An unverified inbox shows an **Unverified** status chip (amber). A verified inbox shows **Verified** (green).
 
-To resend: open the inbox row's actions menu and choose **Resend Verification**, or open the inbox and click **Resend Verification** in its status panel. Confirm the prompt and a new link is sent to the inbox address.
+To resend: open the inbox row's actions menu and choose **Resend Verification** (shown only while the inbox is unverified), or open the inbox and click **Resend Verification** in its status panel. Confirm the prompt and a new link is sent to the inbox address.
 
 ### Verify your sending domain (optional, recommended)
 
-Verifying the domain your club emails come from means outbound messages and replies leave as `you@yourclub.com` instead of a platform address, which improves deliverability and trust. Without it, 1Club still sends, but falls back to the platform sending address and sets your club address as reply-to.
+Verifying the domain your gym's emails come from means outbound messages and replies leave as `you@yourgym.com` instead of a platform address, which improves deliverability and trust. Without it, 1Club still sends, but falls back to the platform sending address and sets your gym's address as reply-to.
 
 The full procedure - DNS records, which address becomes the **From**, and how the organization and club Email fields interact - lives in [Email sending](/settings/email-sending).
 
@@ -86,12 +86,12 @@ The inbox forwarding address always uses the platform's `inbox.1club.ai` domain 
 
 ## How inbound email threads into the Inbox
 
-When a member emails your club address and your provider forwards it to the 1Club forwarding address, 1Club receives it through a SendGrid Inbound Parse webhook and does the following:
+When a member emails your gym's address and your provider forwards it to the 1Club forwarding address, 1Club receives it through a SendGrid Inbound Parse webhook and does the following:
 
 1. **Finds the inbox** by the address the email was actually delivered to (your forwarding address), not by its To: line, which a forward leaves as your gym's own address. If no verified inbox matches, the mail is ignored.
 2. **Skips mail that isn't a member writing in**: out-of-office auto-replies, mail from your gym's own sending address, mail from your staff's sign-in addresses (an internal note to the shared mailbox, for example), and an email it has already filed.
 3. **Resolves the sender** by email. If no contact exists yet, a new contact is created from the sender's name and email. An existing contact keeps the name you gave them.
-4. **Creates an inbound message** with `direction: inbound`, tagged to the inbox, storing the original club address as the recipient.
+4. **Creates an inbound message** with `direction: inbound`, tagged to the inbox, storing your gym's original address as the recipient.
 5. **Threads replies** when the incoming mail carries `In-Reply-To` / `References` headers that match an earlier email, or when the subject is a `Re:` of the same sender's earlier email. Otherwise it starts a new conversation.
 
 Staff are alerted about new inbound messages according to their [Notifications](/settings/notifications) settings.
@@ -108,9 +108,9 @@ The inbox list shows a **Messages** count per inbox. Day-to-day, you read and an
 
 ## Worked examples
 
-### Padel club front desk
+### Padel gym front desk
 
-Your racket-sports club publishes `bookings@acepadel.com` on its website and members reply to booking confirmations there.
+Your padel gym publishes `bookings@acepadel.com` on its website and members reply to booking confirmations there.
 
 - Add an inbox for the **Ace Padel** club with email `bookings@acepadel.com`.
 - Forward `bookings@acepadel.com` to the generated `acepadel_downtown@inbox.1club.ai`.
@@ -118,11 +118,11 @@ Your racket-sports club publishes `bookings@acepadel.com` on its website and mem
 
 ### Multi-location gym chain
 
-Your fitness organization runs three clubs, each with its own address.
+Your fitness organization runs three locations, each with its own address.
 
 - Add one inbox per club (`northside@`, `harbor@`, `airport@`), each scoped to its club.
 - Each gets its own forwarding address, so mail is attributed to the right location automatically.
-- Verify your `yourgym.com` sending domain once under **Settings** > **Organization** > **Domains** so replies from every club go out branded.
+- Verify your `yourgym.com` sending domain once under **Settings** > **Organization** > **Domains** so replies from every location go out branded.
 
 ### Martial-arts school with one shared mailbox
 
@@ -134,14 +134,14 @@ Your jiu-jitsu and muay-thai academy runs everything through `info@northgatemma.
 
 ## Tips & best practices
 
-- **Verify before you rely on it.** Inbound mail is silently dropped for unverified inboxes. Let the verification email come back through your forwarding rather than clicking its link, and the **Verified** chip proves forwarding works. Then send a test email to the club address from an outside account and confirm it appears in the Inbox.
-- **One inbox per real mailbox.** Don't point two clubs' forwarding at the same source address; capture is keyed on the forwarding address per club.
+- **Verify before you rely on it.** Inbound mail is silently dropped for unverified inboxes. Let the verification email come back through your forwarding rather than clicking its link, and the **Verified** chip proves forwarding works. Then send a test email to your gym's address from an outside account and confirm it appears in the Inbox.
+- **One inbox per club.** The forwarding address is built from your organization and club, so a second inbox on the same club shares it and captured mail lands in only one of them.
 - **Pair inbox capture with a verified sending domain.** Members reading a reply from your own domain trust it more, and deliverability is better. See [Email sending](/settings/email-sending).
-- **Keep the club address stable.** Because the address can't be edited, choose the mailbox you intend to keep before creating the inbox.
+- **Keep the address stable.** Because the address can't be edited, choose the mailbox you intend to keep before creating the inbox.
 
 ## Troubleshooting
 
-**Issue**: Emails sent to the club address don't appear in the Inbox.
+**Issue**: Emails sent to your gym's address don't appear in the Inbox.
 
 **Cause / fix**: The inbox is not verified, or forwarding isn't actually enabled at your provider. Confirm the status chip reads **Verified**; if not, use **Resend Verification** and click the link. Then re-check that your provider is forwarding to the exact `..._...@inbox.1club.ai` address (copy it again to be sure).
 
@@ -157,9 +157,9 @@ Your jiu-jitsu and muay-thai academy runs everything through `info@northgatemma.
 
 **Cause / fix**: Microsoft 365 blocks automatic forwarding to external addresses by default. Ask your administrator to allow it for this mailbox in the outbound spam filter policy.
 
-**Issue**: Replies I send from the Inbox come from a platform address, not my club's.
+**Issue**: Replies I send from the Inbox come from a platform address, not my gym's.
 
-**Cause / fix**: Your sending domain isn't verified. Add it under **Settings** > **Organization** > **Domains** with purpose **Email (SendGrid)**, add the DNS records, and click **Verify**. Until the domain is verified, your club address is used as reply-to only. See [Email sending](/settings/email-sending).
+**Cause / fix**: Your sending domain isn't verified. Add it under **Settings** > **Organization** > **Domains** with purpose **Email (SendGrid)**, add the DNS records, and click **Verify**. Until the domain is verified, your gym's address is used as reply-to only. See [Email sending](/settings/email-sending).
 
 **Issue**: An inbound email created a duplicate-looking contact.
 

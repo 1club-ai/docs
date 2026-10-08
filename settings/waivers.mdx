@@ -21,7 +21,7 @@ See [Worked examples](#worked-examples) for the exact rule settings.
 
 ## How it works
 
-The same document can be targeted by several rules. When rules overlap, the strictest wins: any mandatory rule makes it mandatory, and any typed-name rule makes typed name required.
+A rule can require one or more documents, and the same document can be targeted by several rules. When rules overlap, the strictest wins: any mandatory rule makes it mandatory, and any typed-name rule makes typed name required.
 
 A signature counts as accepted regardless of the stored document version, so cosmetic edits to a published document don't re-gate members who already signed.
 
@@ -47,24 +47,26 @@ A rule connects a published document to an audience and sets how acceptance is e
 1. In the **Document Rules** section, click **Add Rule**.
 2. Fill in the dialog:
    - **Name** - An internal label for the rule (for example, `Adults - liability waiver`). Members never see this.
-   - **Document** - Pick the published document this rule enforces.
+   - **Documents** - Pick one or more documents this rule enforces. Only published ones are ever shown to members.
    - **Contact Filters** - Narrow the audience (see below). Leave a filter empty to place no restriction on that dimension.
    - **Optional** - Off by default, so documents are mandatory unless you flip this on.
-   - **Require review and typed name** - Force the member to scroll through the document and type their full name before accepting.
+   - **Records consent for** - Optional rules only. See [Recording marketing consent](#recording-marketing-consent).
+   - **Require review and typed name** - Force the member to scroll through the document and type their full name before accepting. Mandatory rules only.
+   - **Required for entry** - Members this rule covers can't check themselves in until they have signed. Mandatory rules only. See [Required for entry](#required-for-entry).
    - **Active** - Whether the rule is currently in effect.
-3. Click **Save**. To edit or delete a rule later, click its card in the **Document Rules** section.
+3. Click **Save**. To edit or delete a rule later, click its card in the **Document Rules** section. A rule that is required for entry shows a **Required for entry** chip on its card.
 
 ## Contact filters (audience targeting)
 
 Filters decide who a rule applies to. The four categories combine with **AND**: a contact must match every category that has values set. Within a single category, matching **any** value is enough (**OR**). A category you leave empty places no restriction, so a rule with no filters at all applies to everyone.
 
-### Contact Types
+### Contact type
 
-Match on the kind of contact. The available types are **Member**, **Drop-in**, **Lead**, **Staff**, **Lapsed**, and **Contact**. Use this to ask, for example, only drop-in visitors to sign a one-time liability release, or only members to sign the full membership terms.
+Match on the kind of contact in the **Contact Type** field. The available types are **Members**, **Drop In**, **Leads**, **Staff**, **Lapsed**, and **Contacts**. Use this to ask, for example, only drop-in visitors to sign a one-time liability release, or only members to sign the full membership terms.
 
-### Plan
+### Plans
 
-Match on the plans a contact holds through an active membership. Select one or more [plans](/sales/plans); the rule then applies to anyone whose active membership is on one of those plans. During signup - before a membership exists - the rule matches against the plan the member is purchasing in the wizard.
+Match on the plans a contact holds through an active membership. Select one or more [plans](/sales/plans) in the **Plans** field; the rule then applies to anyone whose active membership is on one of those plans. During signup - before a membership exists - the rule matches against the plan the member is purchasing in the wizard.
 
 ### Tags
 
@@ -74,16 +76,26 @@ Match on contact tags (for example, a `competition-squad` or `under-18` tag). Us
 Tag filters are skipped during the public signup flow, because a brand-new contact has no tags yet. A rule that relies only on a tag filter will not surface at signup - it will apply later, once the contact is tagged. For documents that must be signed at signup, target by contact type, plan, or household role instead.
 </Warning>
 
-### Household Role
+### Household role
 
-Match on a contact's role within a [household account](/members/accounts): **Owner**, **Adult**, or **Dependent**. This is how you route a minor's waiver to the `dependent` role so it is presented to the guardian to sign on the child's behalf.
+Match on a contact's role within a [household account](/members/accounts) in the **Household Role** field: **Owner**, **Adult**, or **Child**. This is how you route a minor's waiver to the **Child** role so it is presented to the guardian to sign on the child's behalf.
 
 ## Mandatory gating vs optional
 
 Every rule is **mandatory** unless you switch on **Optional**.
 
 - **Mandatory** (default) - The member cannot finish using the platform until they accept the document. Mandatory documents feed the incomplete-setup state: an authenticated member with an unsigned mandatory document is gated until it is signed.
-- **Optional** - The document is offered but never blocks access. Optional documents are useful for informational consents (marketing preferences, photo release) that you want to record but not enforce.
+- **Optional** - The document is offered but never blocks access. Members may decline it instead of signing. Optional documents are useful for informational consents (marketing preferences, photo release) that you want to record but not enforce.
+
+## Recording marketing consent
+
+An optional rule can also record consent for a messaging channel. In **Records consent for**, pick **Marketing emails**, **Marketing text messages**, or **WhatsApp messages** (or leave it on **Nothing - a plain optional document**). When a member accepts the document, those messages are turned on for them. Declining or withdrawing turns them off. Members can still change the preference elsewhere later, and their latest choice wins.
+
+The field is only available while the rule is **Optional**. If the rule has no **Household Role** filter (or includes **Child**), children are asked too. To ask only grown-ups, choose **Owner** and **Adult** under **Household Role**.
+
+## Required for entry
+
+Turn on **Required for entry** to make a mandatory document a condition of self check-in. Members the rule covers can't check themselves in until they have signed, and the check-in tablet asks them to sign. The toggle is greyed out on an optional rule, and making a rule optional turns it off.
 
 ## Typed-name acceptance
 
@@ -112,21 +124,21 @@ A jiu-jitsu academy enrolls children through a household account, and the parent
 1. Author a published document `Youth participation and injury-risk waiver`.
 2. Create a rule named `Dependents - youth waiver`:
    - **Document**: `Youth participation and injury-risk waiver`
-   - **Household Role**: `Dependent`
+   - **Household Role**: `Child`
    - **Optional**: off (mandatory)
 3. During signup, the guardian completing the wizard is shown the dependent's waiver and accepts it on the child's behalf. The resulting signature records the child as the subject and the guardian as the signer. See [Document signatures](/members/document-signatures) for how proxy signing is recorded.
 
 ### Racket sports - one-time release for drop-in visitors
 
-A padel club lets non-members pay per court but wants a signed release from every drop-in.
+A padel gym lets non-members pay per court but wants a signed release from every drop-in.
 
 1. Author a published document `Drop-in court-use release`.
 2. Create a rule named `Drop-ins - court release`:
    - **Document**: `Drop-in court-use release`
-   - **Contact Types**: `Drop-in`
+   - **Contact Type**: `Drop In`
    - **Optional**: off (mandatory)
 
-### Whole-club code of conduct
+### Whole-gym code of conduct
 
 To require every contact to accept a code of conduct, create a rule with **no contact filters** and leave it mandatory. An empty filter set means the rule applies to everyone.
 
@@ -143,12 +155,13 @@ To require every contact to accept a code of conduct, create a rule with **no co
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
+| A member can't check themselves in | A mandatory rule marked **Required for entry** covers them and they haven't signed | Have them sign on the check-in tablet, or turn off **Required for entry** |
 | A member is never asked to sign a document | The document is not **Published**, or the rule is inactive | Publish the document; toggle the rule **Active** on |
 | A rule does not fire at signup even though the audience seems right | The rule relies on a **tag** filter, which is skipped during public signup | Re-target by contact type, plan, or household role |
-| The **Require review and typed name** toggle is greyed out | The rule is **Optional** - typed name is only allowed on mandatory rules | Turn **Optional** off to make the rule mandatory |
+| The **Require review and typed name** or **Required for entry** toggle is greyed out | The rule is **Optional** - both are only allowed on mandatory rules | Turn **Optional** off to make the rule mandatory |
 | Too many (or too few) members are gated | Filters combine with AND across categories | Widen by clearing a filter category, or narrow by adding values; remember an empty category means "no restriction" |
 | A previously signed member is prompted again | Expected only when a new signature is genuinely required; cosmetic edits do not re-gate | Confirm the member has a signature on file in [Document signatures](/members/document-signatures) |
-| A dependent's waiver is not offered during signup | The rule's **Household Role** does not include `Dependent`, or the document is unpublished | Add `Dependent` to the rule and publish the document |
+| A dependent's waiver is not offered during signup | The rule's **Household Role** does not include **Child**, or the document is unpublished | Add **Child** to the rule and publish the document |
 
 ## Related
 

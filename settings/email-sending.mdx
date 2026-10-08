@@ -17,7 +17,7 @@ Typical uses:
 - **A single-location gym on its own domain** - a padel gym verifies its domain so booking confirmations come from its bookings address and invoices from its main address.
 - **One sender per location** - a gym chain verifies its domain once, gives each location its own club Email, and sends invoices from a separate billing address.
 - **Fixing mail that arrives from a 1Club address** - a martial-arts school finds one location still on an old Gmail address and moves it onto the verified domain.
-- **Unlocking sending on a trial** - a new organization on a trial verifies its domain before it can send messages or run automations.
+- **Unlocking sending on a trial** - a new organization on a trial verifies its domain before it can send email from the Inbox or from automations.
 
 See [Worked examples](#worked-examples) for the exact settings behind the first three, and [Trial sending](#trial-sending) for the last.
 
@@ -54,14 +54,15 @@ A club Email always wins for club-scoped mail, even when its domain is **not** v
 | Email | Address used |
 | --- | --- |
 | Booking confirmation, cancellation, reschedule | Club Email |
-| Order confirmation | Club Email |
+| Order confirmation for a booking | Club Email |
+| Order summary without a booking | Organization-scoped |
 | Daily summary | Club Email |
 | Instructor calendar | Club Email |
 | Invoices and proformas | Organization-scoped (see below) |
 | Payment and renewal notices | Organization-scoped |
 | Welcome email, form confirmations, waitlist | Organization-scoped |
 | Sign-in, verification, invitations, password resets | Organization-scoped |
-| Inbox replies and campaigns | The inbox's own address, or the club in scope |
+| Messages and replies sent from the Inbox | The inbox's own address, or the club in scope |
 
 "Organization-scoped" does not simply mean the organization Email. See the next section.
 
@@ -75,7 +76,7 @@ Messages you send to members from the [Inbox](/inbox/messages) or an automation 
 When a member hits **Reply**, their answer goes to both. Your mailbox gets it as it always has, and 1Club files it in the Inbox under the conversation it answers, so your team sees it next to the message it replies to. You don't need an [email inbox](/settings/email-inboxes) for this.
 
 - Staff are alerted about the reply **in the app**, not by email, because your mailbox already has it.
-- Out-of-office and other automatic answers are dropped, so a campaign doesn't fill the Inbox with them.
+- Out-of-office and other automatic answers are dropped, so a message to many members doesn't fill the Inbox with them.
 - If a colleague answers the member's reply with **Reply all**, their answer isn't filed as the member writing in.
 - A message sent on behalf of a specific person, such as a review request sent from an instructor, keeps that person's reply-to.
 - Booking confirmations, invoices, and other system emails keep a single reply-to: your gym's address.
@@ -98,8 +99,8 @@ Step 2 means an unverified club address can be chosen ahead of your organization
 
 Verification is per **domain**, not per address. Once `yourgym.com` is verified, any address on it (`hello@`, `billing@`, `northside@`) can be used as a From with no further setup.
 
-1. Go to **Settings** > **Organization** > **Domains**.
-2. Enter your domain (for example `yourgym.com`) and set **Purpose** to **Email (SendGrid)**. The domain is created as soon as you finish typing it, so there is no separate **Add** button for email domains.
+1. Go to **Settings** > **Organization** > **Domains** and click **Add Domain**.
+2. Enter your domain (for example `yourgym.com`) and select **Email (SendGrid)** as the **Purpose** (the default). The domain is created as soon as you leave both fields, so there is no separate **Add** button for email domains.
 3. 1Club provisions the domain and shows **DNS records to add** - three CNAME records. One is the return-path record on an `em` subdomain, the other two are DKIM signing keys (`s1._domainkey` and `s2._domainkey`).
 4. Add all three records at your DNS provider.
 5. Wait for DNS to propagate, usually 5 to 30 minutes, then click **Verify**.
@@ -120,11 +121,11 @@ The record names 1Club shows are fully qualified (`em1234.yourgym.com`). Many re
 
 ## Trial sending
 
-Organizations on a trial must have a verified email domain before they can send messages or run automations. Without one, sending is blocked and the admin shows a **Verify your domain to unlock this feature** dialog. Paid plans are never subject to this. See [Platform subscription](/settings/platform-subscription).
+Organizations on a trial must have a verified email domain before they can send email messages, whether from the Inbox or from an automation step. Without one, the email is blocked and the admin shows a **Verify your domain to unlock this feature** dialog. Paid plans are never subject to this. See [Platform subscription](/settings/platform-subscription).
 
 ## Worked examples
 
-### Padel club with a single location
+### Padel gym with a single location
 
 A racket-sports gym runs one location on `acepadel.com`.
 
@@ -144,7 +145,7 @@ A fitness organization runs three gyms on one domain.
 
 Members booking at Harbor see `Harbor <harbor@yourgym.com>`; the monthly invoice run goes out from `Your Gym <billing@yourgym.com>`.
 
-### Martial arts school that forgot one club
+### Martial arts school that forgot one location
 
 A jiu-jitsu academy verified `northgatemma.com` and set the organization Email correctly, but one club still has an old `northgate.mma@gmail.com` address.
 

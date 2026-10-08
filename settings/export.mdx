@@ -4,7 +4,7 @@ description: Download your organization data as CSV, or prep your books for Quic
 keywords: [export, CSV, data export, QuickBooks, QBO, contacts export, bookings export, memberships export, invoices export, payments export, accounting export]
 ---
 
-Export downloads your organization's data as CSV files: contacts, bookings, memberships, invoices, and payments. There's also a QuickBooks bundle that packages customers, invoices, and payments into one ZIP for handing off to your accountant. Only admins can run exports.
+Export downloads your organization's data as an Excel workbook or a CSV file: contacts, bookings, memberships, invoices, and payments. There's also a QuickBooks bundle that packages customers, invoices, and payments for handing off to your accountant. Only admins can run exports.
 
 ## When to use it
 
@@ -41,13 +41,14 @@ Typical uses:
 
 ## Running an export
 
-The export wizard walks you through four steps: **Select data**, **Filters** (date range), **Preview** (the row count and a 10-row sample), and **Download**. Each export is scoped to your current organization and to the role of the person running it.
+The export wizard walks you through four steps: **Select data**, **Filters** (date range and file format), **Preview** (the row count and a 10-row sample), and **Download**. Each export is scoped to your current organization and to the role of the person running it.
 
 1. Open **Settings** > **Data Tools** > **Export**.
 2. Choose what you want to export (one entity per run).
-3. Click **Next** and set a **From** and **To** date if you want to narrow the range. Leave both blank to export everything.
-4. Click **Next** to generate the preview. You'll see the total row count, the list of columns, and the first 10 rows.
-5. Click **Download**. The file is sent straight to your browser; nothing is stored on the server afterwards.
+3. Click **Next** and pick a date range - a preset such as **All time**, or your own range. For the accounting export, you can also narrow it to one company with the billing entity filter, shown when you trade through more than one. See [Billing entities](/settings/billing-entities).
+4. Choose the **File format**: **Excel (.xlsx)**, the default, or **CSV (.csv)**. The accounting export defaults to CSV.
+5. Click **Next** to generate the preview. You'll see the total row count, the list of columns, and the first 10 rows.
+6. Click **Download**. The file is sent straight to your browser; nothing is stored on the server afterwards.
 
 The preview is the same query as the download (just capped at 10 rows), so the row count you see is exactly what you'll get in the file.
 
@@ -68,7 +69,14 @@ For the accounting export, an existing member whose contact record was created y
 
 ## File format
 
-All exports are UTF-8 CSV with a byte-order mark (BOM), so Excel and Numbers will open them with the correct encoding automatically.
+Choose the format on the **Filters** step:
+
+- **Excel (.xlsx)** - a workbook with dates and amounts already typed, ready to sort and sum. Up to 50,000 rows.
+- **CSV (.csv)** - a plain text file that opens in any spreadsheet app. Up to 500,000 rows.
+
+If an export has more rows than the format allows, the preview says so and you can't download it. Narrow the date range, or switch to CSV.
+
+CSV files are UTF-8 with a byte-order mark (BOM), so Excel and Numbers open them with the correct encoding automatically.
 
 - **Dates** are formatted as `YYYY-MM-DD` (UTC).
 - **Timestamps** are full ISO 8601 in UTC.
@@ -77,7 +85,7 @@ All exports are UTF-8 CSV with a byte-order mark (BOM), so Excel and Numbers wil
 
 ## The accounting export (QuickBooks)
 
-The QuickBooks option produces `quickbooks-export.zip`, intended as **preparation** for QuickBooks Online, not a one-click import.
+The QuickBooks option is intended as **preparation** for QuickBooks Online, not a one-click import. As **CSV (.csv)**, the default, it produces `quickbooks-export.zip` with one CSV file per document type, which is what most accounting import tools expect. As **Excel (.xlsx)**, it produces one workbook with a sheet per document type, plus a Read me sheet.
 
 ### What's in the ZIP
 

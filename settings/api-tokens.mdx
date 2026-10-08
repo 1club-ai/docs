@@ -19,7 +19,7 @@ Typical uses:
 See [Worked examples](#worked-examples) for the exact scopes and expiry behind each of these.
 
 <Note>
-Programmatic API access is a paid feature. On a free or trial plan you can view and revoke existing tokens, but the **Add** button is disabled until you upgrade. A banner at the top of the page explains this when it applies.
+Programmatic API access is a paid feature. On a free or trial plan you can view, edit, and revoke existing tokens, but the **Create Token** and **Add endpoint** buttons are disabled until you upgrade. A banner at the top of the page explains this when it applies.
 </Note>
 
 ## Access and permissions
@@ -31,46 +31,62 @@ In practice, only admins (and owners) hold organization settings management, so 
 
 ## Creating a token
 
-API tokens live on **Settings** > **Organization** > **APIs & webhooks**. The list shows each token's prefix, scopes, expiry, last-used date, and created date.
+API tokens live on **Settings** > **Organization** > **APIs & webhooks**. The **API tokens** list shows each token's **Name**, **Key**, **Scopes**, **Expires**, **Last Used**, and **Created** date.
 
-1. Click **Add** in the API tokens section.
+1. Click **Create Token** in the **API tokens** section.
 2. Fill in the token details:
    - **Name** - A label that identifies where this token is used, for example "Website class feed".
    - **Description** - An optional note on what the token is for.
    - **Expires** - Pick an expiry from the dropdown, or leave it as **No expiry** for a token you manage manually.
-   - **Scopes** - In the resource table, open the **Permissions** dropdown next to each resource and select the actions you want to allow. Leave a resource untouched for no access to it. You must select at least one scope.
+   - **Manages its own bookings** - Turn on for a partner platform that runs its own bookings and collects its own payments. Bookings this token creates can then only be changed by the connected system: your staff and members cannot edit or cancel them in 1Club. The token list marks these tokens with a **Manages own bookings** chip.
+   - **Scopes** - Turn on **Full access** for an all-access token (see below), or use the resource table: open the **Permissions** dropdown next to each resource and select the actions you want to allow. A resource you leave on **No access** stays closed. You must select at least one scope.
 3. Click **Save**.
-4. Copy the token immediately from the success banner. The raw token is shown only once and is never displayed again after you dismiss the banner. Store it in your integration's secret store.
+4. Copy the token immediately from the **API token created** banner with **Copy Token**. The raw token is shown only once and is never displayed again after you dismiss the banner. Store it in your integration's secret store.
 
-The token list shows only a short **prefix** of each token for identification, never the full value.
+The **Key** column shows only a short prefix of each token for identification, never the full value.
 
 ## Token scopes
 
 Scopes use the format `resource:action`. Each token is a set of these strings. The resource table in the dialog offers the resources and actions that are currently available:
 
-| Resource         | Available actions |
-| ---------------- | ----------------- |
-| **Classes**      | Read, Write       |
-| **Content**      | Read              |
-| **Clubs**        | Read              |
-| **Transactions** | Read              |
-| **Areas**        | Read              |
-| **Bookings**     | Read, Write       |
-| **Contacts**     | Read, Write       |
-| **Instructors**  | Read              |
-| **Plans**        | Read, Write       |
-| **Memberships**  | Read, Write       |
-| **Check-ins**    | Read, Write       |
+| Resource                  | Available actions       |
+| ------------------------- | ----------------------- |
+| **Classes**               | Read, Write             |
+| **Check-ins**             | Read, Write             |
+| **Content**               | Read, Write             |
+| **Website**               | Read, Write, Publish    |
+| **Media library**         | Read, Write, Delete     |
+| **Clubs**                 | Read                    |
+| **Transactions**          | Read, Write             |
+| **Invoices**              | Read                    |
+| **Areas**                 | Read, Write             |
+| **Bookings**              | Read, Write             |
+| **Contacts**              | Read, Write, Delete     |
+| **Instructors**           | Read, Write             |
+| **Plans**                 | Read, Write             |
+| **Memberships**           | Read, Write             |
+| **Products**              | Read, Write             |
+| **Forms**                 | Read, Write             |
+| **Organization settings** | Write                   |
+| **Revenue accounts**      | Write                   |
+| **Pricing rules**         | Read, Write             |
+| **Booking policies**      | Read, Write             |
+| **Document rules**        | Read, Write             |
+| **Message templates**     | Read, Write             |
+| **Events**                | Read, Write             |
+| **Messages**              | Read, Write             |
+| **Analytics**             | Read                    |
 
-The **Transactions** scope covers the records the admin calls [Charges](/sales/charges).
+The **Transactions** scope covers the records the admin calls [Charges](/sales/charges). **Transactions: Write** records revenue collected outside 1Club, such as a marketplace payout, and refunds of it; it never charges anyone.
 
 - **Read** allows fetching data (GET requests).
-- **Write** allows creating, updating, and deleting data where that resource exposes those operations.
+- **Write** allows creating and updating data where that resource exposes those operations.
+- **Delete** and **Publish** are separate actions on the resources that offer them, so you can grant writes without deletes, or edit a website without publishing it.
 
-Write actions are highlighted in the interface so you can spot them at a glance. Grant only the scopes an integration needs, and avoid write access unless the external system genuinely has to create or change data. The available resources and actions can grow over time; the dialog always reflects the current list.
+Each action has its own color in the interface (write, delete, and publish stand out from read) so you can spot powerful grants at a glance. Grant only the scopes an integration needs, and avoid write access unless the external system genuinely has to create or change data. The available resources and actions can grow over time; the dialog always reflects the current list.
 
 <Note>
-A wildcard scope exists that grants access to all current and future scopes. Treat it as an all-access key: use it only for a fully trusted, internally managed integration, and prefer explicit `resource:action` scopes everywhere else. The wildcard is an API-key feature only - an MCP client that asks for it over OAuth is rejected and must name the scopes it wants. See the [MCP tools reference](/mcp/tools#how-a-connection-gets-its-scopes).
+The **Full access** switch at the top of **Scopes** grants every current and future capability (the wildcard scope). The dialog warns that such a token can read and write everything in the organization. Treat it as an all-access key: use it only for a fully trusted, internally managed integration, and prefer explicit `resource:action` scopes everywhere else. The wildcard is an API-key feature only - an MCP client that asks for it over OAuth is rejected and must name the scopes it wants. See the [MCP tools reference](/mcp/tools#how-a-connection-gets-its-scopes).
 </Note>
 
 ## Token expiry
@@ -85,28 +101,26 @@ Tokens with no expiry stay active until you revoke them. The list shows the time
 
 ## Editing a token
 
-Open a token's actions menu and choose edit to change its name, description, scopes, or expiry. Editing does not reveal the raw token again.
+Open a token's actions menu and choose edit to change its name, description, **Manages its own bookings** setting, scopes, or expiry. Editing does not reveal the raw token again.
 
-<Warning>
-Choosing an expiry in the edit dialog sets a fresh countdown from now. If you edit a token without picking an expiry option, its expiry is cleared and it becomes a no-expiry token. Set the expiry deliberately each time you edit.
-</Warning>
+For a token that already has an expiry, **Expires** starts on **Keep current expiry**, so other edits leave the expiry alone. Choosing a duration sets a fresh countdown from now, and choosing **No expiry** clears it.
 
 ## Revoking a token
 
 1. Find the token in the list.
-2. Open its actions menu and choose **Revoke**.
+2. Open its actions menu and choose **Revoke Token**.
 3. Confirm.
 
 Revoking is immediate and permanent. Any integration using that token stops working at once. Create a new token if the integration needs to continue.
 
 ## Webhooks and MCP
 
-- **Webhooks** remain on this page. Register endpoint URLs that 1Club calls when availability changes, each with its own signing secret. See the [Webhooks reference](/api-reference/channel-integration/webhooks).
+- **Webhooks** remain on this page, in the **Webhooks** section. Click **Add endpoint** and enter an HTTPS **Endpoint URL**, an optional **Description**, and the **Events** to receive. 1Club sends signed POST requests when availability changes. Copy the **Signing secret** when it is shown, because it is shown only once. The endpoint's edit dialog has an **Enabled** switch to pause delivery and **Rotate signing secret**, which stops the old secret at once. See the [Webhooks reference](/api-reference/channel-integration/webhooks).
 - **MCP** is separate from API tokens. Open **Settings** > **Artificial Intelligence** > **AI assistants (MCP)** to copy the endpoint, review connected assistants, and revoke OAuth grants. See [Connect an assistant](/mcp/connect).
 
 ## Worked examples
 
-### Website pulling the class schedule for a padel club
+### Website pulling the class schedule for a padel gym
 
 Your marketing site shows the upcoming padel timetable. Create a token named "Website schedule", grant **Classes: Read**, **Clubs: Read**, and **Areas: Read**, and leave everything else off. The site can render the schedule but can never modify anything. Give it **No expiry** and rotate it if the site is rebuilt.
 
@@ -130,9 +144,9 @@ You need to pull transactions once for a year-end reconciliation at a yoga studi
 
 ## Troubleshooting
 
-**Issue**: The Add button is disabled.
+**Issue**: The Create Token button is disabled.
 
-**Solution**: API access is a paid feature. Free and trial plans can view and revoke tokens but not create them. Upgrade the plan, then create the token.
+**Solution**: API access is a paid feature. Free and trial plans can view, edit, and revoke tokens but not create them. Upgrade the plan, then create the token.
 
 **Issue**: I closed the dialog and lost the token value.
 

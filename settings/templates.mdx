@@ -21,7 +21,7 @@ See [Welcome message example](#welcome-message-example-racket-sports), [padel bo
 Template content is channel-neutral: 1Club stores structured blocks (paragraphs, buttons, images), and each channel renders its own projection - email through the branded transactional layout, SMS and WhatsApp as plain text.
 
 <Note>
-Customizing templates is a paid capability. Free organizations and organizations still on the Grow trial see a **plan-locked** banner and an **Upgrade** button on the Templates page. The **Add template** button is disabled until you upgrade.
+Customizing templates is a paid capability. Organizations on the Free plan see a banner saying template customization is not available in their plan, and the **Add Template** button and **Save** are disabled until they upgrade. Organizations on a trial keep full access.
 </Note>
 
 ## The Templates list
@@ -30,7 +30,7 @@ Both kinds of template live at **Settings** > **Communication** > **Templates**.
 
 - **Name** - the template name.
 - **Source** - a **Custom** chip for templates you authored, a **System** chip for built-in templates, and an additional **Customized** chip when you have an active override for a system template.
-- **Type** - `message`, `transactional`, or `receipt`.
+- **Type** - **Marketing & Updates** (`message`), **Transactional**, or **Receipt**.
 - **Actions** - depends on the source (see below).
 
 A customized system template is shown as its **system** row carrying both the **System** and **Customized** chips; the underlying override is folded into that row rather than appearing as a separate line, so you never see duplicates.
@@ -44,15 +44,15 @@ A customized system template is shown as its **system** row carrying both the **
 
 Use a custom template for the ad-hoc notes you send from the [Inbox](/inbox/overview) - a class reminder, a promotional blurb, a re-engagement note.
 
-1. On the Templates page, click **Add template**. (The button is disabled if your plan does not include template customization.)
+1. On the Templates page, click **Add Template**. (The button is disabled if your plan does not include template customization.)
 2. Fill in **Name** (required).
 3. Choose the **Type**:
-   - **Message** - shows up in the inbox compose picker for manual sends.
+   - **Marketing & Updates** (`message`) - shows up in the inbox compose picker for manual sends.
    - **Transactional** - a system-style email body.
    - **Receipt** - invoice receipt content.
-4. For **message** and **transactional** types, add a **Subject** and optional **Preview text** (the snippet shown in the inbox preview line of an email client).
-5. Write the body in the block editor. Add paragraphs, buttons, images, and dividers.
-6. Insert variables from the **Available Variables** panel on the right. Click a variable chip to copy `{{token}}` to your clipboard, then paste it into the body or subject.
+4. For **Marketing & Updates** and **Transactional** types, add a **Subject** and optional **Preview Text** (the snippet shown in the inbox preview line of an email client).
+5. Write the body in the block editor. Add headings, paragraphs, lists, quotes, buttons, images, and dividers.
+6. Insert variables with the **Insert variable** picker, in the editor toolbar and at the end of the **Subject** field. Pick a variable and its `{{token}}` is inserted where your cursor is.
 7. Click **Save**.
 
 To duplicate an existing custom template, use the **Copy** action on its row. A copy is created with `(Copy)` appended to the name and opens in the editor.
@@ -85,6 +85,8 @@ System templates are the built-in messages 1Club sends automatically. The Templa
 | Booking Cancellation | Sent when a booking is cancelled |
 | Booking Player Welcome | Sent to additional players added to a booking |
 | Booking Reminder | Sent before an upcoming booking |
+| Payment Confirmation | The receipt a member gets when a payment settles |
+| Invoice / Pro-forma | Sends an invoice or pro-forma invoice with the PDF attached |
 | Instructor Schedule Invite | Sent to an instructor when a class or PT session they run is scheduled, updated, or cancelled |
 | Member Invitation | Sent when inviting someone to join as a member |
 | Payment Link | Sent with a pay-now link for an invoice or charge |
@@ -94,10 +96,14 @@ System templates are the built-in messages 1Club sends automatically. The Templa
 | Review Request | Sent after attendance to request a review |
 | Membership Expiration Reminder | Sent before a membership expires |
 | Welcome Email | Sent once when a member first becomes active |
+| Form Submission Confirmation | Sent to the person who filled in a form, once their answers are recorded |
+| Document Signature Request | Sent when staff send a member a document to sign |
+| Promotion | Sent when a member moves up a progression track, such as a new belt or grade |
+| New stripe | Sent when a member is awarded a stripe within their current rank |
 
 ### System emails you cannot customize
 
-A separate set of system emails is fixed and does not appear in the catalog, because they carry security-sensitive or platform-level content: password reset, email verification and resend verification, inbox verification, organization invitation, account confirmation, instructor invitation, invitation reminder, signup notifications, and AI report verification. These always send with their built-in wording.
+A separate set of system emails is fixed and does not appear in the catalog, because they carry security-sensitive or platform-level content: password reset, email verification and resend verification, inbox verification, organization invitation, account confirmation, instructor invitation, invitation reminder, signup notifications, AI report verification, and assessment emails. These always send with their built-in wording.
 
 ## Customizing a system template
 
@@ -106,7 +112,16 @@ Customizing replaces the built-in email with your own version for that one templ
 1. On the Templates page, find the system template row and click **Customize**.
 2. The editor opens pre-filled with the system template's default subject, preview text, and content blocks.
 3. Edit the subject and body. Use the in-editor **Insert variable** picker - it lists exactly the variables this template supports (for example, `{{entityName}}`, `{{clubName}}`, `{{bookingDate}}` on Booking Confirmation), grouped by category.
-4. Click **Save**. The row now shows both **System** and **Customized** chips.
+4. Check the rendered email in the preview below the editor.
+5. Click **Save**. The row now shows both **System** and **Customized** chips.
+
+### Translating a customized template
+
+If your organization serves more than one language, a saved customized template shows a **Translate** button. It translates your wording into every language your gym serves. Click **Save** to publish the translations, then use the **Preview language** selector above the preview to read each one. Members who read a language whose translation is incomplete get your original wording.
+
+**Translate** is disabled while you have unsaved edits, so save first. Templates you wrote yourself (not customized system templates) are always sent exactly as written, and a customized template whose body is pasted HTML is never translated.
+
+### Resetting to the default
 
 To go back to the built-in email, open your customized template and click **Reset to Default**. This deletes the override after a confirmation prompt and cannot be undone; the built-in system email takes over again immediately.
 
@@ -116,7 +131,7 @@ Keep every required variable in a customized template. If you delete a token the
 
 ### Worked example: padel booking confirmation
 
-Rebrand the Booking Confirmation email for a padel club so it reinforces the court-etiquette rules and surfaces the door PIN:
+Rebrand the Booking Confirmation email for a padel gym so it reinforces the court-etiquette rules and surfaces the door PIN:
 
 ```text
 Subject: You're on court - {{entityName}} at {{clubName}}
@@ -152,54 +167,59 @@ Write variables as `{{variableName}}`. They are substituted per recipient when t
 
 ### Manual message templates
 
-For `message` templates, the following variables resolve at send time. This is the set surfaced in the **Available Variables** panel and the same set expanded when a manual message goes out:
+For **Marketing & Updates** (`message`) templates, the following variables resolve at send time. This is the set the **Insert variable** picker offers and the same set expanded when a manual message goes out:
 
 | Variable | Description |
 | --- | --- |
 | `{{contactName}}` | Recipient's full name |
 | `{{contactFirstName}}` | Recipient's first name (for greetings) |
+| `{{contactLastName}}` | Recipient's last name |
 | `{{contactEmail}}` | Recipient's email |
 | `{{organizationName}}` | Your organization's name |
 | `{{organizationEmail}}` | Your organization's contact email |
 | `{{organizationPhone}}` | Your organization's phone number |
+| `{{orgBaseUrl}}` | Your organization's base URL |
+| `{{orgLogoUrl}}` | Your organization's logo URL |
 | `{{senderName}}` | The staff member sending the message |
 | `{{subject}}` | The message subject (handy inside body copy) |
 | `{{messageDate}}` | The formatted send date |
 
-### Receipt templates
+### Transactional and receipt templates
 
-`receipt` templates additionally resolve `{{receiptNumber}}`, `{{receiptDate}}`, `{{amount}}`, and `{{paymentMethod}}` alongside the contact and organization tokens above.
+A **Transactional** template you write offers the contact name tokens (`{{contactFirstName}}`, `{{contactName}}`), the organization tokens (`{{organizationName}}`, `{{organizationEmail}}`, `{{organizationPhone}}`, `{{orgBaseUrl}}`, `{{orgLogoUrl}}`), and `{{clubName}}`. It does not offer `{{subject}}`, `{{senderName}}`, or `{{messageDate}}`, which only resolve in manual messages.
+
+A **Receipt** template offers the contact name and organization name, email, and phone tokens, plus `{{receiptNumber}}`, `{{receiptDate}}`, `{{amount}}`, and `{{paymentMethod}}`.
 
 ### System template variables
 
 Each system template declares its own variable set - Booking Confirmation exposes booking tokens (`{{entityName}}`, `{{clubName}}`, `{{bookingDate}}`, `{{bookingTime}}`, `{{bookingDuration}}`, `{{bookingTotal}}`, `{{accessPin}}`), Membership Expiration Reminder exposes `{{planName}}`, `{{expirationDate}}`, `{{renewalPrice}}`, `{{renewUrl}}`, and so on. When you customize a system template, the **Insert variable** picker shows exactly that template's tokens, so you can only reference values 1Club can actually fill for that send. These booking and membership tokens are only meaningful on their own system template (or on a trigger-based [automation](/marketing/automations) that binds the matching record) - they do not resolve on a plain manual `message` template.
 
 <Note>
-Unknown tokens are not rejected when you save through the admin editor - they are simply left un-substituted in the sent message. Only 1Club's AI assistant enforces the variable allow-list when it drafts a template for you. Always confirm your tokens against the **Available Variables** or **Insert variable** list.
+Unknown tokens are not rejected when you save through the admin editor - they are simply left un-substituted in the sent message. Only 1Club's AI assistant enforces the variable allow-list when it drafts a template for you. Always confirm your tokens against the **Insert variable** list.
 </Note>
 
 ## Per-channel content
 
 The same template can be delivered over email, SMS, or WhatsApp. Because content is stored as channel-neutral blocks:
 
-- **Email** renders the blocks through the branded transactional layout, using the **Subject** and **Preview text**.
+- **Email** renders the blocks through the branded transactional layout, using the **Subject** and **Preview Text**.
 - **SMS and WhatsApp** render a plain-text projection of the same blocks - buttons collapse to their link text, and formatting is stripped. Keep bodies short if you send over these channels.
 
 ## Tips & best practices
 
 - **Greet with `{{contactFirstName}}`, not `{{contactName}}`.** First name reads warmer in a salutation; full name is better for formal receipts.
 - **Customize the highest-volume emails first.** Booking Confirmation, Booking Reminder, and Welcome Email reach nearly every member - branding those has the most impact.
-- **Preview text earns the open.** Fill **Preview text** on email templates; it is the snippet shown next to the subject in most inboxes.
+- **Preview text earns the open.** Fill **Preview Text** on email templates; it is the snippet shown next to the subject in most inboxes.
 - **Do not delete required tokens.** Removing a value like `{{bookingTime}}` or `{{expirationDate}}` leaves a gap in the sent email rather than an error.
 - **Reset is your undo.** If a customization goes wrong, **Reset to Default** restores the built-in email cleanly - there is no need to hand-rebuild it.
-- **Use automations for triggered sends.** A template is reusable content; to send it automatically on an event (booking upcoming, membership expiring, review after check-in), wire it into an [automation](/marketing/automations).
+- **Use automations for triggered sends.** A template is reusable content; to send it automatically on a trigger (booking upcoming, membership expiring, review after check-in), wire it into an [automation](/marketing/automations).
 
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| **Add template** button is greyed out | Template customization is not in your plan, or you are on the Grow trial | Upgrade from the plan-locked banner or **Settings** > **Organization** > **Subscription** |
-| A `{{token}}` shows up literally in a sent message | The token is not in that template's variable set, or it is a system token used on a plain `message` template | Replace it with a variable from the **Available Variables** / **Insert variable** list |
+| **Add Template** button is greyed out | Your organization is on the Free plan, which does not include template customization | Upgrade under **Settings** > **Organization** > **Subscription** |
+| A `{{token}}` shows up literally in a sent message | The token is not in that template's variable set, or it is a system token used on a plain `message` template | Replace it with a variable from the **Insert variable** list |
 | Customized a system template but members still get the old wording | The override is inactive, or you edited a different template than the one that fires | Confirm the row shows the **Customized** chip; re-open and re-save |
 | A value like the access PIN is blank in the email | That variable is optional and the recipient has no value for it (for example, no PIN assigned) | Expected behavior - the line renders empty; consider wording that reads fine without it |
 | Booking or membership tokens do not resolve in a manual send | Those tokens only bind on their system template or a trigger-based automation | Move the send into an [automation](/marketing/automations), or use manual-message variables only |

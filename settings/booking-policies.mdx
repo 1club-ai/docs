@@ -3,7 +3,7 @@ title: "Booking policies"
 description: "Configure how members book, when they pay, and how check-in is enforced, under Settings > Bookings > Booking and cancellation policies."
 ---
 
-Booking policies decide when payment is collected, whether bookings need a contact, whether check-in is required, and how cancellations are refunded. Owners and admins set them up, and members and the front desk meet their rules when a booking is made, checked in, or cancelled. You can have one policy for the whole organisation or different policies per location, area type, class type, instructor type, or plan.
+Booking policies decide when payment is collected, whether bookings need a contact, whether check-in is required, and how cancellations are refunded. Owners and admins set them up, and members and the front desk meet their rules when a booking is made, checked in, or cancelled. You can have one policy for the whole organization or different policies per gym, per class, area, or instructor type, per event, or for a particular audience such as holders of a plan.
 
 ## When to use it
 
@@ -29,12 +29,12 @@ Staff are not held to them. When an admin, manager, front desk, or instructor bo
 The rules that work this way:
 
 - **Min. notice** and **Max. ahead** (including a repeating booking that reaches past **Max. ahead**)
-- **Min. booking slot**, **Max. booking slot**, and **Booking duration step**
+- **Slot duration** (**Shortest**, **Longest**, and **Step**)
 - The working hours of the gym or the area
 - Who an area type or class type is open to
 - A deposit rule that restricts new bookings when a member's wallet is short
 - **Enforce payment** (at booking or at check-in), and **Allow walk-ins**
-- The **Waitlist claim window**
+- The **Waitlist claim** window
 - The check-in window (from 1 hour before the start until the end of the day)
 - A plan's **Require payment upfront**, when staff sell or renew a membership
 
@@ -50,24 +50,26 @@ Two kinds of rule still apply to staff:
 ### Viewing all policies
 
 1. Go to **Settings** > **Bookings** > **Booking and cancellation policies**.
-2. Each policy appears as a card with quick-glance metadata: cancellation rules count, min slot, scope, clubs, and which payment and check-in toggles are on.
-3. Click a policy to edit it, or click **Add** to create a new one.
+2. Each policy appears as a card showing what it applies to, who it applies to (**Everyone** or **Selected audience only**), its gyms, any notice and booking-ahead limits, whether payment is required upfront or at check-in, and a timeline of its refund terms.
+3. Click a policy to open it, or click **Add** to create a new one. Use the copy icon on a card to duplicate a policy.
 
 ### Creating or editing a policy
 
-1. Click **Add** in the top right (or click an existing policy to edit it).
-2. Fill in the sections: **Policy details**, **Scope**, **Booking rules**, **Cancellation rules**, and **Orders**.
-3. Click **Save** when done.
+1. Click **Add** in the top right (or click an existing policy to open it).
+2. Fill in the sections on the page: **General**, **Booking rules**, and **Cancellation rules**. The toggles live in the **Options** panel on the right.
+3. Click **Save** in the save bar when done.
+
+From an existing policy you can also **Duplicate** or **Delete** it from the page header.
 
 ## Booking rules
 
-This is the heart of the policy. Every toggle and field below lives in the **Booking rules** section of the policy dialog.
+This is the heart of the policy. The fields below live in the **Booking rules** section, and a one-line summary at the top of the section restates the limits you have set. An event policy has no booking rules - see [Scope](#scope).
 
-### Min/max booking slot
+### Slot duration
 
-- **Min. booking slot (minutes)** - Minimum booking duration. Members can't book anything shorter.
-- **Max. booking slot (minutes)** - Maximum duration. Members can't book anything longer.
-- **Booking duration step (minutes)** - Booking duration must be the minimum plus a multiple of this step (e.g. min 60 \+ step 60 means only 60, 120, 180 min are allowed).
+- **Shortest** (minutes) - Minimum booking duration. Members can't book anything shorter. Leave blank for no minimum.
+- **Longest** (minutes) - Maximum duration. Members can't book anything longer. A new policy starts at 240 minutes.
+- **Step** - **30 min** or **1 hour**. Every booking duration is a multiple of the step, and **Shortest** and **Longest** must be multiples of it too (for example, shortest 60 and step 1 hour allows only 60, 120, 180 min).
 
 Staff booking a slot outside these limits see a note such as "Members book on a 60 min grid" and can still book it.
 
@@ -77,6 +79,8 @@ Staff booking a slot outside these limits see a note such as "Members book on a 
 - **Max. ahead** (days) - Members can only see and book up to this many calendar days ahead. Leave blank for no limit.
 
 Staff can book outside the window. The booking dialog shows a note such as "Members book up to 7 days ahead", and **Add** books it on the first click.
+
+To let latecomers join a class that is already running, turn on **Keep booking open when the class has attendees** in the **Options** panel. Once someone has booked the class, others can still join inside the **Min. notice** period until it ends.
 
 #### Max. ahead and repeating bookings
 
@@ -100,9 +104,9 @@ Two things to know:
   inside the window when it is created. Use **Never** for a standing weekly booking at a
   gym that also sets a short **Max. ahead**.
 
-### Waitlist claim window (minutes)
+### Waitlist claim
 
-When a spot opens 2-12 hours before a class, the first person on the waitlist has this many minutes to claim it. The default is 15. Leave empty to use 15.
+When a spot opens and isn't auto-booked (for example, less than 12 hours before the class), the first person on the waitlist has this many minutes to claim it. The default is 15. Leave empty to use 15. See [Waitlists](/schedule/waitlists).
 
 The window binds the member claiming the spot. Staff can still turn an entry into a booking after its window has passed - see [Waitlists](/schedule/waitlists).
 
@@ -110,7 +114,7 @@ The window binds the member claiming the spot. Staff can still turn an entry int
 
 A single dropdown that decides when payment is enforced. Pick one of three options:
 
-- **At booking** - Members must pay in the portal before the booking is confirmed. A booking that still has unpaid charges can't be self-checked-in at the kiosk or in the check-in app.
+- **At booking** - Members must pay in the portal before the booking is confirmed. A booking that still has unpaid charges can't be self-checked-in at the kiosk or in the check-in app. This option needs online card payments at every gym the policy covers: if any of them can't take cards online, **At booking** is greyed out, and saving it is refused.
 - **At check-in** - Members can create bookings without paying in advance, but they can't check themselves in until the payment is collected (or an active membership / external program covers the visit).
 - **None** - Payment is not enforced. Members can be checked in even if they still have unresolved payments. The front desk uses judgment to follow up.
 
@@ -128,16 +132,26 @@ Pick **None** for community gyms, martial-arts schools, kids' programs, and othe
   **At the front desk** - Staff are not held to **Enforce payment**. A booking created from the admin dashboard is confirmed without payment, so you can record bookings that will be paid later. At check-in, the dialog says the gym asks for payment at check-in, and staff can still let the member in: without a payment, the amount stays owed. One exception remains: a booking with no entrance method still needs one picked (membership, external program, or direct payment) before check-in, whatever the policy says.
 </Note>
 
+### Charge notice
+
+How many days before a session its charge is added to the member's balance. A repeating booking is charged session by session as each one comes round, so a long series doesn't put months of future sessions on the balance at once. Leave it empty for the default of 3 days. The field is disabled while **Enforce payment** is **At booking**, because the whole series is then charged up front.
+
+### Sell with bookings
+
+Pick the product categories members can add to the same order on the booking confirmation page (for example drinks, towels, or equipment rental). Leave it on **None** to offer no products.
+
+## Options
+
+The toggles in the **Options** panel on the right of the policy page decide who can book and how check-in works. The **Check-in** group holds the check-in toggles. An event policy has no options.
+
 ### Upsell available plans
 
-When enabled, members see suitable membership plans on the booking confirmation screen and can add one to the same order. Useful for converting drop-ins to members. The in-app help reads: "When enabled, members can see suitable membership plans on booking confirmation and add one to the same order."
+When enabled, members see suitable membership plans on the booking confirmation screen and can add one to the same order. Useful for converting drop-ins to members.
 
 By default every matching plan is offered. To show only a specific subset, use the **Plans to upsell** multi-select that appears once the toggle is on:
 
-- Leave it empty to show all matching plans.
-- Pick specific plans to show only those.
-
-Display order follows the global plan order set on the Plans page - see [Membership plans](/sales/plans).
+- Leave it empty to show all matching plans, in the global plan order set on the Plans page - see [Membership plans](/sales/plans).
+- Pick specific plans to show only those. With two or more picked, drag them into the order you want them shown. The booking dialog shows as many as fit and hides the rest behind **Show all**.
 
 ### Check-in required
 
@@ -147,34 +161,59 @@ When on, any booking that isn't checked in by the end of the booking day is auto
 
 ### Auto check-in at booking start
 
-> Auto check-in at start time.
+> Booked members are checked in without staff action.
 
 When on, the system automatically checks the member in at the booking start time without staff action. Useful for venues where staff don't physically scan members in (e.g. self-service court reservations).
 
 ### Allow anonymous bookings
 
-> When enabled, admin can create bookings without selecting a contact.
+> Staff can book without selecting a contact.
 
 Use this when admins need to book for someone who doesn't have a 1club profile yet - for example, a phone caller asking for a personal-training session before they've signed up. The booking is recorded without a contact link; you can attach a contact later if the person creates a profile.
 
 This setting only affects what admins can do in the admin dashboard. It does not let members book anonymously from the public portal. Because only staff can book with no contact, this is one of the rules staff are still held to.
 
+### Allow walk-ins
+
+> Check in a contact who has no booking.
+
+When on, the front desk can check in a contact who arrives without a booking. This replaces the older Flexible (Anonymous) check-in toggle in access control.
+
+### Allow anonymous check-ins
+
+> Check in a visitor with no contact record.
+
+When on, staff can check in a visitor who has no contact at all. It works independently of **Allow walk-ins**.
+
 ### Allow guest bookings
 
-> When enabled, logged-out visitors can book without an existing account.
+> Logged-out visitors book without an account or password - email, name, and whatever else you require at signup.
 
-When this is on, a visitor who isn't logged in can book from your public portal, website, or network without creating a password first. They enter their email, verify it with a one-time code we send them, and complete the booking. After the booking is made, 1Club creates a passwordless member account for them and signs them in, so they can see and manage the booking.
+When this is on, a visitor who isn't logged in can book from your public portal, website, or network without creating a password first. What happens next depends on the email they enter:
 
-If the email already belongs to an active member, the visitor is routed to log in instead. This is off by default - turn it on per policy when you want to let new visitors book before signing up. See [Member onboarding](/members/onboarding) for the full signup and verification experience.
+- **A new email** - They enter their name and any other fields your signup asks for, and the booking is made straight away. Their email is not verified and no account is created, so they stay a contact until they sign up themselves.
+- **An email you already have on a contact** - They must enter a one-time code sent to that email. The booking is made against that contact, who becomes a passwordless member and is signed in.
+- **An email that already has an account** - They are asked to log in instead.
+
+This is off by default - turn it on per policy when you want to let new visitors book before signing up. See [Member onboarding](/members/onboarding) for the full signup and verification experience.
 
 ## Scope
 
-Use the **Scope** section to control which bookings the policy applies to.
+Use the **General** section to control which bookings the policy applies to. What a policy covers and who it covers combine, so one policy can say "Gold members, on padel courts".
 
-- **Clubs** - Leave empty to apply to all clubs, or pick specific clubs.
-- **Scope by type** - Pick one of _All types_, _Area type_, _Class type_, _Instructor type_, or _Plan_. Then narrow further by selecting a specific area type, class type, instructor type, or plan(s).
+- **Clubs** - Leave it on **All clubs**, or pick specific gyms.
+- **What it applies to** - **Bookings** or **Events**.
+  - For **Bookings**, set **Coverage** to **All bookings**, or to **Selected bookings** and then use the **Classes**, **Areas**, and **Instructors** dropdowns. Each one can cover none, all, or only the [class types](/settings/class-types), [area types](/settings/area-types), or [instructor types](/settings/instructor-types) you pick.
+  - For **Events**, pick the events the policy covers in **Events**, or leave it empty for every event. An event policy sets cancellation terms only: booking rules and options don't apply to event tickets.
+- **Who it applies to** - Leave it empty to apply to everyone, or choose an audience (for example a contact type, a tag, or the membership plan people hold). The policy then applies only to those people. Not available for event policies.
 
-When more than one policy could apply to the same booking, the most specific scope wins. A policy scoped to a particular class type beats a policy scoped to a club, which beats an org-wide policy.
+When more than one policy could apply to the same booking, the most specific one wins, in this order:
+
+1. A policy attached to the booking's gym beats an all-gyms policy.
+2. A policy that sets both what and who beats one that sets only what, which beats one that sets only who, which beats an unscoped policy.
+3. Naming the booking's specific type (or event) beats covering all types.
+4. An audience that names membership plans beats one that doesn't.
+5. If it is still a tie, the most recently created policy wins.
 
 ## Cancellation rules
 
@@ -184,9 +223,11 @@ Pick one of three **Cancellation terms** in the policy:
 - **Refund by notice period** - The refund shrinks as the booking approaches. Add a rule per notice period.
 - **Non-refundable** - Members get nothing back, however early they cancel.
 
+A timeline under the dropdown shows how much is refunded at each point before the booking starts. The terms apply equally to bookings paid upfront and on site. Whatever the terms keep and was not paid is collected from the member's wallet, including the deposit, and a no-show owes the full price.
+
 ### Refund by notice period
 
-Add a rule for each notice period. For each rule:
+Click **Add Rule** to add a rule for each notice period. For each rule:
 
 - **Hours in Advance** - How many hours before the booking the member cancels.
 - **Refund %** - What percentage of the booking price is refunded.
@@ -209,7 +250,7 @@ Once a member is booking a specific slot, the policy is shown as the **deadlines
 - 50% refund until Saturday, Sep 12 at 11:00 AM
 - No refund after that
 
-Deadlines are shown in the club's timezone. A band whose deadline has already passed is left out, so a member booking a court an hour before it starts is told plainly that there is no refund rather than being shown a tier they cannot reach. Where no specific booking is in context, the notice periods are shown instead.
+Deadlines are shown in the gym's timezone. A band whose deadline has already passed is left out, so a member booking a court an hour before it starts is told plainly that there is no refund rather than being shown a tier they cannot reach. Where no specific booking is in context, the notice periods are shown instead.
 
 Policies with no rules at all say so too: under **Free cancellation** a member reads "Full refund at any time" on the confirmation before they pay, and again when they open the cancellation.
 
@@ -228,10 +269,6 @@ Members see a single line on the booking confirmation and in their account: "No 
   If you previously faked non-refundable bookings with a very large **Hours in Advance** value (such as 9999 hours at 100% refund), switch the policy to **Non-refundable** and save. The old setup refunds nothing in practice, but members reading the booking confirmation are told to cancel 9999 hours ahead for a full refund.
 </Note>
 
-## Orders
-
-The **Product categories offered with the bookings** field let you allow specific product categories on the booking confirmation page (e.g. drinks, towels, equipment rental). Members can add these to the same order.
-
 ## Worked examples
 
 ### Drop-in yoga studio
@@ -241,10 +278,10 @@ You want walk-ins to be welcome, and payment collected at the door.
 - **Enforce payment** - At check-in
 - **Allow anonymous bookings** - off
 - **Check-in required** - off (members may walk in without a booking)
-- **Allow walk-in check-ins** - on (reception can check in a walk-in who has no booking)
+- **Allow walk-ins** - on (reception can check in a walk-in who has no booking)
 - **Allow anonymous check-ins** - on (a trial visitor with no member account can be checked in; an anonymous check-in can only be covered by direct payment or an external program)
 
-The walk-in and anonymous check-in controls live on the booking policy itself (they replace the older Access Control "Flexible" check-in mode). See [Check-in models](/reference/check-in-models) for how the front desk uses them; per-club identification methods (QR, card, PIN) are still set under [Access control](/settings/access-control).
+The walk-in and anonymous check-in controls live on the booking policy itself (they replace the older Access Control "Flexible" check-in mode). See [Check-in models](/reference/check-in-models) for how the front desk uses them; per-gym identification methods (QR, card, PIN) are still set under [Access control](/settings/access-control).
 
 ### Strict class-based gym
 
@@ -286,7 +323,7 @@ You let admins book PT for callers who haven't signed up yet.
 
 **Issue**: Two policies seem to apply to the same booking 
 
-**Solution**: The more specific scope wins. Class-type-scoped beats club-scoped beats org-wide. Open both policies and check their **Scope** sections to confirm precedence.
+**Solution**: The more specific policy wins. A policy attached to the gym beats an all-gyms policy, then a policy with both a coverage and an audience beats one with only one of them. Open both policies and check their **General** sections, then compare them against the order in [Scope](#scope).
 
 **Issue**: A repeating booking is refused for being too far in advance, but its first session is next week.
 
@@ -302,7 +339,7 @@ repeat with no end. Staff creating the series from the admin dashboard are not h
 ## Related
 
 - [Check-in Models](/reference/check-in-models) - Pick the right model before configuring policies.
-- [Access Control](/settings/access-control) - Per-club check-in mode and identification methods.
+- [Access Control](/settings/access-control) - Per-gym check-in mode and identification methods.
 - [External Programs](/settings/external-programs) - Third-party entrance methods that satisfy payment-at-check-in.
 - [Bookings](/schedule/bookings) - Day-to-day booking management.
 - [Repeating schedules](/reference/repeating-schedules) - How a repeating series is created, and why **Max. ahead** measures its last occurrence.

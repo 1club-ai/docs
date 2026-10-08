@@ -20,7 +20,7 @@ See [Worked examples](#worked-examples) for the exact settings behind each of th
 
 ## How it works
 
-The two halves live in different places. Identification methods and enrollment are set per gym under **Settings** > **Access Control** > **Settings**. The strictness of check-in is governed by your **booking policy**, not by a single toggle on that page. Physical door hardware (access grants and door sync) is part of the native access control feature, documented separately in [Access control settings](/settings/access-control-settings).
+The two halves live in different places. Identification methods and enrollment are set per gym under **Settings** > **Access Control** > **Settings**. The strictness of check-in is governed by your **booking policy**, not by a single toggle on that page. Physical door hardware (access grants and the door access integrations) is documented separately in [Physical access control](/settings/access-control-settings).
 
 If you're choosing how members get into your club, start with [Check-in models](/reference/check-in-models).
 
@@ -80,16 +80,16 @@ Open **Settings** > **Access Control** > **Settings**. Each club appears as its 
 
 Turn on **Access Control** for a club to enable **credential enrollment** - letting members register an access card, NFC device, or PIN themselves for physical entry, instead of staff registering one for them. When it's on, choose the **Enabled Identification Methods**:
 
-- **QR Code** - members enroll a QR code and scan it at the door.
+- **QR Code** - the QR code in the member's app. Every member already has one, so there is nothing to issue.
 - **Access Card** - members enroll a physical access card (NFC/RFID).
 - **PIN Code** - members enroll a numeric PIN to type at the door.
 
-All three are enabled by default; you can turn off any you don't accept. When a method is off, members can't enroll it themselves, though staff can still register one manually.
+Access control is off for every club by default, with no methods enabled, so no credentials are issued until you turn it on and pick the methods you accept. When a method is off, members can't enroll it themselves, though staff can still register one manually.
 
 At the door, 1Club identifies the member in this order: **PIN**, then **access card**, then **QR code**. A PIN is matched on the full 6-digit code, and a kiosk can accept just the last 4 digits as a shortcut.
 
 <Note>
-The **Access grants** tab next to **Settings** lists the access grants that drive physical locks. That side of the native access control feature is documented separately; see [Access control settings](/settings/access-control-settings).
+**Access grants**, next to **Settings** in the **Access Control** menu, lists the area access grants that door access integrations use to open physical doors. That side is documented separately; see [Physical access control](/settings/access-control-settings).
 </Note>
 
 <Note>
@@ -128,8 +128,8 @@ A flagship club can run a strict booking-based policy while a community-run sate
 **Issue**: I turned on walk-ins but staff still can't check someone in without payment.
 **Cause / fix**: The booking policy that applies at this club has **Enforce payment** set to **At check-in**, so an entrance method (external program or direct payment) is required. Collect payment, or set Enforce payment to **None**.
 
-**Issue**: Members can't enroll their QR code themselves.
-**Cause / fix**: Confirm **Access Control** is on for that club and **QR Code** is in the enabled identification methods.
+**Issue**: Members' app QR codes aren't accepted for identification.
+**Cause / fix**: Confirm **Access Control** is on for that club and **QR Code** is in the enabled identification methods. There is nothing to enroll: the QR in the member's app is their credential.
 
 **Issue**: A check-in shows up with no member attached.
 **Cause / fix**: That's an anonymous check-in. They only appear when **Allow anonymous check-ins** is on for the applicable booking policy. Turn it off if you didn't intend to accept them.
@@ -142,5 +142,5 @@ A flagship club can run a strict booking-based policy while a community-run sate
 - [Check-in models](/reference/check-in-models) - pick how members get into your club, and how entrance methods work.
 - [Booking policies](/settings/booking-policies) - where check-in modes, walk-ins, anonymous check-ins, and payment enforcement are configured.
 - [External programs](/settings/external-programs) - partner offerings and corporate wellness benefits used as an entrance method.
-- [Access control settings](/settings/access-control-settings) - the native access control feature (access grants, WebLock door hardware).
+- [Physical access control](/settings/access-control-settings) - access grants and the door access integrations (Impro, WebLock, Salto KS).
 - [Attendance](/schedule/attendance) - review and manage check-in records.

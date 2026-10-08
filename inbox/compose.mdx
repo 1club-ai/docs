@@ -1,19 +1,19 @@
 ---
 title: Compose
-description: Send email, SMS, or WhatsApp to one contact, a list, or everyone matching a contact-type and tag filter. Block editor, templates, variables, file attachments, AI-drafted replies, and drafts.
-keywords: [compose message, send email, send SMS, WhatsApp, recipients, audience filter, contact type, tags, message template, attachments, AI reply, draft]
+description: Send email, SMS, or WhatsApp to one contact, a hand-picked list, or everyone matching a segment. Block editor, templates, variables, file attachments, and drafts.
+keywords: [compose message, send email, send SMS, WhatsApp, recipients, segments, contact type, tags, message template, attachments, draft]
 ---
 
-The composer is the single form behind every one-off message you write: new sends, drafts, and replies. You address one contact, a hand-picked group, or everyone matching a contact-type and tag filter. Owners and managers use it to send updates to a segment of members, and front desk staff and instructors use it to message and reply to individual members.
+The composer is the single form behind every one-off message you write: new sends, drafts, and replies. You address one contact, a hand-picked group, or everyone matching a segment. Owners and managers use it to send updates to a segment of members, and front desk staff and instructors use it to message and reply to individual members.
 
 ## When to use it
 
-Use the composer when a message is a one-off: an announcement, a personal follow-up, or an answer to a member's question. The **Recipients** count shows how many contacts you are about to reach before you send, templates save you rewriting repeatable emails, and **Generate with AI** drafts a reply from the conversation and your gym's data. For messages that should go out on a trigger or a schedule, use an [automation](/marketing/automations) instead.
+Use the composer when a message is a one-off: an announcement, a personal follow-up, or an answer to a member's question. The **Recipients** count shows how many contacts a segment reaches before you send, and templates save you rewriting repeatable emails. For messages that should go out on a trigger or a schedule, use an [automation](/marketing/automations) instead.
 
 Typical uses:
 
 - **Tell a group about something new** - a tennis gym opens extra Saturday courts and emails every member tagged "Weekend player", starting from a template and attaching the updated court grid.
-- **Answer a member's question** - a boxing coach replies to a WhatsApp question about sparring gear, starting from an AI draft, and the reply goes back over WhatsApp.
+- **Answer a member's question** - a boxing coach replies to a WhatsApp question about sparring gear, and the reply goes back over WhatsApp.
 - **Welcome a new lead** - a climbing gym opens the composer from a lead's profile and sends just that person a welcome email.
 - **Win back lapsed members** - a yoga studio drafts a return offer to its lapsed contacts and saves it as a draft for a second look before sending.
 
@@ -21,30 +21,32 @@ See [Worked examples](#worked-examples) for more detail on each.
 
 ## Pick recipients
 
-The composer lives inside the Inbox. Open it by clicking **Compose** in the Inbox header (route `/messages/new`), by selecting a draft from the conversation list, or by hitting **Reply** on an existing thread (route `/messages/<id>/reply`).
+The composer lives inside the Inbox. Open it by clicking **Compose** in the Inbox header (route `/messages/new`), or by selecting a draft from the conversation list. To reply, open a conversation and click **Reply**: a reply box opens inside the thread, headed "Replying to" the contact.
 
-Some flows open the composer pre-filled. The **Promote** button on an [event](/events/events) arrives with the cover image, title, when-and-where line, and a "view event" button already in the body, addressed to all members. Pick or adjust the audience and send.
+Some flows open the composer pre-filled. On a live [event](/events/events), the **Message** menu offers **Announce to all members**, which opens a draft invitation with the event details and a link to book, addressed to every member, and **Message attendees**, which addresses everyone booked on the event.
 
-Above the editor, a **Recipients** header shows a running count of how many contacts the current selection resolves to. You build that audience two ways, which stack:
+Under **Recipients**, choose how to address the message:
 
-- **Contact type** - One or more of `member`, `lead`, `staff`, `contact`, `lapsed`, `drop_in`. Leave it empty for no type filter.
-- **Filter by tag** - Any contact tags you have defined, picked from the tag input.
+- **Select manually** - Pick individual contacts in **Select Contacts**. The message goes to exactly those people, up to 5,000 of them. Sending with nobody picked is refused with "Select at least one recipient".
+- **Use segments** - Send to every contact matching the filters at send time. Combine **Contact Type** (members, drop-ins, leads, lapsed members, contacts, staff), **Filter by tag**, **Membership Categories**, **Pipeline stage is one of**, **Source is one of**, and **Membership Plans**. A count such as "Recipients: 120" shows how many contacts match. With no filters set it reads "Recipients: 1,450 (all contacts)", and the message goes to everyone in your organization.
 
-Below the filters, the **Select Contacts** picker lists matching contacts. Pick individuals to send to exactly those people, or leave the picker empty to send to *every* contact the filter resolves at send time. A message is capped at 5,000 recipients.
+Before a segment send, or a send to more than one hand-picked contact, a confirmation asks "Send to 120 recipients?" (or "Send to everyone matching your filters?"). Sent messages can't be recalled.
+
+When you switch channel, contacts who can't be reached on the new channel are removed from a hand-picked list, and a message tells you how many.
 
 When you arrive from a contact's profile, the URL carries `contactId` (one recipient), `contactIds` (a comma-separated list), or `contactType` (pre-select a type filter), and the composer pre-fills the audience from those.
 
-Instructor-only accounts compose to members at their club: the audience filters and template picker are hidden, and they select from their club's contacts only. Staff limited to the `.own` compose scope can message specific contacts they pick, but cannot target an audience segment.
+Instructor-only accounts compose to the members they teach: the segment option and template picker are hidden. Staff limited to the `.own` compose scope can message specific contacts they pick, but cannot send to a segment.
 
 ## Channels
 
 A new message starts as **email**. Switch to **SMS** once your gym has set up an [SMS sender](/settings/sms), or to **WhatsApp** once a WhatsApp number is connected; a channel that isn't ready isn't offered. The channel of a reply follows the conversation it belongs to: reply inside a WhatsApp thread and it goes out over WhatsApp. Each channel changes the editor and the payload.
 
 - **Email** uses a block editor: paragraphs, headings, lists, images, embeds, code, and quotes. A **subject** field is required, and the body is stored as block JSON, not HTML. Email supports templates and file attachments.
-- **SMS** uses a plain text area. No subject, no formatting, no attachments. A counter under the text shows how many SMS the message takes. It leaves from your gym's own sender name or toll-free number, and members in a country without a ready sender are skipped. Paid-plan only; see [SMS](/settings/sms).
+- **SMS** uses a plain text area. No subject, no formatting, no attachments. A counter under the text shows how many SMS the message takes. It leaves from your gym's own sender name or toll-free number, and members in a country without a ready sender are skipped. While your home country's sender is still being approved, a banner says those members won't get the text yet. Paid-plan only; see [SMS](/settings/sms).
 - **WhatsApp** is also plain text and requires a connected WhatsApp Business number plus a paid plan.
 
-Switching to a plain-text channel (SMS or WhatsApp) clears any applied template, since templates are an email construct.
+Switching to a plain-text channel (SMS or WhatsApp) clears any applied template, since templates are an email construct. The channel switch is hidden on replies, and when email is the only channel available.
 
 ## The email editor and attachments
 
@@ -54,25 +56,24 @@ You can attach files to an email with **Attach files**. The limits: up to **5 fi
 
 ## Templates
 
-If you have access to custom templates (admin and manager roles), a template picker sits beside the subject on email composes. It lists templates of type `message` (your "Marketing & Updates" templates). Selecting one populates the subject and body in place; edit either afterward without changing the original template.
+If you have access to custom templates (the `messages.read.club` permission, which admins and managers hold), a template picker sits beside the subject on email composes. It lists templates of type `message` (your "Marketing & Updates" templates). Selecting one populates the subject and body in place; edit either afterward without changing the original template.
 
-Templates carry `{{variable}}` placeholders. For message templates the available variables are `organizationName`, `organizationEmail`, `organizationPhone`, `contactName`, `contactFirstName`, `contactEmail`, `subject`, `senderName`, and `messageDate`. Legacy HTML templates predating the block editor are accepted, rendered, and converted to blocks on the next save.
+Templates carry `{{variable}}` placeholders. For message templates the available variables are `organizationName`, `organizationEmail`, `organizationPhone`, `orgBaseUrl`, `orgLogoUrl`, `contactName`, `contactFirstName`, `contactLastName`, `contactEmail`, `subject`, `senderName`, and `messageDate`. SMS and WhatsApp messages can use variables too, except `subject` and `orgLogoUrl`. Legacy HTML templates predating the block editor are accepted, rendered, and converted to blocks on the next save.
 
 These manual message templates are distinct from the system (transactional) templates that drive receipts and event emails. See [Templates](/settings/templates) for the full variable reference and the picker.
 
 ## Generate with AI
 
-When you open the composer through **Reply**, a **Generate with AI** button appears above the editor. It calls `POST /v1/ai-messages/{messageId}/suggest`, which uses LangChain with pgvector retrieval to draft a response grounded in your organization and club details, the member's recent bookings and memberships, relevant FAQ/policy content, and the thread so far.
-
-The suggestion replaces the body with paragraph blocks and, for email, sets the subject (defaulting to `Re: <original subject>`). Edit anything before sending. The action is only enabled on replies, because it grounds the response in the original message, and it requires the AI assistant to be enabled for your organization.
+The reply box inside a thread shows a **Generate with AI** button above the editor. AI-drafted replies are not enabled for organizations at the moment, so the button returns "Failed to generate AI response" instead of a draft. Write the reply yourself.
 
 ## Send, save draft, or reply
 
 The action row at the bottom of the form changes with the mode:
 
-- **Send Message** posts the message immediately (`POST /v1/messages`). Success shows a toast and navigates to the new conversation; errors surface inline. A successful send invalidates the Inbox list and the billing quota.
+- **Send Message** posts the message immediately (`POST /v1/messages`). Success shows a toast and navigates to the new conversation; errors show as a toast. A successful send invalidates the Inbox list and the billing quota.
 - **Save Draft** posts the same payload with `isDraft: true`. Drafts show in the Inbox with a draft chip and reopen into the composer. (Drafts drop any attachments, as noted above.)
-- **Reply to Message** sends with `replyToMessageId` set so the message threads under the original, with the subject pre-filled as `Re: <original subject>`.
+- On a reopened draft, **Update & Send** sends it, **Update Draft** saves your changes, and **Delete** removes it after a confirmation.
+- **Send Reply**, in the reply box inside a thread, sends with `replyToMessageId` set so the message threads under the original, with the subject pre-filled as `Re: <original subject>`. A reply goes to the contact who wrote the original message, or to its first recipient if your gym sent it. **Save Draft** isn't offered on replies.
 
 There is no scheduler in the composer. To schedule a future send, use an [automation](/marketing/automations) with a delay, or save a draft and send it manually when ready.
 
@@ -84,24 +85,23 @@ The form blocks a send until:
 - The body has at least one block (email) or non-whitespace text (SMS and WhatsApp).
 - A reply resolves to at least one recipient.
 
-Field errors display under the relevant input, and both **Send Message** and **Save Draft** are disabled while a request is in flight.
+Both **Send Message** and **Save Draft** are disabled while a request is in flight.
 
 ## Worked examples
 
-**Racket sports - waitlist opened.** A tennis club opens extra Saturday courts. Compose an email to the `member` type filtered by the "Weekend player" tag, apply the "Court availability" template, adjust the times, attach the updated grid, and send. The counter confirms the audience size before you commit.
+**Racket sports - waitlist opened.** A tennis club opens extra Saturday courts. Compose an email, switch to **Use segments**, pick the **Members** type and the "Weekend player" tag, apply the "Court availability" template, adjust the times, attach the updated grid, and send. The **Recipients** count and the confirmation dialog show the audience size before you commit.
 
-**Martial arts - single-student reply.** A boxing coach gets an inbound WhatsApp question about sparring gear. Open the thread, tap **Generate with AI** for a grounded first draft, edit it, and hit **Reply to Message** - the reply goes out over WhatsApp automatically.
+**Martial arts - single-student reply.** A boxing coach gets an inbound WhatsApp question about sparring gear. Open the thread, click **Reply**, write the answer, and click **Send Reply** - the reply goes out over WhatsApp automatically.
 
 **Climbing - lead onboarding.** A climbing gym arrives at the composer from a `lead` contact's profile (`contactId` pre-filled), writes a welcome email with a trial-pass button block, and sends to just that person.
 
-**Pilates/Yoga - filtered win-back with a draft.** A yoga studio filters to `lapsed` contacts, drafts a return offer, and saves it as a draft to get a second set of eyes before sending. Because it targets a segment, this needs organization-level compose access.
+**Pilates/Yoga - filtered win-back with a draft.** A yoga studio switches to **Use segments**, picks the lapsed contact type, drafts a return offer, and saves it as a draft to get a second set of eyes before sending. Because it targets a segment, this needs organization-level compose access.
 
 ## Tips & best practices
 
 - Watch the **Recipients** count before sending a filtered blast; it is your last check that the audience is who you expect.
 - Keep attachments under the total 25 MB cap and remember drafts drop them - attach right before you send, not when you draft.
 - Apply a template for repeatable sends, then personalize the opening line so it does not read as a template.
-- Use **Generate with AI** to clear a reply backlog fast, but always read the draft before sending; it grounds on your data but can still miss nuance.
 
 ## Troubleshooting
 
@@ -109,15 +109,15 @@ Field errors display under the relevant input, and both **Send Message** and **S
 | --- | --- | --- |
 | **Send Message** stays disabled | Missing subject (email), empty body, or a request already in flight | Fill the subject and body; wait for the current request to finish |
 | Attachments disappear after saving a draft | Drafts do not persist files; only sends carry them | Re-attach files when you reopen the draft to send |
-| **Generate with AI** button is missing | You are on a new compose, not a reply | The AI draft is reply-only; it needs an original message to ground on |
-| AI generation errors out | The AI assistant is not enabled for the organization | Enable the AI assistant, or write the reply manually |
-| Template picker is not shown | You are replying, on SMS/WhatsApp, or on an instructor (club-scoped) inbox | Templates apply to new email composes with template access |
+| **Generate with AI** shows "Failed to generate AI response" | AI-drafted replies are not enabled for organizations | Write the reply yourself |
+| "Select at least one recipient" | **Select manually** is on with nobody picked | Pick contacts, or switch to **Use segments** |
+| Template picker is not shown | You are replying, on SMS/WhatsApp, or on an instructor inbox | Templates apply to new email composes with template access |
 | SMS or WhatsApp isn't offered, or the send is blocked | Paid-plan channel, no approved SMS sender, or (WhatsApp) no connected number | Upgrade the plan, set up a sender under [SMS](/settings/sms), or connect a WhatsApp number |
 | "All recipients are unsubscribed or suppressed" | Every selected contact opted out or is suppressed | Adjust the recipient list and resend |
 
 ## Related
 
-- [Inbox overview](/inbox/overview) - Channels, the message model, and AI replies.
+- [Inbox overview](/inbox/overview) - Channels, the message model, and permissions.
 - [Conversation list](/inbox/messages) - Where drafts, sent messages, and replies live afterward.
 - [Templates](/settings/templates) - Templates the picker reads from, plus the variable reference.
 - [Contacts](/members/overview) - Tag and segment the contacts you message.

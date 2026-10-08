@@ -5,15 +5,15 @@ description: The 1Club messaging inbox - one conversation-style list of every ou
 keywords: [inbox, messages, conversation list, thread, draft, inbound, outbound, delivery status, message channel, whatsapp, reply]
 ---
 
-The inbox is one list of every conversation between your gym and your members, outbound and inbound, with drafts alongside. Each row is a conversation - a piece of human-authored, replyable correspondence between your gym and a member - not an individual delivery. Admins and managers work the organization-wide inbox, and instructors see the conversations for members at the clubs they teach.
+The inbox is one list of every conversation between your gym and your members, outbound and inbound, with drafts alongside. Each row is a conversation - a piece of human-authored, replyable correspondence between your gym and a member - not an individual delivery. Admins and managers work the organization-wide inbox, and instructors see the conversations they took part in.
 
 ## When to use it
 
-Open the inbox to see what members have written back, pick up a conversation where it left off, and finish messages you started. Each row rolls up a whole thread, new replies appear without a refresh, and a **Draft** chip marks anything not yet sent.
+Open the inbox to see what members have written back, pick up a conversation where it left off, and finish messages you started. Each row rolls up a whole thread, new replies appear without a refresh, a dot marks conversations waiting for your reply, and a **Draft** chip marks anything not yet sent.
 
 Typical uses:
 
-- **Catch a member's reply** - a boulderer answers your route-setting update, and its conversation shows a higher thread counter and a fresh timestamp without a refresh, ready to reply inline.
+- **Catch a member's reply** - a boulderer answers your route-setting update, and its conversation shows the **Waiting for a reply** dot and a fresh timestamp without a refresh, ready to reply inline.
 - **Finish a draft** - a message to all jiu-jitsu members about a belt-grading date is still marked **Draft**, and clicking it reopens the compose pane.
 - **Follow a group conversation** - a message to four padel members about a doubles ladder shows as one row, with every reply threaded beneath.
 
@@ -25,7 +25,9 @@ The conversation list is the main view of **Inbox** in the left rail (route `/me
 
 The list queries `/v1/messages` filtered to top-level rows (those with no `replyToMessageId`). Each row is therefore a conversation head: outbound sends with their replies, inbound submissions with your responses, and drafts not yet sent.
 
-Rows are sorted by `createdAt` descending and paginated 25 at a time. **Load more** at the bottom extends the page in 25-row steps.
+Rows are sorted by `createdAt` descending and paginated 25 at a time. **Load more conversations** at the bottom extends the page in 25-row steps.
+
+Use **Search conversations** above the list to find a conversation by subject, recipient name, or sender name. In the instructor inbox, search matches the subject only.
 
 ## What a row shows
 
@@ -38,10 +40,10 @@ Each row is built around the counterparty of the conversation:
 
 To the right of the name you may see:
 
-- A **WhatsApp** badge next to a single contact whose WhatsApp number is verified.
+- A **WhatsApp** icon next to a single contact who can be reached on WhatsApp.
 - A **Draft** status chip when the message has not been sent yet.
 - The relative time of the latest message (`sentAt` if sent, `createdAt` if still a draft).
-- A **thread counter** badge (the small number bubble) showing how many messages are in the conversation, including the original.
+- A **Waiting for a reply** dot when the latest message in the thread came from the contact rather than your gym. A reply from staff or an automation clears it. Drafts never show it.
 
 Below the name is a snippet: the subject if there is one, otherwise up to the first 80 characters of the body with HTML stripped.
 
@@ -63,15 +65,15 @@ When a message is sent **on behalf of** a specific person - today, a class instr
 Clicking a row updates the URL to `/messages/<id>` and renders the right pane:
 
 - If the message is a **draft**, the compose pane opens so you can finish writing.
-- Otherwise, the **thread view** renders: the original message at the top, replies underneath in order, and an inline reply box at the bottom.
+- Otherwise, the **thread view** renders: the original message at the top, then replies in order, with date separators between days.
 
-When you click **Reply** the URL becomes `/messages/<id>/reply` and the compose pane takes over the right side with the original sender pre-selected as the recipient and the subject pre-filled with `Re: <subject>`.
+Click **Reply** at the bottom of the thread to open a reply box in place, headed "Replying to" the contact, with the subject pre-filled as `Re: <subject>`. **Send Reply** sends it into the same thread. The URL doesn't change.
 
 On desktop, opening the inbox with nothing selected auto-opens the first conversation so the detail pane is not blank. On mobile the list stays put until you pick a row.
 
 ## Real-time updates
 
-The inbox subscribes to the notification WebSocket. Every time a `message`-category event for the current organization arrives, the list and the open thread refetch, so new inbound replies appear without a manual refresh.
+The inbox subscribes to the notification WebSocket. Every time a message event for the current organization arrives (including a member writing in by email, WhatsApp, or a website contact form), the list and the open thread refetch, so new inbound replies appear without a manual refresh. The list also checks for changes every 30 seconds, and **Refresh inbox** reloads it on demand.
 
 Members' email replies to messages you send arrive in the conversation automatically: each emailed message carries a personal reply address alongside your gym's own address. See [Replies to your messages](/settings/email-sending#replies-to-your-messages).
 
@@ -83,20 +85,20 @@ Per-recipient delivery detail is tracked on the record but not surfaced directly
 
 ## Audience scope: admin vs instructor view
 
-- **Admins and managers** see the organization-wide inbox: every message attached to the org. The right-pane **Compose** button is enabled, and the audience filter and template picker are available when composing.
-- **Instructors** see a club-scoped slice: conversations involving members at the clubs they teach at. Their compose form hides the audience filter and template picker; replying to existing inbound messages still works.
+- **Admins and managers** see the organization-wide inbox: every message attached to the org. Segments and the template picker are available when composing.
+- **Instructors** see only their own conversations: messages they sent, messages from the contacts they wrote to, and the threads those belong to. They can still use **Compose**, but their compose form hides segments and the template picker; replying to messages they can read still works.
 
 ## Permissions
 
 - Reading the inbox requires `messages.read.own` (broader `messages.read.club` / `messages.read.organization` holders see more).
 - Composing or replying requires a `messages.create` permission.
-- The audience filter and organization-wide templates require manager or admin scope.
+- Sending to a segment and using templates require `messages.read.club` and `messages.create.club`, which admins and managers hold.
 
 ## Worked examples
 
 ### Spotting a member reply (climbing gym)
 
-A boulderer replied to your route-setting update. Because the inbox refetches on the WebSocket event, the conversation jumps with an incremented thread counter and a fresh timestamp - no refresh needed. Click it to open the thread and reply inline.
+A boulderer replied to your route-setting update. Because the inbox refetches on the WebSocket event, the conversation jumps to the top with a **Waiting for a reply** dot and a fresh timestamp - no refresh needed. Click it to open the thread and reply inline.
 
 ### Finishing a draft blast (martial arts)
 
@@ -108,19 +110,19 @@ You messaged four padel members about a doubles ladder. The row shows the first 
 
 ## Tips & best practices
 
-- **Watch the thread counter.** A rising number bubble means new replies have landed in that conversation.
+- **Work the dots.** A **Waiting for a reply** dot means the member wrote last and nobody has answered yet.
 - **Let the auto-select help on desktop.** The first conversation opens on load, so you can triage without an extra click.
-- **Use Reply, not a fresh compose, to keep threads intact.** Replying preserves the conversation and pre-fills the recipient and `Re:` subject.
-- **Load more, then scroll.** The list starts at 25 rows; extend it before hunting for an older conversation.
-- **Verify WhatsApp before relying on it.** The WhatsApp badge tells you a contact's number is verified and reachable on that channel.
+- **Use Reply, not a fresh compose, to keep threads intact.** Replying preserves the conversation and pre-fills the `Re:` subject.
+- **Search, or load more.** The list starts at 25 rows; search by subject or name, or extend it before hunting for an older conversation.
+- **Check WhatsApp before relying on it.** The WhatsApp icon tells you a contact is reachable on that channel.
 
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| An expected conversation is missing from the list | It is older than the loaded page | Click **Load more** to extend the list, or open it directly by URL |
-| Instructor cannot see a member's message | Instructors are scoped to their own clubs' members | Confirm the member belongs to a club the instructor teaches at; an admin sees the full org inbox |
-| A new reply did not appear | The WebSocket event was missed or the tab was backgrounded | Reload the inbox; the list refetches on load |
+| An expected conversation is missing from the list | It is older than the loaded page | Search for it, click **Load more conversations**, or open it directly by URL |
+| Instructor cannot see a member's message | Instructors see only conversations they took part in | An admin or manager sees the full org inbox and can reply |
+| A new reply did not appear | The WebSocket event was missed or the tab was backgrounded | Click **Refresh inbox**, or wait for the 30-second check |
 | Compose or reply is unavailable | Missing a `messages.create` permission | Grant the relevant messaging permission via roles and permissions |
 | A row shows the sender instead of a recipient | It is an inbound, member-initiated conversation with no stored recipients | Expected - the inbox falls back to the sender's identity for inbound threads |
 | Delivery looks stuck at "sent" | Per-recipient delivery detail is not shown in the list | Delivery and engagement status are tracked on the record via SendGrid/Twilio webhooks, not surfaced in the row |
@@ -129,5 +131,5 @@ You messaged four padel members about a doubles ladder. The row shows the first 
 
 - [Compose](/inbox/compose) - The send and reply flow the right pane drives.
 - [Templates](/settings/templates) - Templates the compose pane reads from.
-- [Inbox overview](/inbox/overview) - How the inbox fits with automations and AI replies.
+- [Inbox overview](/inbox/overview) - How the inbox fits with automations, channels, and permissions.
 - [Automations](/marketing/automations) - Automated, trigger-based sends that also land in the inbox.

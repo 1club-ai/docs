@@ -38,7 +38,7 @@ If you only need to attach an **existing** person to a plan, create a [membershi
 
 ### With sign up off
 
-Turn sign up off and you have a page you send to people you already know. No account is created, nothing is sold, and the answers are kept as a dated record:
+Turn sign up off and you have a page you send to people you already know. No account is created, nothing is sold, and the answers are kept as a dated record. Turn on **Add submitters to the pipeline** if you want people who submit it to become leads:
 
 - A pre-exercise health declaration or PAR-Q before a course or a first session.
 - An emergency contact you never collected.
@@ -57,20 +57,20 @@ A form with sign up off can also be restricted with **Only authenticated**, so o
 Every form is the same wizard. The steps that appear, and their order, are decided by the form's configuration - steps a form doesn't need are skipped automatically. A form with sign up off skips the account, participant and selling steps entirely.
 
 <Steps>
-<Step title="Details">
-Name, email, password, and any contact fields you require at signup. When the form registers children, this step also collects the participants (see **Who is this form for?** under [Settings](#settings)).
-</Step>
 <Step title="Selection">
 Pick a plan, a class type, and/or add packages and products to a cart. This step only appears when the form has at least one of those attached. You can merge it into the Details step with **Combine plan & user details into one step**.
+</Step>
+<Step title="Details">
+Name, email, password, and any contact fields you require at signup. When the form registers children, this step also collects the participants (see **Who is this form for?** under [Who and what it asks](#who-and-what-it-asks)).
 </Step>
 <Step title="Questions">
 The form's own questions, grouped under their section headings. Appears whenever the form has any (see [Questions](#questions)). Sits after the details and before the agreements, so a member knows what they are declaring before signing anything about it.
 </Step>
 <Step title="Documents">
-Read and accept any documents that apply to the new contact. The wizard automatically picks up the [document rules](/settings/waivers) and [document signatures](/members/document-signatures) that target member contact types - you don't attach documents to the form directly.
+Read, accept, and sign any documents that apply to the person, by drawing or typing a signature at the bottom of the step unless the form's signature method is **No signature (documents only)**. The wizard automatically picks up the [document rules](/settings/waivers) and [document signatures](/members/document-signatures) that target member contact types - you don't attach documents to the form directly. With **Show the documents first**, this step comes before Details.
 </Step>
-<Step title="Signature">
-Sign the accepted documents by drawing or typing. Skipped when the form's signature method is set to **No signature**.
+<Step title="Video">
+The form's video, when it has one. With **Require watching the video**, members can't continue until it has played to the end.
 </Step>
 <Step title="Review">
 Confirm the summary and submit. If a selected plan needs upfront payment, the wizard moves straight into a payment step; if a cart has packages or products, the buyer is routed to checkout.
@@ -84,9 +84,9 @@ Drafts are saved in the member's browser as they go, so a half-finished signup s
 1. Go to **Marketing** > **Forms**.
 2. Click **Add form**.
 3. Fill in the sections below.
-4. Save. The form's public URL appears in the **Preview URL** column.
+4. Save. The form's public URL appears in the **Public link** column.
 
-The builder is organized into three sections: **Basic information**, **What members can choose**, and **Settings**.
+The builder is organized into these sections: **Basic Information**, **Links** (once the form is saved), **What this form does**, **Who and what it asks**, **Questions** (sign up off), **What members can choose** and **Layout** (sign up on), and **Video**.
 
 ### Basic information
 
@@ -94,25 +94,27 @@ The builder is organized into three sections: **Basic information**, **What memb
 | --- | --- |
 | **Name** | Internal label, shown in the admin forms list only. Members never see it. Typing a name auto-fills the slug. |
 | **Slug** | The last segment of the public URL. Lowercase letters, numbers, and dashes only. Must be unique in your organization - if it collides, the system appends a number (`yoga-trial-2`). |
-| **Form title** | The heading shown at the top of the wizard. Leave blank to use 1Club's built-in default copy. |
-| **Form subtitle** | The sub-heading under the title. Same fallback behavior as the title. |
-| **Plan selection title** | The heading shown above the plan picker. |
-| **Class type selection title** | The heading shown above the class-type picker. |
+| **Title** | The heading shown at the top of the wizard. Leave blank to use 1Club's built-in default copy. |
+| **Subtitle** | The sub-heading under the title. Same fallback behavior as the title. |
 
 <Note>
-All four heading fields are optional. When left blank, the wizard falls back to sensible default copy rather than showing an empty heading.
+Both heading fields are optional. When left blank, the wizard falls back to sensible default copy rather than showing an empty heading. **Plan selection title** and **Class type selection title** sit next to **Plans** and **Class types on this form** under [What members can choose](#what-members-can-choose).
 </Note>
+
+### Links
+
+Once the form is saved, this section shows its **Public link** and, when the form qualifies, its **Tablet station** link, each with copy and open buttons. See [Sharing the form](#sharing-the-form).
 
 ### What members can choose
 
-This section defines the offerings on the wizard's Selection step. Attach any combination; leave everything empty to create a plain "just capture the contact" form that skips selection entirely.
+Shown only with sign up on, this section defines the offerings on the wizard's Selection step. Attach any combination; leave everything empty to create a plain "just capture the contact" form that skips selection entirely.
 
-- **Plans** - the plans a member can pick from. Only **active** plans appear in the wizard, so deactivating a plan removes it from every form on the next page load without editing the form. Each plan keeps its own pricing, signup fee, payment requirement, and renewal rules - selecting one behaves exactly like a standard [membership](/sales/memberships) checkout.
-- **Class types** - attach one or more class types to add a class-type interest step. When set, members pick a single class type they're interested in. Useful for routing new leads to the right program.
+- **Plans** - the plans a member can pick from, with an optional **Plan selection title** shown above the picker. Only **active** plans appear in the wizard, so deactivating a plan removes it from every form on the next page load without editing the form. Each plan keeps its own pricing, signup fee, payment requirement, and renewal rules - selecting one behaves exactly like a standard [membership](/sales/memberships) checkout.
+- **Class types on this form** - attach one or more class types to add a class-type interest step, with an optional **Class type selection title**. When set, members pick a single class type they're interested in. Useful for routing new leads to the right program.
 - **Packages** - attaching packages turns the form into an **order form** (see below), where members add or remove packages and check out.
 - **Add-on products** - optional products members can add to their order as extras. Products are only meaningful alongside packages or as part of the order-form cart.
 
-### Settings
+### What this form does
 
 <AccordionGroup>
 <Accordion title="Sign up">
@@ -124,9 +126,29 @@ The switch that decides which kind of form this is.
 <Accordion title="Only authenticated">
 Only meaningful with sign up off. When on, the person must be signed in to their member portal before the form opens, and their answers are attributed to them. Leave it off for a form anyone with the link can complete, or for one you send as a personal link from an automation - a personal link already names the person.
 </Accordion>
+<Accordion title="Add submitters to the pipeline">
+Only available with sign up off. People who submit the form become leads in the [pipeline](/members/leads) stage you choose, with an optional source, unless they are already customers. A signup form doesn't offer it, because someone who signs up becomes a member or customer, not a lead.
+</Accordion>
 <Accordion title="Ask for documents and a signature">
 Whether the form runs the agreements ceremony at all. Turn it off for a short questionnaire that needs no contract. When on, the documents shown are the ones your [document rules](/settings/waivers) match to the person, not a list you attach to the form.
+
+Turning it on reveals **Signature method**, which sets how the member signs the documents on the Documents step:
+
+- **Draw signature** - the member draws their signature on a canvas.
+- **Type name** - the member types their legal name to bind the acceptance.
+- **No signature (documents only)** - members still accept documents via the checkboxes on the Documents step, without signing.
 </Accordion>
+<Accordion title="Show the documents first">
+Needs **Ask for documents and a signature**. People read and sign the documents before they enter their details. On a form that sells plans, the plan choice still comes first, since it decides which documents apply. Not available when **Combine plan & user details into one step** is on.
+</Accordion>
+<Accordion title="Confirm the signer's email or phone">
+Needs **Ask for documents and a signature**. Someone signing without being signed in gets a code to their email, then WhatsApp, then a text message. If no code reaches them they can still finish, and their signature waits on their profile for staff to approve.
+</Accordion>
+</AccordionGroup>
+
+### Who and what it asks
+
+<AccordionGroup>
 <Accordion title="Who is this form for?">
 Controls who the form registers and whether the wizard collects participants.
 
@@ -134,27 +156,28 @@ Controls who the form registers and whether the wizard collects participants.
 - **Children (registered by a parent)** - a parent or guardian creates their own account and registers one or more children under it. The wizard adds a participants step for the children.
 - **Individuals & children** - the person can sign up for themselves, add family members, or both. The wizard shows a "who is this for?" toggle plus a participants list.
 </Accordion>
-<Accordion title="Signature method">
-How the member signs the documents shown on the Documents step.
-
-- **Draw signature** - the member draws their signature on a canvas.
-- **Type name** - the member types their legal name to bind the acceptance.
-- **No signature (documents only)** - there's no separate signature step. Members still accept documents via the checkboxes on the Documents step; this just removes the dedicated signing ceremony.
+<Accordion title="Contact fields">
+With sign up on, the form asks exactly what your contact-field settings require at signup (see [Contact fields on the Details step](#contact-fields-on-the-details-step)), so there is nothing to set here. With sign up off, tick what the form asks for: **First name**, **Last name**, **Email**, **Phone**, **Date of birth**, **Gender**, and **Address**. Anything you tick is required.
 </Accordion>
-<Accordion title="Display mode">
-How surfaces that link to the form should present it.
+</AccordionGroup>
 
-- **Open as a page** - the link navigates to the full-page wizard at `/signup/<slug>`.
-- **Open as a dialog** - the wizard opens inline as a modal overlay on top of the current page. Use this when embedding the form on a gym page or marketing site so members never leave the page they're on.
-</Accordion>
+### Layout
+
+Shown with sign up on, when the form has something to select.
+
+<AccordionGroup>
 <Accordion title="Combine plan & user details into one step">
 When on, the Selection and Details steps are merged into a single first step, so members see plan selection and their sign-up details together instead of on two separate screens. Shorter forms feel faster this way. Off by default. This option only has an effect when the form has something to select (a plan, class type, or cart).
 </Accordion>
 </AccordionGroup>
 
+### Video
+
+Add an uploaded **Video** and an optional **Video heading** to show it as its own step just before Review, for an induction or a safety briefing. Turn on **Require watching the video** so members can't continue until it has played to the end. The video works with sign up on or off.
+
 ### Translations
 
-Use the **Translate** button in the Basic information header to provide per-locale overrides for the **Form title**, **Form subtitle**, **Plan selection title**, and **Class type selection title**. Members see the copy for their own language; anything you don't translate falls back to the values above.
+Use the **Translate** button in the Basic Information header to provide per-locale overrides for the **Title**, **Subtitle**, **Plan selection title**, **Class type selection title**, and **Video heading**. Members see the copy for their own language; anything you don't translate falls back to the values above.
 
 ## Questions
 
@@ -247,9 +270,7 @@ On the forms list, open a form's row menu and choose **View responses**. You get
 
 The **Responses** tab next to **Forms** lists every response to every form in one place, including invitations nobody has answered yet. Responses are member data (up to medical answers), so this tab needs permission to read members, not just to build forms.
 
-### On the member
-
-A member's own page has a **Form responses** section on the **Documents** tab, showing what that person has declared, most recent first. This is the view to use before a first session: you are asking about the person, not about the form. Only submitted responses appear here; an unanswered invitation stays on the form's own list.
+The **Responses** tab has **All**, **Not answered**, and **Answered** tabs and a filter by form. Each row shows when it was submitted, the contact (or **Anonymous**), the form (or **Deleted form**), and its status.
 
 ## Order forms (packages and products)
 
@@ -279,22 +300,22 @@ https://<your-portal>/signup/<slug>     sign up on
 https://<your-portal>/forms/<slug>      sign up off
 ```
 
-The **Preview URL** column on the forms list links straight to it. Paste that link into emails, ads, signage, or your link-in-bio, or wire it to a button using the form's **Display mode**.
+The host is your gym's public address: your [website](/marketing/website) or [member portal](/settings/member-portal), including a verified custom domain. The **Public link** column on the forms list, and the **Links** section of the form, link straight to it. Paste that link into emails, ads, signage, or your link-in-bio.
 
-<Note>
-The portal subdomain is set under **Settings** > **Member Apps** > **Member portal** (see the [member portal](/settings/member-portal)). Until that's configured, the **Preview URL** column is empty because there's no public host to build the link against.
-</Note>
+### Tablet station
 
-The wizard is served first-party from your member portal, so the account it creates is signed in against the portal the moment signup completes - there's no cross-site login hop.
+A form can also run as a **Tablet station** at `/station/<slug>`. Leave this link open on a gym tablet and people fill the form in one after another: nobody stays signed in at the end, and the form starts over for the next person. It is for people new to the gym: anyone already registered is asked to open the form on their own phone.
+
+A form qualifies only when it takes no payment and, if it creates no account, asks for first name, last name, and email, is open to anyone without signing in, and is not for children only. Otherwise the **Tablet station** column stays empty.
 
 ## Documents and signature
 
-The Documents and Signature steps are driven by your [document rules](/settings/waivers) and [document signatures](/members/document-signatures), not by the form. A new contact created through any form that signs people up is matched against every active rule that targets member contact types. If a rule matches, the wizard shows the document and the contact must accept it before continuing.
+The Documents step is driven by your [document rules](/settings/waivers) and [document signatures](/members/document-signatures), not by the form. A new contact created through any form that signs people up is matched against every active rule that targets member contact types. If a rule matches, the wizard shows the document and the contact must accept it before continuing.
 
 Two consequences:
 
 - You don't attach documents to a form directly. Adding a new document rule automatically applies to every form that creates matching contacts.
-- The Signature step appears only when the form's signature method is **Draw** or **Type**. Setting it to **No signature** removes the step; documents are still accepted via their checkboxes.
+- The signature pad at the bottom of the Documents step appears only when the form's signature method is **Draw signature** or **Type name**. With **No signature (documents only)**, documents are still accepted via their checkboxes.
 
 ## Editing and deleting
 
@@ -304,7 +325,7 @@ Two consequences:
 
 ## What gets created
 
-With sign up off, a submission creates one **response** against the form, attributed to the member when we know who they are. Answers to questions you pointed at a profile field are also copied onto their profile. Nothing else is created: no account, no membership, no order.
+With sign up off, a submission creates one **response** against the form, attributed to the member when we know who they are. Answers to questions you pointed at a profile field are also copied onto their profile. No account, membership, or order is created. With **Add submitters to the pipeline** on, the person also becomes a lead in the chosen stage unless they are already a customer.
 
 With sign up on, every successful submission creates:
 
@@ -318,8 +339,8 @@ From there the contact behaves like any other member. They appear in the [member
 
 ## Troubleshooting
 
-**The Preview URL column is empty**
-The public URL needs a portal subdomain. Set it under **Settings** > **Member Apps** > **Member portal**; until then there's no host to build the link against.
+**The Tablet station column is empty**
+The form doesn't qualify as a station. It must take no payment and, if it creates no account, ask for first name, last name, and email, be open to anyone without signing in, and not be for children only.
 
 **A plan I attached doesn't appear in the wizard**
 Only **active** plans render. Reactivate the plan under [Plans](/sales/plans) - the form picks it up on the next page load without re-saving the form.
@@ -327,8 +348,8 @@ Only **active** plans render. Reactivate the plan under [Plans](/sales/plans) - 
 **The Selection step never shows**
 The step only appears when the form has something to select. Attach at least one plan, class type, package, or add-on product under **What members can choose**.
 
-**The Documents or Signature step is missing**
-Documents come from your document rules and [document signatures](/members/document-signatures), not the form - a step appears only when an active rule matches the new contact's member contact type. The Signature step is also skipped when the form's signature method is **No signature**.
+**The Documents step or the signature pad is missing**
+Documents come from your document rules and [document signatures](/members/document-signatures), not the form - the step appears only when **Ask for documents and a signature** is on and an active rule matches the person. The signature pad is left out when the form's signature method is **No signature (documents only)**.
 
 **A shared link returns "form not found"**
 The slug changed or the form was deleted. Changing a slug breaks every previously shared link, so avoid editing it once published.
@@ -361,7 +382,7 @@ Pricing, signup fees, and renewal rules the form inherits per plan.
 Control which documents appear on which forms.
 </Card>
 <Card title="Member portal" icon="globe" href="/settings/member-portal">
-The portal that serves the form, on the subdomain set under **Settings** > **Member Apps** > **Member portal**.
+One of the public addresses a form's link can open on.
 </Card>
 <Card title="Automations" icon="bolt" href="/marketing/automations">
 Mail a personal single-use link to one member with the Send form step.

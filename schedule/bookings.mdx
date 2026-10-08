@@ -24,7 +24,14 @@ If you haven't picked a check-in flow yet, start with [Check-in models](/referen
 
 The list page lives under **Schedule** > **Bookings** (open it from the calendar's **More actions** menu); the detail page is where you handle payment, check-in, cancellation, and notes.
 
-The bookings list has four tabs with live counts: **All**, **Upcoming**, **Past**, and **Cancelled**. Upcoming is the default tab. Each tab is paginated and sortable; the cancelled tab uses a dedicated endpoint with a leaner response shape.
+The bookings list has four tabs with live counts: **All**, **Upcoming**, **Past**, and **Cancelled**. Upcoming is the default tab. Each tab is paginated and sortable.
+
+Select rows to act on several bookings at once (shown when you hold the permission for it):
+
+- **Check in N** - checks in every selected booking, settling any payment their entrance method requires.
+- **Cancel N** - cancels only the selected bookings; later occurrences of a recurring series are left alone. Bookings nobody paid for owe nothing unless you turn on **Keep the cancellation charge**, and if any were paid you're asked what happens to that money.
+
+The **Cancelled** tab shows each booking's cancellation reason, refund, and who cancelled it. A booking that was released automatically at the end of the day (a pending booking whose start time arrived) can be brought back with **Reinstate** from its row menu or detail page: it returns confirmed and its charge is outstanding again. Cancellations made by a person can't be reinstated, and Reinstate is refused if the slot has since been booked by someone else.
 
 Click any row to open the booking detail page. Click **Add booking** in the top right to create one from scratch.
 
@@ -66,7 +73,17 @@ If something changes after the dialog checked the slot - time off entered a mome
 
 ## The booking detail page
 
-The detail page header shows the booking title with status chips (confirmed, pending, cancelled, paid/unpaid) and a row of actions: **Add payment**, **Notify participants**, **Edit**, **Cancel**, and (when the booking is `pending`) **Confirm**. Once a booking is confirmed and within the check-in window, an **Add check-in** action also appears.
+The detail page header shows the booking title with status chips (confirmed, pending, cancelled, paid/unpaid) and its actions, each shown only when it applies and you hold the permission for it:
+
+- **Check In** - takes what is owed and checks the member in, in one step. When money is due, the amount is in the label (for example **Check In · €20**). Available within the [check-in window](/schedule/attendance#check-in-window).
+- **Add Payment** - take payment without checking in, for example for tomorrow's court. It sits in the **More actions** menu when **Check In** is available.
+- **Reinstate** - for a booking released automatically at the end of the day (see [The list page](#the-list-page)).
+- **Confirm Booking** - when the booking is `pending`.
+- **Edit** - area and instructor bookings only. A class booking takes its time and price from the class.
+- **Change people (N)** - for a party booking that hasn't started, release places; each released place is refunded under the cancellation policy.
+- **Cancel**.
+
+The **More actions** menu also holds **Message** (opens [Compose](/inbox/compose) addressed to the member), **Assess** when [assessments](/members/assessments) apply, **Change Entrance Method**, and, for the booking's own instructor, **Resend calendar invitation**.
 
 The body uses a two-column layout. The left column is the info table: created at, created by with the booking **source** (one of `admin`, `portal`, `app`, `network`, `website`, `kiosk`, `integration`, `api`), customer or coach, recurrence summary, entrance method, and any discount. The right column lists **Players** for area bookings whose area type allows multiple participants (each player can carry their own per-share payment) and shows a yellow note card if the booking has notes.
 
@@ -92,9 +109,9 @@ Below the info layout, three tabs hold the booking's financial and audit history
 
 ## Paying for a booking
 
-The **Add payment** action opens the payment dialog. If the booking has one outstanding charge, the amount is editable and defaults to the remaining balance. If the booking has multiple outstanding charges (for example, a recurring series or a multi-line order), the amount is locked to the sum of all remaining balances and the server settles them atomically. Partial multi-charge payments are not supported - use the Charges tab to pay them individually.
+The **Add Payment** action opens the payment dialog. If the booking has one outstanding charge, the amount is editable and defaults to the remaining balance. If the booking has multiple outstanding charges (for example, a recurring series or a multi-line order), the amount is locked to the sum of all remaining balances and the server settles them atomically. Partial multi-charge payments are not supported - use the Charges tab to pay them individually.
 
-The right-click and mobile-tap menus on the [Schedule](/schedule/calendar) page expose the same **Add payment** action without opening the booking.
+The right-click and mobile-tap menus on the [Schedule](/schedule/calendar) page expose the same **Add Payment** action without opening the booking.
 
 ## Cancellations
 
@@ -104,7 +121,7 @@ The cancellation creates a reversal of the booking's charge (visible on the Char
 
 ## Recurring bookings
 
-When the booking type is area or instructor, you can set a recurrence pattern in the dialog: how often it repeats, and how the series ends - **Until date**, **After N times**, or **Never**. Editing a recurring booking lets you change the current instance only, or apply changes to all future occurrences. Deleting offers the same scoping.
+When the booking type is area or instructor, you can set a recurrence pattern in the dialog: how often it repeats, and how the series ends - **Until date**, **After occurrences**, or **Never**. Editing a recurring booking lets you change the current instance only, or apply changes to all future occurrences. Cancelling offers the same choice: **Cancel this booking only** or **Cancel this and all future bookings in the series**.
 
 A series that ends on a date or after a set number of repeats is created in full when you save, so a court held for a season shows as occupied for every one of those dates straight away. **Never** keeps a rolling eight-week horizon instead. A series can cover up to 520 occurrences; see [Repeating schedules](/reference/repeating-schedules).
 
@@ -140,7 +157,7 @@ A member paid cash at the desk for a drop-in yoga class. Create a **Class** book
 
 - **Use admin bookings for phone and walk-in reservations.** They are not held to upfront-payment enforcement, so you can record the booking now and collect at check-in.
 - **Check the price breakdown before saving.** It's the fastest way to confirm a membership or external program is covering the visit, or that a promotion applied.
-- **Pay multi-charge bookings from the right place.** For a single balance, use **Add payment**; for individual lines of a recurring series or multi-line order, use the **Charges** tab.
+- **Pay multi-charge bookings from the right place.** For a single balance, use **Add Payment**; for individual lines of a recurring series or multi-line order, use the **Charges** tab.
 - **Cancel with a reason.** The reason and refund are recorded and the member is notified automatically, which keeps disputes clean.
 - **Prefer entrance switching over manual price edits.** Setting the entrance to a membership or external program zeroes the price correctly, rather than hand-editing the total.
 
@@ -148,7 +165,7 @@ A member paid cash at the desk for a drop-in yoga class. Create a **Class** book
 
 **Issue**: The check-in dialog says the gym asks for payment at check-in.
 
-**Solution**: The matching [booking policy](/settings/booking-policies) enforces payment at check-in (or at booking with an outstanding balance). That rule binds members checking themselves in, not you. Take payment with **Add payment**, confirm an active membership, or apply an external program - or check the member in anyway and the amount stays owed.
+**Solution**: The matching [booking policy](/settings/booking-policies) enforces payment at check-in (or at booking with an outstanding balance). That rule binds members checking themselves in, not you. Take payment with **Add Payment**, confirm an active membership, or apply an external program - or check the member in anyway and the amount stays owed.
 
 **Issue**: The booking price is 0 and I expected a charge.
 
@@ -160,11 +177,11 @@ A member paid cash at the desk for a drop-in yoga class. Create a **Class** book
 
 **Issue**: A partial payment across several charges was rejected.
 
-**Solution**: Partial multi-charge payments aren't supported from **Add payment** - it settles all balances atomically. Pay the lines individually from the **Charges** tab instead.
+**Solution**: Partial multi-charge payments aren't supported from **Add Payment** - it settles all balances atomically. Pay the lines individually from the **Charges** tab instead.
 
 **Issue**: The member didn't get a confirmation email.
 
-**Solution**: **Send confirmation email** is only offered on create, and editing never re-sends it. If it was unchecked, notify the member from **Notify participants** or [Compose](/inbox/compose).
+**Solution**: **Send confirmation email** is only offered on create, and editing never re-sends it. If it was unchecked, message the member with **Message** or from [Compose](/inbox/compose).
 
 **Issue**: I get "This area is already booked for this slot" (or the instructor equivalent) and can't save over it, or the footer says a blocked area can't be booked.
 

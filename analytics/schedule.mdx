@@ -43,7 +43,7 @@ The reports share the same filter bar at the top:
 
 The **Check-ins** category covers who actually came in.
 
-**Attendance** (**Analytics** > **Check-ins** > **Attendance**) has KPI cards for **Total check-ins**, **Unique members**, **Average check-ins per member**, and **No-show rate** (the share of bookings that were not attended). Below them are an attendance trend line, **Peak times** by hour, and attendance **By club** and **By area type**. Use no-show rate and peak times together to right-size class capacity and tighten cancellation windows where no-shows are high.
+**Attendance** (**Analytics** > **Check-ins** > **Attendance**) has KPI cards for **Total check-ins**, **Unique members**, **Average check-ins per member**, and **No-show rate** (the share of bookings that were not attended). Below them are an **Attendance Trends** line, **Peak Times** by hour, and **Attendance by Area Type**. Use no-show rate and peak times together to right-size class capacity and tighten cancellation windows where no-shows are high.
 
 The **Check-ins Report** (**Analytics** > **Check-ins** > **Check-ins Report**) lists every individual check-in, grouped by how the member got in (membership, pass, drop-in, or external program) with a subtotal per group and **Total check-ins** at the bottom. Columns are **Member**, entry method, **Time**, and reference. It opens on **Today** and accepts ranges of up to 31 days, so the front desk can reconcile a shift or a day against the till.
 
@@ -53,18 +53,18 @@ The **Dashboard** (**Analytics** > **Bookings** > **Dashboard**) is the top-of-f
 
 KPI cards:
 
-- **Total bookings**, **Confirmed bookings**, **Cancelled bookings**, and **Pending bookings** - Volume by status.
-- **Total revenue** - Amount billed by the bookings in range.
-- **Paid bookings amount** - How much of that has been collected.
-- **Average booking value** - Revenue divided by bookings.
-- **Cancellation rate** - Cancelled bookings as a percentage of the total.
+- **Total Bookings**, **Confirmed Bookings**, **Cancelled Bookings**, and **Pending Bookings** - Volume by status. **Confirmed Bookings** counts every booking that stands (still confirmed, checked in, or a no-show) and notes how many were checked in, so total = confirmed + cancelled + pending. **Cancelled Bookings** also shows the cancellation rate as a share of all bookings.
+- **Total Billed** - What the bookings in range billed, including tax and net of refunds, with any cancellation fees the gym kept. The amount excluding tax is shown underneath. Paid plus outstanding equals billed, the same total as the **Audit** tab.
+- **Total Paid** - How much of that has been collected, including tax.
+- **Outstanding** - What is still owed, including tax.
+- **Average Booking Value** - The average per payable booking, including tax.
 
 Charts:
 
-- **Booking trends** - Bookings (bars) and revenue (line) over time. The time bucket adapts to your date range (daily, weekly, or monthly).
-- **By area type** - Bookings per area type (for example, tennis court, reformer studio, climbing wall).
-- **By source** - Bookings per booking source.
-- **Peak hours** and **Peak days** - When bookings cluster, by hour of day and day of week.
+- **Booking Trends** - Bookings (bars) and total billed (line) over time. The time bucket adapts to your date range (daily, weekly, or monthly).
+- **Bookings by Type** - Bookings per class type, area type, or instructor type (for example, tennis court, reformer class, personal training).
+- **Bookings by Source** - Bookings per booking source.
+- **Peak Booking Hours** and **Peak Booking Days** - When bookings cluster, by hour of day and day of week.
 
 Use this dashboard to spot demand patterns and set your class and court schedule around peak hours and days.
 
@@ -72,8 +72,8 @@ Use this dashboard to spot demand patterns and set your class and court schedule
 
 **By Source** (**Analytics** > **Bookings** > **By Source**) splits booking volume two ways:
 
-- **Bookings by source** - The booking channel (for example, admin, member portal, kiosk). Bookings made through the API are split per API key, and bookings made through AI assistants are counted separately.
-- **Bookings by marketing source (UTM)** - The `utm_source` attached to the booking, so you can attribute bookings to specific marketing links or campaigns.
+- **Bookings by Source** - The booking channel (for example, admin, member portal, kiosk). Bookings made through the API are split per API key.
+- **Bookings by marketing source (UTM)** - The `utm_source` attached to the booking, so you can attribute bookings to specific marketing links or campaigns. Sources that are AI assistants are drawn in a second color, and a **From AI assistants** line above the chart totals them.
 
 This is the same source data summarized on the Bookings dashboard, broken out for attribution work.
 
@@ -104,17 +104,17 @@ Columns: **Date**, **Member**, **Type**, **Resource**, **Club**, **Source**, **S
 You can refine the table with three filters, and the filters also apply to the CSV export so the two always match:
 
 - **Payment** - The payment state of the booking.
-- **Type** - The resource, grouped by **Area**, **Class**, **Instructor**, and **Other**.
-- **Status** - Confirmed, Pending, Checked in, No show, or Cancelled.
+- **Type** - The booking type, grouped under **Area types**, **Class types**, **Instructor types**, and **Other**.
+- **Status** - Confirmed, Pending, Checked in, No-show, or Cancelled.
 
 **Payment** states:
 
 - **Unpaid** - Nothing collected yet.
-- **Partial** - Some but not all of the amount is paid.
+- **Partially paid** - Some but not all of the amount is paid.
 - **Paid** - Fully collected.
 - **Refunded** - Payment was returned.
 - **Covered** - Settled without a direct charge (for example, by a membership).
-- **No charge** - No payment was required.
+- **No payment required** - No payment was required.
 
 **Entrance** captures how the booking was paid for:
 
@@ -126,7 +126,7 @@ Click a row to open the booking detail. Unpaid rows are tinted so you can chase 
 
 ## Bookings monthly report
 
-The **Monthly Report** (**Analytics** > **Bookings** > **Monthly Report**) is a month-by-month matrix: one row per month, one column per booking type, plus **Total bookings** and **Total revenue** columns and a **Totals** row. A stacked bar chart above the table shows the same breakdown by type.
+The **Monthly Report** (**Analytics** > **Bookings** > **Monthly Report**) is a month-by-month matrix: one row per month, one column per booking type, plus **Total Bookings** and **Total Billed (Including tax)** columns and a **Totals** row. Each month's billed figure matches the bookings **Dashboard** for that month. Months with no bookings still get a row of zeros. A **Bookings by Type** stacked bar chart above the table shows the same breakdown.
 
 Use it for period-over-period comparison (for example, "how did padel bookings trend across the last six months?") and export it for board or owner reporting.
 
@@ -170,11 +170,21 @@ The **Earnings Statement** (**Analytics** > **Instructors** > **Earnings Stateme
 
 ### My performance
 
-Any user linked to an instructor record - an instructor, or an owner or manager who also teaches - gets a **My performance** category with their own numbers only: **Bookings**, **Classes**, **Earnings Overview**, **Earnings Statement**, and **By entrance method**. The bookings and classes reports need the `analytics.read.own` permission; the three earnings reports need `billing.read.own`, so you can hide pay from instructors without hiding their schedule stats.
+Any user linked to an instructor record - an instructor, or an owner or manager who also teaches - gets a **My performance** category with their own numbers only. It is the instructor's counterpart to the gym-wide **Instructors** category: an admin who also teaches sees both. The reports are not narrowed by club.
+
+| Tab | What it shows |
+| --- | --- |
+| **Bookings** | **Total Bookings**, **Cancellation Rate**, **Confirmed Bookings**, **Total Revenue**, **Average Booking Value**, **Cancelled Bookings**, **Pending Bookings**, and **My Compensation**, plus a **Booking Trends** chart. |
+| **Classes** | **Total Classes**, **Total Bookings**, **Total Attendance**, **Average Attendance**, **Capacity Utilization**, and **My Compensation**, a **Classes and Attendance Trends** chart, and **Most Popular Classes** with their attendance rate. |
+| **Earnings Overview** | **Total Earnings**, **Total Classes**, **Total Attendance**, and **Personal Trainings**, with **Earnings by Day** and **Earnings from Your Work** charts. |
+| **Earnings Statement** | Every payment behind your pay for the chosen months, line by line. Uses month presets and opens on the last month. |
+| **By entrance method** | Your pay split by how members got in, in a **My share** column, one row per pass, program, and direct payment. Uses month presets and opens on the last month. |
+
+The **Bookings** and **Classes** tabs need the `analytics.read.own` permission; the three earnings tabs need `billing.read.own`, so you can hide pay from instructors without hiding their schedule stats.
 
 ## Exporting reports
 
-Reports with an **Export** button in the top-right download a CSV of exactly what is on screen, including any filters you applied. Exportable reports include the **Check-ins Report**, **Audit**, **Monthly Report**, **Classes Dashboard** (by instructor), **Instructors Dashboard**, **Instructor Pay Report**, **Earnings Statement**, and **Earnings by entrance method**. Files are named with the report and date range, and the club id when the report is narrowed to one club. For scheduled or bundled exports, see [Settings > Data Tools > Export](/settings/export).
+Reports with an **Export** button in the top-right download exactly what is on screen, including any filters you applied. Pick **Excel (.xlsx)** or **CSV (.csv)** from the button's menu; on a phone the button is the menu icon in the top bar. Exportable reports include the **Check-ins Report**, **Audit**, **Monthly Report**, **Classes Dashboard** (by instructor), **Instructors Dashboard**, **Instructor Pay Report**, **Earnings Statement**, and **Earnings by entrance method**. Files are named with the report and date range, and the club id when the report is narrowed to one club. For scheduled or bundled exports, see [Settings > Data Tools > Export](/settings/export).
 
 ## Worked examples
 
@@ -186,7 +196,7 @@ Reports with an **Export** button in the top-right download a CSV of exactly wha
 
 **Gym / Fitness - paying instructors correctly.** A CrossFit box closes the month with the **Instructor Pay Report**, clicks each coach's month cell to verify the sessions behind the figure, then exports the CSV for payroll. For a single disputed coach, the **Earnings Statement** shows every contributing line item.
 
-**Climbing - reading demand by source.** A climbing gym uses **By Source** and sees a spike in **Bookings by marketing source (UTM)** tied to an intro-offer link. They compare it against the bookings **Dashboard** revenue trend to confirm the promotion drove paid bookings, not just free trials.
+**Climbing - reading demand by source.** A climbing gym uses **By Source** and sees a spike in **Bookings by marketing source (UTM)** tied to an intro-offer link. They compare it against the billed line on the bookings **Dashboard** trend chart to confirm the promotion drove paid bookings, not just free trials.
 
 ## Tips & best practices
 

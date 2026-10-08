@@ -5,7 +5,7 @@ keywords:
   - sign in with Google
   - Sign in with Apple
   - Facebook login
-  - Google One Tap
+  - phone sign-in
   - single sign-on
   - social login
   - member sign-in
@@ -13,7 +13,7 @@ keywords:
   - reset password
 ---
 
-1club supports **Sign in with Google**, **Sign in with Apple**, and **Facebook login**, plus classic **email and password**, across all of its apps. Members, staff, and admins can use whichever method they prefer, and the same identity works on the web and in the mobile app.
+1club supports **Google**, **Apple**, and **Facebook** sign-in, plus classic **email and password**, across all of its apps. Members can also sign in with a phone number and a one-time code where their gym allows it. Members, staff, and admins can use whichever method they prefer, and the same identity works on the web and in the mobile app.
 
 ## When this matters
 
@@ -22,19 +22,20 @@ Because an account is keyed to its email address, no matter which method created
 Typical situations:
 
 - **Getting new staff into the admin** - you invite a new hire from **Settings** > **Organization** > **Users**, and they sign in with their work Google account, so there is no password to create or share.
-- **A member who wants to keep their email private** - a member books through the marketplace with **Sign in with Apple** and **Hide My Email**, and still gets confirmations, receipts, and reminders in their real inbox.
+- **A member who wants to keep their email private** - a member books through the marketplace with **Continue with Apple** and **Hide My Email**, and still gets confirmations, receipts, and reminders in their real inbox.
 - **A social sign-up that later needs a password** - a member who joined with Facebook needs to sign in on a shared device without Facebook, so an admin sends them a password reset and they can then sign in either way with the same email.
 
 See [Worked examples](#worked-examples) for each of these in more detail.
 
 ## Supported sign-in methods
 
-- **Google** - one-tap or "Continue with Google". Uses your existing Google account, so there is no separate password to remember. Google One Tap can sign returning members in automatically.
-- **Apple** - "Sign in with Apple". Uses your Apple ID and supports Apple's Hide My Email (private email relay).
-- **Facebook** - "Continue with Facebook".
+- **Google** - **Continue with Google**. Uses your existing Google account, so there is no separate password to remember.
+- **Apple** - **Continue with Apple**. Uses your Apple ID and supports Apple's Hide My Email (private email relay).
+- **Facebook** - **Continue with Facebook**.
 - **Email and password** - a traditional email and password login, with self-service password reset.
+- **Phone number and one-time code** - members only, and only when the gym has chosen **Email or phone number** or **Phone number** under **How members are identified**. The member types their number and gets a code by WhatsApp or text message. See [Member authentication](/members/member-authentication).
 
-No matter which method you choose, an account is identified by its email address. Signing in with Google, Apple, or Facebook for the first time creates a 1club account (or links to an existing one with the same email) automatically. There is nothing to enable per member.
+Signing in with Google, Apple, or Facebook for the first time creates a 1club account, or links to an existing one with the same email, automatically. After that, 1club remembers the provider account itself, so the sign-in keeps working even if the address at the provider changes. There is nothing to enable per member.
 
 ## Where each method works
 
@@ -88,23 +89,32 @@ No matter which method you choose, an account is identified by its email address
 </table>
 
 <Note>
-  Sign in with Google, Sign in with Apple, and Facebook login are available to
-  both staff signing into the admin dashboard and members signing into any
-  member-facing app.
+  Google, Apple, and Facebook sign-in are available to both staff signing into
+  the admin dashboard and members signing into any member-facing app. Apple and
+  Facebook are switched on per platform deployment, so if you don't see a
+  button for one, it is not turned on rather than broken.
 </Note>
 
 ## How sign-in works
 
-All member-facing apps (portal, marketplace, club website, and mobile) sign you in through a single secure sign-in page. Choose a provider or enter your email, authenticate once, and you are returned to the app you started from, already signed in. The mobile app uses the same page in a secure in-app browser, so a member's account and history are identical on web and mobile.
+All member-facing apps (portal, marketplace, club website, and mobile) sign you in through a single secure sign-in page. Choose a provider or enter your email (or phone number, where the gym allows it), authenticate once, and you are returned to the app you started from, already signed in. The mobile app uses the same page in a secure in-app browser, so a member's account and history are identical on web and mobile.
 
-The admin dashboard has its own sign-in page with the same Google, Apple, and Facebook options plus email and password.
+The admin dashboard has its own sign-in page with the same Google, Apple, and Facebook buttons. Below them, you type your email and click **Continue**, and the next step depends on your account:
+
+- **The account has a password** - you're asked for it. **Forgot Password** sends a reset link.
+- **The account was created with a social sign-in** - you're asked to continue with the option you used before, or to choose **Set up a password instead**, which emails you a link to set one.
+- **You were invited but haven't accepted yet** - you're asked to open the invitation link from your inbox, with a **Resend invitation email** button if you lost it.
+- **There is no account for that email** - the sign-up form opens so you can create one.
+
+If you sign in with an account that has no staff role in any organization, the admin shows **No Admin Access**.
 
 ## Sessions and staying signed in
 
 - After you sign in, 1club keeps you signed in as you keep using the app and refreshes your session automatically in the background - you don't re-enter credentials on every visit.
 - Sessions are per device and per app. Signing out on one device does not sign you out on the others.
+- An admin session lasts 30 days from the last time you used it. Member sessions last longer on the web and in the mobile app.
 - Sessions are protected with secure, HTTP-only cookies, so your credentials are never exposed to page scripts.
-- Signing out ends the session on that device. If you think an account is compromised, change the password (or the provider account) and sign out everywhere.
+- Signing out ends the session on that device. Resetting or changing your password signs you out on every other device. If you think an account is compromised, change the password (or secure the provider account).
 
 ## Hide My Email with Apple
 
@@ -122,28 +132,29 @@ You still receive everything as normal. 1club sends your account and notificatio
 
 One email address is one 1club account, regardless of how you sign in. This means:
 
-- If you first signed up with email and password, you can still choose "Continue with Google" or "Sign in with Apple" later, as long as the provider account uses the same email.
-- If you signed up with Google, Apple, or Facebook and now want a password (for example, to sign in on a device without that provider), an org admin can start it for you from **Settings** > **Organization** > **Users** using the **Reset password** action. That sends you a link to set a password; after that, you can sign in with either method using the same email. See [Users](/settings/admin-users).
+- If you first signed up with email and password, you can still choose **Continue with Google** or **Continue with Apple** later, as long as the provider account uses the same email.
+- If you signed up with Google, Apple, or Facebook and now want a password (for example, to sign in on a device without that provider), enter your email on the sign-in screen and choose **Set up a password instead**. An org admin can also send the same link from **Settings** > **Organization** > **Users** using the **Reset password** action. After you set a password, you can sign in with either method using the same email. See [Users](/settings/admin-users).
+- After your first social sign-in, 1club links that provider account to your 1club account. If you later change the email at Google, or Apple rotates your relay address, you still land in the same account.
 - Members can review their sign-in email on their profile. Staff can review and update theirs under [Profile](/settings/profile).
 
 ## Worked examples
 
 ### New staff member joining the admin
 
-An admin invites the new hire from **Settings** > **Organization** > **Users**. The invitation email links them to sign-in. They click "Continue with Google" with their work Google account, and their admin access is ready - no password to create or share.
+An admin invites the new hire from **Settings** > **Organization** > **Users**. The invitation email links them to sign-in. They click **Continue with Google** with their work Google account, and their admin access is ready - no password to create or share.
 
 ### Member who wants to keep their email private
 
-A member books through the marketplace and chooses "Sign in with Apple", then picks "Hide My Email". They still get booking confirmations, receipts, and reminders in their real inbox, forwarded by Apple, without giving the club their real address.
+A member books through the marketplace and chooses **Continue with Apple**, then picks **Hide My Email**. They still get booking confirmations, receipts, and reminders in their real inbox, forwarded by Apple, without giving the club their real address.
 
 ### Social sign-up that later needs a password
 
-A member created their account with Facebook, but wants to sign in on a shared kiosk that doesn't have Facebook. An admin uses **Reset password** on that user in **Settings** > **Organization** > **Users**; the member gets a link, sets a password, and can now sign in either way with the same email.
+A member created their account with Facebook, but wants to sign in on a shared kiosk that doesn't have Facebook. On the sign-in screen they enter their email and choose **Set up a password instead** (or an admin uses **Reset password** on that user in **Settings** > **Organization** > **Users**). The member gets a link, sets a password, and can now sign in either way with the same email.
 
 ## Tips and best practices
 
 - **Pick one primary method per person.** Any method works, but choosing one keeps sign-in predictable across devices.
-- **Match the provider to the email.** Social sign-in only links to an existing account when the provider account uses the same email address.
+- **Match the provider to the email the first time.** A first social sign-in only links to an existing account when the provider account uses the same email address. After that, the link is kept even if the provider's email changes.
 - **Use Reset password to enable password login**, not to create a second account - the account stays the same; only the sign-in options grow.
 - **Keep the sign-in email current.** Members and staff can review it on their profile; it is the key that ties every sign-in method to one account.
 
@@ -151,19 +162,19 @@ A member created their account with Facebook, but wants to sign in on a shared k
 
 ### Can members sign in with Google?
 
-Yes. Members can use "Continue with Google" (including Google One Tap) on the member portal, the marketplace, your club website, and the mobile app.
+Yes. Members can use **Continue with Google** on the member portal, the marketplace, your club website, and the mobile app.
 
 ### Does 1club support Sign in with Apple?
 
-Yes. "Sign in with Apple" is available to members on every member-facing app and to staff on the admin dashboard, and it supports Apple's private email relay.
+Yes, where Apple sign-in is switched on for the platform. **Continue with Apple** is available to members on every member-facing app and to staff on the admin dashboard, and it supports Apple's private email relay.
 
 ### Can I sign in with Facebook?
 
-Yes. "Continue with Facebook" is available on every app - the member portal, the marketplace, your club website, the mobile app, and the admin dashboard.
+Yes, where Facebook sign-in is switched on for the platform. **Continue with Facebook** is available on every app - the member portal, the marketplace, your club website, the mobile app, and the admin dashboard.
 
 ### Can staff use Google, Apple, or Facebook to sign into the admin dashboard?
 
-Yes. The admin dashboard offers Sign in with Google, Sign in with Apple, and Facebook login alongside email and password.
+Yes. The admin dashboard offers Google, Apple, and Facebook sign-in alongside email and password, wherever those providers are switched on for the platform.
 
 ### Can I hide my email when I sign in with Apple?
 
@@ -171,7 +182,11 @@ Yes. Choose "Hide My Email" when Apple prompts you. 1club sends your notificatio
 
 ### I signed up with Google - can I also use a password?
 
-Yes. Ask an org admin to run **Reset password** for you from **Settings** > **Organization** > **Users**. You'll get a link to set a password, and after that you can sign in with either method using the same email.
+Yes. Enter your email on the sign-in screen and choose **Set up a password instead**, or ask an org admin to run **Reset password** for you from **Settings** > **Organization** > **Users**. You'll get a link to set a password, and after that you can sign in with either method using the same email.
+
+### Can members sign in with a phone number?
+
+Yes, if your gym allows it. An owner or admin picks **Email or phone number** or **Phone number** under **How members are identified** in **Settings** > **Members** > **Contacts**. Members then type their number and get a one-time code by WhatsApp or text message. Staff sign in to the admin with email. See [Member authentication](/members/member-authentication).
 
 ### Do I need to create a separate account for the mobile app?
 

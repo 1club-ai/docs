@@ -101,7 +101,7 @@ Both hierarchies apply at the same time, so one grant can satisfy several checks
 A Manager holding **Bookings: Full access (Club)** therefore passes a check for "View bookings (Own)" without holding it literally. That is the point of the model: you grant the least a person needs, and broader holders pass automatically.
 
 <Warning>
-Widening the scope of a Full access grant can hand over more than the editor shows. A few sensitive operations are deliberately pinned to **Organization** scope so that, by default, only an admin or owner reaches them - deleting the website, deleting a payment record, undoing a check-in that has already been recorded. If you grant a role **Full access (Organization)** on Marketing, Billing, or Check-ins, it satisfies those checks too, with no separate checkbox saying so. Grant Organization scope deliberately.
+Widening a grant to **Organization** scope can hand over more than the editor shows. A few sensitive operations are deliberately pinned to Organization scope so that, by default, only an admin or owner reaches them: deleting the website, deleting a payment record, cancelling a booking that is already checked in, checking someone in outside today's check-in window, booking into a session that has already ended, and changing the entrance method after the booking's day. Granting the matching action at Organization scope (for example Check-ins: **Create (Organization)** or Billing: **Delete (Organization)**), or **Full access (Organization)** on the module, satisfies those checks too, with no separate checkbox saying so. Grant Organization scope deliberately.
 </Warning>
 
 ## What each permission allows
@@ -143,7 +143,7 @@ A member belongs to the organization, not to one of its gyms - the membership, b
 | **View** | The member list, a member's profile, and every member picker in the admin. |
 | **Create** | Add a member or contact. Also creates billing accounts, tag definitions, custom-field definitions, and recorded matches. |
 | **Edit** | Amend an existing record: details, notes, household links, PIN, tags, email preferences, invitations, member type, progression, and archiving or unarchiving. |
-| **Delete** | Delete a member or a billing account, purge the archive, delete a tag or custom-field definition, **and merge two profiles**. |
+| **Delete** | Delete a member or a billing account, purge the archive, delete a tag or custom-field definition, delete a progression history entry, **and merge two profiles**. |
 | **Full access** | All four. |
 
 Two things are worth knowing here:
@@ -209,12 +209,15 @@ Bookings and waitlists, for classes and for area or court reservations.
 | Action | Allows |
 |--------|--------|
 | **View** | The booking list and detail, plus the attendee roster on a class. |
-| **Create** | Make a booking, and add someone to a waitlist. |
-| **Edit** | Edit or reschedule a booking, confirm it, add or remove a participant, and process a waitlist. |
+| **Create** | Make a booking, and add someone to a waitlist. At **Organization** scope, also add a booking to a class that has already finished or a slot whose end time has passed. |
+| **Edit** | Edit or reschedule a booking, confirm it, add or remove a participant, process a waitlist, and change the entrance method of a booking that has not been checked in yet. |
 | **Delete** | Cancel a booking, and remove someone from a waitlist. |
-| **Full access** | All four, plus two overrides: booking into a blocked area or an already-taken slot (the latter with a note), and waiving the cancellation policy to issue a full refund. |
+| **Full access** | All four, plus the override for booking into a blocked area or an already-taken court or coach (the latter with a note). |
 
 - **Delete means cancel.** There is no hard delete for a booking. Cancelling carries refunds, notifications, and a knock-on to any order it belongs to.
+- **Whoever may cancel decides about the money.** When a staff member cancels a paid booking, they choose whether to refund it in full or apply the cancellation policy. No extra permission is needed for the full refund.
+- **Booking outside a coach's schedule needs no override.** Every staff member who may book can go past a coach's working hours, time off, or break after a warning. Only a blocked court or a court or coach that is already taken needs **Full access**.
+- **Changing the entrance method is limited to the booking's day.** At **Own** or **Club** scope you can change it until the end of the booking's day. At **Organization** scope you can change it any time.
 - **Own scope is not "bookings I made".** It is bookings assigned to the user, plus every booking on a class they teach. Unlike class writes there is no sole-instructor rule, so a co-taught class's bookings belong to all of its instructors. Editing a whole recurring series additionally requires that no later occurrence belongs to another instructor.
 - **Cancelling a booking that is already checked in** needs the Check-ins override described below, on top of Bookings: Delete.
 - Bookings also get cancelled by neighbouring operations under their own permissions: cancelling a class, cancelling an order, cancelling an event, and resolving an instructor time-off conflict.
@@ -226,18 +229,19 @@ Recording and undoing attendance.
 | Action | Allows |
 |--------|--------|
 | **View** | The attendance log and check-in detail. |
-| **Create** | Record a check-in, including outside the check-in window, which binds only members checking themselves in. |
-| **Edit** | Change an existing check-in, in practice converting the entrance method used for a visit. |
-| **Delete** | Undo a check-in. |
+| **Create** | Record a check-in for today, up to an hour ahead of the session. At **Organization** scope, also check someone in for a booking days ahead or on a day that has already closed. |
+| **Edit** | Change an existing check-in, in practice changing the entrance method used for a visit that has been checked in. At **Own** or **Club** scope only until the end of the booking's day. At **Organization** scope any time. |
+| **Delete** | Undo a check-in. At **Organization** scope, also cancel a booking that has already been checked in. |
 | **Full access** | All four. At **Organization** scope it also recovers a no-show. |
 
-Three overrides live behind **Full access (Organization)** specifically, and they are the reason to think before widening this module's scope:
+Staff are held to the same check-in window as members checking themselves in: today, and at most an hour ahead. Four overrides live behind **Organization** scope specifically, and they are the reason to think before widening this module's scope:
 
-- **Recovering a no-show.** Checking in a booking that was already marked as a no-show, which can undo the no-show fee.
-- **Cancelling a booking that has already been checked in.** This voids the attendance record and zeroes the instructor's pay for it.
-- **Rewriting the entrance method after the visit was recorded and paid for.**
+- **Checking in outside the window** - Create (Organization). A booking days ahead, or a day that has already closed.
+- **Changing the entrance method after the booking's day** - Edit (Organization).
+- **Cancelling a booking that has already been checked in** - Delete (Organization). This voids the attendance record and zeroes the instructor's pay for it.
+- **Recovering a no-show** - Full access (Organization). Checking in a booking that was already marked as a no-show, which can undo the no-show fee.
 
-By default those three land only on Admin, owner, and 1Club support, because Manager holds Check-ins at Club scope. You can delegate any of them to another role by granting it at Organization scope. You cannot take them away from an Admin.
+By default these land only on Admin, owner, and 1Club support, because Manager holds Check-ins at Club scope. You can delegate any of them to another role by granting the action at Organization scope. You cannot take them away from an Admin.
 
 ### Assessments
 
@@ -264,7 +268,7 @@ The instructor roster and admin access for your team.
 
 | Action | Allows |
 |--------|--------|
-| **View** | The instructor list and detail, pay-rate policies, and time off. |
+| **View** | The **Staff** section: the team list, the instructor list and detail, pay-rate policies, time off, and shifts. |
 | **Full access** | Create, edit, delete, merge, and reorder instructors; manage pay-rate policies; manage time off and resolve its booking conflicts; **and manage team members and admin access** - invite, edit, change role, reset a password, and remove a user. |
 
 Organization scope only - there is no Club-scoped version of this module.
@@ -296,8 +300,8 @@ Running the till. This module is layered on top of Billing rather than carved ou
 
 | Action | Allows |
 |--------|--------|
-| **View** | Load the register: the sellable catalog and prices, the totals preview, drafts and open tabs, order and receipt lookup, the bookable timetable, and the customer picker. |
-| **Create** | Transact: create, amend, execute, close, and cancel an order; record the tender; add a walk-in customer; and record a check-in. |
+| **View** | Load the register: the sellable catalog and prices, the totals preview, drafts and open tabs, order and receipt lookup, the bookable timetable, the customer picker, and the rental gear still out. |
+| **Create** | Transact: create, amend, execute, close, and cancel an order; record the tender; add a walk-in customer; record a check-in; and take rental gear back in. |
 | **Full access** | Today this is exactly View plus Create. |
 
 Four things to know before granting it:
@@ -307,11 +311,11 @@ Four things to know before granting it:
 - **To build a register-only cashier, grant Point of sale and revoke Billing.** Unchecking Point of sale on its own does not stop a role that still holds Billing: Create from selling.
 - **A Point of sale grant widens timetable and roster reads to Club scope.** An Own-scoped instructor who is also given Point of sale will see the whole club's timetable and rosters. That follows from the grant, and it is a reason not to hand the till to instructors casually.
 
-If your organization has the point of sale switched off in settings, the register refuses new sales regardless of permissions, while everything already on the books stays settleable.
+If your organization has the point of sale switched off in settings, the register refuses new sales regardless of permissions, while everything already on the books stays settleable. The **Point of sale** module is also hidden from the permissions editor until the point of sale is switched on. Hiding it does not remove what a role already holds, so switching the point of sale back on shows each role as it was.
 
 ### Marketing
 
-The leads pipeline, promotions (under **Sales** > **Promotions**), automations, content, media, reviews, and the website builder.
+The leads pipeline, promotions (under **Sales** > **Promotions**), automations, forms, content, media, reviews, and the website builder. Marketing: **View** also shows **Marketing** > **Marketplace**, but submitting or unpublishing a marketplace listing needs Settings access, so it stays with Admin and owner.
 
 | Action | Allows |
 |--------|--------|
@@ -369,7 +373,9 @@ Lending gear out for a session and getting it back.
 | **Delete** | Write off gear that is not coming back. |
 | **Full access** | All four. |
 
-This split is deliberate: the desk can lend and take back without being able to write off missing gear.
+This split is deliberate: the desk can lend and take back without being able to write off missing gear. The register also sees what is still out and takes gear back through Point of sale, but lending gear, including a rental line in a sale, still needs Rentals: **Create**.
+
+Like Point of sale, the **Rentals** module only appears in the permissions editor once your organization switches rentals on.
 
 ### Cash
 
@@ -379,7 +385,7 @@ The cash drawer, cash movements, and expenses.
 |--------|--------|
 | **View** | The cash ledger, the drawer, the overview, and expense categories. |
 | **Create** | Record a cash movement or expense, scan an expense receipt, and count the drawer. |
-| **Full access** | Also reverse a ledger entry and manage expense categories. |
+| **Full access** | Also correct or reverse a ledger entry and manage expense categories. |
 
 ### Permissions
 
@@ -444,7 +450,7 @@ Open it from **Settings**, in the **Organization** section. Only users holding t
 
 The page is two columns.
 
-**On the left, the five roles.** Each non-admin role carries a badge: **Default** if it still matches the built-in bundle, **Customized** if your organization has changed it. Select a role to load it.
+**On the left, the four staff roles:** Admin, Manager, Front Desk, and Instructor. Member has no admin access, so it is not listed. Each non-admin role carries a badge: **Default** if it still matches the built-in bundle, **Customized** if your organization has changed it. Select a role to load it.
 
 **On the right, that role's permissions**, as one collapsible section per module. A collapsed section still tells you what the role holds there, on the right of its header - for example `View, Create` or `Full access` or **No access** - so you can read the whole role without opening anything.
 
@@ -499,9 +505,9 @@ Permission changes are not instant. They apply the next time an affected user's 
 - **Customize Operations or Settings.** Those modules always resolve from the role defaults.
 - **Take an override away from Admin.** The organization-scoped check-in overrides, for instance, can be delegated to other roles but never removed from Admin.
 
-## Reading the Role permissions table
+## Reading the roles and permissions table
 
-There is also a read-only view of the whole matrix, for when you are assigning a role rather than editing one. Open **Settings** > **Organization** > **Users**, invite or edit a user, and click the info icon next to the role picker.
+There is also a read-only view of the whole matrix, for when you are assigning a role rather than editing one. Invite or edit a user from **Settings** > **Organization** > **Users**, **Staff** > **Team**, or **Staff** > **Instructors**, and click the question-mark icon next to **User information**. It opens **Roles & permissions**. Managers can open it too, since it needs only Staff access.
 
 It shows every role against every module, with the actions each role holds and a scope badge such as **(Own)** where the permission is narrower than the organization. It reflects **your organization's** permissions, including any customization, not the generic defaults. Roles with no permissions - Member - are left out, and so is the admin-only Permissions module.
 
@@ -513,7 +519,7 @@ If the table cannot load your organization's real sets it says so and falls back
 - **Managers**, through staff management, can invite, edit, reset the password of, and remove users whose role is **below** Manager - Front Desk, Instructor, and Member - and can promote someone up to Manager. A Manager cannot modify themselves, another Manager, or an Admin, and can never grant the Admin role or account ownership.
 - A role is assigned when a user is invited and can be changed later by editing them. Changing a role replaces the old one; the owner flag is separate and is preserved.
 
-This hierarchy holds regardless of permissions, on both the screen and the server. Manage it all under **Settings** > **Organization** > **Users**. See [Users](/settings/admin-users).
+This hierarchy holds regardless of permissions, on both the screen and the server. Admins and owners manage users under **Settings** > **Organization** > **Users**. Managers have no Settings access, so they manage the team under **Staff** > **Team** (Admin, Manager, and Front Desk users) and **Staff** > **Instructors**. See [Users](/settings/admin-users).
 
 ## Worked examples
 
@@ -571,6 +577,12 @@ Give them **Admin** and mark them as **owner**. Owners bypass every permission c
 
 **Fix**: Grant Bookings: **Delete** at Club scope, or route cancellations to a Manager.
 
+**Issue**: A Manager or Front Desk user cannot check a member in for a later day or a day that has passed.
+
+**Cause**: Staff check-ins are limited to today, up to an hour ahead of the session. Only Check-ins: **Create** at **Organization** scope reaches past that window.
+
+**Fix**: Check the member in on the day, or grant Check-ins: **Create (Organization)** to the role that needs it.
+
 **Issue**: I unchecked Point of sale but the role can still sell.
 
 **Cause**: The register and the **Sales** > **Orders** screen drive the same operations, and the role still holds Billing: Create.
@@ -606,6 +618,12 @@ Give them **Admin** and mark them as **owner**. Owners bypass every permission c
 **Cause**: Managers only manage roles below Manager, and can never grant Admin or ownership.
 
 **Fix**: Have an Admin or owner make the change.
+
+**Issue**: Point of sale or Rentals is missing from the permissions editor.
+
+**Cause**: Those modules only appear once your organization switches the point of sale or rentals on.
+
+**Fix**: Switch the feature on in **Settings** > **Sales** > **Point of Sale** or **Settings** > **Sales** > **Rentals**, then reload the Permissions page.
 
 **Issue**: I want a brand-new role with a custom name.
 

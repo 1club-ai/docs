@@ -12,28 +12,28 @@ This page collects the issues we see most often in practice. For anything that i
 
 Check, in order:
 
-1. **The org URL is right**. Each organization has its own subdomain on the admin. If you're at the wrong subdomain, your credentials won't be recognized even when they're correct.
+1. **You're on the admin, not a member app**. Staff sign in at the admin (`admin.1club.ai`), which serves every organization. If you see **No Admin Access** after signing in, your account has no staff role in any organization yet - ask an Admin to invite you.
 2. **The email is the one your invite went to**. If you've been invited under a different email than you usually use, sign in with that one.
 3. **Your account is still active**. Ask an Admin in your org to open **Settings** > **Organization** > **Users** and confirm your row exists with status **Active**. If it shows **Invited** or **Expired**, the invitation never completed - have them resend it.
 4. **You're not signed into a different org**. The organization switcher in the organization menu at the top of the left rail might have you in another organization where this user doesn't exist. See [Organizations and clubs](/reference/organization-clubs).
-5. **You're using the sign-in method tied to your account**. Google, Apple, Facebook, and email/password all resolve to one account by email. If "Continue with Google" doesn't recognize you, confirm that Google account uses the same email as your 1club account. See [Signing in](/reference/sign-in).
+5. **You're using the sign-in method tied to your account**. The admin asks for your email first. If it says the email is registered with a social sign-in, use **Continue with Google**, **Continue with Apple**, or **Continue with Facebook** as before, or choose **Set up a password instead**. The first time you use a social sign-in it links to the account with the same email, so confirm that the provider account uses your 1club email. See [Signing in](/reference/sign-in).
 
 ### Password reset email never arrives
 
 - Check spam/junk.
 - Confirm the email is the one on file (have an Admin verify under **Settings** > **Organization** > **Users**).
 - Try once more after 15 minutes - some mail providers delay first-time messages.
-- If you signed up with a Google, Apple, or Facebook OAuth provider and never set a local password, password reset won't apply. Ask an Admin to use **Set password** from **Settings** > **Organization** > **Users** instead.
+- If you signed up with Google, Apple, or Facebook and never set a password, enter your email on the sign-in screen and choose **Set up a password instead**. That sends the same reset link. An Admin can also send it with **Reset password** from **Settings** > **Organization** > **Users**.
 
-### Two-factor or session keeps logging you out
+### Your session keeps logging you out
 
-JWT tokens have a 7-day expiry. After they expire you'll be asked to sign in again - this is normal. If you're being signed out far more often than that, check whether you're using private/incognito mode (cookies don't persist) or whether your browser is clearing cookies on close.
+Admin sessions stay signed in for 30 days and renew each time you use the admin. After 30 days without using it you'll be asked to sign in again, and you'll see "Your session has expired" - this is normal. Resetting or changing your password also signs you out on every other device. If you're being signed out far more often than that, check whether you're using private/incognito mode (cookies don't persist) or whether your browser is clearing cookies on close.
 
 ## Permissions and access
 
 ### "Permission denied" or pages are missing from the menu
 
-Each module is gated by the permissions your role grants. There are five roles - **Admin**, **Manager**, **Front Desk**, **Instructor**, **Member** - and an admin can change what each non-admin role grants. Pages you don't have access to are hidden from the navigation, not just disabled. Some sections also depend on a module being switched on, such as **Events** or the cash register. See [Roles and permissions](/reference/roles-permissions) for the full module-by-module matrix.
+Each module is gated by the permissions your role grants. There are five roles - **Admin**, **Manager**, **Front Desk**, **Instructor**, **Member** - and an admin can change what Manager, Front Desk, and Instructor grant. Pages you don't have access to are hidden from the navigation, not just disabled. Some sections also depend on a module being switched on, such as **Events** or the cash register. See [Roles and permissions](/reference/roles-permissions) for the full module-by-module matrix.
 
 If you should have access and don't:
 
@@ -61,7 +61,7 @@ A club that still has associated data (bookings, areas, memberships, and so on) 
 
 ### Currency, time zone, or locale is wrong across the admin
 
-These are organization-level settings, not per-club. Update them under **Settings** > **Organization** > **Details**; the change propagates to every page that reads org settings. See [Organization settings](/settings/organization).
+Time zone and locales are organization settings under **Settings** > **Organization** > **Details**; the change propagates to every page that reads org settings. A club can run on its own time zone, so if only one gym looks wrong, check the club's **Timezone** under **Settings** > **Clubs** > **Clubs**. Currency is set under **Settings** > **Billing** > **General**. See [Organization settings](/settings/organization).
 
 ## Home and analytics
 
@@ -85,7 +85,11 @@ Check the date range and the club selected in the breadcrumb, then the **Billing
 
 ### Walk-in won't check in
 
-If the booking policy at this club has **Enforce payment** set to **At check-in** but Check-in Mode is **Strict**, you can't check in a person who doesn't have a contact, even if you're willing to take payment. Either create a lightweight contact for them, or switch the club's [Access control](/settings/access-control) to **Flexible** and let payment satisfy the requirement.
+Staff can check in a known contact who has no booking even when **Allow walk-ins** is off - that toggle only binds members checking themselves in. A visitor with no contact at all is different: checking them in needs **Allow anonymous check-ins** on the matching booking policy. Either create a lightweight contact for them, or turn **Allow anonymous check-ins** on under **Settings** > **Bookings** > **Booking and cancellation policies**. See [Check-in models](/reference/check-in-models).
+
+### You can't check someone in for another day
+
+Staff check-ins follow the check-in window: from one hour before the booking starts until the end of the booking's day. Only users holding Check-ins: **Create** at **Organization** scope (Admins and owners by default) can check someone in for a later day or a day that has already closed. See [Roles and permissions](/reference/roles-permissions#check-ins).
 
 ### Booking doesn't appear in the calendar
 
@@ -122,9 +126,9 @@ If the card form won't load or every charge fails before it reaches the issuer, 
 
 ## Exports
 
-### Export rejected with "exceeds 500,000 row limit"
+### Export rejected with "exceeds the 500,000 row limit"
 
-This is a hard cap. Narrow the date range (a single quarter is usually enough) and try again. For yearly accounting handoffs, run four quarterly exports.
+This is a hard cap for CSV exports. Excel (XLSX) exports stop at 50,000 rows, so export as CSV if you need more. Narrow the date range (a single quarter is usually enough) and try again. For yearly accounting handoffs, run four quarterly exports.
 
 ### QuickBooks export creates duplicate customers
 

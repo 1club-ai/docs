@@ -24,24 +24,25 @@ You manage products under **Sales** > **Products** in the admin (`/billing/produ
 
 | Sub-tab | What it holds | Shown when |
 | --- | --- | --- |
-| **Products** | The catalog of sellable items, described on this page | Always |
-| [**Packages**](/sales/packages) | Fixed-price bundles of plans and products | Always |
+| **Products** | The catalog of sellable items, described on this page | You have any products permission |
+| [**Packages**](/sales/packages) | Fixed-price bundles of plans and products | You can view billing |
 | [**Stock**](/sales/inventory) | On-hand quantities per location | Inventory is on |
 | [**Ingredients**](/sales/inventory#recipes-and-ingredients-for-cafe-and-bar) | Raw items that recipes draw down | Inventory is on |
 | [**Deliveries**](/sales/deliveries) | Supplier deliveries and invoice scanning | Inventory is on |
 | [**Rentals**](/sales/rentals) | Gear that is lent out and still to come back | Rentals is on, or gear is still out |
 
-Products are shown in a data grid with columns for **Name**, **Price**, **Visibility**, and **Status** (Active or Inactive), plus a row menu to edit or delete. Click any row to open the product's detail page.
+Products are shown in a data grid with columns for **Name**, **Price**, **Visibility**, and **Status** (Active or Inactive), plus a row menu to edit or delete. When rentals are on, a **Rented out** chip next to the name marks rental items. Click any row to open the product in the edit dialog. The dialog has its own address (`/billing/products/<id>`), so you can bookmark or share a link to it.
 
-The page header has three actions:
+Use the filters to narrow the grid by **Categories** and **Brands**. Select rows with the checkboxes to **Delete** several products at once. Products still used by stock or packages are skipped and reported in a warning.
 
-- **Add Product** - opens the product dialog.
-- **Categories** - opens the category manager (see [Categories and brands](#categories-and-brands)).
-- **Brands** - opens the brand manager.
+The page header has two controls:
+
+- **Add** - a menu of everything you can create from this page: **Add Product**, and, when inventory is on and you can manage it, **Add Ingredient**, **Add Inventory**, **New delivery**, and **Add supplier**.
+- The more-actions menu - **Categories** opens the category manager and **Brands** opens the brand manager (see [Categories and brands](#categories-and-brands)).
 
 ## Creating or editing a product
 
-Click **Add Product** (or edit an existing row) to open the product dialog.
+Choose **Add** > **Add Product** (or click an existing row) to open the product dialog.
 
 The dialog asks for:
 
@@ -49,24 +50,21 @@ The dialog asks for:
 - **Club** - which club the product belongs to. For single-club organizations the lone club is selected automatically; multi-club organizations pick one, or leave it unset to make the product available across clubs.
 - **Category** - the product category, used to group products on the POS. Type to search existing categories, or type a new name to create one inline.
 - **Brand** - an optional brand. Type to search, or type a new name to create one inline.
-- **Barcode** - an optional code (up to 64 characters) for scan-to-sell at the point of sale.
-- **Price** - the sell price in your organization's currency.
-- **Revenue Account** - the accounting code the sale is booked against. Leave it as **None (uses default)** to fall back to your organization's default account, or pick a specific account (shown as `code - name`).
-- **Visibility** - **Public** (visible to anyone), **Member only** (visible after sign-in), or **Private** (admin-only, e.g. staff-only items).
-- **Active** - inactive products are hidden from the POS and can't be added to packages or order forms, but existing sales are preserved.
-- **Description** - free text shown on the product's detail page and public surfaces.
-- **Features** - a tag list of short selling points.
-- **Images** - up to five images; the first is used as the primary image.
+- **Barcode** - an optional code (up to 64 characters) for scan-to-sell at the point of sale. Scan the item into this field to fill it in.
+- **SKU / Product code** - an optional internal product code.
 - **Color** - a display color for the product.
-- **Sale or rental** - shown when rentals are on. Set **Fulfilment** to **Rented out** to lend the product instead of selling it. See [Equipment rentals](/sales/rentals).
+- **Active** - inactive products are hidden from the POS and can't be added to packages or order forms, but existing sales are preserved.
+- **Sale or rental** - shown when rentals are on. Set **Fulfilment** to **Rented out** to lend the product instead of selling it, then set when it is **Due back** and whether to **Return automatically**. See [Equipment rentals](/sales/rentals).
+- **Price** - the sell price in your organization's currency. For a rental, it is the fee for one rental.
+- **Cost price** - what you pay per unit, used for margin reporting. Optional.
+- **Revenue Account** - the accounting code the sale is booked against. Leave it as **None (uses default)** to fall back to your organization's default account, or pick a specific account (shown as `code - name`).
+- **Tax rate** - overrides the revenue account's default tax rate at the point of sale. Leave it as **None (uses default)** to use the revenue account's rate.
+- **Visibility** - **Public** (visible to anyone), **Admin & Member** (visible to signed-in members and staff), or **Admin only** (staff-only items).
+- **Description** - free text shown on public surfaces.
+- **Features** - a tag list of short selling points.
+- **Images** - up to five images. The hint suggests photographing on a white background and adding three or more (front, back, detail).
 
-<Tip>
-Products do not carry their own tax rate. Tax is applied at the point of sale using your organization's tax settings, and the product's **Revenue Account** determines which accounting code the sale (and its tax) lands on. Set up your accounts and tax rates once, then just pick the right account per product.
-</Tip>
-
-### The product detail page
-
-Click a product row to open its detail page. It shows a **Product Details** card (price, description, features, revenue account, and status/visibility chips) and an **Images** gallery you can drag to reorder. Use the header buttons to **Edit** or **Delete** the product. If inventory management is on, the page also shows a **Stock** section and a **Recipe** action (see [Inventory and stock](#inventory-and-stock)).
+When you open an existing product and inventory management is on, the dialog also shows the product's **Stock** section, and a **Recipe** button appears next to the save button if you can manage inventory (see [Inventory and stock](#inventory-and-stock)).
 
 ### Categories and brands
 
@@ -93,7 +91,7 @@ On a [form](/marketing/forms), you can attach products as **add-on products** - 
 
 ## Inventory and stock
 
-Stock tracking is optional and off by default. Turn it on under **Settings** > **Sales** > **Inventory Management** (which enables ingredient tracking, a stock ledger, and recipe-based consumption). Once enabled, each product's detail page gains a **Stock** section and a **Recipe** action.
+Stock tracking is optional and off by default. Turn it on under **Settings** > **Sales** > **Inventory Management** (which enables ingredient tracking, a stock ledger, and recipe-based consumption). Once enabled, each product's edit dialog gains a **Stock** section and a **Recipe** button.
 
 - **Direct stock** - Simple retail goods (a can of drink, a grip) are tracked directly: their on-hand count decrements on each sale.
 - **Recipe-based** - A product that's assembled from ingredients (for example a mixed drink) can have a **Recipe** of ingredients; selling it consumes the ingredients instead.
@@ -118,7 +116,7 @@ You sell grips, overgrips, strings, and branded tees at the front desk.
 
 You want members to grab a sports drink or rent a towel at checkout.
 
-- Create products _Sports drink_ and _Towel_ in a _Cafe & add-ons_ category, set **Member only** visibility if they're for members.
+- Create products _Sports drink_ and _Towel_ in a _Cafe & add-ons_ category, set **Admin & Member** visibility if they're for members.
 - They appear on the POS Products tab, and you can attach them as **add-on products** on your signup order form so new members can add them during signup.
 - For the sports drink, enable direct stock so the fridge count stays accurate; for a mixed smoothie, define a **Recipe** so selling it draws down the ingredients.
 
@@ -147,7 +145,7 @@ You rent shoes and harnesses to drop-in climbers.
 
 **Issue**: A product doesn't appear on the point of sale.
 
-**Solution**: Confirm the product is **Active** and its **Visibility** isn't set to Private for a context where it shouldn't be hidden. Also check the club scope - a product tied to another club won't show for the currently selected club.
+**Solution**: Confirm the product is **Active** and its **Visibility** isn't set to **Admin only** for a context where it shouldn't be hidden. Also check the club scope - a product tied to another club won't show for the currently selected club.
 
 **Issue**: The product shows under the wrong group on the POS, or in an "uncategorized" group.
 
@@ -164,6 +162,10 @@ You rent shoes and harnesses to drop-in climbers.
 **Issue**: Revenue for a product is landing in the wrong account.
 
 **Solution**: Edit the product and set its **Revenue Account** explicitly instead of **None (uses default)**. Existing sales aren't re-booked; the change applies to future sales.
+
+**Issue**: Some products weren't deleted in a bulk delete.
+
+**Solution**: Products that stock or packages still use can't be deleted. Set them to inactive instead, or remove them from the packages first.
 
 ## Related
 

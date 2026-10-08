@@ -34,11 +34,17 @@ Typical uses:
 - **A supplier you order from every week** - you match an unfamiliar line to your catalogue by hand once, and the next invoice from that supplier arrives already matched.
 - **An invoice with a new item and a delivery charge** - you create the new product straight from its line and mark the delivery charge **Expense only**, so it counts towards the expense without booking stock.
 
+## The deliveries list
+
+Go to **Sales** > **Products** > **Deliveries** (`/billing/products/deliveries`). The list shows each delivery's **Invoice date**, **Invoice no.**, **Supplier**, **Club**, number of **Lines**, **Total**, and **Status**. Use the **All**, **Draft**, **Posted**, and **Voided** tabs to filter by status. When you have a single gym selected, the list shows only that gym's deliveries.
+
+Click a row to open the delivery. To throw away a draft you no longer need, use its row action to delete it. Only drafts can be deleted, because nothing has been booked yet. A posted delivery is voided instead (see [Void a delivery](#void-a-delivery)).
+
 ## Create a delivery
 
-Go to **Sales** > **Products** > **Deliveries** and select **New delivery**. Deliveries require the `inventory.manage.club` permission; reading them requires `inventory.read.club`.
+On the **Deliveries** tab, select **New delivery**. You can also choose **Add** > **New delivery** on the **Products** tab. Deliveries require the `inventory.manage.club` permission; reading them requires `inventory.read.club`.
 
-The delivery opens as a **draft**. Nothing you do to a draft affects stock or money, so you can leave it half-finished and come back to it.
+The delivery opens as a **draft**. Nothing you do to a draft affects stock or money, so you can select **Save Draft**, leave it half-finished, and come back to it.
 
 ## Scan a supplier invoice
 
@@ -93,7 +99,7 @@ Leave it at 1 when the invoice bills individual items.
 
 ### Costs and VAT
 
-**Unit cost** is the net price per billed unit, excluding VAT, and **VAT %** is the rate on that line.
+**Unit cost** is the net price per billed unit, excluding VAT, and **Tax %** is the rate on that line.
 
 The two sides of the delivery use different figures, which is intentional:
 
@@ -120,18 +126,20 @@ Voiding is how you correct a posted delivery. Fix whatever was wrong on a new de
 
 ## Suppliers
 
-Suppliers are created from the delivery itself: open the supplier picker and choose **Add supplier**. A supplier holds its VAT number, company ID, contact details, and the payment method and expense category to default new deliveries to.
+You can add a supplier from the delivery itself (open the supplier picker and choose **Add supplier**) or with **Add** > **Add supplier** on the **Products** tab. A supplier holds its tax number, company ID, address, contact details, and the **Default payment method** and expense category to default new deliveries to.
+
+To see and manage all your suppliers, select **Suppliers** on the **Deliveries** tab. From there you can **Archive** a supplier you no longer use, select **Show archived** to list archived suppliers, and **Restore** one to make it selectable on new deliveries again.
 
 Scanning an invoice from an unknown supplier creates that supplier automatically from the name printed on the document.
 
-Suppliers are archived rather than deleted, so posted deliveries keep pointing at whoever supplied them.
+Suppliers are archived rather than deleted, so posted deliveries keep pointing at whoever supplied them. An archived supplier stops appearing when you pick a supplier.
 
 ## Permissions
 
 | Action                        | Permission                     |
 | ----------------------------- | ------------------------------ |
 | View deliveries and suppliers | `inventory.read.club`          |
-| Create, scan, post and void   | `inventory.manage.club`        |
+| Create, scan, post and void, delete drafts, manage suppliers | `inventory.manage.club` |
 | Choose an expense category    | `cash.read.club`               |
 | Turn inventory on or off      | `settings.manage.organization` |
 

@@ -8,7 +8,7 @@ A plan is the template you sell to members. It defines the price, the billing ca
 
 ## When to use it
 
-Create a plan for every membership or pass you sell. One plan can be recurring or a one-time pass, cap how often it can be used, limit which classes, courts, or instructors it covers, add a signup fee or starter wallet credit, and be shown publicly, to members only, or kept private for staff-assisted signups. Trials and intro prices attach to a plan as [promotions](/sales/promotions).
+Create a plan for every membership or pass you sell. One plan can be recurring or a one-time pass, cap how often it can be used, limit which classes, courts, or instructors it covers, add a signup fee or starter wallet balance, and be shown publicly, to members only, or kept private for staff-assisted signups. Trials and intro prices attach to a plan as [promotions](/sales/promotions).
 
 Typical uses:
 
@@ -36,15 +36,20 @@ Plans live under **Sales** > **Plans** in the admin (`/billing/plans`). **Plans*
 
 - A **color dot** (the plan's color).
 - **Name**.
-- **Price**, with the **signup fee** shown beneath it when one is set.
+- **Price**, with the billing frequency beneath it (for `custom` plans it reads "N days/weeks/months") and the **signup fee** when one is set.
 - A **category** chip (when the plan has a category).
-- A **frequency** chip (for `custom` plans it reads "N days/weeks/months").
+- A **sessions** chip when the plan caps its uses, and a **Shared with account** chip when the plan is shared with the holder's account.
+- A **visibility** chip (Public, Admin & Member, or Admin only).
 
-Drag any row by its handle to set the global plan order (see [Plan order](#plan-order)). The row menu has **Edit** and **Delete**.
+Drag any row by its handle to set the global plan order (see [Plan order](#plan-order)). Clicking a plan's name opens it for editing. The row menu has **Edit**, **Delete**, and **View Details**.
 
-Above the list, four cards summarize **Total Plans**, **Active Plans**, **Average Price**, and **Recurring Plans** (anything with a billing type other than one-time). A **frequency filter** at the top narrows the list to a specific billing cadence, and the **Active** / **Inactive** tabs carry a count badge each.
+A **frequency filter** at the top narrows the list to a specific billing cadence, and the **Active** / **Inactive** tabs carry a count badge each.
 
 The page header also has **Categories** (manage plan categories) and **Add Plan**.
+
+<Note>
+  Adding, editing, deleting, and reordering plans, and managing categories, need the **billing.manage.organization** permission. Without it, the list is read-only and clicking a plan's name opens its details page.
+</Note>
 
 ## Creating or editing a plan
 
@@ -55,7 +60,8 @@ Click **Add Plan**, or open a row's menu and choose **Edit**. The plan dialog is
 - **Plan Name** - public-facing. Required.
 - **Gym** - which gym the plan belongs to. Only shown when your organization has more than one gym; choose **All** to make it organization-wide.
 - **Category** - an optional grouping (see [Plan categories](#plan-categories)). Pick an existing one or type a new name to create it inline.
-- **Visibility** - `Public`, `Member only`, or `Private`. Controls which sales surfaces the plan appears on.
+- **Barcode** - an optional code printed on a shelf card. Scan the card into this field to fill it in. When the code is scanned at the [Point of Sale](/pos/point-of-sale), the register adds this plan to the basket.
+- **Visibility** - **Public**, **Admin & Member**, or **Admin only**. Controls which sales surfaces the plan appears on.
 - **Description** - public-facing free text.
 - **Active** - whether the plan can be sold. Toggling a plan inactive does not affect existing memberships on it; they keep running until they expire or are cancelled.
 
@@ -66,21 +72,23 @@ You can translate **Name** and **Description** into your other locales with the 
 - **Price** (labeled **Price per Period** for recurring plans) - the amount charged each billing period, or the one-off price for a one-time plan.
 - **Type** - the billing frequency: **One-time**, **Weekly**, **Monthly**, **Quarterly**, **Annually**, or **Custom**. Choosing **Custom** reveals a **Period** number and a **Unit** of `Days`, `Weeks`, or `Months` (for example, `10 weeks`).
 - **Signup Fee** - a one-time fee charged when joining. Added to the first charge. Optional.
-- **Wallet Credit** - credit added to the member's wallet when the membership is activated. Use it for "get X credit when you join" offers. Optional.
+- **Wallet balance** - value added to the member's wallet when the membership is activated. Use it for "get X credit when you join" offers. Optional. If the plan sells through a billing entity other than the default one, a warning explains that the member can only spend this balance on the default billing entity's sales.
 - **Revenue Account** - the accounting code that charges for this plan are tagged with. Leave as **None (uses default)** to fall back to the organization default.
-- **Default Auto Renewal** - whether new memberships on this plan are flagged to auto-renew at the end of each period. Members can flip this on their own membership later. When on, a **Renewal Lead Time (Days)** field appears: how many days before the renewal date 1Club attempts the auto-renewal charge. This is also the cancellation cut-off. Defaults to 3, maximum 60.
-- **Require payment upfront** - when on (the default), 1Club attempts to charge the member's stored default payment method as each period becomes due. When off, the charge is not attempted automatically and you collect through invoices or charges instead.
+- **Default Auto Renewal** (recurring plans only) - whether new memberships on this plan start with auto-renew on. Members can flip this on their own membership later. When on, a **Renewal Lead Time (Days)** field appears: how many days before the renewal date 1Club attempts the auto-renewal charge. This is also the cancellation cut-off. Defaults to 3, maximum 60.
+- **Require payment upfront** - the membership only starts once it has been paid. When on (the default), 1Club also attempts to charge the member's stored default payment method as each period becomes due. When off, the charge is not attempted automatically and you collect through invoices or charges instead.
 
-### Validity and access
+### Validity
 
-- **Sessions** - the usage cap (the plan's max uses). For recurring plans this is uses per billing period (for example, `10/month`); for one-time plans it is the total uses for the pass. Leave blank for unlimited.
-- **Session limit is per** - whether each use counts as one **Booking** or as the booking's duration in **Hours**. Hidden for generic plans, where a use is always one unit. Only shown once the plan has a scope.
+- **Shared with account** - everyone on the holder's household or company account can use the membership, all drawing on the same allowance. This applies to memberships sold from now on. To switch an existing membership over, change it on the membership itself.
+- **Coverage** - what the plan grants access to:
+  - **General plan** - check-ins and dynamic pricing only, with no booking access.
+  - **Restricted plan** - covers only what the **Classes**, **Areas**, and **Instructors** dropdowns allow. Each dropdown offers **No ...**, **All ...** (for example **All classes**), or specific class types, area types, or instructor types. Pick at least one of the three.
+- **Sessions** - the usage cap (the plan's max uses). For recurring plans this is uses per billing period (for example, `10/month`); for one-time plans it is the total uses for the pass. Leave blank for unlimited. General plans keep the cap, because check-ins spend the same counter.
+- **Session limit is per** - whether each use counts as one **Booking** or as the booking's duration in **Hours**. Only shown on a restricted plan with a **Sessions** cap.
 - **Validity (Days)** (one-time plans only) - how long the pass remains valid after it is issued.
-- **Valid for** - what the plan grants access to. Turn on **Apply to all bookings** to cover everything, or toggle individual scopes - **Classes**, **Areas**, **Instructors** - and, within each, pick specific class types, area types, or instructor types (leave a scope's list empty to mean "all of that scope").
-- **Household Allowance** - the number of additional household members the plan covers, used in account-level billing. `0` means individual only.
 
 <Warning>
-  Leaving **Valid for** completely empty (no scope selected) creates a **generic plan**. Generic plans cannot be used to access bookings. They only work for direct check-ins and they still affect dynamic booking pricing. If you want a membership that members book classes or courts with, pick at least one scope (or turn on **Apply to all bookings**).
+  A **General plan** cannot be used to access bookings. It only works for direct check-ins and still affects dynamic booking pricing. If you want a membership that members book classes or courts with, choose **Restricted plan** and set at least one of **Classes**, **Areas**, or **Instructors**.
 </Warning>
 
 ### Presentation
@@ -96,7 +104,7 @@ Set per-day open and close times, or fall back to the default. A plan's operatin
 
 ## Plan details
 
-Click a plan's name to open its details page. It shows the same fields plus two stat cards at the top: **Active Memberships** (a count of memberships on the plan currently in `active` status) and **Total Revenue** (the sum of the prices of those active memberships).
+Choose **View Details** from a plan's row menu to open its details page. It shows the same fields plus two stat cards at the top: **Active Memberships** (a count of memberships on the plan currently in `active` status) and **Total Revenue** (the sum of the prices of those active memberships).
 
 If the plan has images, a sortable gallery sits at the top; drag to reorder and the change saves as you drop. The right column shows the assigned **Revenue Account**, or a "None (uses default)" hint when none is set. The details page also lists the [promotions](#trials-free-days-and-intro-offers) targeting the plan.
 
@@ -140,7 +148,7 @@ You run a yoga studio and want an all-access monthly pass.
 
 - **Type**: Monthly. **Price per Period**: your monthly rate.
 - **Sessions**: leave blank (unlimited).
-- **Valid for**: toggle **Classes** and leave the class-type list empty so it covers all classes (or turn on **Apply to all bookings**).
+- **Coverage**: **Restricted plan**, with **Classes** set to **All classes**.
 - **Sports**: yoga. **Default Auto Renewal**: on, so members roll over each month.
 - Optionally set **Operating hours** to model an off-peak version that only works before 4pm.
 
@@ -151,29 +159,29 @@ A punch card that expires.
 - **Type**: One-time. **Price**: the pack price.
 - **Sessions**: 10, with **Session limit is per** set to **Bookings**.
 - **Validity (Days)**: 60, so the pack expires two months after purchase.
-- **Valid for**: **Classes**, scoped to your reformer or mat class types.
+- **Coverage**: **Restricted plan**, with **Classes** set to your reformer or mat class types.
 
 ### Racket monthly membership (court access, per-hour usage)
 
 A padel or tennis membership that includes a set number of court hours.
 
 - **Type**: Monthly. **Sessions**: 8, with **Session limit is per** set to **Hours** (eight court hours per month).
-- **Valid for**: **Areas**, scoped to the _Padel court_ area type (see [Areas](/settings/areas)).
-- **Signup Fee**: a one-off joining fee. **Wallet Credit**: optional starter credit for extra bookings.
+- **Coverage**: **Restricted plan**, with **Areas** set to the _Padel court_ area type (see [Areas](/settings/areas)).
+- **Signup Fee**: a one-off joining fee. **Wallet balance**: optional starter credit for extra bookings.
 
-### Family membership (household allowance)
+### Family membership (shared with the account)
 
 One membership that covers a household.
 
-- **Type**: Monthly or Annually. **Household Allowance**: 3 (the primary member plus three additional household members).
-- **Valid for**: **Apply to all bookings**, or scope to the class and court types the family should reach.
+- **Type**: Monthly or Annually. **Shared with account**: on, so everyone on the holder's household account books against the same allowance.
+- **Coverage**: **Restricted plan**, with the class and court types the family should reach.
 - **Category**: "Family" so it groups on your website.
 
 ### Martial arts unlimited with intro offer
 
 An unlimited jiu-jitsu or muay-thai membership with a trial.
 
-- **Type**: Monthly, **Sessions** blank, **Valid for** the martial-arts class types.
+- **Type**: Monthly, **Sessions** blank, **Coverage** restricted to the martial-arts class types.
 - On the plan details page, **Add promotion** and create a **Free trial** (auto-apply, 100%) so new members get their first month free, or a **First-month intro** at 50% off.
 
 ### Day pass (generic check-in plan)
@@ -181,11 +189,11 @@ An unlimited jiu-jitsu or muay-thai membership with a trial.
 A single-visit pass for drop-ins who check in at the front desk rather than booking.
 
 - **Type**: One-time, **Validity (Days)**: 1.
-- Leave **Valid for** empty to create a generic plan - it won't grant booking access but works for direct check-ins and still feeds dynamic booking pricing.
+- Set **Coverage** to **General plan** - it won't grant booking access but works for direct check-ins and still feeds dynamic booking pricing.
 
 ## Tips & best practices
 
-- **Pick a scope unless you truly want generic.** An empty **Valid for** makes a generic plan that can't book anything. For a bookable membership, toggle a scope or use **Apply to all bookings**.
+- **Pick a restricted plan unless you truly want generic.** A **General plan** can't book anything. For a bookable membership, choose **Restricted plan** and set at least one scope.
 - **Choose the session unit deliberately.** Class packs usually count per **Booking**; court memberships that sell "hours per month" count per **Hour**.
 - **Model trials as promotions, not prices.** Keep the plan price at its true value and attach a free-trial or intro promotion so analytics and eligibility stay consistent.
 - **Prefer Inactive over Delete.** Deactivating stops new sales while existing memberships keep running; deleting is permanent and blocked while memberships reference the plan.
@@ -196,15 +204,15 @@ A single-visit pass for drop-ins who check in at the front desk rather than book
 
 **Issue**: Members can't book anything with a membership on this plan.
 
-**Cause**: The plan has no **Valid for** scope, so it is a generic plan.
+**Cause**: The plan's **Coverage** is **General plan**.
 
-**Fix**: Edit the plan and toggle at least one scope (Classes, Areas, or Instructors), or turn on **Apply to all bookings**.
+**Fix**: Edit the plan, set **Coverage** to **Restricted plan**, and set at least one of **Classes**, **Areas**, or **Instructors**.
 
 **Issue**: The **Session limit is per** field isn't showing.
 
-**Cause**: It only appears once the plan has a scope; generic plans always count one unit per use.
+**Cause**: It only appears on a restricted plan with a **Sessions** cap. General plans always count one unit per use.
 
-**Fix**: Select a **Valid for** scope first, then choose **Bookings** or **Hours**.
+**Fix**: Set **Coverage** to **Restricted plan** and enter a **Sessions** number, then choose **Bookings** or **Hours**.
 
 **Issue**: A recurring plan's renewal charge never runs.
 

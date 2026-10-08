@@ -31,7 +31,7 @@ The wallet is created automatically the first time a member earns credit; until 
 
 ## How credit gets added
 
-Credit reaches a member's wallet in a few ways. Each addition is recorded as a positive entry in the [wallet ledger](#the-wallet-ledger).
+Credit reaches a member's wallet in a few ways, including a staff [top-up](#topping-up-a-wallet). Each addition is recorded as a positive entry in the [wallet ledger](#the-wallet-ledger).
 
 ### Vouchers
 
@@ -85,7 +85,28 @@ Wallet activity also surfaces on the member's [charges](/sales/charges) - a vouc
 
 Go to **Sales** > **Finance** > **Wallet** to see every member who holds a wallet, with their **Balance** and **Last movement**. Search by name to find one member.
 
-The **Wallet movements** tab next to it lists every entry across all wallets, newest first, with the date, member, **Type**, description, **Payment method**, the **Staff** member who recorded it, and the amount. Tabs filter by type, such as **Voucher**, **Refund**, or **Spend**, and only types that have entries appear.
+The **Wallet movements** tab next to it lists every entry across all wallets, newest first, with the date, member, **Type**, description, **Payment method**, the **Staff** member who recorded it, and the amount. Tabs filter by type, such as **Top up**, **Correction**, **Voucher**, **Plan wallet grant**, **Refund**, or **Spend**, and only types that have entries appear.
+
+Click a row on either tab to open that member's wallet. It shows the **Current balance** and the member's full **Wallet history**, and, depending on your permissions, tabs to top up, refund, or correct the balance. The same wallet opens from the member's profile.
+
+### Topping up a wallet
+
+On the **Top up** tab, enter the amount and pick a **Payment method**:
+
+- **A manual method** (cash or a standalone card terminal) records money you already collected. It does not charge a card. Click **Record collected payment**. Recording a top-up collected at the desk needs the **billing.manage.organization** permission.
+- **An online method** creates a checkout. Click **Create checkout**, then **Copy checkout** and send the link to the member. The wallet updates once the payment is confirmed. This does not activate a card reader.
+
+If the member owes unpaid cancellation charges, the top-up settles those first, and the dialog shows the split, for example "Add 50.00 -> settle 10.00 in unpaid cancellation charges -> leave 40.00 in the wallet". Topping up needs the **billing.create.club** permission.
+
+### Refunding unspent funding
+
+On the **Refund unspent funding** tab (**Return deposit** when the member holds a [wallet deposit](/settings/billing-general#deposit-rules)), you return money the member paid into the wallet. The refundable balance includes surplus funding but excludes vouchers and complimentary credit. Funds return through the original payment methods: Stripe refunds are processed automatically, and for cash or other manual refunds you confirm only after handing the money back. When part of the refund has to go back through a payment provider that 1Club can't refund for you, the form asks for a **Provider refund reference**: refund through that provider first, then record its reference. A **Reason** is required. If the refund leaves a deposit shortfall, the dialog warns you.
+
+### Correcting a balance
+
+On the **Adjust wallet balance** tab, enter an **Amount** (positive to increase the balance, negative to decrease it) and a **Reason**, then click **Apply correction**. The correction is saved to the ledger with your name as a **Correction** entry.
+
+Refunding and correcting both need the **billing.manage.organization** permission.
 
 ## Wallet credit and revenue
 

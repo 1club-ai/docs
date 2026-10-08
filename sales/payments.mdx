@@ -47,7 +47,7 @@ Open **Sales** > **Finance** > **Payments**. The grid shows these columns:
 - **Status** - Succeeded, pending, failed, refunded, partially refunded, cancelled, or processing.
 - **Created by** - The admin who recorded the payment.
 
-Tabs across the top filter by status: **All**, **Succeeded**, **Pending**, and **Failed**, each with a count. Click a row to open the payment. Where you have the right permission, the row action menu offers **Delete** for eligible payments (see [Deleting a payment](#deleting-a-payment)).
+Tabs across the top filter by status: **All**, **Succeeded**, **Pending**, and **Failed**, each with a count. Click a row to open the payment. Where you have the right permission, the row action menu offers **Delete** for eligible payments (see [Deleting a payment](#deleting-a-payment)) and **Write off** for a stuck card reader payment (see [Writing off a stuck card reader payment](#writing-off-a-stuck-card-reader-payment)).
 
 The **Created by** column shows the admin who recorded the payment. For payments captured automatically by a provider (online checkout, automatic membership renewals), the column is empty - those are system-recorded. For manually recorded payments (front desk, phone, bank transfer logged by staff), it shows the admin's name.
 
@@ -213,12 +213,13 @@ See [Voiding a charge](/sales/charges#row-actions) for that path.
 Some flows refund a member automatically by crediting their **wallet** rather than reversing the original tender, without asking you to pick a destination:
 
 - A booking is **cancelled** under a cancellation policy. The refund follows the tiered rules on the matching policy - see [Booking policies](/settings/booking-policies).
-- An **order** is cancelled.
 - A member's **entrance method changes** at check-in (they paid directly, then a membership or program is used to admit them instead). 1Club marks the original payment refunded and credits the amount to their wallet.
 - A booking's **split is edited**. Anything already paid goes back to each player's wallet so they can settle their new share from it - see [Splitting a booking across its players](#splitting-a-booking-across-its-players).
 
+Cancelling a paid **order** is different: the **Cancel order** dialog asks you to pick **Original payment method** or **Wallet balance** under **Refund to**. See [Cancelling an order](/sales/orders#cancelling-an-order).
+
 <Note>
-  Cancellation refunds always go to wallet credit. To return that money to the
+  Booking cancellation refunds always go to wallet credit. To return that money to the
   member's card instead, refund the charge from the billing page and choose
   **Back to the card**.
 </Note>
@@ -264,6 +265,20 @@ Deletion requires the **billing delete** permission at the organization level.
   went through a provider, where the funds genuinely are with that provider
   despite the method chosen.
 </Note>
+
+## Writing off a stuck card reader payment
+
+A payment taken on a card reader can get stuck in **Pending** when the provider never confirms how it ended. When nothing can resolve it any more, an admin can write it off from the row action menu on **Sales** > **Finance** > **Payments** with **Write off**. The action appears on pending payments taken on a [payment terminal](/settings/payment-terminals).
+
+The dialog asks **What did you check?** Explain in at least a sentence what you verified. The reason is recorded on the payment with your name, for whoever reconciles the statement. If the payment is still recent enough for the system to resolve on its own, the write-off is refused and you are told why.
+
+<Warning>
+  Only write off a payment that can no longer be resolved with the provider. A
+  card may in fact have been charged, so check the provider statement before
+  and after. A write-off cannot be undone.
+</Warning>
+
+Writing off needs the **billing.manage.organization** permission, which only admins and owners hold by default.
 
 ## Worked examples
 

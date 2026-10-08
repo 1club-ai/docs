@@ -38,6 +38,9 @@ Response:
       "name": "Unlimited",
       "description": "All courts, all week",
       "clubId": 5,
+      "seasonId": null,
+      "planCategoryId": 2,
+      "revenueAccountId": null,
       "price": 49,
       "signupFee": 20,
       "billingFrequency": "monthly",
@@ -46,6 +49,13 @@ Response:
       "sessionUnit": null,
       "validityPeriod": null,
       "autoRenews": true,
+      "renewalDaysInAdvance": 0,
+      "requirePaymentUpfront": false,
+      "customPeriod": null,
+      "customPeriodUnit": null,
+      "features": [],
+      "visibility": "Public",
+      "validFor": { "scopes": ["classes", "areas"] },
       "sports": ["padel"]
     }
   ],
@@ -56,7 +66,10 @@ Response:
 ```
 
 By default only plans the gym still sells are returned, so everything here can be
-sold. Add `includeInactive=true` when you need retired plans as well - to find one
+sold. Season plans are never listed: a season pass is priced from the slots the
+buyer picks, so its own `price` is 0 and it cannot be sold through this API.
+Get-by-id still resolves one, with `seasonId` set - check it before treating any
+plan as sellable. Add `includeInactive=true` when you need retired plans as well - to find one
 you retired and want back, for example. Name
 matching works like
 [contact search](/api-reference/channel-integration/contacts#matching-is-case-insensitive-and-cross-script):
@@ -104,6 +117,8 @@ curl -X POST "https://api.1club.ai/v1/platform/plans" \
   }'
 ```
 
+Only `name` and `price` are required. The other fields are `description`, `clubId`, `planCategoryId`, `revenueAccountId`, `signupFee`, `billingFrequency` (`one_time`, `weekly`, `monthly`, `quarterly`, `annually`, or `custom`), `customPeriod`, `customPeriodUnit` (`days`, `weeks`, or `months`), `isActive`, `maxUses`, `sessionUnit` (`booking` or `hour`), `validityPeriod`, `autoRenews`, `renewalDaysInAdvance` (0 to 60), `requirePaymentUpfront`, `sports`, `features`, `visibility` (`Private`, `Member_only`, or `Public`), and `validFor`.
+
 `validFor.scopes` controls which booking resources the plan can cover. Omit a type list to cover every type in that scope. For example, `scopes: ["classes"]` covers every class type. Add `classTypes: [3, 7]` to limit it to those class type IDs.
 
 An empty `validFor` creates a generic plan for direct gym entry. It does not make class, area, or instructor bookings free.
@@ -141,6 +156,17 @@ curl -X DELETE "https://api.1club.ai/v1/platform/plans/9" \
 ```
 
 Deletion returns `204 No Content`. If memberships or other records still reference the plan, the API returns `409 Conflict`. Retire an in-use plan instead of deleting it.
+
+## Plan categories
+
+A **plan category** groups plans under a heading on a price list. Set a plan's `planCategoryId` to file it. Categories use the plans scopes and have no paging or search.
+
+- `GET /v1/platform/plan-categories` - every category, in display order, as `{ "data": [...] }`. Each has `categoryId`, `name`, `sortOrder`, `planCount`, `createdAt`, and `updatedAt`. Requires `plans:read`.
+- `GET /v1/platform/plan-categories/{id}` - one category. Requires `plans:read`.
+- `POST /v1/platform/plan-categories` - create one with `name` and an optional `sortOrder`. Requires `plans:write`.
+- `PATCH /v1/platform/plan-categories/{id}` - rename one or move it in the order. Requires `plans:write`.
+
+Categories cannot be deleted through the API.
 
 ## What the fields mean for a sale
 

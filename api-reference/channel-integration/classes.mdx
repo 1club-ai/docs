@@ -1,10 +1,10 @@
 ---
 title: "Classes"
-description: "List, create, update, and delete class occurrences through the Platform API."
+description: "List, create, update, and delete class occurrences, read a class roster, and book a customer into a class through the Platform API."
 keywords: [classes, schedule, classes read, classes write, platform api]
 ---
 
-Class reads require `classes:read`. Class management requires `classes:write`.
+Class reads require `classes:read`. Class management requires `classes:write`. Reading a class roster and booking a customer into a class use the bookings scopes.
 
 ## List classes
 
@@ -13,7 +13,20 @@ curl "https://api.1club.ai/v1/platform/classes?startDate=2026-08-01T00:00:00%2B0
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
-Use `startDate`, `endDate`, and `locale` to filter and translate the response. The endpoint returns class schedule, price, capacity, gym, area, instructors, and status fields.
+One row is one occurrence: a weekly class has a row per session, linked by `recurrenceId` and `occurrenceIndex`. A row's `id` is what a booking's `classId` points at. The endpoint returns class schedule, price, capacity, gym, area, instructors, and status fields, ordered by start time.
+
+Query parameters, all optional:
+
+- `startDate`, `endDate` - ISO date-times, or a bare `YYYY-MM-DD` read as midnight UTC. `startDate` keeps occurrences still running at or after it, and `endDate` keeps occurrences starting before it. With neither, the whole schedule is in scope, past included.
+- `clubId`, `classTypeId`, `instructorId` - narrow to one gym, class type, or instructor
+- `status` - `active` or `cancelled`
+- `sport` - only classes for this sport
+- `search` - case-insensitive match on the class name
+- `locale` - resolve `name` and `description` in this locale, for example `en`
+- `limit` - 1 to 100, defaults to 50
+- `offset` - defaults to 0
+
+Every class the organization owns is listed, member-only and private occurrences included.
 
 ## Get a class
 
@@ -26,7 +39,7 @@ The class must belong to the API key's organization.
 
 ## Create a class
 
-Send one class occurrence. Recurrence creation remains in the 1Club dashboard.
+Send one class occurrence, or add `recurrence` to create a whole repeating series in one request.
 
 ```bash
 curl -X POST "https://api.1club.ai/v1/platform/classes" \
@@ -46,7 +59,38 @@ curl -X POST "https://api.1club.ai/v1/platform/classes" \
   }'
 ```
 
-Times must include `Z` or an explicit UTC offset. All referenced gyms, areas, class types, and instructors must belong to the authorized organization. An area must belong to the selected gym.
+Times must include `Z` or an explicit UTC offset. `clubId`, `name`, `startTime`, and `endTime` are required. The other fields are `areaId`, `classTypeId`, `instructorIds` (up to 20), `description`, `scheduleNote`, `priceBeforeTax`, `isFree`, `maxCapacity`, `visibility`, `sport`, and `color` (a hex value such as `#1E88E5`). Unknown fields are rejected with a `400`.
+
+All referenced gyms, areas, class types, and instructors must belong to the authorized organization. An area must belong to the selected gym.
+
+### Recurring classes
+
+Add `recurrence` to create a series. `startTime` and `endTime` are still required: they are the template slot that gives every occurrence its time of day and duration, and the series starts from `startTime`.
+
+```json
+{
+  "recurrence": {
+    "frequency": "weekly",
+    "interval": 1,
+    "daysOfWeek": ["monday", "wednesday"],
+    "ends": { "type": "after", "occurrences": 24 }
+  }
+}
+```
+
+- `frequency` - `daily`, `weekly`, or `monthly`
+- `interval` - every N days, weeks, or months, 1 to 365. Defaults to 1.
+- `daysOfWeek` - for a weekly series, the days it runs on
+- `ends.type` - `until` (runs to `endDate`), `after` (runs for `ends.occurrences` sessions), or `never`
+- `ends.occurrences` counts **occurrences, not weeks**, across every day in `daysOfWeek`. Twelve weeks of a Monday and Wednesday class is `24`.
+
+A bounded series is created in full and capped at 520 occurrences; over that, the request is refused with `RECURRENCE_TOO_MANY_OCCURRENCES`. An open-ended series creates a rolling window and extends itself. The response is the first occurrence, with `series.occurrencesCreated`. An occurrence at a gym that is closed is skipped rather than failing the request, so compare that count with what you expected.
+
+<Note>
+  The area is checked for a clash on the **first** occurrence only, the same rule
+  the dashboard applies. Read the area's availability for the window first if later
+  weeks matter.
+</Note>
 
 <Warning>
   Write `priceBeforeTax`, not `price`. A class reads back with both: `price`
@@ -70,7 +114,9 @@ curl -X PATCH "https://api.1club.ai/v1/platform/classes/312" \
   -d '{ "maxCapacity": 20 }'
 ```
 
-Changing the area, instructors, or time updates the related schedule reservations. Conflicting reservations return `409 Conflict`.
+Changing the area, instructors, or time updates the related schedule reservations. Conflicting reservations return `409 Conflict`. Add `notifyCustomer: true` to tell booked customers about the change.
+
+For a recurring class, add `?scope=all_future` to apply the edit to this and every later occurrence. The default is `this_instance`. With `scope=all_future`, a body carrying only `recurrence.ends` and `recurrence.endDate` moves where the series ends. A later end creates the new occurrences, and an earlier one removes the occurrences past it, refused with `409` when any of those has an active booking or waitlist entry. The cadence (`frequency`, `interval`, `daysOfWeek`) cannot be changed: delete the remaining series and create it again.
 
 ## Delete a class
 
@@ -85,3 +131,50 @@ curl -X DELETE "https://api.1club.ai/v1/platform/classes/312" \
 For a recurring class, add `?scope=all_future` to delete this and later occurrences. The default is `this_instance`.
 
 Deletion returns `409 Conflict` when affected future classes have active customer bookings or waitlist entries. Cancel or move those records before retrying.
+
+## Class roster
+
+Requires the `bookings:read` scope. Returns who is booked into one class occurrence, whether they were checked in, and what they paid.
+
+```bash
+curl "https://api.1club.ai/v1/platform/classes/312/bookings" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Query parameters: `status` (optional, for example `confirmed`, `checked_in`, or `cancelled`), `limit` (1 to 100, defaults to 100), and `offset`.
+
+Each attendee row carries `bookingId`, `classId`, `contactId`, `contactName`, `bookerName`, `contactEmail`, `status`, `source`, `startTime`, `endTime`, `checkedIn`, `checkedInAt`, `membershipId`, `entranceMethod`, `payment`, `notes`, and `createdAt`. `contactEmail` is `null` unless your key also holds `contacts:read`. An anonymous seat has a `null` `contactId`, and `bookerName` is who paid for it.
+
+Cancelled seats are left out unless you ask for `status=cancelled`. Do not expect `total` to equal the class's booked count: the roster keeps no-shows, and the booked count adds walk-in check-ins that have no booking.
+
+## Book a customer into a class
+
+Requires the `bookings:write` scope. Enrols one customer in a class occurrence, the way the gym's staff add someone to a class. Booking into classes is limited to **60 requests per minute**, in addition to the standard limit.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/classes/312/bookings" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: class-312-contact-300" \
+  -d '{ "contactId": 300, "payment": { "status": "paid", "amount": 15 } }'
+```
+
+Body fields:
+
+- `contactId` or `customer` - exactly one, as on [Create a booking](/api-reference/channel-integration/bookings#create-a-booking)
+- `payment.status` (required) - `paid` or `unpaid`
+- `payment.amount`, `payment.reference`, `payment.fee` (optional) - as on [Create a booking](/api-reference/channel-integration/bookings#create-a-booking). `amount` defaults to the class price.
+- `notes` (optional) - up to 2,000 characters
+- `notifyCustomer` (optional) - defaults to `false` for an API key
+
+The seat takes the class's time, gym, and price. Capacity, the class's booking policy, and the "already on this class" check apply as they do in the dashboard, and a waitlist entry the customer already holds is converted into this booking. With `unpaid` and no `amount`, a membership the customer holds that covers the class is used, so one session is spent and nothing is owed; otherwise the class price is recorded as owed.
+
+Returns `201` with the same booking object as [Create a booking](/api-reference/channel-integration/bookings#create-a-booking), with `classId` set. A cancelled class (`CLASS_CANCELLED`) or one that has already run (`BOOKING_ALREADY_ENDED`) is a `400`. A full class, or a customer already booked on it, teaching it, or checked in to it, is a `409`.
+
+## Class types and progression tracks
+
+A **class type** is a kind of class the gym runs. Set a class's `classTypeId` to file it.
+
+- `GET /v1/platform/class-types` and `GET /v1/platform/class-types/{id}` - list and read class types. The list returns `{ "data": [...] }` with no paging. Requires `classes:read`.
+- `POST /v1/platform/class-types` and `PATCH /v1/platform/class-types/{id}` - create and update a class type. Every field applies to classes already scheduled as this type, not only new ones. Requires `classes:write`.
+- `GET /v1/platform/progression-tracks` - the rank ladders the gym uses, to link a class type to one with `progressionTrackId`. Requires `classes:read`.

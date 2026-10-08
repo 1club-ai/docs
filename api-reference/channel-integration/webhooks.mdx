@@ -31,7 +31,9 @@ Steps 3-4 keep the calendar fresh in seconds; steps 1 and 5 keep it correct even
 In the admin dashboard under **Settings** > **Organization** > **APIs & webhooks**, add a webhook endpoint:
 an HTTPS URL to receive events. On creation you get a **signing secret**
 (`whsec_...`) shown **once** - store it securely; you'll use it to verify every
-delivery. You can rotate the secret or disable the endpoint at any time.
+delivery. You can rotate the secret or disable the endpoint at any time. An
+organization can have up to 10 endpoints, and managing them requires the
+**settings.manage.organization** permission.
 
 <Note>
   Webhooks are part of the paid API feature. Endpoints must use `https`.
@@ -63,12 +65,22 @@ and makes events safe to process out of order.
 
 - **`id`** - unique per event. Deduplicate on it (delivery is at-least-once).
 - **`sequence`** - the change's position in your org's change feed. Compare it to the `version` on an availability read to know whether your last read already reflects this change; use it as the `since` cursor for the [change feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed).
-- **`data.reason`** - a coarse cause label, e.g. `booking.created`, `booking.cancelled`, `booking.updated`, `booking.released`, `class.reserved`, `class.reservation_removed`, `event.published`, `event.unpublished`, `event.cancelled`, `event.updated`, `area.updated`. Treat it as a hint; always re-pull for truth.
+- **`data.clubId`** - the gym the area belongs to. It can be `null`.
+- **`data.reason`** - a coarse cause label. Values today:
+  - Bookings: `booking.created`, `booking.updated`, `booking.cancelled`, `booking.released`, `booking.reinstated`, `booking.relocated`
+  - Classes: `class.reserved`, `class.reservation_removed`
+  - Events: `event.published`, `event.unpublished`, `event.updated`, `event.cancelled`, `event.deleted`
+  - Areas and area types: `area.created`, `area.updated`, `area.deleted`, `area_type.updated`
+  - Area blocks: `area_block_created`, `area_block_updated`, `area_block_deleted`
+  - Seasons: `season_slot.moved`, `season_pass.cancelled`
+
+  The list grows as new kinds of change are tracked. Treat it as a hint, never branch on an exhaustive list, and always re-pull for truth.
 
 <Note>
   `data.window` is the affected time range, but for configuration changes (such
-  as `area.updated`, when operating hours or capacity change) it is a **coarse,
-  forward-looking window** of up to ~60 days - not a single slot. Always re-pull
+  as `area.updated`, when operating hours or capacity change, or `area_type.updated`)
+  it is a **coarse, forward-looking window** of about 62 days from the change - not
+  a single slot. Always re-pull
   `/availability` for the window rather than assuming exactly one slot changed.
 </Note>
 
@@ -147,8 +159,8 @@ be what stops a double-booking.
 
 - **Respond within 10 seconds.** Any `2xx` marks the delivery successful. A non-`2xx`, a connection error, or a response slower than the **10-second** timeout counts as a failure. Do the minimum synchronously (verify, enqueue, ack) and re-pull availability asynchronously.
 - **At-least-once.** You may receive the same `id` more than once. Deduplicate on `id` and make handling idempotent (re-pulling availability already is).
-- **Retries with backoff.** A failed delivery is retried up to **7 attempts total** - the first immediately, then after roughly 1m, 5m, 30m, 2h, 6h, and 24h (about **33 hours** end to end). Timing has a few seconds of jitter.
-- **Auto-disable.** After the 7th attempt fails, the endpoint is **disabled automatically** and the reason is shown under **Settings** > **Organization** > **APIs & webhooks**. Re-enable it (and rotate the secret if needed) once healthy, then reconcile with the change feed to catch up on everything sent while it was down.
+- **Retries with backoff.** A failed delivery is retried up to **7 attempts total** - the first immediately, then after roughly 1m, 5m, 30m, 2h, 6h, and 24h (about **33 hours** end to end). Each attempt runs on the next tick of the 30-second dispatch worker, so it can arrive up to about half a minute after its scheduled time.
+- **Auto-disable.** After the 7th attempt fails, the endpoint is **disabled automatically** and the reason is shown under **Settings** > **Organization** > **APIs & webhooks**. While an endpoint is disabled, new changes are not queued for it. Re-enable it (and rotate the secret if needed) once healthy, then reconcile with the change feed to catch up on everything that changed while it was down.
 - **Ordering is not guaranteed.** Use `sequence` if you need to order or detect gaps; because events are invalidations you re-pull for, exact order rarely matters.
 
 ## Reconcile after downtime

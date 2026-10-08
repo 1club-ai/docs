@@ -1,10 +1,10 @@
 ---
 title: "API Reference"
 sidebarTitle: "Introduction"
-description: "Integrate with the 1Club platform to access clubs, classes, content, and transactions."
+description: "Integrate with the 1Club platform to access clubs, classes, bookings, contacts, content, and transactions."
 ---
 
-The 1Club Platform API lets you programmatically access and manage your organization's data - clubs, classes, content, and transactions - from your own websites, integrations, and back-office scripts.
+The 1Club Platform API lets you programmatically access and manage your organization's data - clubs, classes, bookings, contacts, memberships, content, transactions, and more - from your own websites, integrations, and back-office scripts.
 
 ## Base URL
 
@@ -55,21 +55,48 @@ For the full guide - including scope selection, expiry options, revocation, and 
 
 ### Token scopes
 
-Each token is granted access to specific resources with either **Read** or **Write** permission:
+Each token is granted access to specific resources. Most resources offer **Read** and **Write**, and a few add a separate action for an operation that is more than a write:
 
 - **Read** - allows fetching data (GET requests)
-- **Write** - allows creating and updating data (POST/PUT/PATCH requests)
+- **Write** - allows creating and updating data (POST/PUT/PATCH requests, and the deletes a resource allows)
+- **Delete** - `contacts:delete` and `media:delete` only, for archiving a contact and permanently deleting a media file
+- **Publish** - `website:publish` only, for making website edits public
 
-Grant only the scopes the integration actually needs. The Platform API currently supports these scopes:
+A token can instead hold the single wildcard scope `*`, which grants every scope, including ones added later. Scopes carry no hierarchy: `products:write` does not include `products:read`, so grant both when an integration reads before it writes.
 
-- `classes:read` - list and read classes
-- `content:read` - list and read published content
-- `clubs:read` - list your clubs and look one up by slug
-- `transactions:read` - list and read billing transactions
-- `transactions:write` - record a settlement (revenue collected outside 1club, reported as one sum for a gym) and refunds of it
-- `areas:read` - list areas and read their availability
-- `bookings:read` - read a booking by external id
-- `bookings:write` - create and cancel bookings
+Grant only the scopes the integration actually needs. The Platform API supports these scopes:
+
+| Resource | Scopes |
+| --- | --- |
+| Classes and class types | `classes:read`, `classes:write` |
+| Check-ins | `checkins:read`, `checkins:write` |
+| Content | `content:read`, `content:write` |
+| Website | `website:read`, `website:write`, `website:publish` |
+| Media library | `media:read`, `media:write`, `media:delete` |
+| Clubs | `clubs:read` |
+| Transactions | `transactions:read`, `transactions:write` |
+| Invoices | `invoices:read` |
+| Areas, area types, and area blocks | `areas:read`, `areas:write` |
+| Bookings | `bookings:read`, `bookings:write` |
+| Contacts | `contacts:read`, `contacts:write`, `contacts:delete` |
+| Instructors and instructor types | `instructors:read`, `instructors:write` |
+| Plans and plan categories | `plans:read`, `plans:write` |
+| Memberships | `memberships:read`, `memberships:write` |
+| Products and product categories | `products:read`, `products:write` |
+| Forms | `forms:read`, `forms:write` |
+| Organization settings | `organization:write` |
+| Revenue accounts | `revenue-accounts:write` |
+| Pricing rules | `pricing-rules:read`, `pricing-rules:write` |
+| Booking policies | `booking-policies:read`, `booking-policies:write` |
+| Document rules | `document-rules:read`, `document-rules:write` |
+| Message templates | `templates:read`, `templates:write` |
+| Events | `events:read`, `events:write` |
+| Messages (drafts only) | `messages:read`, `messages:write` |
+| Analytics | `analytics:read` |
+
+`transactions:write` records a settlement (revenue collected outside 1Club, reported as one sum for a gym) and refunds of it. Nothing is charged to anyone.
+
+`GET /v1/platform/me` needs no scope and returns the scopes a key holds - see [Verify a key](/api-reference/channel-integration/authentication#verify-a-key).
 
 <Note>
   A transaction in this API is the record the 1Club admin and member apps call a
@@ -110,12 +137,17 @@ curl "https://api.1club.ai/v1/platform/classes?startDate=2026-05-01" \
 
 ## Rate limiting
 
-- **100 requests per minute** per organization
-- When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header
+- **100 requests per minute** per organization, across every Platform API endpoint
+- Some endpoints have a tighter limit on top, in a separate bucket:
+  - Booking writes (create, update, cancel, and adding or removing players): **60 per minute**
+  - Booking a customer into a class: **60 per minute**
+  - Reports: **20 per minute**
+- When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header (seconds)
 - Rate limit headers are included in every response:
-  - `X-RateLimit-Limit` - max requests per window
-  - `X-RateLimit-Remaining` - requests remaining
-  - `X-RateLimit-Reset` - seconds until the window resets
+  - `RateLimit-Limit` - max requests per window
+  - `RateLimit-Remaining` - requests remaining
+  - `RateLimit-Reset` - seconds until the window resets
+  - `RateLimit-Policy` - the limit and window, for example `100;w=60`
 
 ## Errors
 
@@ -123,10 +155,16 @@ curl "https://api.1club.ai/v1/platform/classes?startDate=2026-05-01" \
 | ------ | ----------------------------------------------------------- |
 | `400`  | Invalid request parameters                                  |
 | `401`  | Missing or invalid API key                                  |
-| `403`  | Token is missing the required scope for this endpoint       |
+| `403`  | Token is missing the required scope for this endpoint, or API access is not available to the organization |
 | `404`  | Resource not found (or doesn't belong to your organization) |
+| `409`  | Conflict, for example an `Idempotency-Key` reused with a different request |
 | `429`  | Rate limit exceeded                                         |
 | `500`  | Internal server error                                       |
+
+Most errors return a JSON body of the shape `{ "error": "...", "message": "...", "code": "...", "details": { ... } }`, where `code` is a stable, machine-readable reason and `details` carries structured values when the error has them. Authentication, scope, and rate-limit errors return a shorter body:
+
+- A missing scope returns `{ "error": "Insufficient access scope", "requiredScope": "bookings:write" }`.
+- An organization on the free plan or in trial returns `403` with `code: "PLAN_FEATURE_LOCKED"`, and an organization that is no longer active returns `403` with `code: "ORGANIZATION_NOT_ACTIVE"`.
 
 ## Security best practices
 

@@ -1,6 +1,6 @@
 ---
 title: "Check-ins"
-description: "List attendance records and check in an existing booking through the Platform API."
+description: "List attendance records, and check in an existing booking or a member without one, through the Platform API."
 keywords: [check-ins, attendance, booking check-in, checkins read, checkins write]
 ---
 
@@ -19,7 +19,7 @@ Optional filters:
 - `clubId`
 - `classId`
 - `bookingId`
-- `startDate` and `endDate` as ISO 8601 date-times
+- `startDate` and `endDate` as ISO 8601 date-times with an offset (`Z` or `+03:00`)
 - `limit` from 1 to 100 and `offset`
 
 When both dates are present, the range cannot exceed 92 days. Results are ordered by attendance date, newest first.
@@ -54,13 +54,37 @@ Body fields:
 
 - The booking must belong to the authorized organization.
 - The booking must be `confirmed` or `pending`. Any other status - cancelled, already `checked_in`, or a no-show - is rejected with `400`.
-- Check-in must be inside the configured window.
+- Check-in must be inside the configured window. Outside it, the request returns `403`.
 - Required payment must already be settled.
 - The booking cannot already have a check-in. A second attempt returns `409`.
 
 A successful request returns `201 Created` with the attendance record and changes the booking status to `checked_in` atomically.
 
+## Check in a member without a booking
+
+Send `contactId` and `clubId` instead of `bookingId` to check a member in at the gym on their membership, the way the front desk's direct check-in does. It spends one session from the membership.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/checkins" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: checkin-contact-300-2026-08-12" \
+  -d '{ "contactId": 300, "clubId": 5 }'
+```
+
+Body fields:
+
+- `contactId` (required) - the member checking in
+- `clubId` (required) - the gym they are checking in at. It must belong to the authorized organization.
+- `membershipId` (optional) - the membership to spend the visit from. Omit it to use the member's own covering membership; one with nothing owed is preferred.
+- `externalProgramId` (optional) - a zero-fee external program to record the visit against instead of a membership
+
+Send **exactly one** of `bookingId` or `contactId`, and at most one of `membershipId` or `externalProgramId`. Unknown fields are rejected.
+
+The membership must not be limited to particular classes, areas, or instructors, must have sessions left, and must have nothing owed on it. Otherwise the request returns `400` with `code` set to `MEMBERSHIP_NOT_ELIGIBLE`, `MEMBERSHIP_UNPAID`, or `NO_COVERING_MEMBERSHIP`. Nothing is charged.
+
 <Note>
-  This endpoint checks in an existing booking. Use the 1Club dashboard for
-  walk-ins, direct membership entry, payment collection, and anonymous entry.
+  To check someone into a class or an area, book it first and check that booking
+  in. Use the 1Club dashboard for payment collection, a member who owes money,
+  and anonymous entry.
 </Note>

@@ -17,22 +17,27 @@ API keys are created in the admin dashboard under **Settings** > **Organization*
 
 Grant only the scopes the integration needs:
 
-- `areas:read` - list areas and read their availability
-- `bookings:read` - read a booking and list bookings in a window
-- `bookings:write` - create and cancel bookings, and manage players on them
-- `contacts:read` - search customers and open one by id
-- `contacts:write` - create a customer
-- `instructors:read` - search coaches and open one by id
-- `plans:read` - find the membership plans a gym sells
-- `plans:write` - create, update, retire, and delete plans
-- `classes:read` - list and read classes
-- `classes:write` - create, update, and delete classes
+- `areas:read` - list areas, area types, and area blocks, and read their availability
+- `bookings:read` - read a booking, list bookings in a window, list players on a booking, and read a class roster
+- `bookings:write` - create, update, and cancel bookings, manage players on them, and book a customer into a class
+- `areas:write` - create and update areas and area types, and block or unblock an area
+- `contacts:read` - search customers, open one by id, and list pipeline stages and contact sources
+- `contacts:write` - create and update a customer
+- `contacts:delete` - archive a customer, which also cancels their memberships and future bookings
+- `instructors:read` - search coaches, instructor types, and pay rate policies, and open one by id
+- `instructors:write` - create and update coaches, instructor types, and pay rate policies
+- `plans:read` - find the membership plans a gym sells and their plan categories
+- `plans:write` - create, update, retire, and delete plans, and create and update plan categories
+- `classes:read` - list and read classes, class types, and progression tracks
+- `classes:write` - create, update, and delete classes, and create and update class types
 - `memberships:read` - read memberships
 - `memberships:write` - create memberships, and pause, resume, or cancel them
 - `checkins:read` - list and read attendance records
-- `checkins:write` - check in an existing booking
+- `checkins:write` - check in an existing booking, or check a member in without one
 - `products:read` - search the product catalogue and its categories, and read how many are left to sell
 - `products:write` - create and update products and product categories
+
+See [Token scopes](/api-reference/introduction#token-scopes) for every scope the Platform API supports.
 
 A booking-only integration needs the first three. Add the contacts and instructors scopes when you want to resolve a customer or a coach by name before booking - see [Contacts](/api-reference/channel-integration/contacts) and [Instructors](/api-reference/channel-integration/instructors).
 
@@ -67,7 +72,10 @@ curl "https://api.1club.ai/v1/platform/me" \
   "scopes": ["areas:read", "bookings:read", "bookings:write"],
   "fullAccess": false,
   "effectiveScopes": ["areas:read", "bookings:read", "bookings:write"],
-  "resources": [{ "resource": "bookings", "actions": ["read", "write"] }]
+  "resources": [
+    { "resource": "classes", "label": "Classes", "actions": ["read", "write"] },
+    { "resource": "bookings", "label": "Bookings", "actions": ["read", "write"] }
+  ]
 }
 ```
 
@@ -80,6 +88,7 @@ curl "https://api.1club.ai/v1/platform/me" \
   `payment.amount`, plan and product prices, transaction totals - is a bare number
   in this currency. Read it once and store it against the connection rather than
   assuming it matches your own.
+- **`resources`** is the catalog of every resource the Platform API exposes and the actions each supports. It is the same for every key, so it does not tell you what this key holds - `effectiveScopes` does. The example above is shortened.
 - **`organization.id`** is the same id that arrives as `organizationId` on an
   [availability webhook](/api-reference/channel-integration/webhooks), so a
   per-organization connection can be keyed on it.
@@ -88,7 +97,7 @@ curl "https://api.1club.ai/v1/platform/me" \
 
 The channel endpoints share the Platform API's limits and error model:
 
-- **100 requests per minute** per organization. A `429` response includes a `Retry-After` header.
-- Errors return a JSON body of the shape `{ "error": "...", "message": "...", "code": "..." }`.
+- **100 requests per minute** per organization. Booking writes are also capped at **60 per minute**. A `429` response includes a `Retry-After` header.
+- Errors return a JSON body of the shape `{ "error": "...", "message": "...", "code": "..." }`. A missing scope returns `403` with `{ "error": "Insufficient access scope", "requiredScope": "..." }`.
 
 See [Rate limiting](/api-reference/introduction#rate-limiting) and [Errors](/api-reference/introduction#errors) for the full reference.

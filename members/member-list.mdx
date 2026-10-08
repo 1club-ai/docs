@@ -8,14 +8,14 @@ The Member list is the contacts grid: every person tracked in your org - members
 
 ## When to use it
 
-Open the Member list when you need to find someone, pull out a group of contacts, or act on many of them together. Tabs split the list by contact type, the filter drawer narrows by tag, plan, status, or progression level, and bulk actions invite, merge, or archive contacts. It is also where you add new members, leads, children, memberships, and accounts, and where your sales pipeline lives on the **Leads** tab.
+Open the Member list when you need to find someone, pull out a group of contacts, or act on many of them together. Tabs split the list by contact type, the filter drawer narrows by tag, status, missing details, plan, or progression level, and bulk actions invite, merge, or archive contacts. It is also where you add new members, leads, children, memberships, and accounts, and where your sales pipeline lives on the **Leads** tab.
 
 Typical uses:
 
 - **Nudge members who never set up their portal** - filter by plan and **Unregistered** status, then invite everyone in one batch.
 - **Sign up a family** - add a parent at a martial-arts gym, then add each child as a dependent on the household.
 - **Clear out cold leads** - move the leads from a padel open day that never converted to **Cold** in one go.
-- **Chase payments before a bill run** - check the **Unpaid** tab for anyone carrying a pending or failed payment.
+- **Chase payments before a bill run** - check the **Unpaid** tab for anyone who owes money that is not past due yet.
 
 See [Worked examples](#worked-examples) for the steps.
 
@@ -33,7 +33,7 @@ Tabs filter the grid. **All** and **Leads** are always present. The others only 
 - **Members** - contacts with `type = member`. Default tab when present.
 - **Drop-ins** - one-off visitors (`type = drop_in`).
 - **Leads** - your sales pipeline: everyone with a pipeline stage, as a board or a list. See [Leads and pipeline](/members/leads).
-- **Unpaid** - contacts carrying the system **Unpaid** smart tag (pending or failed payment). Only shown when that tag exists in your org.
+- **Unpaid** - contacts carrying the system **Unpaid** smart tag: they have an unpaid charge, and none of it is past due yet. Contacts with a past-due charge carry the **Past Due** or **Overdue** tag instead, which you can pick in the **Tags** filter. Only shown when the Unpaid tag exists in your org.
 - **Accounts** - contacts grouped under household or company accounts, shown grouped by account. This tab is read-only (no row selection).
 - **Lapsed** - members whose membership ended without renewal (`type = lapsed`).
 
@@ -45,21 +45,23 @@ Each tab shows a count badge from the server. The page remembers the last tab yo
 
 The grid shows, by default:
 
-- **Name** with avatar, plus email below.
+- **Name** with avatar, plus email below. An alert icon sits at the end of the cell when the contact has something to resolve, such as an amount due or an unsigned required document: red for an error, orange for warnings only. Hover it to see the list.
 - **Phone**, with a WhatsApp badge when the number is WhatsApp-verified.
 - **Age** computed from date of birth.
-- **User status** - whether the contact has a member-portal account. If they have no account but do have an email address or a phone number, this cell shows an **Invite** button. Otherwise it shows a status chip (`unregistered`, `invited`, `incomplete`, `active`, `inactive`, or `suspended`).
+- **User Status** - whether the contact has a member-portal account. When they have an account, it shows its status chip (`invited`, `incomplete`, `active`, `inactive`, or `suspended`). When they have none, staff who can update members see an **Invite** button. The button is disabled, with a tooltip explaining why, when the contact has neither an email address nor a phone number. Staff without that permission see **unregistered**.
 - **Type** chip (member, lead, drop-in, etc.).
 - **Memberships** - active membership plan names (shows "No memberships" when none).
-- **Accounts** - household and company accounts the contact belongs to, each a link, with the account type underneath.
-- **Progression** - skill and level chips per enabled track. Only shown when progression tracks are configured.
+- **Account** - household and company accounts the contact belongs to, each a link, with the account type underneath.
+- **Level** - skill and level per progression track the contact is on.
 - **Rating** - when ratings are enabled, the contact's strongest sport rating, with the rest in a tooltip.
-- **Engagement** - latest engagement score chip (see [Engagement analytics](/analytics/engagement)). Only shown when at least one contact in the current view has a score.
+- **Member Engagement** - latest engagement score and level (see [Engagement analytics](/analytics/engagement)). Only shown when at least one contact in the current view has a score.
 - **Tags** - manual and smart tags as chips.
+
+**Type** and **Memberships** describe membership history, so they only show for staff who can read memberships.
 
 On the **Leads** tab, **Stage**, **Source**, and **Assigned to** follow the name, and the columns a lead does not have yet (type, memberships, progression, accounts, and user status) are left out.
 
-Hidden by default: **Invitation status** and **Created at**. Any custom contact fields your org has defined are added as extra columns, also hidden by default. Toggle visibility from the column menu. On the Accounts tab, the per-row Accounts column is hidden because the grouping header already shows it.
+Hidden by default: **Created At**. Any custom contact fields your org has defined are added as extra columns, also hidden by default. Toggle visibility from the column menu. On the Accounts tab, the per-row Accounts column is hidden because the grouping header already shows it.
 
 ## Search and filter
 
@@ -67,9 +69,10 @@ Use the search bar to match by name, email, or phone. The filter drawer (top rig
 
 - **Tags** - any combination of manual and smart tags. Only tags currently applied to at least one non-archived contact appear.
 - **Status** - the contact's user-account status.
-- **Plan** - one or more active plans. Only plans that currently have at least one active membership are listed.
+- **Missing details** - **No phone number** or **No email address**, to find the records you still need to complete. Always offered, even when nothing is missing, so you can confirm the answer is zero. Not available on the **Accounts** tab.
+- **Plan** - one or more active plans. Only plans that currently have at least one active membership are listed, and only staff who can read memberships see this filter.
 - **Level** - progression levels, grouped by track when more than one track is enabled.
-- **Stage**, **Source**, and **Assigned to** - on the **Leads** tab only. The board view filters by source and assignee, since its columns already are the stages.
+- **Stage**, **Source**, and **Assigned to** - on the **Leads** tab only. The board view filters by source and assignee only, since its columns already are the stages. The other filters apply to the list view.
 
 The drawer loads its in-use option lists the first time you open it, so early on it may briefly show every option before narrowing to those actually in use. Filter selections live in the URL, so a filtered view can be shared as a link or bookmarked.
 
@@ -79,15 +82,17 @@ Members carry two kinds of tags: **manual tags** that you add per contact, and *
 
 Each tag can have an optional color, set as a hex code in **Settings** > **Members** > **Smart Tags**. Text color is auto-picked for contrast.
 
-Smart tags ship with a default rule set covering **Attendance** (All-Star, Regular, Casual, Low Activity, Ghost), **Financial** (Unpaid, Failed, Overdue, Lapsed), **Lifecycle**, **Loyalty** (Legend, Champion, Pro, Rising Star, Beginner), **Membership**, and **New contact**. See [Smart tagging](/settings/smart-tagging) for the full list and rule editor.
+Smart tags ship with default rules in categories such as **Attendance** (All-Star, Regular, Casual, Low Activity, Inactive), **Financial** (Unpaid, Past Due, Overdue), **Lifecycle**, **Membership**, and **Loyalty** (Legend, Champion, Pro, Rising Star, Beginner). See [Smart tagging](/settings/smart-tagging) for the full list and rule editor.
 
 ## Adding a member
 
-Click **Add member** at the top right to open the create dialog. It contains the contact form plus an optional membership section:
+Click **Add Member** at the top right to open the create dialog. **Add Member** and the **+** menu next to it only show for staff who can create members. It contains the contact form plus an optional membership section:
 
 1. Fill in the contact details. **First name** is always required. **Last name**, **email**, **phone**, **date of birth**, and **gender** are required only if your org marks them required under **Settings** > **Members** > **Contacts**. You can also set a profile image, tags, address, and any custom fields. There is no **Club** to pick: a member belongs to the organization, and each membership or booking records its own.
 2. To sell a plan at the same time, click **Add membership** and pick a plan in the membership section. Leave it off to create the contact without a membership.
 3. Save. The contact is created and you land on their [profile](/members/member-profiles).
+
+If the email address or phone number you enter already belongs to another contact, the dialog says so and offers **Open contact**, so you don't create the same person twice. See [Duplicates and merging](/members/merge-duplicates).
 
 The contact's `type` is derived from what they actually hold - attaching a membership makes them a member, and a bare contact with no membership or booking stays a plain contact. A contact becomes a lead only by entering the pipeline. You don't set the type by hand.
 
@@ -95,7 +100,7 @@ On the **Leads** tab the outlined button becomes **Add Lead**, which adds the co
 
 ### The create (+) menu
 
-The primary **+** button next to **Add member** opens a menu of create actions:
+The primary **+** button next to **Add Member** opens a menu of create actions:
 
 - **Add Member** - the dialog above.
 - **Add Lead** - the same contact form plus a **Pipeline** section (stage, source, assignee). See [Leads and pipeline](/members/leads#adding-leads).
@@ -107,13 +112,13 @@ The primary **+** button next to **Add member** opens a menu of create actions:
 
 The three-dot overflow menu (next to the **+** button) links to related pages. Each entry only shows if you can open the page behind it:
 
-- **Memberships** - opens [**Sales** > **Memberships**](/sales/memberships).
-- **Cards** - the [access cards](/members/member-cards) registry.
+- **Memberships** - opens [**Sales** > **Memberships**](/sales/memberships). Needs permission to read memberships.
+- **Cards** - the [access cards](/members/member-cards) registry. Needs permission to read operations.
 - **Matches** - opens [**Events** > **Matches**](/events/matches). Only when ratings are enabled.
 - **Accounts** - the [accounts](/members/accounts) list.
-- **Contact analysis** - a check of your roster for missing details and possible duplicates.
-- **Signatures** - the [document signatures](/members/document-signatures) ledger.
-- **Archive** - opens **Settings** > **Data Tools** > **Archive**.
+- **Contact analysis** - a check of your roster for missing details and possible duplicates. See [Duplicates and merging](/members/merge-duplicates#contact-analysis).
+- **Signatures** - the [document signatures](/members/document-signatures) ledger. Needs permission to read settings.
+- **Archive** - opens **Settings** > **Data Tools** > **Archive**. Needs permission to read settings.
 
 ## Per-row actions
 
@@ -121,20 +126,22 @@ Click a row to open the member's [profile](/members/member-profiles). The row ac
 
 - **View** - open the profile (needs `members.read.organization`).
 - **Edit** - open the contact edit dialog (needs `members.update.organization`).
-- **Archive** - soft-delete the contact (needs `members.update.organization`).
-- **Merge** - open the merge dialog with this contact on one side, then pick the duplicate (needs `members.delete.organization`).
+- **Archive** - soft-delete the contact. The action shows for staff with `members.update.organization`, and the archive itself needs `members.delete.organization`. See [Suspend and archive](/members/suspend-and-archive).
+- **Merge** - open the merge dialog with this contact on one side, then pick the duplicate (needs `members.delete.organization`). See [Duplicates and merging](/members/merge-duplicates).
+
+If the contact is also an instructor who still teaches upcoming classes or recurring series, archiving opens **Reassign classes before archiving** first. Choose **Reassign to another instructor** and pick one, or **Leave unassigned**, then click **Reassign and archive**.
 
 Members permissions are organization-wide: there is no per-**Club** access to the member list.
 
 ## Bulk actions
 
-Select rows with the checkboxes. The bulk action bar appears with the count of selected contacts and its actions:
+Select rows with the checkboxes. The bulk action bar appears with the count of selected contacts and its actions. Bulk actions are not available on the **Leads** board view; switch to the list to select leads.
 
-- **Move to stage** and **Assign to** - on the **Leads** tab only. See [Leads and pipeline](/members/leads#bulk-moves-and-assignment).
+- **Move to stage** and **Assign to** - on the **Leads** tab only, for staff with `members.update.organization`. See [Leads and pipeline](/members/leads#bulk-moves-and-assignment).
 
 - **Invite** - opens the invite dialog, where you choose how the invitation travels, then sends it to every selected contact who is eligible (reachable on that channel, and either unregistered or holding an expired invite). The info icon shows how many of your selection are eligible. Invitations go out in a single request that the server governs against your gym's daily invite budget; it reports back how many were invited, how many each channel carried, and how many failed, were throttled, skipped, could not be reached on your chosen channel, or were ineligible, so a problem with one contact never hides another. Invite is offered for any selection. When nobody selected can be invited, the dialog says why. It needs `members.update.organization`.
-- **Merge** - appears when exactly two contacts are selected. Opens the merge dialog for the pair. It needs `members.delete.organization`.
-- **Archive** - archives each selected contact. Contact records are never hard-deleted, so financial history and audit trails stay intact. Archiving runs one request per contact and reports partial success if some fail. This action needs `members.update.organization`.
+- **Merge** - appears when exactly two contacts are selected. Opens the merge dialog for the pair. It needs `members.delete.organization`. See [Duplicates and merging](/members/merge-duplicates).
+- **Archive** - archives each selected contact after you confirm. Contact records are never hard-deleted, so financial history and audit trails stay intact. Archiving runs one request per contact and reports partial success if some fail. If a contact was archived but some of their memberships or bookings could not be cancelled, the result says so: archive them again to finish the job. The action shows for staff with `members.update.organization`, and the archive itself needs `members.delete.organization`.
 
 Archived contacts disappear from the list. To get back to them, use **Settings** > **Data Tools** > **Archive**.
 
@@ -198,8 +205,8 @@ You just launched online booking and want to nudge members who never activated t
 
 A parent signs up two kids for the kids jiu-jitsu program.
 
-1. Click **Add member** and create the parent as the account owner (or **Add account** to create the household first).
-2. Use the **+** menu > **Add dependent** twice, picking the household each time, to add both children with the Dependent role.
+1. Use the **+** menu > **Add Account** to create the household with the parent as the primary contact, who becomes the owner.
+2. Use the **+** menu > **Add Child** twice, picking the household each time, to add both children with the Dependent role.
 3. Attach the kids program plan to each child in the membership section or from their profile.
 
 ### Clean up stale leads after a padel open day
@@ -207,19 +214,20 @@ A parent signs up two kids for the kids jiu-jitsu program.
 Your open day generated a batch of leads that never converted.
 
 1. Open the **Leads** tab and switch to **List**.
-2. Filter by **Source** (for example **Event**), or by created date if you show the Created at column.
+2. Filter by **Source** (for example **Event**), or sort by created date if you show the **Created At** column.
 3. Select the ones that went quiet and use **Move to stage** > **Cold**. They stay in the pipeline and can warm up later. To drop someone from the pipeline entirely, use **Remove from pipeline** on their card instead.
 
 ### Spot unpaid members before a billing run
 
-1. Open the **Unpaid** tab (visible when the system Unpaid tag exists).
-2. Review who is carrying a pending or failed payment, then follow up before the next [bill run](/sales/bill-runs).
+1. Open the **Unpaid** tab (visible when the system Unpaid tag exists) to see who owes money that is not past due yet.
+2. For charges already late, go back to **All** and filter **Tags** by **Past Due** or **Overdue**.
+3. Follow up before the next [bill run](/sales/bill-runs).
 
 ## Tips & best practices
 
 - **Share filtered views as links.** Because tab, search, and filter state live in the URL, you can bookmark "active members on the coaching plan" or paste it to a colleague.
 - **Use the inline Invite button for one-offs.** You don't need to select a row - the User status column shows an **Invite** button for any unregistered contact you can reach. It opens the same dialog, so a single invitation gets the same channel choice as a batch.
-- **Turn on Created at when auditing signups.** It's hidden by default; toggle it from the column menu when you need to sort or eyeball recent joins.
+- **Turn on Created At when auditing signups.** It's hidden by default; toggle it from the column menu when you need to sort or eyeball recent joins.
 - **Let the type calculate itself.** Attach a membership rather than hand-setting `type = member`; the system keeps the type in step with what the contact actually holds.
 - **Archive, don't fear data loss.** Archiving is a soft delete that preserves charges and history, so it's safe to tidy the list aggressively.
 
@@ -227,7 +235,7 @@ Your open day generated a batch of leads that never converted.
 
 **Issue**: A tab I expect (Members, Drop-ins, Lapsed, Unpaid) isn't showing.
 
-**Solution**: Tabs other than All and Leads only appear when their bucket has at least one contact, and Unpaid also requires the system Unpaid smart tag to exist. Members, Drop-ins, and Lapsed also need permission to read memberships. Add a matching contact or enable the tag, then reload.
+**Solution**: Tabs other than All and Leads only appear when your organization has at least one contact in their bucket, and Unpaid also requires the system Unpaid smart tag to exist. Members, Drop-ins, and Lapsed also need permission to read memberships. Add a matching contact or enable the tag, then reload.
 
 **Issue**: The invite dialog says nobody in the selection can be invited.
 

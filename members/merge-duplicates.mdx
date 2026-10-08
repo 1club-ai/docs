@@ -1,0 +1,98 @@
+---
+title: Duplicates and merging
+description: Find contacts with missing details or entered twice with Contact analysis, and merge two duplicate contacts into one record without losing their history.
+keywords: [merge, duplicate contacts, merge contacts, contact analysis, missing details, possible duplicates, no phone number, no email address, data quality]
+---
+
+A duplicate is the same person entered twice, for example once by the front desk with a phone number and once through an online signup with an email. Merging folds the duplicate into the record you keep, so bookings, memberships, payments, and history all sit on one contact. Managers use **Contact analysis** to find duplicates and incomplete records, and the front desk is warned about likely duplicates while they type.
+
+## When to use it
+
+Two records for one person split their history: the front desk sees half the visits, a balance sits on the wrong record, and the member gets two of every message. Merging fixes that in one step and keeps everything either record held.
+
+Typical uses:
+
+- **A walk-in who later signs up online** - a padel player was added at the desk with only a phone number, then registered on the portal with their email. Merge the desk record into the portal one.
+- **A clean-up after an import** - after importing members from your previous system, open **Contact analysis** and work down the list of possible duplicates.
+- **Completing records before you send reminders** - filter the roster to contacts with **No email address**, then add the missing addresses.
+
+## How it works
+
+A merge keeps one contact and retires the other:
+
+- **Everything moves to the contact you keep.** All bookings, memberships, payments, invoices, check-ins, notes, documents, tags, messages, and the wallet balance.
+- **The duplicate is archived.** It stays in **Settings** > **Data Tools** > **Archive** marked **Merged into** the contact you kept, and it cannot be unarchived. Its email and phone are freed up for reuse.
+- **You choose the values where the records disagree.** For each field that differs, pick which record's value to keep. Empty fields on the kept contact are filled from the duplicate.
+- **A merge cannot be undone.**
+
+## Contact analysis
+
+Go to **Members**, open the three-dot overflow menu, and click **Contact analysis**. The panel has two sections.
+
+**Missing details** counts the contacts on your roster with **No phone number** and with **No email address**. Click a count to open the Member list on the **All** tab, filtered to exactly those contacts. Opening it clears your other filters and search, so the list matches the number you clicked. The same filter is in the Member list's filter drawer as **Missing details**.
+
+**Possible duplicates** lists pairs of contacts that look like the same person, each with a confidence chip (**Very likely**, **Likely**, or **Possible**) and the reasons the pair matched:
+
+- **Same phone**
+- **Similar email**
+- **Same name** or **Similar name**
+- **Same date of birth**
+- **Same address**
+
+The panel shows the first 8 pairs, and says how many more there are. Click **Merge** on a pair to open the merge dialog. When you finish or cancel the merge, you return to the panel to work on the next pair. Pairs are worked out from the contact data each time you open the panel, so a pair you fix by editing a record simply stops appearing.
+
+## Merge two contacts
+
+You can open the merge dialog in four ways:
+
+- From **Contact analysis**, with **Merge** on a pair.
+- On the [Member list](/members/member-list), select exactly two contacts and click **Merge** in the bulk action bar.
+- From the row action menu of one contact on the Member list, click **Merge**, then pick the other contact under **Which contact is the duplicate of this one?**
+- When you edit a contact and save an email address that another contact already uses, the form shows **This contact already exists** with **Merge with this contact**.
+
+The **Merge duplicate contacts** dialog then shows:
+
+1. **Keeping** and **Merging away** - the two records side by side, with each one's wallet balance. 1Club suggests which one to keep. Click **Keep the other one instead** to swap. When one record holds the person's login, it has to be the one you keep, and the dialog says so instead of offering the swap.
+2. **Where the records disagree** - one row per field that differs. Pick the value to keep for each. The login email is locked to the record that holds the login.
+3. A summary of what moves across, plus any warnings that apply:
+   - When the duplicate has its own login for your organization, merging deletes that login. If the person signs in with it again, they are asked to use the login on the contact you keep.
+   - When the login moves to the contact you keep, that contact's email changes to the login's email.
+   - When both contacts have their own Stripe customer, the one you keep is retained, and saved cards on the other are not transferred.
+
+Click **Merge contacts** to finish.
+
+### When a merge is blocked
+
+The dialog shows the reason in red and disables **Merge contacts** when the pair cannot be merged as chosen. For example:
+
+- The contact you are keeping is archived. Unarchive it first, or keep the other one.
+- Both contacts have an instructor profile. Delete the profile you don't want, then merge.
+- The duplicate holds the instructor profile or the current login, so it has to be the one you keep. Swap the sides.
+- The duplicate is the last owner of your organization. Transfer ownership first.
+- Both contacts are entered in a tournament that is still running. Merge once it has finished, or withdraw one of them.
+- The two wallet balances are in different currencies. Spend or refund one of them first.
+- The duplicate was already merged into another contact.
+
+## Duplicate warnings while you type
+
+The contact form warns you before a duplicate is created:
+
+- **Another contact uses this number** appears when the phone number you enter belongs to another contact. You can still save, because households often share one number. When that contact also has the name you typed, the notice says it is most likely the same person.
+- **This contact already exists** appears when you save an email address another contact already uses. **Open contact** takes you to that contact. When you are editing an existing contact, **Merge with this contact** is offered too. When you are adding a new contact, there is nothing to merge yet, so only **Open contact** is offered.
+
+## Permissions
+
+| Action | Permission |
+| --- | --- |
+| Open **Contact analysis** and see possible duplicates | `members.read.organization` |
+| Merge two contacts | `members.delete.organization` |
+| Merge a contact who has admin portal access | Also staff-management permission, and permission to manage that person's role |
+
+You cannot merge your own account. Merging counts as a delete because it retires one record, so a role that can edit members but not delete them can correct a duplicate's details but cannot merge it. See [Roles and permissions](/reference/roles-permissions).
+
+## Related
+
+- [Member list](/members/member-list) - the **Missing details** filter, and the **Merge** bulk and row actions
+- [Suspend and archive](/members/suspend-and-archive) - where merged-away contacts end up
+- [Import](/settings/import) - bringing members in from another system
+- [Roles and permissions](/reference/roles-permissions) - the Members permissions

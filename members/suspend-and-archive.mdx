@@ -6,7 +6,7 @@ keywords: [suspend member, reinstate member, pause access, archive contact, unar
 
 Two actions stop a member using your gym, and they are not interchangeable.
 
-- **Suspend** pauses a member. Their record, plan, and history stay exactly as they are, they cannot book or check in, and one click puts them back. Reach for this first.
+- **Suspend** pauses a member's access. Their record, plan, and history stay exactly as they are, they cannot sign in to your gym, and one click puts them back. Reach for this first.
 - **Archive** removes the member from active use. It cancels their memberships and future bookings, hides them from your lists, and keeps the record only for financial and legal history.
 
 Both live in the three-dot overflow menu on the [member profile](/members/member-profiles), and both apply to your gym alone. The same person can stay an active member somewhere else.
@@ -15,8 +15,8 @@ Both live in the three-dot overflow menu on the [member profile](/members/member
 
 | | Suspend | Archive |
 | --- | --- | --- |
-| Member can book or check in | No | No |
-| Member can sign in to the portal | No | No |
+| Member can sign in to the portal or app (and book there) | No | No |
+| Staff can book and check them in | Yes | No |
 | Memberships and future bookings | Untouched, still billable | Cancelled |
 | Shows in the Member list | Yes, marked suspended | No, moves to the Archive |
 | Staff role and permissions | Kept | Removed |
@@ -37,7 +37,7 @@ Use **archive** for a member who has left and is not coming back.
 2. Click the three-dot menu in the header, next to **Edit**.
 3. Choose **Suspend** and confirm.
 
-The profile then shows a banner saying the member is suspended, with a **Reinstate** button inside it. The member is signed out of the member portal straight away and cannot sign back in to your gym.
+The profile then shows an **Access suspended** banner with a **Reinstate** button. The member is signed out of the member portal straight away and cannot sign back in to your gym, so they can't book or manage anything themselves. They also stop receiving notifications. Staff can still book and check them in at the desk, and bill them for what they owe.
 
 Only a member with an active account can be suspended. A member who has been invited but has not accepted yet, or who has not finished signing up, has no active account to pause - invite or archive them instead.
 
@@ -52,7 +52,7 @@ You cannot reinstate your own account. If your access has been suspended, anothe
 Staff are members too, so the same action pauses a colleague's access to the admin. Seniority applies:
 
 - Pausing anyone with admin access needs staff-management permission on top of `members.update.organization`.
-- A manager cannot suspend an admin or an account owner.
+- A manager can suspend only roles below manager (front desk, instructor, member), so not another manager, an admin, or an account owner.
 - Only an admin or an account owner can suspend an owner.
 - You cannot suspend yourself, and you cannot suspend the last active account owner - somebody has to be able to administer the gym.
 
@@ -62,9 +62,20 @@ A suspended colleague is signed out of the admin within a minute and cannot sign
 
 Archiving is in the same three-dot menu, below **Suspend**. It needs the `members.delete.organization` permission, and unarchiving needs `members.update.organization`. Members permissions apply to the whole organization, so there is no per-**Club** version of either.
 
-An archived member is kept for financial and legal history but is hidden from your lists, has memberships and future bookings cancelled, and cannot sign in. Find archived records under **Settings** > **Data Tools** > **Archive**, also reachable from **Archive** in the overflow menu on the [Member list](/members/member-list).
+An archived member is kept for financial and legal history but is hidden from your lists, has memberships and future bookings cancelled, and cannot sign in.
 
-To bring someone back, open their record from the Archive and click **Unarchive**. Their contact details and history return, but their staff role and account links do not - re-add those by hand.
+Archiving can ask two more questions:
+
+- **What happens to the money paid?** - when the member has future bookings already paid for, choose **Refund in full** or **Apply the cancellation policy**.
+- **Reassign classes before archiving** - when the contact is also an instructor who still teaches upcoming classes or recurring series, choose **Reassign to another instructor** or **Leave unassigned**, then **Reassign and archive**.
+
+If some memberships or bookings could not be cancelled, you see "Contact archived, but not everything was released". Archive them again to finish. Find archived records under **Settings** > **Data Tools** > **Archive**, also reachable from **Archive** in the overflow menu on the [Member list](/members/member-list).
+
+To bring someone back, open their record from the Archive and click **Unarchive**. Their contact details and history return, but their staff role and account links do not - re-add those by hand. A contact that was archived because it was [merged into another](/members/merge-duplicates) can't be unarchived.
+
+### Permanently deleting archived contacts
+
+The Archive page has **Clean up archived contacts**, which permanently deletes every archived contact in your organization with their related records (bookings, check-ins, charges, memberships, invoices, and more). Type `CLEANUP` to confirm. This cannot be undone, and it needs `members.delete.organization`. A summary tells you how many contacts were scanned, deleted, and failed.
 
 <Warning>
   Archiving cancels memberships and future bookings, and unarchiving does not restore them. If you only want to stop someone temporarily, suspend them instead.

@@ -1,7 +1,7 @@
 ---
 title: AI assistants
 description: The AI copilot built into 1Club - an admin chat assistant that books, configures, messages, and reports, plus AI reply suggestions, a day overview, a website builder, and a member-facing assistant.
-keywords: ["ai assistant", "ai copilot", "chat assistant", "ai agent", "ai native", "ai insights", "ai reply", "day overview", "website builder ai", "member assistant", "page suggestions", "business audit", "conversation history", "ai check-in"]
+keywords: ["ai assistant", "ai copilot", "chat assistant", "ai agent", "ai native", "ai insights", "ai reply", "day overview", "website builder ai", "member assistant", "page suggestions", "what needs attention", "overdue invoices", "failed payments", "renewal reminder", "lapsing members", "business audit", "conversation history", "ai check-in"]
 ---
 
 1Club has AI woven through the product. In the admin, staff get a chat copilot that can take real actions on their behalf: check members in, create bookings, change settings, draft messages, and answer questions about your data. On the member side, your portal and public website can carry an assistant that answers members' questions and books classes for them. This page maps out every AI surface and what each one lets you do.
@@ -43,9 +43,32 @@ The line under the greeting on [Home](/home/overview) is a one-sentence AI summa
 
 Inside a message thread, the compose pane has a **Generate AI reply** action. It drafts a response grounded in the original message plus your organization's data (retrieved with pgvector similarity search), and lands the suggestion in the editor for you to edit before sending. Each suggestion carries a tone and a confidence score so staff can review before anything goes out. The feature works on replies, not brand-new sends. See [Messaging](/inbox/overview).
 
-## Page suggestions
+## Suggestions: what needs your attention
 
-On some screens the copilot offers page-aware suggestion chips - context-specific next actions for where you are in the admin. Suggestions are gated on the permission needed to act on them, so you're never shown an action you can't take. Screens with no suggestions simply show none.
+The copilot's suggestion chips start with what it found in your gym today. Each chip states a finding with a real number - "3 invoices overdue · €375.00", "4 memberships end this week", "Spin Express today 18:30 is 4 of 12 booked" - and, underneath, what the copilot will do about it in one word: **Remind** for invoices, payments and renewals, **Invite** for members and classes.
+
+### What it looks for
+
+| Finding | What it means | What the copilot drafts |
+| --- | --- | --- |
+| Overdue invoices | Unpaid invoices past their due date, with what is still owed (the same figure as the Invoices dashboard) | One payment reminder to those members |
+| Failed payments | Charges that failed in the last 7 days | A message asking them to update their card or pay at the desk |
+| Memberships ending | Active memberships ending within 7 days, without auto-renew, where the member hasn't bought what comes next | A renewal reminder |
+| Regulars who stopped coming | Members with an active membership who came at least 4 times in the 8 weeks before the last 3, and not since, with nothing booked | A "we miss you" message |
+| New members who never came in | Members who joined 5 to 30 days ago and have never booked or checked in | A first-visit welcome |
+| A class short of bookings | A recurring class in the next 36 hours that is under 40% full, with regulars who haven't booked it | An invitation to those regulars |
+
+### How it works
+
+- **Click a finding and the facts appear at once.** The chat shows the members, invoices or regulars behind the chip straight away, as a table with each member's photo or initials, then the copilot writes the draft. The numbers always come from your data, never from the AI.
+- **Each row opens its record.** Click a row in that table to open the invoice, the charge, the membership or the member.
+- **Nothing is sent.** Every follow-up is saved as a draft in the inbox for you to review and send. **Review draft** opens it.
+- **Handled findings leave the list.** Once the copilot has drafted something for a finding, its chip disappears and the next finding takes its place. The chip comes back only if the finding changes (for example, a new membership starts ending).
+- **Not now.** Hover a chip and use its ✕ to hide it for a week in your browser.
+- **All clear.** When nothing needs attention, the strip says what it checked, for example "All clear: invoices, payments and renewals look fine".
+- **Questions fill the rest.** Up to three findings show at a time; the remaining chips are questions you can ask about your numbers, or next steps for setting up.
+
+Findings show on the screens they belong to: Home shows them all, **Members** shows memberships, regulars and new members, **Schedule** shows classes, and **Billing** shows invoices and payments. Urgent ones (overdue invoices and failed payments) follow you to other screens when you open the copilot. Each finding needs the permission to see its data, so someone without billing access never sees invoice or payment findings. Findings refresh every 15 minutes, and straight away after the copilot drafts or changes something.
 
 ## AI business audit
 

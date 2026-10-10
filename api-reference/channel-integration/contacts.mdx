@@ -1,13 +1,13 @@
 ---
 title: "Contacts"
-description: "Search, open, and create the customers your bookings belong to."
+description: "Search, open, create, update, and archive the customers your bookings belong to."
 keywords: [contacts, customers, crm, search, contactId, platform api]
 ---
 
 Every booking belongs to a **contact** in the gym's 1Club CRM. Use these endpoints to
 resolve a customer you only know by name into the `contactId` you pass when
 [creating a booking](/api-reference/channel-integration/bookings#create-a-booking),
-and to create the customer when they are new.
+to create the customer when they are new, and to keep their details current.
 
 <Note>
   You can still create a booking without touching these endpoints by sending an
@@ -27,7 +27,7 @@ curl "https://api.1club.ai/v1/platform/contacts?search=ivan&limit=10" \
 
 Query parameters:
 
-- `search` (optional) - matches on name, email, or phone. An empty value is treated as no search.
+- `search` (optional) - matches on name, email, or phone, up to 120 characters. An empty value is treated as no search.
 - `limit` (optional) - 1 to 100, defaults to 25
 - `offset` (optional) - defaults to 0
 
@@ -38,12 +38,16 @@ Response:
   "data": [
     {
       "id": 300,
+      "uuid": "0199a1c2-4b7e-7d10-8f3a-2c9e5d6b1a40",
       "name": "Ivan Petrov",
       "firstName": "Ivan",
       "lastName": "Petrov",
       "email": "ivan@example.com",
       "phone": "+359888123456",
       "type": "member",
+      "pipelineStageId": null,
+      "sourceId": null,
+      "assignedToId": null,
       "createdAt": "2026-07-01T09:12:00.000Z"
     }
   ],
@@ -54,7 +58,11 @@ Response:
 ```
 
 `total` counts every contact matching the filters, ignoring pagination, so you can
-tell whether more pages exist.
+tell whether more pages exist. Results are ordered by name.
+
+- `uuid` - a stable, unguessable identifier. Prefer it over `id` when you store a reference.
+- `type` - the derived contact type, for example `contact`, `member`, or `lead`. `archived` marks a retired contact.
+- `pipelineStageId`, `sourceId`, `assignedToId` - the sales pipeline stage the contact is in, where they came from, and the staff member following them up. See [Pipeline stages and contact sources](#pipeline-stages-and-contact-sources).
 
 ### Matching is case-insensitive and cross-script
 
@@ -80,8 +88,15 @@ curl "https://api.1club.ai/v1/platform/contacts/300" \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
-Returns the same object as one row of the search response. A `404` means no contact
-with that id exists in your organization.
+Returns the same object as one row of the search response, archived contacts
+included. A `404` means no contact with that id exists in your organization.
+
+Pass `include=overview` to also get `overview`: what staff see on the contact's
+profile before serving them - alerts such as an Amount Due or a required document
+left unsigned, the money they owe and hold, activity counts and the last visit, and
+the contact details the record lacks. The money needs `transactions:read` and gear
+on loan needs `products:read`, on top of `contacts:read`. Without them the rest is
+still returned, and `withheld` names what was left out and the scope it needs.
 
 ## Create a contact
 
@@ -105,7 +120,10 @@ Body fields:
 - `firstName` (required)
 - `lastName` (optional)
 - `email` (optional)
-- `phone` (optional)
+- `phone` (optional) - stored in international form (for example `+359877762016`) when it is a valid number for the organization's country, and as given otherwise
+- `pipelineStageId` (optional) - put the contact in the sales pipeline at this stage
+- `sourceId` (optional) - where the contact came from
+- `assignedToId` (optional) - the staff member following them up
 
 At least one of `email` or `phone` is required, so the person stays reachable and
 findable. Email is normalized to lower case.
@@ -114,12 +132,63 @@ Response (`201 Created`) is the created contact.
 
 <Warning>
   Search before you create. Creating a contact whose email already exists
-  returns `409`, and duplicate people are awkward to merge afterwards. The
+  returns `409`, and so does one whose phone number already belongs to a contact
+  with the same name (`code: "CONTACT_EXISTS"`; a shared number under a different
+  name, such as a household, is accepted). Both name the existing contact in
+  `details.contactId`. Duplicate people are awkward to merge afterwards, so the
   recommended flow is search, then create only when there is no match.
 </Warning>
 
 Creating a contact accepts an `Idempotency-Key`, so a retry after a timeout cannot
 produce a second record. See [Idempotency](/api-reference/channel-integration/idempotency).
+
+## Update a contact
+
+Requires the `contacts:write` scope. Send only what changes: `null` clears `lastName`, `email`, `phone`, `pipelineStageId`, `sourceId`, or `assignedToId`, and an omitted field is left alone.
+
+```bash
+curl -X PATCH "https://api.1club.ai/v1/platform/contacts/300" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "phone": "+359888654321" }'
+```
+
+Returns the updated contact.
+
+- The display `name` is always recomputed from `firstName` and `lastName`, and the phone is canonicalized as on create.
+- A contact must keep at least one of `email` or `phone`.
+- An `email` already used by another contact in the organization is a `409`.
+- The `email` of a contact whose address is also their 1Club login cannot be changed (`400`). The person changes it themselves.
+- Clearing a field the organization marks as required for staff is a `400` naming the field.
+- An archived contact cannot be edited.
+- `pipelineStageId` moves the contact in the sales pipeline, and `null` takes them out of it. A contact who has never been a customer is a lead while they are in the pipeline, so this can change `type`.
+
+## Archive a contact
+
+Requires the `contacts:delete` scope. `contacts:write` alone cannot archive, because archiving cancels things that restoring the contact does not bring back.
+
+```bash
+curl -X DELETE "https://api.1club.ai/v1/platform/contacts/300" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Nothing is destroyed. The contact is archived: they drop out of search, their history stays intact, and the response is the contact itself with `type: "archived"`. Archiving also releases everything they hold on the forward schedule: active memberships, bookings they organized, and bookings they are only a player on. Restoring the contact in 1Club does not restore any of these.
+
+- **Paid future bookings.** When the cancellation policy would keep money from a paid future booking, pass `keepCancellationCharge`: `false` refunds it in full, and `true` applies the policy. Without it, such an archive is refused with `409` and `code: "CANCELLATION_CHARGE_DECISION_REQUIRED"`, and nothing changes.
+- **Refused contacts.** A staff member or owner who can reach the admin portal, an instructor whose profile still has upcoming classes, and a contact paying part of a split bill on a future booking are refused with `409` and `code: "CONFLICT"`. Resolve those in 1Club first.
+- **Partial release.** If a membership or booking fails to release, the contact is still archived, and the response is `409` with `code: "ARCHIVE_INCOMPLETE"` and the unreleased items in `details.outstanding`. Repeat the same request to finish the job. Read `code` to tell this apart from a refusal: one means nothing happened, the other means the archive did.
+
+## Pipeline stages and contact sources
+
+Requires the `contacts:read` scope. These list the values `pipelineStageId` and `sourceId` refer to. Each returns `{ "data": [...] }` with no paging.
+
+```bash
+curl "https://api.1club.ai/v1/platform/pipeline-stages" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+- `GET /v1/platform/pipeline-stages` - each stage has `id`, `name`, `color`, `kind` (`open` or `cold`), `isDefault` (the stage new leads start in), `sortOrder`, and `contactCount`.
+- `GET /v1/platform/contact-sources` - each source has `id`, `name`, `color`, `isActive`, and `sortOrder`.
 
 ## Resolving a customer before booking
 
@@ -142,7 +211,7 @@ produce a second record. See [Idempotency](/api-reference/channel-integration/id
 
 ## What this API does not do
 
-- **No contact updates or deletes.** Profile fields are edited by the gym in 1Club. This keeps the CRM record authoritative on the gym's side.
+- **No hard deletes.** Archiving retires a contact and keeps their history. Restoring an archived contact is done in 1Club.
 - **No merging.** If duplicates appear, they are resolved inside 1Club.
 - **One-way sync.** 1Club never pushes contact changes back to you.
 - **Archived contacts cannot be booked.** Archiving is how a gym retires a contact. An archived contact is hidden from search and rejected as the person a booking is for, or as a player on one.

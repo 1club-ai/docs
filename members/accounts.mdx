@@ -1,20 +1,20 @@
 ---
 title: Accounts
 description: Group members into households or companies for shared billing, cross-member bookings, and consolidated reporting at /members/accounts.
-keywords: [accounts, household, company, family, corporate, primary contact, billing email, acting on behalf, roles, owner, dependent, employee]
+keywords: [accounts, household, company, family, corporate, primary contact, billing email, acting on behalf, roles, owner, child, dependent, employee]
 ---
 
 Accounts group related members under a single shared entity: a **household** for a family unit, or a **company** for an employer or organization that pays for its people. Owners and managers create and manage accounts, and members with the right account role - a parent, or a company admin - can book and buy for the others on the account.
 
 ## When to use it
 
-Accounts let you treat a family or a corporate client as one customer without merging their people into one profile. Memberships and bookings stay attached to each individual contact, but invoices, charges, and acting permissions roll up to the account.
+Accounts let you treat a family or a corporate client as one customer without merging their people into one profile. Memberships and bookings stay attached to each individual contact, while the account page gathers its members' memberships and charges, holds the invoices you issue to the account, and decides who may act for whom.
 
 Typical uses:
 
-- **A family that pays together** - a padel family where the parent is the account owner, every invoice rolls up to the household, and the parent books courts for the children.
-- **A corporate wellness client** - an employer whose employees each hold their own membership, with invoices sent to the company's billing email instead of each employee.
-- **A parent booking for a minor** - a martial-arts school where a parent books jiu-jitsu classes for their child, who as a dependent can only book for themselves.
+- **A family that pays together** - a padel family where the parent is the account owner, the household page shows what everyone owes, and the parent books courts for the children.
+- **A corporate wellness client** - an employer whose employees each hold their own membership, with the invoices you issue to the company sent to its billing email.
+- **A parent booking for a minor** - a martial-arts school where a parent books jiu-jitsu classes for their child, who as a **Child** on the household can only book for themselves.
 
 See [Worked examples](#worked-examples) for how to set up each of these.
 
@@ -24,8 +24,8 @@ See [Worked examples](#worked-examples) for how to set up each of these.
 
 A household represents a family or shared unit (parents and children, partners, roommates).
 
-- **Roles**: Owner, Adult, Dependent.
-- **Acting on behalf of**: Owners and Adults can book, check in, and manage memberships for any household member. Dependents can only act for themselves, and only Owners or Adults can book for a Dependent.
+- **Roles**: Owner, Adult, Child.
+- **Acting on behalf of**: Owners and Adults can book, check in, and manage memberships for any household member. A Child can only act for themselves, and only Owners or Adults can book for a Child.
 - **Naming**: Households are named automatically after the owner's surname, so you rarely type a name.
 - **Typical use**: A parent paying for their children's classes, or partners sharing a single membership invoice.
 
@@ -45,22 +45,22 @@ Staff with admin access can always act on behalf of any contact, regardless of a
 Accounts live at `/members/accounts`.
 
 1. Navigate to **Members** in the main menu.
-2. Open the three-dot overflow menu next to **Add member** and click **Accounts**.
+2. Open the three-dot overflow menu next to **Add member** and click **Accounts**. The entry is shown to staff who can read members.
 3. Use the tabs at the top to filter between **All**, **Households**, and **Companies**.
 
 To see contacts grouped under their accounts inside the member list instead, open the **Accounts** tab of **Members**.
 
-The list shows each account's name, type, primary contact, billing email, and member count. Click a row to open the account. When you have no accounts yet, the page shows an empty state prompting you to create your first one.
+The list shows each account's name, type, primary contact, billing email, and member count. Click a row to open the account, or use the row actions to view, edit, add a member to, or delete it. When you have no accounts yet, the page shows an empty state prompting you to create your first one.
 
 ## Creating an account
 
-1. From the Accounts page, click **Add account**.
+1. From the Accounts page, click **Add Account**. You need members create access.
 2. Choose the type with the **Household / Company** toggle. Type is set at creation and cannot be changed afterward.
 3. Fill in the details:
    - **Name** - required for companies. Hidden for households, which are named automatically after the owner's surname (you can rename a household later by editing it).
    - **Legal name**, **Tax number**, **Billing email**, **Billing address** - companies only.
    - **Primary contact** - the owner (household) or admin (company). Pick an existing contact or quick-add a new one; this person becomes the first member.
-4. For a **household**, add any **Family members** inline. Each row captures a new person's details and a role (for example, a Dependent child). They are created as contacts and attached to the household when you save.
+4. For a **household**, add any **Family members** inline with **Add Family Member**. Each row captures a new person's details and a role (for example, **Child**). They are created as contacts and attached to the household when you save.
 5. Click **Save**.
 
 The primary contact is added automatically as the first member, with the role **Owner** (household) or **Admin** (company).
@@ -76,44 +76,45 @@ Open an account to see four tabs:
 | **Charges** | What account members owe, with the payments and refunds against it |
 | **Invoices** | Invoices tied to any member of the account |
 
-The header's **Add** menu offers **Add member**, **Add membership**, and **Add invoice**. **Edit** changes the account details, and **Delete** removes the account (requires manage access).
+The header's **Add** menu offers **Add member**, **Add Membership** (opens the membership dialog for the primary contact), and **Issue invoice**. **Edit** changes the account details, including the primary contact. The **Add** menu and **Edit** need members update access, and **Delete** needs members delete access. Deleting asks you to confirm: member assignments are removed, and invoices stay but lose their link to the account.
 
 ## Managing members
 
 ### Add a member
 
 1. On the account, open the **Add** menu and choose **Add member** (or use the **Add** button on the account panel of a member's [profile](/members/member-profiles)).
-2. Enter the new person's details. The fields follow your org's settings and the chosen role (a Dependent, for example, does not need their own email).
+2. Choose **Existing contact** to pick someone already on file, or **New contact** to enter a new person's details. The fields follow your org's settings and the chosen role (a Child, for example, does not need their own email).
 3. Pick a role. The options match the account type:
-   - Household: Owner, Adult, Dependent
+   - Household: Owner, Adult, Child
    - Company: Admin, Employee
-4. Click **Save**. The person is created as a contact and attached to the account.
+4. Click **Save**. A new person is created as a contact, and either way the contact is attached to the account.
 
 A contact can belong to more than one account (for example, an adult in their own household who is also on a company account through their employer).
 
-### Change a role or remove a member
+### Remove a member or change their role
 
-- Roles are shown per member on the **Members** tab.
+- Roles are shown per member on the **Members** tab. The tab also offers an invite action for members without a portal login.
 - Use the member row's actions to **Remove member**. The primary contact cannot be removed while they hold that role. Removing a member detaches them from the account; their contact record, memberships, and history stay intact.
+- There is no action to change a member's role. Remove the member and add them again with the new role.
 
 ## Billing and consolidated invoicing
 
-Accounts aggregate billing across all their members.
+The account page brings together what its members owe.
 
-- **Invoices** - The account detail page's **Invoices** tab lists every invoice tied to any of its members. You can also raise an invoice against the account directly from the **Add** > **Add invoice** menu.
+- **Invoices** - The account detail page's **Invoices** tab lists the invoices issued to the account itself, from **Add** > **Issue invoice**. Invoices issued to an individual member stay on that member's profile and do not appear here.
 - **Charges** - What account members owe, with the payments and refunds against it, appears on the **Charges** tab.
-- **Billing email** - For companies, invoices and billing emails are sent to the account's billing email, not the individual employee.
+- **Billing email** - For companies, when you send an invoice issued to the account, it goes to the account's billing email instead of the primary contact's email.
 - **Memberships** - Memberships stay attached to the individual contact who uses them. The account's **Memberships** tab rolls them up so you can see every active membership the household or company is paying for.
 
-If you delete an account, its members are detached but their contact records, memberships, and past invoices stay intact.
+If you delete an account, its members are detached but their contact records, memberships, and past invoices stay intact. The invoices lose their link to the account.
 
 ## Acting on behalf of another member
 
 Account roles control who can book, check in, or buy for whom from the public app and front desk.
 
-- A household **Owner** or **Adult** can book a class for a **Dependent** in the same household.
+- A household **Owner** or **Adult** can book a class for a **Child** in the same household.
 - A company **Admin** can book for any **Employee** on the account.
-- **Dependents** and **Employees** can only act for themselves.
+- A **Child** or an **Employee** can only act for themselves.
 
 Staff with admin access can always act on behalf of any contact, regardless of account roles.
 
@@ -122,26 +123,26 @@ Staff with admin access can always act on behalf of any contact, regardless of a
 ### Set up a padel family with shared billing
 
 1. Open the paying parent's [profile](/members/member-profiles) and use the account panel's **Add** to create a **Household** (the parent is locked in as **Owner**).
-2. In the create dialog, add the partner as an **Adult** and each child as a **Dependent** in the inline family-members section.
+2. In the create dialog, add the partner as an **Adult** and each child as a **Child** in the inline family-members section.
 3. Assign each person their memberships or court packages.
-4. Every invoice now rolls up to the household for reporting and follow-up, and the parent can book courts for the children.
+4. The household's **Memberships** and **Charges** tabs now show the whole family in one place, and the parent can book courts for the children.
 
 ### Onboard a corporate gym client
 
 1. Create a **Company** account with the employer's legal name, tax number, and billing email.
 2. Set the HR or office manager as the **Primary contact** (role: **Admin**).
 3. Use **Add** > **Add member** to add each covered employee with the role **Employee**.
-4. Sell memberships to each employee. Invoices are sent to the company billing email.
+4. Sell memberships to each employee. Invoices you issue to the account from **Add** > **Issue invoice** are sent to the company billing email.
 
 ### Let a martial arts parent book for a minor
 
-1. On the child's household, confirm the child's role is **Dependent** and the parent's is **Owner** or **Adult**.
-2. The parent can now book jiu-jitsu classes for the child from the portal or front desk; the child, as a Dependent, can only book for themselves.
+1. On the child's household, confirm the child's role is **Child** and the parent's is **Owner** or **Adult**.
+2. The parent can now book jiu-jitsu classes for the child from the portal or front desk; the child can only book for themselves.
 
 ## Tips & best practices
 
 - Create households from the owner's member profile so the owner and naming are set for you.
-- Use **Dependent** for children without their own login - they do not need an email, and only Owners or Adults can book for them.
+- Use **Child** for children without their own login - they do not need an email, and only Owners or Adults can book for them.
 - Set the company **billing email** to a monitored inbox (AP, office manager) so invoices are not missed.
 - Keep memberships on the individuals who use them; rely on the account tabs for the consolidated view rather than assigning one shared membership.
 - Prefer removing a member over deleting the account when someone leaves - their history is preserved either way, but removal is more precise.
@@ -153,12 +154,13 @@ Staff with admin access can always act on behalf of any contact, regardless of a
 | Name field missing when creating a household | Households are auto-named after the owner's surname | Leave it - the name is derived; edit the household later to rename it |
 | Cannot change an account's type | Type is fixed at creation | Create a new account of the desired type and move the members |
 | A member row has no **Remove** action | That member is the account's primary contact | Reassign the primary contact by editing the account, then remove them |
-| Company invoices going to an employee, not the company | No billing email set on the account | Edit the company and add a **Billing email** |
-| A dependent cannot book for a sibling | Dependents can only act for themselves | Have an Owner or Adult make the booking |
+| Company invoices going to an employee, not the company | No billing email set on the account, or the invoice was issued to the employee rather than the account | Edit the company and add a **Billing email**, and issue company invoices from the account's **Add** > **Issue invoice** |
+| A child cannot book for a sibling | A Child can only act for themselves | Have an Owner or Adult make the booking |
+| An invoice is missing from the account's **Invoices** tab | It was issued to a member, not to the account | Open it from the member's profile |
 
 ## Related
 
 - [Member list](/members/member-list) - find and filter individual contacts
 - [Member profile](/members/member-profiles) - a single contact's accounts, memberships, and history
 - [Memberships](/sales/memberships) - plans assigned to individual contacts
-- [Invoices](/sales/invoices) - billing documents that can be grouped by account
+- [Invoices](/sales/invoices) - billing documents, which can be issued to an account

@@ -32,7 +32,7 @@ Promotions are always one of two types. Pick the type when you create the promot
 | **Can be scoped to a class/area/instructor?** | No - wallet credit is universal | Yes (see **Scope** below) |
 | **Effect on the ledger** | Creates a wallet transaction | Reduces the booking/order total |
 | **Auto-apply at checkout** | No | Yes - see [Auto-apply](#auto-apply-trials-and-intro-offers) |
-| **Can target a specific plan?** | No | Yes - via **Plan** in the Valid for section |
+| **Can target a specific plan?** | No | Yes - via **Applies to** in the **Plans** section |
 
 ## Creating a promotion
 
@@ -40,15 +40,16 @@ Promotions are always one of two types. Pick the type when you create the promot
 2. Click **Add Promotion** and choose **Voucher** or **Discount** as the type.
 3. Fill in:
    - **Name** - shown to staff, on the member-facing receipt and, for an auto-apply discount, on your booking calendar beside the discounted price (for example "Buy 1 get 1"). Use the translate button next to the field to give it a name in every language your site supports.
+   - **Auto-apply** *(discounts only)* - applies the discount at checkout automatically, with no code needed. Turning it on hides the **Code** field. See [Auto-apply](#auto-apply-trials-and-intro-offers).
    - **Code** *(optional)* - what members type. Codes are normalised to UPPERCASE and must be unique within the organization. If you leave it blank, the promotion can still be applied by staff from the dashboard but won't have a code to share.
    - **Description** - shown to members where the promotion appears.
-   - **Value** - for vouchers, the credit amount; for discounts, either a percentage (max 100) or a fixed amount, depending on **Discount format**.
-4. Set the active window, caps, visibility, audience and scope (see below).
+   - **Amount** - for vouchers, the credit amount; for discounts, either a percentage (max 100) or a fixed amount. Pick **%** or your currency symbol from the selector inside the field.
+4. Set the visibility, active window, caps, plans, scope, conditions and audience (see below).
 5. **Save.**
 
 ## Scheduling (active window)
 
-Each promotion has an optional **Starts at** and **Ends at**. The list view shows a status badge:
+Each promotion has an optional **Starts At** and **Ends At** in its **Active window** section. The list view shows a status badge:
 
 - **Scheduled** - created but the start time hasn't passed yet. Codes won't validate.
 - **Live** - within the active window. Available to redeem.
@@ -60,8 +61,8 @@ Leaving both fields empty makes the promotion live indefinitely.
 
 Two independent limits control how often a promotion can be redeemed:
 
-- **Max redemptions** - total across all members. Once reached, the promotion stops working for everyone.
-- **Max redemptions per member** - how many times a single member can use it. Must be less than or equal to the global cap.
+- **Max Redemptions** - total across all members. Once reached, the promotion stops working for everyone.
+- **Max Per Member** - how many times a single member can use it. Must be less than or equal to the global cap.
 
 If a booking that consumed a promotion is later cancelled, the redemption is rolled back automatically - the global counter decrements and the member's per-member allowance is freed.
 
@@ -70,54 +71,63 @@ If a booking that consumed a promotion is later cancelled, the redemption is rol
 Controls where the promotion shows up in the member portal:
 
 - **Public** - listed publicly (e.g. signup flow), visible to non-members.
-- **Member-only** - visible to signed-in members.
-- **Private** - never listed; can only be applied by typing the code or by staff action. Use this for codes you distribute through email, social, or partner channels.
+- **Admin & Member** - visible to signed-in members.
+- **Admin only** - never listed; can only be applied by typing the code or by staff action. Use this for codes you distribute through email, social, or partner channels.
 
 ## Audience targeting (segment filter)
 
-Restrict who can redeem by:
+The **Audience** section restricts who can redeem by:
 
-- **Member types** - only contacts of these types can redeem.
+- **Member Types** - only contacts of these types can redeem.
+- **Membership Plans** - only contacts holding a membership on one of these plans.
 - **Tags** - only contacts carrying at least one of these tags.
 
-Within a list the match is **OR** (any tag matches). Between lists it's **AND** (the member must match both the type filter and the tag filter when both are set). Leave both empty to allow everyone in the audience defined by **Visibility**.
+Within a list the match is **OR** (any tag matches). Between lists it's **AND** (the member must match every filter that is set). Leave them all empty to allow everyone in the audience defined by **Visibility**.
 
-## Scope (valid for) - discounts only
+## Scope (plans and valid for) - discounts only
 
-A discount can target two independent surfaces. List entries on either surface; the discount is valid when the purchase matches **any** declared surface.
+A discount can target two independent surfaces: the plans being bought, and the bookings being made.
 
-**Plan surface - what plan is being purchased:**
+**Plans - what plan is being purchased:**
 
-- **Plan** - the discount applies only when the buyer is purchasing one of the selected plans. Used for first-purchase intro pricing, trials, and plan-specific promo codes. Required for [auto-apply](#auto-apply-trials-and-intro-offers).
+In the **Plans** section, **Applies to** sets whether the discount also applies when someone buys a membership or pass:
 
-**Booking surface - what is being booked:**
+- **Bookings only** (the default) - memberships and passes are not discounted, only paid bookings.
+- **All plans** - applies when buying any membership or pass. A membership keeps the discounted price on renewals. This also discounts bookings unless you restrict **Valid for** below. Not available with **Auto-apply**.
+- **Selected plans** - applies to the plans you pick. Bookings still follow **Valid for** below. Used for intro pricing, trials, and plan-specific promo codes.
 
-- **Class types** - applies only when the booking is for one of these class types.
-- **Area types** - applies only when the booking targets one of these area types.
-- **Instructor types** - applies only when the assigned instructor is one of these types.
+When the discount applies to plans, **First purchase only** limits it to people who have never had one of these plans. It is on by default for an auto-apply discount and off for a coded one. Turn it off to apply the discount on every purchase (for example, a members' price for contacts with a tag). **Max Per Member** can still limit how often.
+
+**Valid for - what is being booked:**
+
+Set **Valid for** to **All bookings** for every visit, or to **Selected bookings** to limit it:
+
+- **Classes** - applies only when the booking is for one of these class types.
+- **Areas** - applies only when the booking targets one of these area types.
+- **Instructors** - applies only when the assigned instructor is one of these types.
 - **Clubs** - applies only to bookings at the selected gyms. Leave empty for every gym. Use it when two of your gyms share the same area type but the offer is for one of them.
 
-A promotion with both surfaces (e.g. "Plan: Annual + Class types: Yoga") applies to purchases of the listed plans **and** to bookings of the listed class types. Leaving every surface empty makes the discount valid for any booking or order (but never for a plan purchase, since plan eligibility is opt-in).
+A promotion with both surfaces (e.g. **Selected plans**: Annual, and **Classes**: Yoga) applies to purchases of the listed plans **and** to bookings of the listed class types. With **Applies to** on **Bookings only** and **Valid for** on **All bookings**, the discount is valid for any booking or order, but never for a plan purchase.
 
 Vouchers are wallet credit, so they aren't scoped - once a voucher is redeemed the credit can be spent on anything the wallet can pay for.
 
 ## Auto-apply (trials and intro offers)
 
-A discount can be set to **Auto-apply**, meaning it lands silently at checkout for any first-time buyer of the targeted plan. No code needed. This is how you build trials, free days, and first-month-off offers.
+A discount can be set to **Auto-apply**, meaning it lands silently at checkout with no code needed. Paired with **First purchase only**, this is how you build trials, free days, and first-month-off offers.
 
 ### How it works
 
 1. Create a **Discount** promotion.
-2. Pick one or more plans in **Valid for** > **Plan**. Auto-apply requires at least one eligible plan or booking scope; the trial and intro-offer use cases below are all plan-based.
-3. Set **Value** to the discount you want (100% for a free trial, e.g. 50 for "50% off the first period").
-4. Toggle **Auto-apply** on.
+2. In the **Plans** section, set **Applies to** to **Selected plans** and pick one or more plans. Auto-apply can't target **All plans**, and an auto-apply discount that applies to **Bookings only** needs **Valid for** set to **Selected bookings** with at least one class, area, or instructor type.
+3. Set **Amount** to the discount you want (100% for a free trial, e.g. 50 for "50% off the first period").
+4. Toggle **Auto-apply** on. **First purchase only** turns on with it.
 5. Save.
 
 From then on, anyone buying one of those plans **for the first time** automatically gets the discount applied to the membership creation charge. No code entry, no admin step.
 
 ### First-time buyer rule
 
-Auto-apply only fires for a contact who has **no prior membership** on any of the targeted plans - active, expired, or cancelled. Once they've ever held a membership on one of those plans, they no longer qualify. This prevents the same person re-triggering an intro offer by signing up again.
+With **First purchase only** on, the discount only fires for a contact who has **no prior membership** on any of the targeted plans - active, expired, or cancelled. Once they've ever held a membership on one of those plans, they no longer qualify. This prevents the same person re-triggering an intro offer by signing up again. Turn **First purchase only** off for a standing price, such as a members' rate for a tag.
 
 When more than one auto-apply promotion could fire for the same plan and contact, the one with the **largest computed savings** wins. Only one applies.
 
@@ -135,7 +145,7 @@ Vouchers credit the wallet; they have no checkout-time line to silently discount
 
 ## Attaching promotions to a plan
 
-The plan detail page (**Sales** > **Plans**, then open a plan) has a **Promotions** section listing every promotion whose **Valid for** > **Plan** includes this plan. From there you can:
+The plan detail page (**Sales** > **Plans**, then **View Details** on a plan) has a **Promotions** section listing every promotion that targets this plan. From there you can:
 
 - **Add promotion** - opens the promotion editor pre-scoped to this plan. Pick the shape you want: 100% auto-apply (trial), code-driven percentage off, fixed-amount intro, etc.
 - **Edit** any attached promotion in place.
@@ -147,6 +157,7 @@ This is the most common entry point when you're building a trial for a specific 
 
 You can also require a checkout context before a discount applies. The **Conditions** section of the promotion has:
 
+- **First booking only** - the discount applies only to a member with no earlier booking at your gym, their own or one they were added to. This is different from **Max Per Member**: that caps how often the discount is used, while this decides who it is offered to. Cancelled bookings and check-ins without a booking don't count.
 - **Minimum people** - the discount applies only when the class booking party has at least that many people (minimum 2). Use it to reward group bookings - for example, a discount that kicks in only when someone books a class for three or more. Leave it empty for no people requirement. See [Party bookings](/schedule/classes) for how party sizes work.
 - **Only at certain times** - days (optional; empty means every day) plus a start and end time, read on the gym's clock. Choose how the booking must match the window:
   - **Starts in the window** - the whole booking qualifies when it starts inside the window. A 15:00 booking that runs to 17:00 qualifies for an 8:00 to 16:00 offer. This is what most offers mean by "book between 8:00 and 16:00".
@@ -169,9 +180,9 @@ Signed-in members see offers they qualify for. Visitors who are not signed in do
 
 A padel gym wants a second hour free on daytime bookings at one of its gyms:
 
-1. Create a **Discount** with **Discount format** set to percentage and **Value** 50.
+1. Create a **Discount** with **Amount** 50 and **%** selected.
 2. Name it "Buy 1 get 1" and translate the name if your site has more than one language.
-3. In **Valid for**, switch to **Selected bookings**, turn on **Areas** and pick your court type. Under **Clubs**, pick the gym running the offer. An auto-apply discount needs at least one booking type, so **All bookings** can't be saved with **Auto-apply** on.
+3. Leave **Applies to** on **Bookings only**. In **Valid for**, switch to **Selected bookings** and pick your court type under **Areas**. Under **Clubs**, pick the gym running the offer. An auto-apply discount needs at least one booking type, so **All bookings** can't be saved with **Auto-apply** on.
 4. Under **Conditions**, turn on **Only at certain times** and set 08:00 to 16:00 with **Starts in the window**, and set **Minimum length** and **Maximum length** both to 120. Leave the days empty for every day.
 5. Turn on **Auto-apply** and save.
 
@@ -220,7 +231,7 @@ On **Sales** > **Promotions**, click **View Analytics** to open the promotions d
 ## Retiring a promotion
 
 - **Promotions with no redemptions** can be deleted outright.
-- **Promotions that have ever been redeemed** cannot be deleted - this preserves the audit trail on past bookings and wallet transactions. To stop them being used, set **Ends at** to a time in the past (or to now). The status badge becomes **Ended** and validation returns "expired".
+- **Promotions that have ever been redeemed** cannot be deleted - this preserves the audit trail on past bookings and wallet transactions. To stop them being used, set **Ends At** to a time in the past (or to now). The status badge becomes **Ended** and validation returns "expired".
 
 ## Validation reasons (admin reference)
 
@@ -231,24 +242,32 @@ When validating a code in the admin (for example, on a booking dialog) you may s
 - **expired** - past the end time.
 - **max_redemptions_reached** - global cap hit.
 - **max_redemptions_per_contact_reached** - this member has used it as many times as allowed.
+- **contact_not_found** - the member couldn't be found.
 - **member_type_mismatch** - the contact's type isn't in the segment filter.
 - **tag_mismatch** - the contact has none of the required tags.
+- **membership_plan_mismatch** - the contact doesn't hold a membership on one of the audience's **Membership Plans**.
+- **segment_not_eligible** - the contact doesn't match the promotion's audience.
 - **class_type_not_eligible** - discount is scoped to class types and this booking isn't one of them.
 - **area_type_not_eligible** - discount is scoped to area types and this area isn't one of them.
 - **instructor_type_not_eligible** - discount is scoped to instructor types and this instructor isn't one of them.
 - **plan_not_eligible** - discount is scoped to specific plans and this plan isn't one of them. Also fires when the buyer is purchasing a plan and the promotion has no plan rule set (plan eligibility is opt-in).
 - **booking_not_eligible** - the booking-surface scope is set but the booking doesn't satisfy it (catch-all when the granular reason can't be narrowed).
 - **scope_not_eligible** - the promotion declares both plan and booking surfaces, and neither matches.
+- **min_people_not_met** - the booking party is smaller than the **Minimum people** condition.
 - **club_not_eligible** - the discount is limited to some gyms and this booking is at another one.
 - **time_not_eligible** - the booking does not start in (or fit inside) the promotion's time of day.
 - **duration_not_eligible** - the booking is shorter or longer than the promotion's booking length.
-- **not_first_time_buyer** - an auto-apply discount was evaluated for a contact who already holds (or held) a membership on one of the targeted plans.
+- **not_first_time_buyer** - a **First purchase only** discount was evaluated for a contact who already holds (or held) a membership on one of the targeted plans.
+- **not_first_booking** - a **First booking only** discount was evaluated for a member who already has a booking.
+- **exceeds_outstanding** - the discount is more than what is still owed. Lower it, or refund the difference instead.
+- **nothing_outstanding** - nothing is left to pay on this membership. Refund the member instead.
+- **settled_after_apply** - the charge the discount came off is already paid. Refund the member instead.
 - **wrong_type** - a voucher code was entered at checkout (vouchers credit the wallet; they aren't applied as a discount).
 
 ## Best practices
 
 - **Cap per-member use** for codes you intend to share publicly. A per-member limit of 1 prevents the same member redeeming a public code repeatedly.
-- **Prefer Ends at over deletion.** Setting an end date is reversible and keeps the redemption history intact.
+- **Prefer Ends At over deletion.** Setting an end date is reversible and keeps the redemption history intact.
 - **Use segment filters for re-engagement campaigns.** Combine a "lapsed" tag with a generous voucher to bring members back.
 - **Scope discounts to fill specific inventory.** A 30% discount valid only for low-demand class types is a more efficient lever than a blanket discount. A time-of-day auto-apply discount does the same for quiet hours, and your calendar advertises it for you.
 - **Use a promotion, not a pricing rule, for an offer you want members to see.** Pricing rules set your everyday prices silently. A promotion is named on the calendar and the receipt, can be capped, and shows up in promotion analytics.

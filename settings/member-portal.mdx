@@ -17,7 +17,7 @@ Typical uses:
 - **A public class list for an ad** - a padel gym marks its **Classes** page public, so an ad link shows the weekly classes to anyone and booking prompts a sign-in.
 - **Grouping programs** - a martial-arts gym puts its jiu-jitsu and muay-thai pages in one "Programs" folder in the portal navigation.
 - **Two booking calendars** - a yoga studio adds a second **Calendar** page so reformer sessions and mat classes each get their own calendar.
-- **Self-service help** - a climbing gym turns on the **AI assistant** so members can ask what beginner classes are on this week and get booking help without messaging a person.
+- **Self-service help** - a climbing gym turns on the **AI Assistant** so members can ask what beginner classes are on this week and get booking help without messaging a person.
 
 See [Worked examples](#worked-examples) for the steps behind each of these.
 
@@ -39,27 +39,29 @@ If your organization has no slug yet, the portal cannot generate a URL. The page
 
 The portal settings live under **Settings** > **Member Apps** > **Member Portal**. A live preview on the same screen shows the portal exactly as members will see it as you edit, and an **Open** button views it in a new tab.
 
-### Enable member portal
+### Enable Member Portal
 
 The master switch. When off, members cannot reach the portal at all and the preview is replaced with a disabled notice. Turn it on once your slug is set and you have decided which pages to show. Turning the portal off does not delete any member data; it only closes the front door.
 
-### AI assistant
+### AI Assistant
 
-Adds an AI assistant launcher inside the portal. Members can ask it to help with bookings, memberships, and general club information. This toggle is only editable while the portal is enabled.
+Adds a chat launcher inside the portal that answers member questions, such as help with bookings, memberships, and general gym information. This toggle is only editable while the portal is enabled.
 
-### Legal and cookie consent
+### Legal documents and cookie consent
 
-Turns on legal documents and the cookie-consent experience for the portal. Enabling it seeds a default set of legal documents for your organization if they are missing (the seeding is safe to run repeatedly, so it never duplicates documents you already have). This portal legal toggle is independent of the website's own legal setting.
+The **Legal documents & cookie consent** toggle shows the cookie-consent banner in the portal and links to your policy documents. This portal toggle is independent of the website's own legal setting.
+
+Turning it on doesn't create any documents. If you don't have policies yet, click **Publish starter policies**, which appears once the toggle is on. It creates a basic privacy and cookie policy in each of your languages, ready to edit, and never overwrites a document you already have. The same documents are shared with your website.
 
 ## Portal pages
 
-The **Portal Pages** panel is where you build the portal's navigation. Each row is a page that members see in their sidebar. You control the set, the order, the labels, the icons, and which pages are public.
+The **Portal Pages** panel is where you build the portal's navigation. It appears once the portal is enabled. Each row is a page that members see in their sidebar. You control the set, the order, the labels, the icons, and which pages are public.
 
 ### Adding and removing pages
 
 - Use **Add** to pick from pages that are not yet enabled.
 - Reorder enabled pages to change the order they appear in the portal navigation.
-- Some page types can be added more than once. For those, the Add menu offers **Add another ...** so you can create a second instance (for example, more than one booking calendar). Extra instances get their own slug and label.
+- Every page type except **Home**, **Inbox**, **My Account**, and the area-type and instructor-type pages can be added more than once. For those, the Add menu offers **Add another ...** so you can create a second instance (for example, more than one booking calendar). Extra instances get their own slug and label.
 
 ### Page types you can enable
 
@@ -73,14 +75,16 @@ Core pages:
 
 Optional pages:
 
+- **Products** - your shop of products members can order.
 - **Posts** - announcements and updates.
+- **Tournaments** - your tournaments.
 - **FAQs** - a frequently-asked-questions page.
-- **How to guides** - help content.
-- **Calendar** - a booking calendar. Supports multiple instances.
-- **Book** - a search-and-book entry point.
+- **How to Guides** - help content.
+- **Calendar** - a booking calendar.
+- **Book** - the booking experience: availability, a live calendar, and the day's group activities.
 
 <Note>
-The old combined **Schedule** page is marked deprecated in the picker. New portals should use the unbundled pages (Classes, Calendar, Book) instead of the single Schedule page.
+The old **Schedule** page is marked **(deprecated)** in the picker and now behaves as a **Classes** page. New portals should use the unbundled pages (Classes, Calendar, Book) instead.
 </Note>
 
 In addition to the built-in pages, the picker automatically offers one page per **bookable area type** and one page per **instructor type** you have configured, so members can browse, for example, "Courts" or "Coaches" directly. These are driven by your [area types](/settings/areas) and [instructor types](/staff/instructors); add or rename them there and they appear here.
@@ -91,8 +95,11 @@ Open a page's settings to control how it appears:
 
 - **Icon** - the navigation icon for the page.
 - **Label** - a custom navigation label. Leave it empty to use the default, and use the translate option to provide per-locale labels.
-- **Public** - whether unauthenticated visitors can see this page (see below).
+- **URL slug** - the page's path segment under `/p/`. Letters, numbers, and dashes.
+- **Public** - whether unauthenticated visitors can see this page (see below). **Copy link** copies the page's address to share.
 - **Group** - which group (folder) the page belongs to.
+
+**Calendar**, **Book**, and **Classes** pages have extra options of their own, such as which class types a **Classes** page lists.
 
 ### Page groups
 
@@ -104,7 +111,7 @@ A public page is visible to visitors who have not signed in. This lets prospects
 
 ## How saving works
 
-Changes to the enable toggle, AI assistant, pages, groups, and public flags are staged locally and a floating save bar appears when there are unsaved changes. Click **Save** to apply them. The **Legal and cookie consent** toggle is the exception: it saves immediately when you flip it.
+Changes to the enable toggle, AI assistant, pages, groups, and public flags are staged locally and a floating save bar appears when there are unsaved changes. Click **Save** to apply them. The **Legal documents & cookie consent** toggle is the exception: it saves immediately when you flip it.
 
 ## Worked examples
 
@@ -122,7 +129,7 @@ A yoga and pilates studio wants one calendar for reformer sessions and one for m
 
 ### Climbing gym turns on the AI assistant
 
-A climbing gym enables the portal, then flips on **AI assistant** so members can ask "what beginner classes are on this week?" and get booking help without messaging a human. Because the toggle only works while the portal is enabled, they enable the portal first.
+A climbing gym enables the portal, then flips on **AI Assistant** so members can ask "what beginner classes are on this week?" and get booking help without messaging a human. Because the toggle only works while the portal is enabled, they enable the portal first.
 
 ## Tips and best practices
 
@@ -136,13 +143,14 @@ A climbing gym enables the portal, then flips on **AI assistant** so members can
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| Portal preview shows a "disabled" notice | The portal is turned off | Flip **Enable member portal** on and save |
+| Portal preview shows a "disabled" notice | The portal is turned off | Flip **Enable Member Portal** on and save |
 | "Organization Slug Required" warning, no portal URL | The organization has no slug | Set the **Slug** on the [Organization](/settings/organization) Details page |
-| AI assistant toggle is greyed out | The portal is disabled | Enable the portal first, then set the AI assistant toggle |
+| **AI Assistant** toggle is greyed out | The portal is disabled | Enable the portal first, then set the **AI Assistant** toggle |
 | A page members expect is missing | It is not in the enabled list | Add it from the **Add** menu in Portal Pages and save |
 | Prospects cannot see classes without signing in | The page is not marked public | Open the page's settings and turn on **Public** |
 | Custom portal domain not used | The domain is not verified | Verify a **Portal subdomain** domain under **Settings** > **Organization** > **Domains** |
 | A page's custom label is not showing in another language | No translation set for that locale | Use the translate option in the page's label settings |
+| The cookie banner links to missing policies | No legal documents exist yet | Click **Publish starter policies** under the legal toggle |
 
 ## Related
 

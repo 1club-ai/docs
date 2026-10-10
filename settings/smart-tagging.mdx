@@ -1,10 +1,10 @@
 ---
 title: Smart tagging
-description: Rule-based tags that 1Club applies to members automatically, segmenting them by payments, lifecycle, membership expiry, attendance, loyalty, age, household role, language, and the sports they book.
-keywords: [smart tags, automatic tagging, member segmentation, attendance tags, financial tags, lifecycle tags, membership expiry, loyalty tags, interest tags, language tags, sync tags]
+description: Rule-based tags that 1Club applies to members automatically, segmenting them by payments, lifecycle, membership expiry, attendance, loyalty, age, saved payment methods, household role, language, and the sports they book.
+keywords: [smart tags, automatic tagging, member segmentation, attendance tags, financial tags, lifecycle tags, membership expiry, loyalty tags, interest tags, language tags, payment method tags, frozen, sync tags]
 ---
 
-Smart tagging applies tags to your contacts automatically based on rules you configure once. The engine looks at how a member pays, how long they've been with you, when their membership expires, how often they check in, how active they've been overall, their age, their household role, their preferred language, and which sports they book. From then on 1Club keeps every contact's tags in sync, so staff can filter and target members without curating lists by hand. Smart tags sit next to manual tags everywhere they're used - member lists, [promotion segments](/sales/promotions), and messaging - but you can't add or remove a smart tag on an individual profile; you change the rule instead.
+Smart tagging applies tags to your contacts automatically based on rules you configure once. The engine looks at how a member pays, which payment methods they have saved, how long they've been with you, when their membership expires, how often they check in, how active they've been overall, their age, their household role, their preferred language, and which sports they book. From then on 1Club keeps every contact's tags in sync, so staff can filter and target members without curating lists by hand. Smart tags sit next to manual tags everywhere they're used - member lists, [promotion segments](/sales/promotions), and messaging - but you can't add or remove a smart tag on an individual profile; you change the rule instead.
 
 ## When to use it
 
@@ -37,16 +37,16 @@ Both types behave identically when you filter or segment. A promotion that targe
 
 The engine treats contacts differently depending on what they are:
 
-- **Members** (contacts with bookings or memberships) are eligible for every enabled category.
-- **Leads** (contacts with no activity yet) only receive the demographic and lifecycle-of-contact categories: **Age**, **Contact stages**, **Relationship**, and **Language**. The activity-based categories (Attendance, Financial, Lifecycle, Loyalty, Membership, Interest, Progression, Assessment) don't apply until the lead becomes a member.
+- **Members, drop-ins, lapsed members, and leads** (anyone who has booked, checked in, or held a plan, or who is in your [pipeline](/members/leads)) are eligible for every enabled category.
+- **Contacts with no activity** (never booked, checked in, or held a plan, and not in your pipeline) only receive **Age**, **Contact stages**, **Relationship**, **Language**, and **Payment method**. The activity-based categories (Attendance, Financial, Lifecycle, Loyalty, Membership, Interest, Progression, Assessment) don't apply until the contact becomes a lead or a customer.
 - **Staff** (instructors, managers, admins) never receive smart tags. Any auto-tag they picked up before becoming staff is stripped on the next evaluation; their manual tags are kept.
 - **Archived contacts** are frozen - their tags stay as a snapshot and are not recomputed.
 
 ## Categories
 
-Each category has an **Enable this tag category** switch. Within a category, a contact gets at most one tag - the highest matching tier - except **Interest** (one tag per qualifying sport) and **Relationship** (a contact can be both Parent and Child). Disable a category and every tag it produced is removed on the next sync.
+Each category has an **Enable this tag category** switch. Within a category, a contact gets at most one tag - the highest matching tier - except **Interest** (one tag per qualifying sport), **Relationship** (a contact can be both Parent and Child), **Payment method** (one tag per kind of saved method), and **Progression** and **Assessment** (a member can carry more than one). Disable a category and every tag it produced is removed on the next sync.
 
-The categories below are listed in the order they appear on the page. Four are enabled out of the box: **Financial**, **Lifecycle**, **Membership**, and **Contact stages**.
+The categories below are listed in the order they appear on the page. Five are enabled out of the box: **Financial**, **Lifecycle**, **Membership**, **Contact stages**, and **Payment method**.
 
 ### Financial (enabled by default)
 
@@ -62,13 +62,17 @@ The field is labelled **Min Days Overdue**. The **Unpaid** tier is fixed and can
 
 ### Lifecycle (enabled by default)
 
-Tracks how long a member has been with you, counted from the start date of their first membership. Requires an **active** membership, so a lapsed member drops out of the category.
+Tracks where each person is in their journey. A contact gets the first of these that applies:
 
-Defaults: **Trial** (day 1+), **Probation** (day 15+), **Active** (day 46+). The field is labelled **Min Days Since First Membership**.
+- **Pipeline stage** - a contact in your [pipeline](/members/leads) carries their stage as their Lifecycle tag (for example "New lead" or "Contacted"). The page lists one row per stage; rename or add stages under **Settings** > **Members** > **Pipeline** (**Edit in Pipeline settings**).
+- **Frozen** - every recurring membership or [season pass](/schedule/season-passes) the member holds is paused. A paused plan next to an active one isn't Frozen. This row is fixed: you can rename and recolour it, but not delete it.
+- **Tenure tags** - how long the member has been with you, counted from the start date of their first plan. Requires a plan that is active or pending, so a lapsed member drops out of the category. A day pass or a class pack starts the count as much as a recurring membership does. Someone who visited before buying their first plan doesn't get **Trial**, but gets the later tiers as usual.
+
+Tenure defaults: **Trial** (day 1+), **Probation** (day 15+), **Active** (day 46+). The field is labelled **Min Days Since First Membership**.
 
 ### Membership (enabled by default)
 
-Monitors where a member sits relative to their membership expiry date. A **positive** value means days *before* expiry; a **negative** value means days *after*.
+Monitors where a member sits relative to their membership expiry date. The field is labelled **Days Before Expiry**: a **positive** value means days *before* expiry; a **negative** value means days *after*.
 
 Defaults: **Expiring** (7 days before), **Expiring Soon** (3 days before), **Expired** (7 days after).
 
@@ -100,6 +104,12 @@ Defaults: **Infant** (0-4), **Kid** (5-12), **Junior** (13-17), **Adult** (18-64
 Tags contacts by how recently they were added - useful for spotting fresh leads. The field is **Max Days Since Created**.
 
 Default: **New** (within 14 days).
+
+### Payment method (enabled by default)
+
+Tags contacts by the kinds of payment method they have saved in Stripe and can still be charged to. An expired card doesn't count. There's one fixed row per kind: **Card**, **ACH Debit**, **SEPA Debit**, **Bacs Debit**, **Link**, and **Other Payment Method**. As with Relationship, you can only edit each row's display name and colour.
+
+A contact gets one tag per kind they have saved, and it applies to contacts with no activity too, since someone can save a card before they ever book. The tags update when a payment method is saved or removed, not in the nightly run. If you turn the category off and on again, 1Club rebuilds the tags from Stripe in the background. A gym that doesn't use Stripe sees none of these tags.
 
 ### Relationship (disabled by default)
 
@@ -138,7 +148,7 @@ The average takes every score on those assessments as a share of its template's 
 
 ### Engagement scoring (disabled by default)
 
-Sitting at the bottom of the same page, engagement scoring is a related feature rather than a tag category. When enabled, it computes a member engagement score from four weighted inputs - **Financial**, **Services**, **Physical**, and **Engagement** - whose weights must sum to 100%. The score surfaces on the [member engagement](/analytics/marketing) view; it doesn't create tags.
+Sitting at the bottom of the same page, engagement scoring is a related feature rather than a tag category. When enabled, it computes a member engagement score from four weighted inputs - **Financial**, **Services**, **Physical**, and **Engagement** - whose weights must sum to 100%. The score surfaces on the [engagement dashboard](/analytics/engagement); it doesn't create tags.
 
 ## Configuring rules
 
@@ -146,20 +156,20 @@ Sitting at the bottom of the same page, engagement scoring is a related feature 
 2. For each category:
    - Toggle **Enable this tag category** on or off.
    - Edit a tier - adjust the threshold (visits, days, age range, and so on) and rename or recolour the tag.
-   - Add a tier with **Add tag** (not available for Relationship, Language, Interest, Progression, or Assessment, whose rows are fixed or derived).
-   - Delete a tier you don't need (the fixed Unpaid, Parent/Child, language, progression, and assessment rows can't be deleted).
+   - Add a tier with **Add Tag** (not available for Payment method, Relationship, Language, Interest, Progression, or Assessment, whose rows are fixed or derived).
+   - Delete a tier you don't need (the fixed Unpaid, Frozen, payment method, Parent/Child, language, progression, and assessment rows can't be deleted). Lifecycle's pipeline stage rows are managed under **Settings** > **Members** > **Pipeline**.
 3. Save with the floating save alert at the bottom of the page.
 
 Tag names must be unique within a category, and the dialog validates thresholds (for example, minimum visits can't be negative and overdue days must be at least 1).
 
-After you save, 1Club syncs the tag registry (renames, new tiers, deletions) and re-evaluates affected contacts. To see a big change take effect immediately, use **Sync tags** (below).
+After you save, 1Club updates the tags themselves right away: a renamed tier is renamed on every contact that has it, and a deleted tier comes off every contact. Saving doesn't re-evaluate who qualifies for each tag - that happens on the next sync. To apply a threshold change or a newly enabled category now, use **Sync tags** (below).
 
 ## How and when tags are kept in sync
 
 Smart tags are recomputed:
 
-- **Reactively**, on the events that could shift a tag - when a contact is created, a membership is created or cancelled, a payment succeeds or fails, a booking is created, cancelled, marked no-show, or checked in, a member is promoted or a level is corrected or removed, an assessment is added, edited or removed, or a member has a birthday. The affected contact is re-evaluated right away.
-- **Nightly**, as a backstop, for every contact in the organization (runs at 03:00 UTC). This is what catches purely time-based transitions - a membership crossing its expiry window, a lead ageing past "New", a household-role change.
+- **Reactively**, on the events that could shift a tag - when a contact is created or moves to another pipeline stage, a membership is created, cancelled, paused, resumed, or expires, a payment succeeds or fails, a booking is created, cancelled, marked no-show, checked in, or completed, a payment method is saved or removed, a member is promoted or a level is corrected or removed, an assessment is added, edited or removed, or a member has a birthday. The affected contact is re-evaluated right away.
+- **Nightly**, as a backstop, for every contact in the organization (runs at 03:00 UTC). This is what catches purely time-based transitions - a membership crossing its expiry window, a contact ageing past "New", a household-role change.
 - **On demand**, via the **Sync tags** button on the Smart tagging page. It re-evaluates everyone and reports how many members were updated.
 
 Re-evaluation only touches tags the engine manages. Manual tags are never removed by a sync.
@@ -191,18 +201,18 @@ You add and remove manual tags on a single contact from the tag chips on their p
 
 ## Renaming or disabling categories
 
-- **Renaming a tier** updates the tag name across every contact that has it.
+- **Renaming a tier** updates the tag name across every contact that has it as soon as you save.
 - **Disabling a category** removes every tag in that category from every contact on the next sync.
 - **Re-enabling a category** re-applies its tags on the next sync.
-- **Deleting a tier** removes it from contacts that currently have it (next sync) and leaves the rest of the category intact.
+- **Deleting a tier** removes it from every contact that has it as soon as you save, and leaves the rest of the category intact.
 
 Promotion and automation filters that referenced a disabled or deleted tag simply stop matching anyone - they don't break.
 
 ## Worked examples
 
-### Racket-sports club: fill courts and chase renewals
+### Racket-sports gym: fill courts and chase renewals
 
-A padel and tennis club wants to market by sport and keep courts busy.
+A padel and tennis gym wants to market by sport and keep courts busy.
 
 - Enable **Interest** (Minimum Bookings per Sport = 3) so regulars pick up padel and tennis interest tags. Target a padel-night promotion at the padel tag only.
 - Enable **Attendance** to separate court regulars ("Regular", "All-Star") from members who are slipping ("Low Activity", "Inactive").
@@ -228,16 +238,16 @@ Enable **Language** so members are tagged by their preferred locale (for example
 
 ## Tips & best practices
 
-- **Start with the defaults.** Financial, Lifecycle, Membership, and Contact stages are on out of the box because almost every club needs them. Add Attendance, Loyalty, Interest, and the demographic categories as you're ready to act on them.
+- **Start with the defaults.** Financial, Lifecycle, Membership, Contact stages, and Payment method are on out of the box because almost every gym needs them. Add Attendance, Loyalty, Interest, and the demographic categories as you're ready to act on them.
 - **Use Attendance for short-term campaigns and Loyalty for long-term recognition.** They answer different questions: "who's gone quiet recently?" vs. "who's been with us the longest?"
 - **Don't duplicate categories with manual tags.** If you find yourself hand-tagging members "Overdue", adjust the Financial thresholds instead.
 - **Remember auto-renewing memberships never show "Expiring".** If you rely on the Membership tags for renewals, they target non-auto-renewing plans.
-- **Re-check thresholds periodically.** What counted as "Regular" attendance a year ago may not match how your club runs today.
+- **Re-check thresholds periodically.** What counted as "Regular" attendance a year ago may not match how your gym runs today.
 
 ## Troubleshooting
 
 **Issue**: A member isn't getting an activity tag (Attendance, Financial, Loyalty, and so on).
-**Cause / fix**: The contact is still a lead with no bookings or memberships, so only demographic categories apply - or the category is disabled. Confirm they have activity and the category is on.
+**Cause / fix**: The contact has no bookings, check-ins, or plans and isn't in your pipeline, so only the demographic and payment method categories apply - or the category is disabled. Confirm they have activity and the category is on.
 
 **Issue**: A member has no Language tag.
 **Cause / fix**: The tag comes from a linked account's preferred language. A contact with no linked user account (a walk-in or unregistered lead) can't be tagged. Also confirm the Language category is enabled.
@@ -251,8 +261,11 @@ Enable **Language** so members are tagged by their preferred locale (for example
 **Issue**: I changed a threshold but tags didn't update.
 **Cause / fix**: Reactive re-evaluation fires on data changes, not rule changes. After a rule change, click **Sync tags** to apply it now, or wait for the nightly run at 03:00 UTC.
 
+**Issue**: A lead shows a pipeline stage as their Lifecycle tag instead of Trial.
+**Cause / fix**: That's by design - while a contact is in your pipeline, their stage is their Lifecycle tag. Once they leave the pipeline, the Frozen and tenure tags apply.
+
 ## Related
 
 - [Members](/members/overview) - where tags are surfaced and used.
 - [Promotions](/sales/promotions) - restrict offers to specific tags via segment filters.
-- [Marketing analytics](/analytics/marketing) - break down performance by member segment and view engagement scores.
+- [Engagement analytics](/analytics/engagement) - view engagement scores across your members.

@@ -1,6 +1,6 @@
 ---
 title: Analytics overview
-description: Pre-built dashboards and reports for clubs, members, check-ins, bookings, classes, instructors, revenue, marketing, web traffic, and inventory, with live and historical views.
+description: Pre-built dashboards and reports for clubs, members, check-ins, bookings, classes, instructors, revenue, sales, marketing, web traffic, and inventory, with live and historical views.
 keywords:
   - analytics
   - dashboards
@@ -18,16 +18,17 @@ There is no report builder or query interface - every report has predefined filt
 
 ## Overview
 
-- **Category sidebar** on the left groups every report under a heading (Clubs, Members, Check-ins, and so on). A search box at the top of the sidebar filters the list by report name or description. On a phone, **Analytics** opens on a category index instead.
+- **Category sidebar** on the left lists the categories (Clubs, Members, Check-ins, and so on). A search box at the top of the sidebar finds a report by name or description. If you can only see one category, the sidebar is hidden. On a phone, **Analytics** opens on a category index instead, with the search box above it.
+- **Report tabs** across the top of the page switch between the reports in the selected category (for example **Dashboard**, **Audit**, **By Source**, **Utilization**, and **Monthly Report** under **Bookings**).
 - **KPI cards** give you the headline numbers at a glance (total revenue, average score, total members).
-- **Recharts charts** below the cards are interactive: hover for tooltips, click a legend entry to toggle a series on or off, and pan or zoom on time-based charts.
+- **Charts** below the cards show a tooltip with exact figures when you hover a point or bar.
 - **Live and historical views** - the Clubs category has a live **Today's Performance** dashboard that auto-refreshes; every other report reads a date range you pick.
-- **Club scoping** - most reports follow the club selected in the breadcrumb at the top of the admin; **All clubs** shows the whole organization.
+- **Club scoping** - most reports follow the club selected in the breadcrumb at the top of the admin; **All clubs** shows the whole organization. Reports built on organization-wide data (for example the **Sales** and **Members** dashboards) ignore the breadcrumb.
 - **Role-scoped access** - what each report shows respects the viewer's permissions and scope (see [Who can see what](#who-can-see-what)).
 
 ## The category sidebar
 
-The left sidebar lists every report, grouped into categories. The exact set you see depends on your permissions and which features are enabled for your organization (for example, the **Inventory** category only appears when inventory is turned on).
+The left sidebar lists the categories in the order below; the reports in each category appear as tabs once you open it. The exact set you see depends on your permissions and which features are enabled for your organization (for example, the **Inventory** category only appears when inventory is turned on).
 
 | Category | Reports |
 | --- | --- |
@@ -39,8 +40,9 @@ The left sidebar lists every report, grouped into categories. The exact set you 
 | **Instructors** | **Instructors Dashboard**, **Instructor Pay Report**, **Earnings Statement**, **Earnings by entrance method** |
 | **My performance** | Your own **Bookings**, **Classes**, **Earnings Overview**, **Earnings Statement**, **By entrance method** (only for users linked to an instructor record) |
 | **Revenue** | **Revenue**, **Revenue Report**, **Payments Report**, **Invoices Dashboard** |
+| **Sales** | **Sales Dashboard**, **Customer Lifecycle** |
 | **Website and Apps** | **Web Traffic** |
-| **Marketing** | **Marketing Dashboard**, **Email Analytics Dashboard**, **Promotions** |
+| **Marketing** | **Email Analytics Dashboard**, **Promotions** |
 | **Inventory** | **Stock Movements** (only when inventory is enabled) |
 
 ## What's available
@@ -52,26 +54,29 @@ The docs group these categories into a few pages:
 - **[Engagement](/analytics/engagement)** - Member engagement scoring (0 to 100 per member) and how scores change over time.
 - **[Schedule and instructors](/analytics/schedule)** - The **Check-ins**, **Bookings**, **Classes**, **Instructors**, and **My performance** categories.
 - **[Revenue](/analytics/billing)** - Revenue dashboard, revenue report, payments report, and invoices dashboard.
-- **[Marketing](/analytics/marketing)** - The **Marketing** and **Website and Apps** categories.
+- **[Sales](/analytics/sales)** - How leads become customers, and how customers move between contact types and stay over time.
+- **[Marketing](/analytics/marketing)** - The **Marketing** and **Website and Apps** categories: email delivery, promotion redemptions, and web traffic.
 - **Inventory** - **Stock Movements** is a ledger of every receive, sale, adjustment, and waste entry. See [Inventory](/sales/inventory).
 
 ## How the dashboards work
 
 Every report shares the same layout:
 
-The **filter bar** at the top holds the date range: one field showing the selected days, with previous and next period arrows. Open it to pick a preset - **Today**, **Yesterday**, **This week**, **Last week**, **This month**, **Last month**, **Last 3 days**, **Last 7 days**, **Last 2 weeks**, **Last 30 days**, **Last 90 days**, **Last 6 months**, **Last 365 days**, **This year**, **Previous year** - or a custom range on the calendar. Reports that trend by month (for example the bookings monthly report and instructor reports) show month presets instead. Some pages add extra filters (billing entity, event type, source) on the same row. There is no club control: the report follows the club in the breadcrumb.
+The **filter bar** at the top holds the date range: one field showing the selected days, with previous and next period arrows. Open it to pick a preset - **Today**, **Yesterday**, **This week**, **Last week**, **This month**, **Last month**, **Last 3 days**, **Last 7 days**, **Last 2 weeks**, **Last 30 days**, **Last 90 days**, **Last 6 months**, **Last 365 days**, **This year**, **Previous year** - or a custom range on the calendar. Reports that trend by month (for example the bookings monthly report and instructor reports) show month presets instead: **Last 1 month**, **Last 3 months**, **Last 6 months**, and **Last 12 months**. Some pages add extra filters (billing entity, event type, source) on the same row. There is no club control: the report follows the club in the breadcrumb.
 
 The **KPI cards** sit below the filter bar - usually three or four cards, each with a single number and an icon.
 
-The **charts** are below the cards. They are built with Recharts, so hovering shows tooltips, the legend toggles series on and off, and you can pan or zoom on time-based charts.
+The **charts** are below the cards. Hover a point or bar to see its exact figures.
 
 Your chosen range is remembered per report (stored in the URL and locally), so returning to a report restores the range you last used there.
 
+Reports with an **Export** button let you download what is on screen as **Excel (.xlsx)** or **CSV (.csv)**, with your filters applied.
+
 ## Data freshness
 
-Most dashboards run live queries against your operational data, so as soon as a booking is created or a payment lands, it shows up. Two exceptions:
+Dashboards run live queries against your operational data, so as soon as a booking is created or a payment lands, it shows up the next time the report loads. Two things to know:
 
-- The **Clubs** > **Today's Performance** dashboard reads hourly aggregates. It shows the timestamp of the last completed hour at the top of the page and auto-refreshes every five minutes.
+- The **Clubs** > **Today's Performance** dashboard re-queries on its own every five minutes, so it can trail the latest activity by up to five minutes. It shows today's date and the current hour at the top of the page.
 - The **Engagement** scoring system writes scores in a background job (it runs nightly at 03:00 UTC as part of member smart-tagging, and on demand from the Smart tagging page). The dashboard reads from that stored score, not the live activity tables, so brand-new activity is reflected only after the next run.
 
 ## Time zones
@@ -84,10 +89,10 @@ Analytics access follows the role's permissions. The gym-wide reports need `anal
 
 - **Admin** sees everything.
 - **Manager** sees every gym-wide report (`analytics.manage.club`).
-- **Front desk** has no analytics permission by default.
+- **Front desk** has no analytics permission by default. It can still open **Inventory** > **Stock Movements** when inventory is enabled, because that report follows the inventory permission.
 - **Instructor** sees only the **My performance** category (`analytics.read.own` for bookings and classes, `billing.read.own` for earnings).
 
-**My performance** also requires the user to be linked to an instructor record, whatever their role. The **Inventory** category's **Stock Movements** report requires `inventory.read` instead of an analytics permission, and the category only appears when inventory is enabled.
+**My performance** also requires the user to be linked to an instructor record, whatever their role. The **Sales** category also needs `members.read.organization`, because it reads organization-wide contact data; admins and managers have it by default. The **Inventory** category's **Stock Movements** report requires `inventory.read.club` instead of an analytics permission, and the category only appears when inventory is enabled.
 
 See [Roles and permissions](/reference/roles-permissions) for the full breakdown.
 
@@ -114,14 +119,14 @@ You want to re-engage lapsed reformer clients. Open **Members** > **Member Engag
 - **Set the time range once** at the top of the page. Charts on the same report share the range, so you do not need to set it per chart.
 - **Compare clubs side by side** by running **Clubs** > **Performance Trends** for **All clubs**, then switching the breadcrumb to one club at a time.
 - **Use the sidebar search** to jump straight to a report by name instead of scanning categories.
-- **Bookmark a filtered report.** Because the time range and club are stored in the URL, a bookmark reopens the exact view you set up.
+- **Bookmark a filtered report.** Because the time range is stored in the URL, a bookmark reopens the same period. The club comes from the breadcrumb, so check it when you reopen the link.
 - **For raw data, export instead.** Analytics pages are for reading; CSV exports under **Settings** > **Data Tools** > **Export** are for analysis in Excel, BI tools, or your accountant's software.
 
 ## Troubleshooting
 
 - **A category is missing from the sidebar** - the category is feature-gated or permission-gated. **Inventory** only appears when inventory is enabled for your organization, and you only see reports your role's permissions cover. Check with an admin or see [Roles and permissions](/reference/roles-permissions).
 - **A report is empty for the range you picked** - there is no data in that window. Widen the time range or switch the breadcrumb to **All clubs**. If a whole dashboard is blank, confirm the underlying feature (bookings, billing, marketing) is in use.
-- **The Today dashboard looks a few minutes stale** - that is expected. It reads hourly aggregates and refreshes every five minutes; the header shows the last completed hour.
+- **The Today dashboard looks a few minutes stale** - that is expected. It refreshes every five minutes on its own; reload the page to see the latest numbers straight away.
 - **Engagement numbers do not match live activity** - engagement scores are written by a background job, not computed live. See [Engagement analytics](/analytics/engagement) for the refresh schedule.
 - **Numbers differ from a CSV export** - the dashboards apply their own date and status filters (for example, excluding voided charges). Exports give you the raw rows so you can apply your own rules.
 

@@ -10,9 +10,9 @@ The **Clubs** category in **Analytics** rolls up activity, revenue, and resource
 
 Use it to watch the day as it happens, compare your locations, and decide where you have spare or missing capacity. Typical questions it answers:
 
-- **Which location's courts are underused?** - an operator with two padel venues compares average area utilization per venue over 90 days, then checks the day-of-week pattern to see when the quieter site fills.
+- **Which location's courts are underused?** - an operator with two padel venues compares area utilization per venue over 90 days, then checks the day-of-week pattern to see when the quieter site fills.
 - **Why is revenue low today when bookings look normal?** - a CrossFit box sees check-ins tracking as usual on the hourly chart while revenue stays flat, a sign of unpaid or comped bookings.
-- **Is there demand for another class slot?** - a yoga studio reads average class utilization alongside the weekday pattern before adding a second morning reformer class.
+- **Is there demand for another class slot?** - a yoga studio reads class utilization alongside the weekday pattern before adding a second morning reformer class.
 
 See [Worked examples](#worked-examples) for how to read each of these.
 
@@ -27,15 +27,15 @@ Both dashboards follow the club selected in the breadcrumb at the top of the adm
 
 ## Today's performance
 
-This is the live operations view. It shows the current date and the timestamp of the last completed hour at the top, and re-queries every five minutes so you can leave it open on a screen at the front desk. It has no date filter, because it is always scoped to today.
+This is the live operations view. It shows today's date and the current hour at the top, and re-queries every five minutes so you can leave it open on a screen at the front desk. It has no date filter, because it is always scoped to today.
 
 ### KPI cards
 
 The top rows summarize the day so far:
 
-- **Bookings created** - Bookings made for today, regardless of status.
-- **Revenue today** - Net revenue recognized today. This counts money actually taken in: it excludes voided charges, reversals, and the portion of any sale paid from wallet credit rather than fresh payment.
-- **Active members** - Distinct members who have a booking or a check-in today.
+- **Bookings created** - Bookings scheduled for today that are not cancelled. The court and instructor holds the platform creates for each class are not counted.
+- **Revenue today** - Net revenue recognized today, excluding tax. This counts money actually taken in: it excludes reversals, anything refunded back to a card, and the portion of any sale paid from wallet credit rather than fresh payment.
+- **Active members** - Distinct members who have a booking (not cancelled) or a check-in today.
 - **Check-ins** - Total check-ins recorded today.
 - **Bookings confirmed** - Bookings for today currently in confirmed status.
 - **Bookings cancelled** - Bookings for today that were cancelled.
@@ -44,10 +44,10 @@ The top rows summarize the day so far:
 
 ### Hourly trends chart
 
-A combined chart plots **bookings created**, **revenue**, and **check-ins** hour by hour across the day. Use it to see when your day peaks. Hover any hour for exact figures, and click a series name in the legend to hide or show it.
+A combined chart plots **bookings** (by the hour they start), **check-ins**, and **revenue** hour by hour across the day. A dashed **Now** line marks the current hour; hours still ahead are drawn faded, so you can see bookings already on the schedule for later today. Use it to see when your day peaks, and hover any hour for exact figures.
 
 <Note>
-The Today view focuses on activity and revenue by hour. For utilization rates (class, area, and instructor occupancy), use **Performance trends** below. Utilization is computed over completed days, not the current in-progress hours.
+The Today view focuses on activity and revenue by hour. For utilization rates (class, area, and instructor occupancy), use **Performance trends** below.
 </Note>
 
 ## Performance trends
@@ -56,20 +56,22 @@ This is the historical view. Set a date range in the filter bar (it defaults to 
 
 ### KPI cards
 
-- **Total bookings** - Bookings created in the range.
-- **Total revenue** - Net revenue for the range, on the same real-money basis as the Today view.
+- **Total bookings** - Bookings starting in the range that are not cancelled.
+- **Total revenue** - Net revenue for the range, on the same real-money, excluding-tax basis as the Today view.
 - **Total memberships** - Memberships sold in the range.
 - **Total check-ins** - Check-ins recorded in the range.
 - **Average booking value** - Total revenue divided by total bookings.
-- **Average class utilization** - Average share of class seats filled.
-- **Average area utilization** - Average share of area operating hours booked.
-- **Average instructor utilization** - Average share of instructor operating hours booked.
+- **Class utilization** - Class seats booked as a share of the seats there were to fill, across the whole range.
+- **Area utilization** - Area hours booked as a share of the area operating hours, across the whole range.
+- **Instructor utilization** - Instructor hours booked as a share of their operating hours, across the whole range.
+
+The three utilization cards divide everything booked by everything available over the whole range, rather than averaging the daily rates, so a quiet day weighs less than a busy one. A card shows `-` when the range had nothing to fill (for example, no class with a seat limit was held).
 
 ### How utilization is calculated
 
 Utilization compares what was booked against what was available, expressed as a percentage:
 
-- **Class utilization** - Booked seats divided by class capacity (the sum of each class's maximum capacity for the day).
+- **Class utilization** - Booked seats divided by class capacity (the sum of each class's maximum capacity for the day). Cancelled classes and classes with no seat limit are left out of both sides.
 - **Area utilization** - Booked hours divided by the area's available hours, where availability comes from the area's (or club's) operating hours.
 - **Instructor utilization** - Booked instructor hours divided by the instructor's available hours from their operating hours.
 
@@ -78,14 +80,14 @@ Because availability is driven by operating hours, keeping **Settings** > **Club
 ### Charts
 
 - **Daily trends** - Bookings, check-ins, and revenue over the range on one chart.
-- **Utilization trends** - Class, area, and instructor utilization percentages over time, with revenue overlaid as a dashed line so you can see whether busier resources actually convert to income.
+- **Utilization trends** - Class, area, and instructor utilization percentages over time, with revenue overlaid as a dashed line so you can see whether busier resources actually convert to income. When the chart groups days into weeks or months, each point is booked over available for that whole week or month. A line breaks where there was nothing to fill, such as a day the club was closed.
 - **Day of week patterns** - Average bookings, revenue, and check-ins for each weekday, so you can tell a quiet Tuesday from a packed Saturday.
 
 ## Worked examples
 
 ### Comparing two padel locations
 
-You run two padel venues and want to know which courts are underused. Open **Performance trends**, set the range to the last 90 days, and note the **average area utilization** with **All clubs** selected in the breadcrumb. Then switch to each venue in turn. If the downtown site sits at 78% area utilization and the suburban site at 41%, the suburban courts have slack. Cross-check the **day of week patterns** chart per site: if the suburban venue only fills on weekends, the fix is midweek programming or off-peak pricing rather than more courts.
+You run two padel venues and want to know which courts are underused. Open **Performance trends**, set the range to the last 90 days, and note the **area utilization** card with **All clubs** selected in the breadcrumb. Then switch to each venue in turn. If the downtown site sits at 78% area utilization and the suburban site at 41%, the suburban courts have slack. Cross-check the **day of week patterns** chart per site: if the suburban venue only fills on weekends, the fix is midweek programming or off-peak pricing rather than more courts.
 
 ### Spotting a revenue dip early
 
@@ -93,7 +95,7 @@ A CrossFit box keeps **Today's performance** open at reception. Mid-afternoon th
 
 ### Checking capacity before adding a class
 
-A yoga studio is considering a second morning reformer slot. On **Performance trends**, filter to the studio and read **average class utilization** alongside the **day of week patterns** bars. If mornings already run near capacity and weekday demand is even, the second slot is justified. If utilization is 55% and concentrated on two days, promote the existing class first.
+A yoga studio is considering a second morning reformer slot. On **Performance trends**, filter to the studio and read the **class utilization** card alongside the **day of week patterns** bars. If mornings already run near capacity and weekday demand is even, the second slot is justified. If utilization is 55% and concentrated on two days, promote the existing class first.
 
 ## Tips and best practices
 
@@ -101,7 +103,6 @@ A yoga studio is considering a second morning reformer slot. On **Performance tr
 - **Set the date range once.** Both charts on Performance trends share the range from the filter bar, so you only set it once per visit.
 - **Leave Today open at the desk.** It refreshes every five minutes on its own, which makes it a good live board for front-of-house staff.
 - **Fix operating hours before trusting utilization.** Utilization percentages depend on operating hours for areas and instructors. If they look wrong, verify the schedule under **Settings** > **Clubs** > **Areas** first.
-- **Use the legend to declutter.** On busy charts, click a series in the legend to hide it and focus on one metric.
 
 ## Troubleshooting
 
@@ -109,7 +110,7 @@ A yoga studio is considering a second morning reformer slot. On **Performance tr
 | --- | --- | --- |
 | Performance trends shows nothing | No activity in the selected range or club | Widen the date range, or switch the breadcrumb to **All clubs**. |
 | Utilization percentages look far too low or too high | Operating hours for areas or instructors are missing or wrong, so available capacity is miscalculated | Check and correct operating hours under **Settings** > **Clubs** > **Areas** and on instructor schedules. |
-| Revenue is lower than the cash you expected | Net revenue excludes voided charges, reversals, and any part of a sale paid from wallet credit | This is expected. Wallet-funded amounts are not new money in. Reconcile against [Analytics > Billing](/analytics/billing). |
+| Revenue is lower than the cash you expected | Net revenue excludes tax, reversals, card refunds, and any part of a sale paid from wallet credit | This is expected. Wallet-funded amounts are not new money in. Reconcile against [Revenue analytics](/analytics/billing). |
 | Today's revenue looks stalled while check-ins keep rising | Bookings are being taken without payment or are comped | Review unpaid bookings in **Analytics** > **Bookings** > [**Audit**](/analytics/schedule#booking-audit). |
 | A club is missing from the breadcrumb | Your account only has access to certain locations, or the club is inactive | Confirm your access and the club's status under [Reference > Organization and clubs](/reference/organization-clubs). |
 | Today's numbers seem an hour or a day off | "Today" uses the organization's time zone, not your device's | Verify the time zone under **Settings** > **Organization** > **Details**. |

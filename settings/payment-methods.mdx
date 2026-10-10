@@ -12,10 +12,10 @@ Set up a method for every way money actually reaches you, so each payment is rec
 
 Typical uses:
 
-- **Cash at the front desk** - a gym adds a private "Cash" method that staff select at the point of sale, while members never see it in the portal.
-- **Card payments in the portal** - a studio connects Stripe and preselects the Stripe Card method, so members booking a class check out with fewer clicks.
+- **Cash at the front desk** - staff select the private **Cash** method at the point of sale, while members never see it in the portal.
+- **Card payments in the portal** - a studio connects Stripe and preselects the **Stripe** method, so members booking a class check out with fewer clicks.
 - **Bank transfer for invoiced customers** - a gym records transfers from corporate accounts and families against a private "Bank transfer" method when reconciling paid invoices.
-- **Wallet credit for drop-ins** - a climbing gym keeps the **Wallet** method visible to members so they can spend topped-up credit at checkout.
+- **Wallet credit for drop-ins** - a climbing gym lets members top up a wallet and spend the credit on drop-ins, while the desk records cash on the **Cash** method.
 
 See [Worked examples](#worked-examples) for the steps behind each of these.
 
@@ -24,28 +24,30 @@ See [Worked examples](#worked-examples) for the steps behind each of these.
 Every method belongs to a channel, which determines how a payment is processed:
 
 - **Manual** - recorded outside any gateway (cash, bank transfer). This is the channel for every method you create.
-- **Stripe (Card)** - card processing through your connected Stripe account. Provided as a system method.
+- **Stripe** - card processing through your connected Stripe account. Provided as a system method.
 - **Wallet** - in-app wallet credit. Provided as a system method.
 
-A method's channel is fixed. To take card payments you don't create a Stripe method - you connect Stripe and the system Stripe Card method appears automatically.
+A method's channel is fixed. To take card payments you don't create a Stripe method - you use the system **Stripe** method and [connect Stripe](/settings/integrations/stripe) so it can take payments.
+
+Card readers add their own system method too. **Stripe Terminal** and **myPOS terminal** appear in the list only once you have registered an active reader for that provider under [Payment terminals](/settings/payment-terminals).
 
 ## The payment methods list
 
 Payment methods are configured in the **Payment Methods** section of **Settings** > **Billing** > **General**. The list combines two sources:
 
-- **System methods** - provided by 1Club, marked with a **System** chip. Stripe Card appears here once you connect Stripe. You can't create, edit, or delete these from this page.
-- **Organization methods** - manual methods you create yourself, for money you collect outside a payment gateway (cash, bank transfer, and similar).
+- **System methods** - provided by 1Club, marked with a **System** chip: **Stripe**, **Wallet**, and a terminal method for each provider you have an active card reader for. You can't create, edit, or delete these from this page.
+- **Organization methods** - manual methods for money you collect outside a payment gateway. Every organization starts with two, **Cash** and **POS Terminal** (for card payments taken on a machine that isn't connected to 1Club, recorded by hand), both **Admin only**. Add your own for anything else, such as bank transfer.
 
 Each row shows the method's **Name**, **Code**, **Visibility**, and a **Preferred** toggle (for methods available to member bookings). System methods sort to the top of the list.
 
 ## Adding a manual payment method
 
 1. Go to **Settings** > **Billing** > **General** and scroll to **Payment Methods**.
-2. Click **Add payment method**.
+2. Click **Add Payment Method**.
 3. Fill in:
    - **Name** - what the method is called in the admin and at checkout (for example, "Cash" or "Bank transfer").
    - **Code** - a short identifier used in reports and integrations (for example, `cash`, `venmo`, `square`).
-   - **Visibility** - **Private** (admin only), **Public**, or **Member only** (shown in the member portal and app).
+   - **Visibility** - **Admin only** (staff only), **Admin & Member** (also shown to members in the portal and app), or **Public**. New methods default to **Admin only**.
 4. Click **Save**.
 
 Manual methods record a payment without going through a gateway - useful for in-person collection or any flow you settle outside Stripe. Every manual method you create belongs to the **Manual** channel automatically; there's no channel picker.
@@ -54,54 +56,56 @@ Manual methods record a payment without going through a gateway - useful for in-
 
 - **Edit** - open an organization method to change its **Name** or **Visibility**. The **Code** is locked after creation, because reports and integrations reference it.
 - **Delete** - only methods that aren't referenced by any existing payment can be deleted. If a method has been used, change its **Visibility** to hide it instead - this keeps historical payments intact.
-- **System methods** can't be edited or deleted here. For Stripe Card, the row's action links to **Configure Stripe integration** so you manage it under [Integrations](/settings/integrations).
+- **System methods** can't be edited or deleted here. For **Stripe**, the row's action links to **Configure Stripe integration** so you manage it under [Integrations](/settings/integrations/stripe).
+
+Creating, editing, and deleting methods needs full billing access, and choosing the preferred method needs organization settings access. See [Roles and permissions](/reference/roles-permissions).
 
 ## Preferred method for member bookings
 
-Methods that are available to member bookings show a **Preferred** toggle in the list. Turn it on for one method to preselect it when a member books a class in the member portal, reducing checkout friction. Turning on a different method's toggle moves the preference; turn the current one off to leave members with no preselection so they choose explicitly.
+Methods that are available to member bookings - those with **Public** or **Admin & Member** visibility that are paid online - show a **Preferred** toggle in the list. Turn it on for one method to preselect it when a member books a class in the member portal, reducing checkout friction. Turning on a different method's toggle moves the preference; turn the current one off to leave members with no preselection so they choose explicitly.
 
 ## Worked examples
 
 ### Accept cash at the front desk
 
-1. Add a manual method named "Cash" with **Visibility** set to **Private**.
+1. Check that the **Cash** method, which every organization starts with, has **Visibility** set to **Admin only**.
 2. Front-desk staff can select it on point-of-sale and walk-in payments, while members never see it in the portal.
 
 ### Let members pay by card in the portal
 
 1. Connect Stripe under [Integrations](/settings/integrations).
-2. The Stripe Card system method appears automatically in **Payment methods**.
-3. Make sure it's visible to members, then turn on its **Preferred** toggle so it's preselected for bookings.
+2. The system **Stripe** method is already in the **Payment Methods** list and is visible to members.
+3. Turn on its **Preferred** toggle so it's preselected for bookings.
 
 ### Add bank transfer for invoiced billing
 
-1. Add a manual method named "Bank transfer" with **Visibility** set to **Private**.
+1. Add a manual method named "Bank transfer" with **Visibility** set to **Admin only**.
 2. Use it when reconciling paid invoices for corporate accounts or families that settle by transfer.
 
 ### Sell class packs on a wallet at a climbing gym
 
-If members top up an in-app wallet and spend it on drop-ins, keep the system **Wallet** method visible to members so wallet credit is an option at checkout, and reserve a **Private** "Cash" method for the desk.
+If members top up an in-app wallet and spend it on drop-ins, payments made from wallet credit are recorded against the system **Wallet** method, and the desk keeps using the **Admin only** **Cash** method for cash. You don't need to configure the **Wallet** method. Wallet credit belongs to your default company - see [Billing entities](/settings/billing-entities#two-things-that-stay-whole).
 
 ## Tips & best practices
 
 - **Keep codes stable.** They're referenced in reports and integrations, and can't be changed after a method is created.
 - **Hide, don't delete.** Changing a deprecated method's visibility keeps historical payments intact; deletion is blocked once a method has been used.
 - **Pick one preferred method.** Only one method is preselected for member bookings - choose the one most members use.
-- **Set visibility deliberately.** Anything set to **Public** or **Member only** shows in the member portal and app; use **Private** for desk-only methods like cash.
+- **Set visibility deliberately.** Anything set to **Public** or **Admin & Member** shows in the member portal and app; use **Admin only** for desk-only methods like cash.
 
 ## Troubleshooting
 
 **A method won't delete**
-It's referenced by at least one existing payment. Change its **Visibility** to hide it instead of deleting.
+It's referenced by at least one existing payment. Set its **Visibility** to **Admin only** to keep it out of the member portal instead of deleting it.
 
 **Members can't pay by card in the portal**
-Connect Stripe under [Integrations](/settings/integrations), then confirm the Stripe Card method's **Visibility** allows members to see it.
+Connect Stripe under [Integrations](/settings/integrations/stripe). The system **Stripe** method is visible to members by default and can't be edited.
 
 **The Preferred toggle isn't shown for a method**
 Only methods available to member bookings show the toggle. Check that the method's visibility makes it available to members.
 
 **A member sees a method they shouldn't at checkout**
-Set that method's **Visibility** to **Private** so it's admin-only.
+Set that method's **Visibility** to **Admin only** so only staff see it.
 
 ## Related
 

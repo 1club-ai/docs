@@ -29,17 +29,21 @@ Body fields:
 
 - `contactId` (required) - the customer, from [Contacts](/api-reference/channel-integration/contacts)
 - `planId` (required) - the plan, from [Plans](/api-reference/channel-integration/plans)
-- `startDate` (optional) - ISO date-time; defaults to now
-- `endDate` (optional) - omit to let the plan's billing frequency decide
+- `startDate` (optional) - ISO date-time with offset; defaults to now
 - `autoRenew` (optional) - defaults to the plan's setting
 - `payment.status` (required) - `paid` (you collected the money) or `unpaid` (outstanding)
+- `payment.reference` (optional) - your own id for the payment you collected, up to 128 characters. Requires `payment.status: "paid"`.
+- `payment.fee` (optional) - what you kept out of the amount, your commission. Recorded for reconciliation; it does not reduce the sale. Requires `payment.status: "paid"` and an explicit `overrides.amount` it cannot exceed.
 - `overrides` (optional) - see [Overriding the plan](#overriding-the-plan)
+
+There is no `endDate`: how long a membership runs follows from the plan.
 
 Response (`201 Created`):
 
 ```json
 {
   "membershipId": 7412,
+  "membershipUuid": "0199c3e5-2a4b-7c6d-8e9f-1a2b3c4d5e6f",
   "contactId": 300,
   "planId": 9,
   "planName": "Unlimited",
@@ -65,7 +69,7 @@ See [Idempotency](/api-reference/channel-integration/idempotency).
 The membership starts life according to what is owed, not according to what you
 declare:
 
-- **`paid`** - 1Club records a payment against the **External / API** payment method (no card is charged) and the membership becomes `active`, or `pending` when it starts in the future.
+- **`paid`** - 1Club records a payment against a payment method named after your API key (no card is charged) and the membership becomes `active`, or `pending` when it starts in the future. The customer is not sent a payment receipt for it - you issue your own.
 - **`unpaid`** - the charge is left outstanding and the membership sits at `pending_payment`. It grants no access until the money is settled in 1Club.
 - **Nothing owed** - a free plan with no joining fee is `active` straight away. There is no payment to wait for.
 
@@ -177,10 +181,10 @@ configures it:
 | `status`    | Companion field | What happens                                                                                                            |
 | ----------- | --------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `cancelled` | `cancelMode`    | `end_of_period` (default) keeps access until the paid period ends and stops the renewal. `immediate` ends access today. |
-| `paused`    | `resumeAt`      | Pauses the membership. `resumeAt` must be in the future; the pause lifts by itself then.                                |
+| `paused`    | `resumeAt`      | Pauses the membership. `resumeAt` is optional; when sent it must be in the future, and the pause lifts by itself then.  |
 | `active`    | -               | Resumes a paused membership. Only valid from `paused`.                                                                  |
 
-**A detail change** - any of `endDate`, `autoRenew`, `maxUses`, `usesRemaining`. Use
+**A detail change** - any of `autoRenew`, `maxUses`, `usesRemaining`. Use
 `usesRemaining` to correct a balance after a migration.
 
 `cancelMode` only applies to a cancellation and `resumeAt` only to a pause; sending

@@ -26,7 +26,14 @@ The list shows one row per instructor with a drag handle and these columns: **In
 
 Drag a row to reorder; the new order is what shows on the schedule and in selectors. The drag handle is disabled while a reorder request is in flight. If the server rejects the reorder, the list snaps back to the server order with a toast.
 
-Click a row to open the instructor profile, or **Add Instructor** to create one. The profile has tabs including **Pay rates**, **Time off**, and **Roster**, so you can manage one instructor's pay, absences, and shifts in one place.
+Click a row to open the instructor profile, or **Add Instructor** to create one. The profile has **Bio**, **Bookings**, **Classes**, **Reviews**, **Pay rates**, **Time off**, and **Roster** tabs, so you can manage one instructor's work, pay, absences, and shifts in one place. Its **Add** menu attaches a **Pay rate** or records **Time off** for them.
+
+Each row's menu (and the profile's header) offers, depending on your permissions:
+
+- **Edit** - open the instructor dialog.
+- **Invite to Admin** or **Revoke Admin Access** - give the instructor a login, or take it away. Revoking keeps the instructor profile; they just can no longer sign in.
+- **Merge duplicate instructor** (list only) - move a duplicate's upcoming classes, recurring series, and future pay into this instructor, then deactivate the duplicate.
+- **Delete** - remove the instructor. If they still teach upcoming classes or recurring series, you're first asked to hand those to another instructor or leave them unassigned. An instructor who has taught classes can't be deleted without losing that history, so you're offered **Archive** instead: the profile leaves the instructor list and can no longer be booked, and past classes keep their record. Archiving needs permission to delete members.
 
 ## Creating or editing an instructor
 
@@ -40,7 +47,7 @@ The user dialog handles both inviting a new instructor (which creates the contac
 - **Max concurrent bookings** - only visible when bookable is on. How many overlapping one-on-one bookings the instructor accepts.
 - **Active instructor** toggle - inactive instructors are hidden from selectors but kept for historical bookings.
 - **Operating hours** - per-day working hours used by the booking dialog's availability checks.
-- **Give instructor access** - when on, the user is invited with the instructor role and can sign in and see their own classes and earnings on [Home](/home/overview).
+- **Give them instructor access** - when on, the user is invited with the instructor role and can sign in, see their own schedule on [Home](/home/overview) and the calendar, and see their earnings under **Analytics** > **My performance**.
 
 Per-instructor display colors used on the schedule are configured separately under **Settings** > **Bookings** > **Schedule Display**, not on the instructor dialog itself.
 
@@ -60,11 +67,11 @@ On the **Schedule** calendar you can drag a booking or class to a new time. The 
 
 ## Pay rates and earnings
 
-What an instructor earns is set by pay rate policies under **Staff** > **Pay rates**, not by the **Hourly rate** (which is what members pay). Policies can pay per class, per attendee, per session, or a share of revenue, and can hold pay back until the booking is paid. Instructors who sign in see the result on their own **Earnings** page. See [Pay rates](/staff/pay-rates).
+What an instructor earns is set by pay rate policies under **Staff** > **Pay rates**, not by the **Hourly rate** (which is what members pay). Policies can pay per class, per attendee, per session, or a share of revenue, and can hold pay back until the booking is paid. Instructors who sign in see the result under **Analytics** > **My performance** > **Earnings Overview**. See [Pay rates](/staff/pay-rates#instructor-earnings).
 
 ## Mixed-role accounts
 
-A user who is both an instructor and an admin or manager has access to two schedule views. The org-wide schedule lives under the **Schedule** menu (see [Schedule](/schedule/calendar)). A personal "My teaching schedule" view, scoped to just their own classes and bookings, is reached through the instructor menu in the sidebar.
+A user who is both an instructor and an admin or manager sees the full [Schedule](/schedule/calendar) and can narrow it to their own classes and bookings with the **Staff** filter in the calendar header. Their own numbers are under **Analytics** > **My performance** (see [Schedule analytics](/analytics/schedule)).
 
 ## Worked examples
 
@@ -104,7 +111,7 @@ A gym that runs paid drop-in classes sets a pay rate policy with **Compensate fo
 
 **Issue**: The instructor can't sign in to their dashboard.
 
-**Solution**: Access is only granted when **Give instructor access** was on at invite. Edit the instructor and enable it to send the invitation.
+**Solution**: Access is only granted when **Give them instructor access** was on at invite. Use **Invite to Admin** from the instructor's row menu to send the invitation.
 
 **Issue**: A bookable instructor shows no availability.
 

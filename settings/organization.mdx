@@ -23,12 +23,12 @@ See [Worked examples](#worked-examples) for the steps behind each of these.
 
 ## What you can edit on Details
 
-Open **Settings** > **Organization** > **Details**. The Details page is a single form with three sections.
+Open **Settings** > **Organization** > **Details**. The Details page is a single form with one row per setting. The fields fall into three groups.
 
 ### Details
 
 - **Name** - Your organization's display name. Used in emails, the member portal, and admin headers. Required.
-- **Slug** - The URL-safe identifier. Lowercase letters, numbers, and hyphens only, and up to 40 characters. It becomes your member portal subdomain (`{slug}.portal.1club.ai`) and shows up in public links, so keep it short. Required, and it must be unique across all organizations.
+- **Slug** - The URL-safe identifier, on the same row as **Name**. Lowercase letters, numbers, and hyphens only, and up to 40 characters. It becomes your member portal subdomain (`{slug}.portal.1club.ai`) and shows up in public links, so keep it short. Required, and it must be unique across all organizations.
 - **Description** - Optional short blurb shown on public surfaces such as the marketplace listing.
 
 ### Contact info
@@ -53,7 +53,7 @@ The form uses a floating save bar. Edit any field and a **Save** control appears
 The organization time zone is resolved from your coordinates or address only once, the first time it is set. Editing your address later does not silently move the org time zone, so if you relocate the headquarters, set the time zone yourself. Individual clubs behave differently: a club re-derives its own time zone whenever its address changes.
 
 <Note>
-Currency and billing preferences are not on this page, and neither is your legal identity: the legal name, tax and registration numbers, registered address, bank details, and invoice numbering belong to the company you invoice through, under **Settings** > **Billing** > **General**. Most gyms have one; see [Billing entities](/settings/billing-entities). Form field configuration - which contact fields are required, optional, or hidden - lives under **Settings** > **Members** > **Contacts**. See [Members overview](/members/overview).
+Currency and billing preferences are not on this page, and neither is your legal identity: the legal name, tax and registration numbers, registered address, bank details, and invoice numbering belong to the company you invoice through, under **Settings** > **Billing** > **General**. Most gyms have one; see [Billing entities](/settings/billing-entities). Form field configuration - which contact fields are required, optional, or hidden - lives under **Settings** > **Members** > **Contacts**. See [Contacts](/settings/contacts).
 </Note>
 
 ## Clubs
@@ -62,24 +62,31 @@ A club is a single physical location. Everything schedulable (areas, classes, st
 
 ### Creating or editing a club
 
-1. Go to **Settings** > **Clubs**. The list shows every location; filter by name, city, or state.
-2. Click **Add Club** to open the club form, or click an existing club to edit it.
-3. Fill in **Basic information** (**Club Name**, **Subtitle**, **Slug**, **Description**) and **Contact information** (**Email**, **Phone**, **Website**, address).
-4. Set **Operating hours**, **Sports**, and **Amenities**.
-5. Optionally assign **Club Managers** (staff who receive contact-form messages for this club) and upload **Club Images**.
-6. Save.
+1. Go to **Settings** > **Clubs** > **Clubs**. Each location shows as a card with its status, slug, address, contact details, and review rating.
+2. Click **Add Club** to open the club form, or click a card to edit that club.
+3. Fill in **Club Name**, **Slug**, **Subtitle**, **Description**, **Status**, and **Club type**.
+4. Add the contact details: **Phone**, **Email**, **Website**, **Address**, and the **Map location** pin.
+5. Set **Timezone**, **Social profiles**, **Club logo**, **Club Images** (up to eight), **Sports**, **Amenities**, and **Operating Hours**.
+6. Optionally assign **Club Managers**, the staff who receive contact-form messages for this club. When none are set, messages go to organization-level staff.
+7. Save.
 
 ### Club fields worth knowing
 
 - **Email** - The location's contact address, and the **From** address on most member email for this club (booking confirmations, cancellations, daily summaries). Keep it on a domain you have verified. See [Email sending](/settings/email-sending).
 - **Slug** - Must be unique across clubs; it appears in the club's public page URL.
-- **Status** - A club is `active` or `inactive`. Inactive clubs stay in the admin but are pulled from public surfaces.
-- **Sports and amenities** - Drive the marketplace listing and filtering. A club must be complete to stay published; an edit that leaves it incomplete is automatically unpublished.
+- **Status** - **Active**, **Hidden**, or **Closed**. **Active** is visible to everyone. **Hidden** keeps the club fully working for staff (schedule, bookings, and reports) but takes it off your website, the member portal, and the 1club marketplace. **Closed** retires it: it leaves the schedule, the club switcher, and every club picker.
+- **Set closing date** - From the club's **More actions** menu, schedule a closing date instead of closing the club today. The club stays open and bookable through that date, nothing can be booked after it, and it closes on its own the day after. A **Closing** badge shows next to the status until then.
+- **Timezone** - The clock the club runs on: operating hours, class times, and prices are shown and saved in this zone. It is set from the club address and re-derived whenever the address changes. Clear it to use the organization time zone.
+- **Map location** - Where members are sent. Drag the pin if it is not exactly on your entrance. A pin you place by hand is never moved by an address edit or a Google import.
+- **Billing entity** - Which company invoices and takes payments for this club. The row appears only when your organization has more than one [billing entity](/settings/billing-entities); otherwise the club uses the organization default.
+- **Sports and amenities** - Drive the marketplace listing and filtering. A club must be complete to stay published; an edit that leaves it incomplete is automatically unpublished, and a warning names the missing fields. On a published listing, some changes go to review first: the page shows **Changes awaiting review** while the listing keeps its approved details, and you can **Discard changes** to drop the proposal.
 - **Google Business Profile / OpenStreetMap** - Connect a club to import address, hours, sports, amenities, photos, and reviews. Empty fields are filled and existing values are kept.
-- **Daily summary** - Per-club summary email to admins, with a configurable send time. New clubs get it on by default.
-- **Kiosk options** - Per-club kiosk toggles (check-in, classes, plans, products) are configured here and stored against the club.
+- **Daily summary** - In the right-hand panel, **Send to admins** emails admins a recap of yesterday each morning, at the chosen **Send time**. New clubs get it on by default.
+- **Booking labels** - Also in the right-hand panel: your own names for the booking cards members see (private training, group activities, and areas). Leave a name blank to use the built-in, already translated one.
 
-Deleting a club is blocked while it still has dependent data (bookings, areas, and so on); remove or reassign that first.
+Kiosk and check-in app options are set per gym under **Settings** > **Member Apps**. See [Kiosk](/settings/kiosk).
+
+To delete a club, open it and choose **Delete** from the actions menu. Deleting is blocked while the club still has associated data (bookings, areas, and so on); remove or reassign that first, or set the club to **Closed** instead.
 
 ## Branding
 
@@ -106,6 +113,8 @@ Custom domains are managed under **Settings** > **Organization** > **Domains**. 
 3. For website and portal domains, delete any leftover A, AAAA, or CNAME records for the same host first, or verification will fail.
 4. Wait for DNS to propagate, then click **Verify**.
 
+The domains list shows each domain's **Purpose** and **Status**. A **Website (CMS)** domain also shows which of your websites it opens; when you have more than one website, or the domain is **Not assigned**, use **Change website** in the row's actions to point it at another site. **View DNS** reopens the records to add.
+
 Domain status moves through:
 
 - **Pending verification** - Added, DNS not yet confirmed.
@@ -119,7 +128,7 @@ Your 1Club platform plan lives under **Settings** > **Organization** > **Subscri
 
 ## Who can edit
 
-Organization settings are gated on the organization settings permission, part of the **Admin** role's default bundle. Roles without it see the page read-only or get a permission error. Creating clubs and editing branding and domains require the organization management permission. See [Roles and permissions](/reference/roles-permissions).
+Every Settings page needs the Settings module at **View** (organization scope), part of the **Admin** role's default bundle. Saving organization details and creating, editing, or deleting clubs need Settings **Full access**. Roles without it see the page read-only or get a permission error. See [Roles and permissions](/reference/roles-permissions).
 
 ## Worked examples
 
@@ -129,7 +138,7 @@ A padel and tennis club changes its name and wants a cleaner portal address. On 
 
 ### Martial arts gym opens a second location
 
-A jiu-jitsu and muay-thai gym adds a second mat space. They go to **Settings** > **Clubs** > **Add Club**, name it, set its own address (which derives that club's time zone), select the `jiu-jitsu` and `muay-thai` sports, and set operating hours. The organization time zone is untouched; only the new club picks up the local zone.
+A jiu-jitsu and muay-thai gym adds a second mat space. They go to **Settings** > **Clubs** > **Clubs** and click **Add Club**, name it, set its own address (which derives that club's time zone), select the `jiu-jitsu` and `muay-thai` sports, and set operating hours. The organization time zone is untouched; only the new club picks up the local zone.
 
 ### Multi-language yoga studio
 
@@ -144,7 +153,7 @@ A climbing gym wants members to visit `members.gripcity.com` instead of the defa
 - **Choose the slug carefully and early.** It is your portal web address. Changing it later breaks existing links and QR codes.
 - **Set the address by selecting a map suggestion**, not by typing freehand, so coordinates and time zone resolve correctly.
 - **Only enable locales you can support.** Adding a language exposes it to members even if your content is not translated yet.
-- **Keep club status honest.** Mark a location inactive rather than deleting it if you might reopen; deletion is blocked while data exists anyway.
+- **Keep club status honest.** Set a location to **Hidden** while staff still run it out of public view, or **Closed** when it is retired, rather than deleting it; deletion is blocked while data exists anyway.
 - **Verify domains during low traffic.** Website and portal domains are not live until the certificate is issued, so plan the cutover.
 
 ## Troubleshooting
@@ -157,7 +166,7 @@ A climbing gym wants members to visit `members.gripcity.com` instead of the defa
 | Branding page blocks saving | You are on the Free plan | Upgrade to a paid plan under **Organization** > **Subscription** |
 | Custom domain stuck on "Issuing SSL certificate" | DNS is confirmed but the certificate is still being issued | Wait a few minutes and click **Verify** again |
 | Custom domain will not verify | Conflicting A, AAAA, or CNAME records for the same host | Delete the old records at your DNS provider, then verify |
-| Cannot delete a club | It still has bookings, areas, or other dependent data | Remove or reassign that data first |
+| Cannot delete a club | It still has bookings, areas, or other associated data | Remove or reassign that data first, or set the club to **Closed** |
 | The Organization page is read-only | Your role lacks the organization settings permission | Ask an Admin to grant it |
 
 ## Related
@@ -168,4 +177,4 @@ A climbing gym wants members to visit `members.gripcity.com` instead of the defa
 - [Roles and permissions](/reference/roles-permissions) - Who can edit organization settings.
 - [Areas](/settings/areas) - Bookable spaces created within each club.
 - [Profile](/settings/profile) - Per-user preferences (language, theme, password).
-- [Members overview](/members/overview) - Contact and signup field configuration.
+- [Contacts](/settings/contacts) - Contact and signup field configuration.

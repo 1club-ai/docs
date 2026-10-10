@@ -22,21 +22,26 @@ See [Worked examples](#worked-examples) for the steps behind each of these.
 
 Open **Schedule** in the left rail; the calendar is the page it lands on.
 
-The calendar has two view types saved per browser: **Day** and **Week**.
+Pick a view in the calendar header: **Day**, **Timeline**, **3 days**, or **Week**. Your browser remembers the last view you used; the first time, the calendar opens in **Week**.
 
-**Day view** is a vertical time grid with one column per resource, grouped left-to-right by type: class-type columns first, then a fallback "Classes" column, then instructor columns A-Z, then area columns grouped by area type. The time axis is built from your organization's operating hours, in 30-minute increments.
+**Day** is a vertical time grid for one day with one column per resource: class-type columns first (A-Z), then a fallback "Classes" column, then instructor columns in the order set under **Staff** > **Instructors**, then area columns in the order set under **Settings** > **Clubs** > **Areas**. Instructor columns use the instructor's display name. The time axis is built from your operating hours, in 30-minute increments.
 
-**Week view** is a horizontal grid with days as columns. Resources are merged - you see all activities for the week, not one column per resource - because the day-column layout would be unreadably wide.
+**Timeline** shows the same day and the same resources as **Day**, turned on its side: one row per resource, with time running across.
 
-The mini calendar on the left navigates dates; the **Today** button returns to today. The selected date is pushed to the URL as `?date=YYYY-MM-DD` so you can share a link to a specific day.
+**3 days** and **Week** show days as columns, starting from the selected date for **3 days**. Resources are merged - you see all activities for each day in one column, not one column per resource - because a column per resource per day would be unreadably wide.
+
+Use the arrows and **Today** to move between dates, or click the date to pick one from a calendar. The selected date is pushed to the URL as `?date=YYYY-MM-DD` so you can share a link to a specific day.
 
 ## Resources and what shows up where
 
 The schedule reads three live data sources for the visible range:
 
 - **Classes** - shown as blocks on their class-type column (or the fallback "Classes" column for classes without a type). Each class with assigned instructors also produces a mirror "teaching" block on each instructor's column in day view, so the instructor reads as busy.
-- **Bookings** - shown on the area column if they have an area, on the instructor column if they have an instructor (both, if they have both), or on the relevant class-type column if they're class-bound. Class-bound bookings are suppressed in week view because the class itself already represents them.
-- **Instructor time off** - shown as grey blocks on the instructor's column.
+- **Bookings** - shown on the area column if they have an area, on the instructor column if they have an instructor (both, if they have both), or on the relevant class-type column if they're class-bound. Class-bound bookings are suppressed in the **3 days** and **Week** views because the class itself already represents them.
+- **Instructor time off** - shown as grey blocks on the instructor's column, alongside shift breaks and rostered days off (see [Roster and time off](/staff/roster)).
+- **Area blocks** - shown as grey, dashed cards on the area's column (see [Area blocks](/schedule/area-blocks)).
+
+Staff who can only see their own schedule still see when a court is taken by someone else's booking: the slot shows as **Occupied**, without the booking's details.
 
 An hour that a [season pass](/schedule/season-passes) paid for carries a small season icon labelled with the season's name, so a contracted week reads as an hour of a prepaid contract rather than a casual booking. Makeup hours replayed on another date carry the same marker.
 
@@ -46,9 +51,15 @@ Active areas (`status=active`) and bookable instructors (`isBookable=true`) are 
 
 ## Filtering what you see
 
-The **Resource filter panel** in the calendar header lets you toggle individual resources on or off. Your overrides are saved per view (day vs week) in browser storage.
+The **Show on schedule** button in the corner of the grid lists every class type, instructor, and area, so you can toggle individual resources on or off. When some are hidden, its label tells you how many. Your choices are saved per view in browser storage.
 
-The organization-level defaults for what's hidden come from **Settings** > **Bookings** > **Schedule Display** (the **Default visibility** card), which lets you hide entire class types, instructor types, or area types, plus a flag for uncategorized instructors and areas. The toggle in the filter panel layers on top of these defaults: if you flip a resource to a state that matches the default, the override drops so future settings changes still take effect.
+Each column header also has an options menu: **Show only this instructor** (instructor columns), **Hide**, and **View details**, which opens the instructor's profile or the area's settings.
+
+The organization-level defaults for what's hidden come from **Settings** > **Bookings** > **Schedule Display** (the **Default visibility** card), which lets you hide entire class types, instructor types, or area types, plus uncategorized classes, instructors, and areas. Your own toggles layer on top of these defaults: if you flip a resource to a state that matches the default, the override drops so future settings changes still take effect.
+
+### Staff filter
+
+The **Staff** filter in the header narrows the calendar to the bookings and classes of the instructors you pick. Your own name is listed first, so a coach can show just their own schedule, or themselves plus the coach covering their evening class. Leave it empty to show all staff. The selection is kept in the URL (`?instructors=`), so you can share a filtered schedule as a link, and your browser remembers it for next time. The filter only appears when there are at least two instructors to choose from.
 
 ## Coloring
 
@@ -67,37 +78,49 @@ Click an empty time slot to open the create dialog. The dialog is pre-filled bas
 
 You can drag-select multiple consecutive slots to extend the duration before the dialog opens.
 
-In **week view**, clicking a slot opens a small menu instead of a dialog so you can pick between **Add booking**, **Add class**, or **Add time off** (the last option is shown only on instructor columns).
+This applies in the **Day** and **Timeline** views. In the **3 days** and **Week** views, where columns are days, clicking a slot opens a small menu instead so you can pick **Add Booking** or **Add Class**. When the slot is tied to an instructor or an area, the menu also offers **Add Time off** or **Add Block**.
 
 The same slot menu offers **Add Season Pass** when the date you clicked falls inside a season that is on sale at that gym, and you hold the permission to create memberships. It opens the season sale drawer with that hour pre-filled, so the whole run of weeks is sold from the slot the member asked for. See [Season passes](/schedule/season-passes).
 
-The header has an **Add** button that opens a menu with **Booking**, **Class**, **Event**, **Checkin**, **Time off**, and **Block** (each shown only when you hold the permission for it). Next to it, the **More actions** menu links to the [Bookings](/schedule/bookings) list, [Classes](/schedule/classes) list, [Attendance](/schedule/attendance), [Areas](/settings/areas) (under **Settings** > **Clubs**), and **Configure**, which opens the Schedule Display settings. **Event** creates a draft [event](/events/events); the events list itself lives in the **Events** section.
+The header has an **Add** button that opens a menu with **Booking**, **Class**, **Event**, **Checkin**, **Time off**, and **Block** (each shown only when you hold the permission for it). Next to it, the **More actions** menu links to the [Bookings](/schedule/bookings) list, [Classes](/schedule/classes) list, [Attendance](/schedule/attendance), [Areas](/settings/areas) (under **Settings** > **Clubs**, shown when you can view settings), and **Configure**, which opens the Schedule Display settings. **Event** creates a draft [event](/events/events); the events list itself lives in the **Events** section.
 
 ## Acting on existing blocks
 
-Click a block to open the matching dialog: bookings open the booking dialog, classes default to the add-booking flow for that class (so the most common case - someone wants to book into the class - is one click), time-off entries open the time-off dialog.
+Click a block to open it: bookings, classes, and events open their detail pages, while time-off entries, shift breaks, and area blocks open their edit dialogs.
 
-Right-click a block (or use the mobile tap menu) for the full set of actions: **View** (open the detail page), **Edit**, **Cancel**, **Delete**, **Add check-in**, **Add payment**, **Add booking** (for classes), and **Notify participants**.
+Right-click a block (or use the mobile tap menu) for its actions. Each is shown only when you hold the permission for it:
 
-**Add payment** is smart about split balances: if the booking has one outstanding charge, you get a single-charge payment dialog with an editable amount. If it has multiple, the amount is locked to the full sum and the server settles them atomically. See [Bookings](/schedule/bookings) for the full story.
+- **Bookings** - **View**, **Edit**, **Check In**, **Add Payment** (only while there's a balance), **Message**, and **Cancel**.
+- **Classes** - **View**, **Edit**, **Cancel** (or **Restore** for a cancelled class), **Add Booking**, **Check In**, **Message** (when the class has bookings), and **Delete**.
+- **Time off and area blocks** - **Edit** and **Delete**.
+- **Events** - **View**.
 
-## Duplicating a class
+**Message** opens [Compose](/inbox/compose) addressed to the member or the class's booked participants.
 
-To copy a class to another time without reopening the class dialog, hold **Option** (Mac) or **Alt** (Windows) and drag the class block to a new slot, then release.
+**Add Payment** is smart about split balances: if the booking has one outstanding charge, you get a single-charge payment dialog with an editable amount. If it has multiple, the amount is locked to the full sum and the server settles them atomically. See [Bookings](/schedule/bookings) for the full story.
+
+## Duplicating a class or booking
+
+To copy a class or a booking to another time without reopening its dialog, hold **Option** (Mac) or **Alt** (Windows) and drag the block to a new slot, then release.
 
 While you drag with the key held, the calendar shows that you are copying rather than moving: the cursor becomes a copy cursor, the source block gets a green outline and a small copy badge, and the target slots highlight in green. Let go of the key mid-drag to fall back to a normal move.
 
-The result is a single one-off class at the drop time. It keeps the original's name, description, instructors, area, capacity, price, visibility, color, and class type, but never its recurrence, and it starts with no bookings or check-ins. The copy appears the instant you drop it, and a **Class duplicated** toast offers an **Undo** action that removes it again.
+- **A copied class** is a single one-off class at the drop time. It keeps the original's name, description, instructors, area, capacity, price, visibility, color, and class type, but never its recurrence, and it starts with no bookings or check-ins. A **Class duplicated** banner offers **Undo**, which removes it again.
+- **A copied booking** is the same member on the same court or with the same coach, for the same duration, at the drop time. It's priced for the new slot, set to be paid at the desk rather than drawn from a membership, never repeats, and doesn't send a confirmation email. A **Booking duplicated** banner offers **Undo**, which cancels the copy.
 
-The gesture works with a mouse and keyboard and applies to classes only - bookings and time-off blocks keep their normal drag-to-reschedule behavior. A dismissible hint in the calendar header points it out until you close it.
+The gesture works with a mouse and keyboard. Time-off blocks keep their normal drag-to-reschedule behavior. A dismissible hint in the calendar header ("Hint: Option + drag to duplicate") points it out until you close it.
+
+## Live updates
+
+While the calendar shows today or a future date, it checks for changes every 30 seconds and reloads when someone else adds or changes something, briefly highlighting the cards that changed. It pauses while you have a dialog, menu, or drag open. The refresh button in the bottom corner shows when the schedule was last updated and reloads it on demand.
 
 ## Bookings created with a member pre-selected
 
 If you arrive at the schedule from a member profile with **Book a slot**, the URL carries `?contactId=X`. A toast prompts you to pick a slot, and every booking dialog you open from a slot click is pre-filled with that contact.
 
-## Instructor-only and mixed-role views
+## Instructors on the calendar
 
-Instructor-only accounts see a streamlined **My teaching schedule** view that hides resources they don't own. Mixed-role accounts (instructor + manager or admin) can open either the full **Schedule** page (described above) or their personal **My teaching schedule** through the instructor menu in the sidebar.
+Instructors use the same **Schedule** page. An instructor who can only see their own schedule sees their own classes and bookings, gets no actions the server would refuse, and adds their own time off from **Add** > **Time off**. An instructor who is also a manager or admin sees the full calendar and can narrow it to themselves with the [Staff filter](#staff-filter).
 
 ## Worked examples
 
@@ -111,28 +134,28 @@ A member asks to move their Tuesday court an hour later. Find the block on the c
 
 ### Front-desk check-in during class
 
-As members arrive for the 09:00 class, right-click the class block and choose **Add check-in** (or click the block, which defaults to the add-booking flow for walk-ins). No need to open the class detail page.
+As members arrive for the 09:00 class, right-click the class block and choose **Check In**. No need to open the class detail page.
 
 ### Declutter a multi-court venue
 
-A racket center with a dozen courts and several coaches can be noisy in Day view. Use the **Resource filter panel** to show only the courts you're working, saved per view so the desk keeps its layout.
+A racket center with a dozen courts and several coaches can be noisy in Day view. Use **Show on schedule** to show only the courts you're working, saved per view so the desk keeps its layout.
 
 ## Tips & best practices
 
 - **Day view for the desk, Week view for planning.** Day view gives you per-resource columns for live operations; Week view is better for seeing the whole week at a glance.
 - **Option/Alt-drag to clone, plain drag to move.** Release the modifier mid-drag to fall back to a move; the copy cursor and green highlight tell you which mode you're in.
 - **Share a day with a link.** The selected date is in the URL (`?date=YYYY-MM-DD`), so you can send a colleague a specific day.
-- **Let settings own the defaults.** Set org-wide visibility under **Settings** > **Bookings** > **Schedule Display**; use the filter panel only for per-session tweaks, since matching the default drops your override.
+- **Let settings own the defaults.** Set org-wide visibility under **Settings** > **Bookings** > **Schedule Display**; use **Show on schedule** only for per-session tweaks, since matching the default drops your override.
 
 ## Troubleshooting
 
 **Issue**: A court or coach is missing from the calendar.
 
-**Solution**: Only **active** areas and **bookable** instructors get a column. Check the area status and the instructor's **Bookable** toggle. Also confirm the resource's type isn't hidden under **Settings** > **Bookings** > **Schedule Display**, or re-enable it in the resource filter panel.
+**Solution**: Only **active** areas and **bookable** instructors get a column. Check the area status and the instructor's **Bookable** toggle. Also confirm the resource's type isn't hidden under **Settings** > **Bookings** > **Schedule Display**, or re-enable it under **Show on schedule**. If the **Staff** filter is set, only the selected instructors are shown.
 
-**Issue**: A class booking doesn't appear in Week view.
+**Issue**: A class booking doesn't appear in the Week or 3 days view.
 
-**Solution**: This is by design. Class-bound bookings are suppressed in Week view because the class block already represents them. Switch to Day view to see individual bookings.
+**Solution**: This is by design. Class-bound bookings are suppressed in the **3 days** and **Week** views because the class block already represents them. Switch to **Day** or **Timeline** to see individual bookings.
 
 **Issue**: Block colors aren't what I expect.
 

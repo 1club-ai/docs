@@ -3,7 +3,7 @@ title: "Bookings"
 description: "Create, cancel, and look up bookings through the platform API."
 ---
 
-Create a booking when a customer books a court in your app, and cancel it when they cancel on your side. 1Club returns a `bookingId` you use to cancel or look the booking up later.
+Create a booking when a customer books a court in your app, update it when they move it, and cancel it when they cancel on your side. 1Club returns a `bookingId` you use to update, cancel, or look the booking up later.
 
 ## Create a booking
 
@@ -20,7 +20,7 @@ curl -X POST "https://api.1club.ai/v1/platform/bookings" \
     "endTime": "2026-07-20T18:00:00Z",
     "contactId": 300,
     "instructorId": 42,
-    "payment": { "status": "paid", "amount": 54 },
+    "payment": { "status": "paid", "amount": 54, "reference": "pay_8f2c1a", "fee": 5 },
     "channel": "Padel Community",
     "notes": "Booked via Padel Community"
   }'
@@ -34,27 +34,45 @@ Body fields:
 - `customer` - an inline customer matched to a contact by email, instead of `contactId`
 - `instructorId` (optional) - the coach leading the session, from [Instructors](/api-reference/channel-integration/instructors)
 - `payment.status` (required) - `paid` (you collected the money) or `unpaid` (outstanding)
-- `payment.amount` (optional) - amount collected; defaults to the computed price for the slot (max 1,000,000)
-- `channel` (optional) - a label stored for attribution
-- `notes` (optional)
-- `notifyCustomer` (optional) - send the customer a 1Club confirmation email; defaults to `false`
+- `payment.amount` (optional) - the price the customer paid, before any fee you kept; defaults to the computed price for the slot (max 1,000,000)
+- `payment.reference` (optional) - your own id for the payment you collected, up to 128 characters. Requires `payment.status: "paid"`.
+- `payment.fee` (optional) - what you kept out of `amount`, your commission. It does not reduce the sale; the gym reconciles it against your payout statement. Requires `payment.status: "paid"` and an explicit `payment.amount` it cannot exceed.
+- `channel` (optional) - a label stored for attribution, up to 120 characters
+- `notes` (optional) - up to 2,000 characters
+- `notifyCustomer` (optional) - tell the customer their booking is confirmed: email plus the in-app, WhatsApp, and SMS notification, and the payment receipt for a `paid` booking. Defaults to `false` for an API key, since your system normally sends its own confirmation. The gym's own staff alerts are sent either way.
 
-Send **exactly one** of `contactId` or `customer`. Sending both, or neither, is a `400`.
+Send **exactly one** of `contactId` or `customer`. Sending both, or neither, is a `400`. `payment.reference` and `payment.fee` cannot accompany an amount of `0`, which records no payment.
 
 Response (`201 Created`):
 
 ```json
 {
   "bookingId": 48213,
+  "bookingUuid": "0199b2d4-7c1e-7a3f-9d2e-5b8c4f1a2e3d",
   "status": "confirmed",
   "areaId": 51,
+  "classId": null,
+  "eventId": null,
   "instructorId": 42,
   "contactId": 300,
+  "maxPlayers": null,
   "startTime": "2026-07-20T17:00:00.000Z",
   "endTime": "2026-07-20T18:00:00.000Z",
-  "payment": { "status": "paid", "amount": 54 }
+  "payment": {
+    "status": "paid",
+    "amount": 54,
+    "paidAmount": 54,
+    "refundedAmount": 0,
+    "reference": "pay_8f2c1a",
+    "fee": 5
+  }
 }
 ```
+
+- `bookingUuid` - a stable, unguessable identifier. Prefer it over `bookingId` when you store a reference.
+- `maxPlayers` - how many players the booking takes, the organizer included, when it differs from the area type's default (for example `2` on a court booked for singles). `null` means the area type's own limit.
+- `payment.paidAmount` - what has been collected, before any refund. `payment.refundedAmount` - what has been returned. `paidAmount - refundedAmount` is what the gym kept.
+- `payment.reference` and `payment.fee` - what you reported on create, or `null`.
 
 Creating a booking accepts an `Idempotency-Key`, so a timeout cannot become two bookings. See [Idempotency](/api-reference/channel-integration/idempotency).
 
@@ -66,24 +84,26 @@ The inline `customer` object remains supported for integrations that never hold 
 
 ### Adding a coach
 
-Pass `instructorId` when the session is coached rather than a bare court hire. The coach must take one-on-one bookings (`isBookable`), and their own calendar is respected, so a booking that would double-book them is rejected. Attaching a coach also feeds the gym's instructor pay records automatically.
+Pass `instructorId` when the session is coached rather than a bare court hire. The coach must be active in your organization. Their `bookability` setting does not block an API booking, because your key acts for the gym, but their own calendar is respected, so a booking that would double-book them is rejected. Attaching a coach also feeds the gym's instructor pay records automatically.
 
 ### How the amount is calculated
 
-`payment.amount` is optional. When you omit it, 1Club prices the slot itself: the **area price per hour plus the instructor hourly rate, times the duration**. A one hour court at 24 with a coach at 30 is priced at 54. Without an instructor it is just the area price. Send `payment.amount` explicitly whenever your side is the authority on what the customer paid.
+`payment.amount` is optional. When you omit it, 1Club prices the slot itself: the **area price per hour plus the instructor hourly rate, times the duration**. A one hour court at 24 with a coach at 30 is priced at 54. Without an instructor it is just the area price. When the instructor has `priceIncludesArea: true`, their hourly rate is an all-in price and the area price is not added on top. Send `payment.amount` explicitly whenever your side is the authority on what the customer paid.
+
+`payment.amount` is stated the way the gym states its prices: where the gym's tax rate is exclusive, tax is added on top, exactly as for a price entered in the admin.
 
 ### How payment is recorded
 
-- `paid` - 1Club records the booking's charge as paid (a Charge in the 1Club admin, a `transaction` in the Platform API), settled against a dedicated **External / API** payment method (manual channel, no card charged). Counts as revenue and paid.
+- `paid` - 1Club records the booking's charge as paid (a Charge in the 1Club admin, a `transaction` in the Platform API), settled against a payment method named after your API key (manual channel, no card charged). Each key gets its own method, so the gym can tell your revenue apart from every other partner's. Counts as revenue and paid.
 - `unpaid` - 1Club records the booking's charge as outstanding. Counts as accrued revenue with nothing paid.
 
-The `payment.status` you get **back** can also be `no_charge`, which means nothing was ever owed - a free area, or an explicit amount of `0`. There is no charge to settle in that case, so it is reported as `no_charge` rather than as whichever of `paid` or `unpaid` you sent.
+The `payment.status` you get **back** can also be `no_charge`, which means there is nothing to collect - a free area, an explicit amount of `0`, or a membership or external program the customer holds that covers the booking. There is no charge to settle in that case, so it is reported as `no_charge` rather than as whichever of `paid` or `unpaid` you sent.
 
 You keep ownership of collection and refunds. 1Club never charges a card for these bookings.
 
 ### Booking policy is not applied to this API
 
-1Club has member-facing booking rules a gym can configure: a minimum notice period, a maximum number of days in advance, an opening-hours envelope, and a block on slots that have already ended. **None of them are enforced for this API**, because the system calling it runs its own booking rules.
+1Club has member-facing booking rules a gym can configure: a minimum notice period, a maximum number of days in advance, an opening-hours envelope, a block on slots that have already ended, and the coach's working hours. **None of them are enforced for this API**, because the system calling it runs its own booking rules.
 
 That is what lets you record a schedule as it stands, including sessions in the past when you are migrating an existing calendar into 1Club.
 
@@ -91,8 +111,7 @@ That is what lets you record a schedule as it stands, including sessions in the 
   Physical constraints always apply and are never overridden: a genuine
   double-booking, the area's concurrency capacity, a court the gym has **blocked**
   for maintenance or a private hire, a live event on the court, the coach's own
-  calendar, whether an instructor takes one-on-one bookings, and the slot
-  alignment the area requires. A booking that breaks one of these is rejected -
+  calendar, and the slot alignment the area requires. A booking that breaks one of these is rejected -
   see [Conflicts](#conflicts). There is no override parameter.
 </Warning>
 
@@ -147,8 +166,7 @@ contact automatically, as a by-product of booking sync. Sync is one-way:
     archived.
   </Step>
   <Step title="Validate the instructor">
-    When `instructorId` is present, the coach must be active in your organization
-    and must take one-on-one bookings.
+    When `instructorId` is present, the coach must be active in your organization.
   </Step>
   <Step title="Create the booking">
     Link the resolved `contactId` and write the booking, re-checking availability
@@ -157,7 +175,7 @@ contact automatically, as a by-product of booking sync. Sync is one-way:
   </Step>
   <Step title="Record revenue & respond">
     Record the booking's charge (`paid` → settled, `unpaid` → outstanding) and return
-    `201` with `{ bookingId, status, payment }`.
+    `201` with the booking.
   </Step>
 </Steps>
 
@@ -203,10 +221,11 @@ uses for `busy[].subject`. A court conflict is `member_booking`, `class`, `event
 or `area_block`; a coach conflict adds `time_off` and `shift_break`. The counterpart's own `startTime`/`endTime` may be wider
 than the slot you asked for.
 
-`id` and `label` are always `null` on this API. They carry the counterpart's row id
-and the member's name for the gym's own staff calendar, where someone is entitled to
-see who they would be displacing - an integration is not, so it is told that the hour
-is taken and no more.
+`id` and `label` carry the counterpart's id and name (the booking and its customer's
+name, or the class or event and its name). They are `null` unless your key can read
+that counterpart through this API anyway: `bookings:read` for a booking, `classes:read`
+for a class or an event, and `areas:read` for a block. A `bookings:write`-only key is
+told that the hour is taken, and not by whom.
 
 The codes you can see today are `AREA_AT_CAPACITY`, `AREA_BLOCKED`,
 `AREA_RUNNING_EVENT`, `INSTRUCTOR_AT_CAPACITY`, `INSTRUCTOR_TEACHING_CLASS`, and
@@ -224,29 +243,70 @@ through. Re-read availability for the window and offer another slot.
 
 ### Common errors
 
-- `400` - the slot cannot be sold (see [Conflicts](#conflicts)), the area is not bookable through this API, the contact or instructor was not found in your organization, the contact is archived, the instructor does not take one-on-one bookings, or you sent both `contactId` and `customer` (or neither).
+- `400` - the slot cannot be sold (see [Conflicts](#conflicts)), the area is not bookable through this API, the contact was not found in your organization, the instructor was not found or is inactive, the contact is archived, you sent both `contactId` and `customer` (or neither), or `payment.reference` or `payment.fee` was sent without a collected payment.
 - `409` - an `Idempotency-Key` was reused with a different request body. Scheduling conflicts are `400`.
 - `403` - the API key is missing the `bookings:write` scope.
 - `429` - rate limit exceeded (booking writes are throttled in addition to the standard per-org limit).
 
 Opening hours, minimum notice, and how far ahead you may book are **not** enforced for this API - see [Booking policy is not applied to this API](#booking-policy-is-not-applied-to-this-api).
 
+## Update a booking
+
+Requires the `bookings:write` scope. Reschedules a booking, moves it to another area, attaches or removes a coach, reassigns the customer, or changes its notes or price. Send only the fields that change.
+
+```bash
+curl -X PATCH "https://api.1club.ai/v1/platform/bookings/48213" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: booking-48213-move-18h" \
+  -d '{ "startTime": "2026-07-20T18:00:00Z", "endTime": "2026-07-20T19:00:00Z" }'
+```
+
+Body fields, all optional, at least one required:
+
+- `startTime`, `endTime` - ISO date-times with offset. The end must be after the start, whether stored or sent.
+- `areaId` - move the booking to this area. It must be an area this API can sell, as on create.
+- `instructorId` - attach this coach, or `null` to take the coach off. The coach must be free at the time.
+- `contactId` - reassign the booking to this contact. An outstanding charge moves with it.
+- `notes` - up to 2,000 characters
+- `amount` - the booking's new price, before tax, in the gym's currency (max 1,000,000). Omit it to keep the price you recorded.
+- `notifyCustomer` - tell the customer their booking changed. Sent only when the edit names a time, area, or instructor. Defaults to `false` for an API key. A body with nothing but `notifyCustomer` is refused.
+
+Returns the booking after the edit, in the same shape as create. As on create, the gym's booking rules are not applied, but an occupied or blocked court, or a coach who is already booked, is refused with `400` and `details.conflicts` - see [Conflicts](#conflicts).
+
+- A cancelled booking cannot be edited (`BOOKING_CANCELLED`), and a booking on a class takes its time and price from the class (`BOOKING_ON_CLASS_NOT_RESCHEDULABLE`).
+- Payment status cannot be changed here. A new `amount` on a paid booking leaves any increase outstanding. A price below what was already paid is refused with `409` (`BOOKING_CHARGE_OVERPAID`), because it needs a refund rather than an edit.
+- A booking an API key created cannot be made to recur (`RECURRENCE_NOT_AVAILABLE_TO_MANAGING_KEY`), so each session you sell stays its own booking.
+
 ## Cancel a booking
 
-Requires the `bookings:write` scope. Cancels the booking by its 1Club id. No refund is issued by 1Club.
+Requires the `bookings:write` scope. Cancels the booking by its 1Club id. 1Club moves no money: you collected the payment, so you return it.
 
 ```bash
 curl -X POST "https://api.1club.ai/v1/platform/bookings/48213/cancel" \
-  -H "Authorization: Bearer 1club_sk_live_..."
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "reason": "Customer cancelled in app", "refund": { "amount": 44, "reference": "refund_8f2c1a" } }'
 ```
+
+The body is optional. Fields:
+
+- `reason` (optional) - why the booking is cancelled, up to 500 characters. Shown to the gym's staff on the cancellation. Defaults to a note naming the API.
+- `refund.amount` (optional) - what you returned to the customer. `0` records no refund, for example when you kept the whole payment as a cancellation fee. It cannot exceed what was collected (`400` with `code: "AMOUNT_EXCEEDS_REFUNDABLE"`).
+- `refund.reference` (optional) - your own id for the refund, up to 128 characters
+- `notifyCustomer` (optional) - tell the customer the booking was cancelled. Defaults to `false` for a booking this API created.
 
 Response:
 
 ```json
-{ "bookingId": 48213, "status": "cancelled" }
+{ "bookingId": 48213, "status": "cancelled", "refundedAmount": 44 }
 ```
 
-Cancelling is idempotent: cancelling an already-cancelled booking succeeds and returns the same response.
+Cancelling with an API key **records a refund of everything collected** unless `refund.amount` says otherwise, so the gym's revenue matches yours. Send the amount you actually returned to keep a cancellation fee, or `0` if you kept it all. `refundedAmount` is what this call recorded, and `0` when nothing was. An `unpaid` booking records nothing.
+
+Cancelling is idempotent: cancelling an already-cancelled booking succeeds with `status: "cancelled"`. A repeat records a refund only when it carries an explicit `refund`, so a retry can record a refund that failed the first time without ever recording one twice.
+
+A booking that has already been checked in cannot be cancelled (`409`, `BOOKING_ALREADY_CHECKED_IN`). One occurrence of a recurring booking is cancelled, not the series.
 
 ## Look up a booking
 
@@ -257,28 +317,18 @@ curl "https://api.1club.ai/v1/platform/bookings/48213" \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
-```json
-{
-  "bookingId": 48213,
-  "status": "confirmed",
-  "areaId": 51,
-  "instructorId": 42,
-  "contactId": 300,
-  "startTime": "2026-07-20T17:00:00.000Z",
-  "endTime": "2026-07-20T18:00:00.000Z",
-  "payment": { "status": "paid", "amount": 54 }
-}
-```
-
-A `404` means no booking with that id exists in your organization. Pass
-`include=customer` to embed the contact, as on
+Returns the same object as one row of [List bookings](#list-bookings). A `404` means no
+booking with that id exists in your organization. Pass `include` to embed more, as on
 [List bookings](#embedding-the-customer).
 
 <Note>
-  Look-up and cancel only reach bookings **this API created**. That is deliberate:
-  cancelling issues no refund, so a key must not be able to cancel a booking a
-  member made in the gym's own app. To see bookings from every channel, use
-  [List bookings](#list-bookings).
+  Reads reach **any** booking in your organization, whichever channel created it.
+  Writes do not: update, cancel, and adding or removing players reach only the
+  bookings **an API key created** (`source: "api"`), and any other booking is
+  reported as not found. That is deliberate, so a key cannot change or cancel a
+  booking a member made in the gym's own app. A booking another API key manages is
+  refused with `409` and `code: "BOOKING_EXTERNALLY_MANAGED"`, naming that
+  integration in `details.managedBy`.
 </Note>
 
 ## List bookings
@@ -292,10 +342,11 @@ curl "https://api.1club.ai/v1/platform/bookings?from=2026-07-20T00:00:00Z&to=202
 
 Query parameters:
 
-- `from`, `to` (optional) - ISO date-times bounding the booking start time. The window may span at most 93 days. Omit both for the next 7 days; pass one and the other is derived from it.
+- `from`, `to` (optional) - ISO date-times, or a bare `YYYY-MM-DD` read as midnight UTC, bounding the booking start time. `from` is inclusive and `to` exclusive. The window may span at most 93 days. Omit both for the next 7 days; pass one and the other is derived from it.
 - `clubId`, `areaId`, `instructorId`, `contactId` (optional) - narrow to one gym, court, coach, or customer
+- `classId`, `eventId` (optional) - only the attendees of one class occurrence, or the bookings for one event
 - `status` (optional) - for example `confirmed`, `pending`, `cancelled`
-- `include` (optional) - `customer` embeds each booking's customer, see [Embedding the customer](#embedding-the-customer)
+- `include` (optional) - comma-separated expansions: `customer`, `money`, `cancellation`. See [Embedding the customer](#embedding-the-customer).
 - `limit` (optional) - 1 to 100, defaults to 50
 - `offset` (optional) - defaults to 0
 
@@ -306,17 +357,21 @@ Response:
   "data": [
     {
       "bookingId": 48213,
+      "bookingUuid": "0199b2d4-7c1e-7a3f-9d2e-5b8c4f1a2e3d",
       "status": "confirmed",
       "areaId": 51,
+      "classId": null,
+      "eventId": null,
       "instructorId": 42,
       "contactId": 300,
+      "maxPlayers": null,
       "clubId": 5,
       "source": "api",
       "notes": null,
       "createdAt": "2026-07-18T08:30:00.000Z",
       "startTime": "2026-07-20T17:00:00.000Z",
       "endTime": "2026-07-20T18:00:00.000Z",
-      "payment": { "status": "paid", "amount": 54 }
+      "payment": { "status": "paid", "amount": 54, "paidAmount": 54, "refundedAmount": 0, "reference": "pay_8f2c1a", "fee": 5 }
     }
   ],
   "total": 1,
@@ -325,7 +380,7 @@ Response:
 }
 ```
 
-Unlike look-up by id, this returns bookings from **every** channel, each tagged with `source` (`api` for yours, plus `admin`, `portal`, `app`, and others). That is what makes reconciliation possible: a caller that cannot see member and staff bookings cannot tell that a slot it thinks is free was taken in the gym's own tools.
+This returns bookings from **every** channel, each tagged with `source` (`api` for yours, plus `admin`, `portal`, `app`, `kiosk`, `network`, `website`, and `integration`). That is what makes reconciliation possible: a caller that cannot see member and staff bookings cannot tell that a slot it thinks is free was taken in the gym's own tools.
 
 ### Embedding the customer
 
@@ -354,6 +409,9 @@ Each row in `data` then carries a `customer` alongside its `contactId`:
     "email": "alex@example.com",
     "phone": "+359881234567",
     "type": "member",
+    "pipelineStageId": null,
+    "sourceId": null,
+    "assignedToId": null,
     "createdAt": "2026-05-02T09:14:00.000Z"
   }
 }
@@ -370,6 +428,15 @@ booking has no contact.
   1Club requires an email **or** a phone on a contact, not both.
 </Note>
 
+### Money and cancellation
+
+Two more expansions sit alongside `customer`. Combine them with commas, for example `include=customer,money,cancellation`.
+
+- **`money`** - what the booking billed, what was paid, and what is still outstanding, with the charges, cancellation credits, payments, and refunds behind those figures. Requires `transactions:read`.
+- **`cancellation`** - the cancellation terms stamped on the booking when it was accepted, with the deadlines they give and until when it cancels for free, and, once cancelled, who cancelled it, when, why, with how much notice, and at what refund. Needs no scope beyond `bookings:read`.
+
+An expansion whose scope your key lacks is refused with `403` rather than left out.
+
 If your key deliberately holds no contacts scope, attendee **names** are still
 available for class bookings: `GET /v1/platform/classes/{id}/bookings` returns
 `contactName` under `bookings:read` alone, and gates only the email on
@@ -382,7 +449,7 @@ A doubles court is booked by one person but played by several. The customer the 
 
 ### List players
 
-Requires the `bookings:read` scope.
+Requires the `bookings:read` scope. Works on any booking in your organization. Adding and removing players reaches only the bookings an API key created, as with cancel.
 
 ```bash
 curl "https://api.1club.ai/v1/platform/bookings/48213/participants" \
@@ -403,6 +470,8 @@ curl -X POST "https://api.1club.ai/v1/platform/bookings/48213/participants" \
   -H "Content-Type: application/json" \
   -d '{ "contactId": 301 }'
 ```
+
+Returns `201` with `{ "bookingId": 48213, "contactId": 301 }`.
 
 ### Remove a player
 

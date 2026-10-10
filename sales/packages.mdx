@@ -16,6 +16,7 @@ Typical uses:
 - **A beginner day at a climbing gym** - a day pass plus a chalk bag and a guidebook, sold at one price from the **Packages** tab on the point of sale.
 - **A martial-arts trial with a gi** - a trial month and a uniform attached to the signup form, so prospects buy the whole bundle when they register online.
 - **A term paid up front** - one class-pack plan at **Qty 3**, priced below three individual packs.
+- **A kids' birthday party** - a bookable package that runs on Saturdays at 10:00 or 14:00, priced per child, where parents pick a free slot and the number of kids on your order form.
 
 See [Worked examples](#worked-examples) for how to set up each of these.
 
@@ -36,23 +37,44 @@ You manage packages under **Sales** > **Products** > **Packages** in the admin (
 
 Packages are shown in a data grid with columns for **Name**, **Price**, **Items** (the component count), **Visibility**, and **Status** (Active or Inactive), plus a row menu to edit or delete. Click a row to open the package dialog.
 
+The **Packages** sub-tab needs the **billing.read.club** permission.
+
 ## Creating or editing a package
 
 1. Go to **Sales** > **Products** > **Packages**.
 2. Click **Add package** to open the package dialog.
 3. Enter a **Name** and the **Package price** - the single fixed price charged for the whole bundle.
 4. Under **Items in this package**, use **Add Plan** and **Add Product** to add components, and set a **Qty** for each. A package must contain at least one item.
-5. Optionally set **Visibility**, **Active**, a **Description**, an **Image**, and a **Color**.
-6. Save.
+5. Optionally set a **Barcode**, **Visibility**, **Club**, **Active**, a **Description**, an **Image**, and a **Color**.
+6. Optionally turn on **Use a single quantity for the whole package** or **Bookable** (see below).
+7. Save.
 
 ### Per-field reference
 
 - **Name** - required.
-- **Package price** - the single fixed price for the whole bundle. This is what the customer is charged, regardless of the sum of the components' list prices.
+- **Package price** - the single fixed price for the whole bundle. This is what the customer is charged, regardless of the sum of the components' list prices. Labeled **Base price** when the package uses a single quantity.
+- **Barcode** - an optional code printed on a shelf card. Scan the card into this field to fill it in. When the code is scanned at the [Point of Sale](/pos/point-of-sale), the register adds this package to the basket.
+- **Club** - leave as **All clubs** to sell the package everywhere. Pick one gym and the package's slots run on that gym's clock.
 - **Items in this package** - the plans and products included. Add a plan or a product row, choose the item, and set its **Qty**. Only active plans and products can be selected, and a product set to **Rented out** cannot be part of a package (see [Equipment rentals](/sales/rentals)). The item pickers show each option's list price for reference.
-- **Visibility** - **Public**, **Member only**, or **Private** (admin-only).
+- **Visibility** - **Public**, **Admin & Member**, or **Admin only**.
 - **Active** - inactive packages are hidden from the POS and order forms.
-- **Description**, **Image** (up to five), **Color** - display fields shown on the package and public surfaces.
+- **Description**, **Image** (up to five), **Color** - display fields shown on the package and public surfaces. Use the translate button to translate the name, description, and unit label.
+
+### Single quantity for the whole package
+
+Turn on **Use a single quantity for the whole package** when the buyer should pick one number that applies to every item, for example the number of kids at a party. Per-item quantities are turned off and the price is charged per unit. The extra fields are:
+
+- **Minimum quantity**, **Maximum quantity**, and **Default quantity** - the range the buyer can pick from and where it starts.
+- **Base price** - the price for the minimum quantity.
+- **Additional unit price** - charged for each unit above the minimum quantity.
+- **Unit label** - what one unit is called (for example _kids_, _sessions_, or _guests_). It shows next to the quantity on a form.
+
+### Bookable packages
+
+Turn on **Bookable** for parties, team building, and private hire. Buyers then pick one of the package's slots when they buy it on a [form](/marketing/forms).
+
+- **Days it runs** - the weekdays the package is offered. Leave empty to allow any day.
+- **Slots** - the start times you run the package at. Type a **Time** and click **Add**. A slot is either taken or free, so once someone books a slot on a given date, nobody else can.
 
 <Note>
 Packages are categorized and priced at the package level; the components keep their own revenue accounts. There's no separate tax field on a package - tax is applied per component at sale time using your organization's tax settings (see [How the revenue split works](#how-the-revenue-split-works)).

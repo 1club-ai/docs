@@ -1,0 +1,115 @@
+---
+title: Contacts
+description: Decide how members are identified, which standard contact fields staff and members must fill in, whether family members can join at signup, and which custom fields you collect, under Settings > Members > Contacts.
+keywords: [contacts, contact fields, custom fields, signup fields, required fields, member identifier, phone sign-in, family members, saved payment method]
+---
+
+The **Contacts** settings page decides what 1Club asks for whenever a contact record is created: by staff in the admin, or by a member signing up or completing their own profile. Owners and admins set it up once, and it then drives the contact forms, the signup flow, and any [form](/marketing/forms) that signs people up.
+
+## When to use it
+
+Every gym collects slightly different details. These settings let you ask for exactly what you need, and nothing more, without changing each form by hand.
+
+- **A kids' academy** makes **Date of birth** required for both the account holder and each child, so every junior is enrolled with an age.
+- **A gym whose members live on WhatsApp** identifies members by **Phone number**, so new members sign up and sign in with a code instead of an email and password.
+- **A climbing gym** adds an **Emergency contact** custom field that members fill in at signup and staff see on the profile.
+- **A studio that bills by card** marks **Saved payment method** as required, so members without a card on file see a reminder in the portal and app.
+
+## Where to find it
+
+Go to **Settings** > **Members** > **Contacts**. The page has four parts, top to bottom:
+
+1. **How members are identified**
+2. **Standard Fields**
+3. **Show family members on signup**
+4. **Custom Fields**
+
+Changes to the first three save as soon as you make them. Custom fields are added and edited in a dialog.
+
+## How members are identified
+
+Choose what a member's account is keyed on:
+
+- **Email** - A phone number is contact information only. Members sign in with their email and password.
+- **Email or phone number** - Every account still has an email address, and sign-in and sign-up lead with it. Members can also sign in with a verified phone number.
+- **Phone number** - New members are asked for a phone number and get a one-time code by WhatsApp or SMS. An email address is optional.
+
+The note above the options spells out what signup collects and how members sign in under your current choice. If no way to deliver a one-time code has been set up for the platform, only **Email** is available and the options are greyed out.
+
+<Warning>
+Normalize your contact phone numbers before you choose **Email or phone number** or **Phone number**. Sign-in matches a member by the number on their contact, so a number written differently can land a member on a new record instead of their own.
+</Warning>
+
+See [Member authentication](/members/member-authentication) for the full sign-in behavior under each option.
+
+## Standard fields
+
+**Standard Fields** is a table of the built-in contact fields with three settings each:
+
+- **Admin** - Whether staff must fill the field in when they add or edit a contact: **Required** or **Optional**.
+- **Member** - Whether the member is asked for it when they sign up or complete their own profile: **Required**, **Optional**, or **Don't show**.
+- **Applies to** - Where the field is collected at signup: **Account holder**, **Child** (each child's row on the household step), or **Both**. It is greyed out when the **Member** column is **Don't show**.
+
+| Field | Out of the box | Limits |
+| --- | --- | --- |
+| **Last name** | Required for staff and members, both | **Member** cannot be **Don't show**, and **Applies to** is always **Both** |
+| **Email** | Required for staff and members, account holder | **Member** cannot be **Don't show**, and **Applies to** offers no **Child** option |
+| **Phone** | Optional for staff, not shown to members, account holder | |
+| **Date of birth** | Optional for staff, not shown to members, both | |
+| **Gender** | Optional for staff, not shown to members, both | |
+| **Profile photo** | Optional for staff, not shown to members, both | **Admin** is always **Optional** |
+
+When members are identified by **Email**, the account holder always provides an email address, so the **Member** column for **Email** only decides whether family members are asked for one.
+
+### Saved payment method
+
+The last row, **Saved payment method**, is not a form field. Set it to **Required** and members without a saved card see a reminder in the portal, on the website, and in the app, and payment notifications ask them to add one. It never blocks signup or booking. The row needs Stripe: until you [connect Stripe](/settings/integrations/stripe), it stays on **Optional** and cannot be changed.
+
+## Family members on signup
+
+**Show family members on signup** lets members add family members, such as children or a partner, while they sign up. It is on by default. Turn it off and the household step is hidden. See [Member onboarding](/members/onboarding#family-members-on-signup).
+
+## Custom fields
+
+Custom fields collect information the standard fields do not cover, such as an emergency contact, a T-shirt size, or a belt grade from a previous gym. They appear on the contact form, on the member profile, and, when visible to members, at signup.
+
+To add one, click **Add Field**. To change or remove one, use the row's **Edit** or **Delete** action. Drag a row by its handle to change the order the fields appear in.
+
+Each field has:
+
+- **Field Name** - The internal name, for example `emergency_contact`.
+- **Field Label** - What staff and members see, for example _Emergency Contact_.
+- **Contact Type** - Which contact types the field applies to: **Member**, **Staff**, **Lead**, **Contact**, **Lapsed**, or **Drop-in**. Leave it empty to apply to all contact types.
+- **Applies to** - At signup, whether the field is collected for the **Account holder**, each **Child**, or **Both**.
+- **Field Type** - **Text Input**, **Text Area**, **Number**, **Yes/No**, **Dropdown**, **Date**, **Time**, **Email**, **URL**, or **Phone**. A **Dropdown** takes its options one per line.
+- **Visibility** - **Admin only**, **Admin & Member**, or **Public**. Only fields visible to members can be asked for at signup.
+- **Placeholder** and **Default Value** - Optional hints for the input.
+- **Required Field** - Staff cannot save a contact without this field.
+- **Required on Signup** - Members must fill it in when they sign up. Needs **Admin & Member** or **Public** visibility. A required field that members can see must also be required on signup.
+- **Active** - Turn a field off without deleting it.
+
+<Tip>
+When importing members, name a CSV column `custom_` followed by the field name and it maps to that custom field automatically. See [Import](/settings/import).
+</Tip>
+
+## Permissions
+
+Viewing this page needs Settings access, and changing the identifier, the standard fields, the family toggle, or the saved payment method needs Settings **Full access**. Adding, editing, reordering, and deleting custom fields is checked against the Members module (**Create**, **Edit**, and **Delete** at organization scope). See [Roles and permissions](/reference/roles-permissions).
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| The **How members are identified** options are greyed out | No way to deliver a one-time code has been set up for the platform | Only **Email** is available until it is |
+| **Saved payment method** is stuck on **Optional** | Stripe is not connected | [Connect Stripe](/settings/integrations/stripe) |
+| **Required on Signup** cannot be turned on | The field's **Visibility** is **Admin only** | Change **Visibility** to **Admin & Member** or **Public** first |
+| **Applies to** is greyed out for a standard field | Its **Member** column is **Don't show**, or the field is **Last name** | Show the field to members first; **Last name** always applies to both |
+| A member signed in and landed on a new, empty record | Their phone number on file does not match the one they typed | Normalize phone numbers before switching to phone sign-in |
+
+## Related
+
+- [Member authentication](/members/member-authentication) - How members sign in under each identifier.
+- [Member onboarding](/members/onboarding) - The signup flow these fields feed.
+- [Forms](/marketing/forms) - Signup forms follow this page's field configuration.
+- [Member profiles](/members/member-profiles) - Where staff see and edit contact details and custom fields.
+- [Settings overview](/settings/overview) - The full map of Settings categories.

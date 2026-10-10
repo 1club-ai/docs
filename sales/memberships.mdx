@@ -64,14 +64,21 @@ Each row shows:
 
 - **Contact** - the member who holds the membership.
 - **Plan** - the plan the membership was sold under.
-- **Price** - the snapshotted price, with the billing frequency underneath.
-- **Auto renew** - Yes/No (shown as "-" for one-time memberships).
-- **Usage** - the allowance bar (see [How usage is counted](#how-usage-is-counted)). Shows **Unlimited** when the plan has no use cap.
 - **Period** - the current period's start and end dates ("Ongoing" for recurring memberships with no fixed end).
+- **Price** - the snapshotted price, with the billing frequency underneath.
+- **Auto Renew** - Yes/No (shown as "-" for one-time memberships).
+- **Shared with account** - **Yes** when everyone on the holder's household or company account can use the membership, otherwise "-".
+- **Usage** - the allowance bar (see [How usage is counted](#how-usage-is-counted)). Shows **Unlimited** when the plan has no use cap.
 - **Status** - the status chip.
-- **Payment status** - whether the membership's charges are paid, pending, or overdue.
+- **Payment Status** - whether the membership's charges are paid, pending, or overdue.
 
-Click a row to open the membership detail page. The row action menu exposes **View**, **Edit**, and the lifecycle actions that apply to the current status.
+Click a row to open the [membership detail page](#the-membership-detail-page). The row action menu exposes **View**, **Edit**, and the actions that apply to the current status: **Renew**, **Extend**, **Reconcile bookings**, **Pause**, **Resume**, **Cancel Membership**, **Add Payment** (while something is unpaid), and **Delete**.
+
+### Reconcile bookings
+
+**Reconcile bookings** covers a member's eligible bookings in the current period with the membership, up to its remaining allowance. Use it when bookings were paid some other way before the member bought a capped membership that should cover them. Bookings beyond the allowance stay on their existing payment. It is offered on active memberships with a use cap.
+
+To reconcile several at once, select rows with the checkboxes and choose **Reconcile bookings** from the bulk actions. Non-active memberships are skipped. If some fail, they stay selected so you can retry them.
 
 ## Adding a membership
 
@@ -83,6 +90,17 @@ Click **Add Membership**. The dialog lets you:
 4. **Set auto-renew.** Only available for recurring frequencies; defaults from the plan.
 5. **Apply a discount (optional).** Enter a promotion code or pick a discount in the price section. The discount lowers the saved price, so recurring renewals inherit the reduced amount going forward. Only discount-type promotions apply here, not wallet vouchers.
 6. **Take payment (optional).** If the plan requires payment upfront, the payment section opens automatically. You can still save without a payment: the dialog notes that the plan is normally paid when sold, and the amount stays as an outstanding balance to collect from the member's profile. The signup fee is charged as a separate charge and is not reduced by a discount.
+
+## The membership detail page
+
+Click a row to open a membership's detail page. It shows:
+
+- A **Membership Details** card with the plan, status, price, signup fee, any discount, billing frequency, auto-renew, sharing, usage, and payment status, plus pause details and any days it was **Extended** by, with the reason.
+- A **Payment** card with the **Total**, what is **Paid**, and what is **Still owed**.
+- A **Member** card linking to the holder.
+- Tabs for the membership's **Charges**, **Bookings**, and **Check-in History**, each with a count.
+
+While a charge on the membership is unpaid, **Add Payment** leads the header so you can collect it in one click. **Edit** sits beside it. The more-actions menu holds **Renew**, **Extend**, **Reconcile bookings**, **Pause**, **Resume**, **Cancel**, and **Delete**, each shown only when it applies.
 
 ### Editing a membership
 
@@ -116,6 +134,12 @@ When you **Resume** (available only from **Paused**), the end date and renewal d
 
 The renew dialog previews the resulting **New billing period** dates and the price. You can renew now and leave the charge pending for later settlement. If the plan requires payment upfront, the dialog notes it, and without a payment the new period stays as an outstanding balance. One-time memberships show a warning and cannot be renewed - create a new membership instead.
 
+### Extend
+
+**Extend** adds days on top of the period the plan sets, for example to make up for a closure. Enter the **Extra days** and a **Reason**. The dialog shows the **New date** the membership ends or renews on. Use a negative number to take back days granted by mistake. The extension and its reason show on the membership detail page.
+
+Extend is available on any membership that has an end or renewal date and is not cancelled. If the membership has already ended, the extra days bring it back to active.
+
 ### Cancel
 
 **Cancel** is available for any membership that is not already cancelled or expired. What the dialog offers depends on auto-renew:
@@ -127,6 +151,8 @@ The renew dialog previews the resulting **New billing period** dates and the pri
 - **Season passes** open their own dialog instead. Ending one has to release the courts and close the pass together, so the generic cancel is refused for them. See [Cancelling a season pass](/schedule/season-passes#cancelling-a-season-pass).
 
 Either mode voids any pending future recurrence charges so the member is not billed again. A membership already scheduled to cancel at period end can be flipped to immediate cancellation from the same dialog.
+
+Cancelling needs the memberships delete permission, not just update, because it ends the subscription and triggers its refunds.
 
 ### Delete
 

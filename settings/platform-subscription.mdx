@@ -1,10 +1,10 @@
 ---
 title: Platform subscription
-description: Manage your organization's own 1Club (SaaS) subscription - the platform plan tiers Free, Grow, and Run, the 30-day Grow trial, plan add-ons like Website, usage quotas, and the Stripe billing portal.
-keywords: [platform plan, platform subscription, Free plan, Grow plan, Run plan, Grow trial, plan add-on, Website add-on, billing portal, quota, active member limit, message limit, SaaS subscription, upgrade, downgrade]
+description: Manage your organization's own 1Club (SaaS) subscription - a platform plan per location (Free, Grow, or Run), the 30-day Grow trial, plan add-ons like Website, the shared member allowance, and the Stripe billing portal.
+keywords: [platform plan, platform subscription, Free plan, Grow plan, Run plan, Grow trial, plan add-on, Website add-on, billing portal, quota, active member limit, message limit, SaaS subscription, upgrade, downgrade, per-club billing, locations]
 ---
 
-Your platform subscription is the SaaS plan your organization pays 1Club for - the tier that unlocks features, sets your usage quotas, and determines what add-ons you can buy. Owners and admins manage it. This is entirely separate from the [Plans](/sales/plans) you sell to your own members: those are membership templates you charge members for, billed through your own Stripe account. This page is about what you pay 1Club.
+Your platform subscription is what your organization pays 1Club for. Each location (each entry under **Settings** > **Clubs**) has its own platform plan - the tier that unlocks features, adds to your member allowance, and determines what add-ons that location can buy - and all paid locations are billed together on one subscription. Owners and admins manage it. This is entirely separate from the [Plans](/sales/plans) you sell to your own members: those are membership templates you charge members for, billed through your own Stripe account. This page is about what you pay 1Club.
 
 <Note>
 Do not confuse the two. **Platform plan** (Free / Grow / Run) is your SaaS tier with 1Club. **Plan** under [Sales > Plans](/sales/plans) is a membership or pass template you sell to members. They use different billing rails and different money flows.
@@ -12,30 +12,40 @@ Do not confuse the two. **Platform plan** (Free / Grow / Run) is your SaaS tier 
 
 ## When to use it
 
-Your platform plan decides which 1Club features your gym can use and how many active members and marketing messages it can have. You come back to it when you start out, when your member count changes, when you need an add-on, or when you want to pause paid features.
+Your platform plans decide which 1Club features your gym can use and how many active members and marketing messages it can have. You come back to them when you start out, when your member count changes, when you open a new location, when you need an add-on, or when you want to pause paid features.
 
 Typical uses:
 
-- **Trying paid features before paying** - a new padel gym starts the 30-day Grow trial with no card to try automations, verifies its email domain so it can send during the trial, and upgrades before the trial ends.
-- **Matching the plan to your size** - a jiu-jitsu academy with 180 active members picks the **Run 200** tier, and moves up to **Run 400** as it grows.
-- **Adding a public website** - a yoga studio on a paid plan adds the **Website** add-on, with a prorated charge on its next invoice.
+- **Trying paid features before paying** - a new padel gym gets the 30-day Grow trial at signup with no card, tries automations, verifies its email domain so it can send during the trial, and picks a paid plan before the trial ends.
+- **Matching the plan to your size** - a jiu-jitsu academy with 180 active members puts its location on **Run 200**, and moves up to **Run 400** as it grows.
+- **Running several locations** - a climbing gym runs its flagship on Grow and keeps a small satellite location on Free at no charge.
+- **Adding a public website** - a yoga studio adds the **Website** add-on to its location's paid plan.
 - **Pausing paid features** - a climbing gym downgrades to Free over a quiet stretch and keeps its data for when it upgrades again.
 
 See [Worked examples](#worked-examples) for how each of these plays out.
 
 ## Platform plan tiers
 
-1Club offers three platform plans. The plan catalog (names, prices, quotas, and features) is defined in Stripe, so exact prices depend on your organization's currency (USD, EUR, or GBP) and current pricing. The tiers are:
+1Club offers three platform plans, and each location is on one of them. The plan catalog (names, prices, quotas, and features) is defined in Stripe, so exact prices depend on your organization's currency (USD, EUR, or GBP) and current pricing. The tiers are:
 
 | Plan | Who it is for | Active member quota | Marketing messages |
 | --- | --- | --- | --- |
-| **Free** | Clubs just getting started with core scheduling | Capped (indicatively around 100 active members) | Not included |
+| **Free** | Gyms just getting started with core scheduling | Capped (indicatively around 100 active members) | Not included |
 | **Grow** | Growing teams that want automation and reporting | Unlimited | Daily and monthly message allowance |
 | **Run** | Larger organizations needing scale and premium support | Tiered by active member count | Included allowance |
 
-- **Free** is a database-only state. There is no Stripe subscription behind it and no charge. If a paid plan or trial is cancelled or expires with no active subscription remaining, your organization falls back to Free automatically.
+- **Free** is the state of having no paid plan. There is no Stripe subscription behind it and no charge. A location on Free costs nothing. If a paid plan or trial is cancelled or expires with no active subscription remaining, your organization falls back to Free automatically.
 - **Grow** is a flat paid plan with unlimited active members and a messaging allowance. It is the plan the trial gives you.
-- **Run** is a tiered paid plan. Its price and member quota scale with how many active members you have, across tiers named **Run 100**, **Run 200**, **Run 400**, and **Run Unlimited**. When you select Run you pick a tier with the **active members** slider.
+- **Run** is a tiered paid plan. Its price and member allowance scale with size, across tiers named **Run 100**, **Run 200**, **Run 400**, and **Run Unlimited**. When you select Run you pick a size with the slider.
+
+### Locations on different plans
+
+When your locations are on different plans, they combine into one set of limits for the organization:
+
+- **Features follow the best plan.** If any location is on Grow, the whole organization gets Grow's features.
+- **Member allowances add up.** Your active-member limit is the sum of your paid locations' allowances, and one location on an unlimited plan makes it unlimited. Locations on Free add no members.
+- **Message limits take the highest allowance** rather than adding up.
+- **Plan add-ons belong to one location.** See [Plan add-ons](#plan-add-ons).
 
 <Note>
 "Active members" means contacts with a member or drop-in type in your organization. This is the count that drives Run tier pricing and the active-member quota.
@@ -43,71 +53,80 @@ See [Worked examples](#worked-examples) for how each of these plays out.
 
 ### Monthly or yearly
 
-Each paid plan can be billed **Monthly** or **Yearly**. Use the toggle above the plan cards to switch what price is shown; yearly is displayed as a per-month equivalent with a "billed yearly" note. The billing frequency you choose is applied when you check out.
+Each paid plan can be billed **Monthly** or **Yearly**. You choose with the toggle above the plan cards when you start your subscription, and the frequency you choose is applied when you check out. Every location on one subscription shares its billing frequency, so once the subscription is live the plan picker uses that frequency for every location.
 
 ## The Grow trial
 
 The **Grow trial** is a one-time, 30-day entitlement to the Grow plan:
 
-- **30 days.** The trial runs for 30 days from when it starts.
+- **Granted at signup.** A new organization starts on the Grow trial automatically, and it runs for 30 days. You don't start it from the subscription page. An organization created from a 1Club network listing starts on Free with no trial.
 - **No card required.** The trial is tracked entirely in your platform subscription record (status `trialing` with a trial end date) with no Stripe subscription behind it. You are never charged to start it.
-- **One per organization.** Each organization can use the trial only once. The trial end date is kept permanently as the "trial consumed" marker, so once you have had a Grow trial you cannot start another - even after downgrading to Free.
+- **One per organization.** Each organization can use the trial only once. The trial end date is kept permanently as the "trial consumed" marker, so once you have had a Grow trial you cannot get another - even after downgrading to Free.
 - **Expires to Free.** If you do not convert to a paid plan before the trial ends, your organization moves to the Free plan. You keep your data; you lose the paid features.
 
-While the trial is active you see a banner: "Your Grow trial ends on {date}" with the reminder "Choose a plan to continue using 1Club. After your trial ends, you'll be moved to the Free plan." To keep Grow features, select a paid plan from **Available plans** before the trial ends - this sends you to Stripe Checkout to add a payment method and start paying.
+While the trial is active, the sidebar shows your plan as **Grow Trial**, and the subscription page shows a price of 0 with **Trial ends on** and the date. To keep paid features, choose a paid plan for a location before the trial ends - this sends you to Stripe Checkout to add a payment method and start paying.
 
 <Warning>
-Sending marketing messages during the trial requires a verified email domain. A trialing organization without a verified domain is blocked from sending until it either verifies a domain or moves to a paid (active) plan. Paid customers are never subject to this restriction. Verify your sending domain under **Settings** > **Organization** > **Domains** before you plan a campaign; see [Email sending](/settings/email-sending).
+Sending marketing messages during the trial requires a verified email domain. A trialing organization without a verified domain is blocked from sending until it either verifies a domain or moves to a paid (active) plan. Paid customers are never subject to this restriction. Verify your sending domain under **Settings** > **Organization** > **Domains** before you plan a marketing send; see [Email sending](/settings/email-sending).
 </Warning>
 
 ## The subscription page
 
-Your platform subscription is stored against your organization and controlled from **Settings** > **Organization** > **Subscription** at `/settings/organization/subscription`. **Account & Billing** in the account menu at the bottom of the sidebar opens the same page. From the subscription settings page you can:
+Your platform subscription is controlled from **Settings** > **Organization** > **Subscription** at `/settings/organization/subscription`. **Account & Billing** in the account menu at the bottom of the sidebar opens the same page. The page reads like the invoice it predicts:
 
-- See your current platform plan, its price, billing frequency, and status.
-- Compare the available tiers - **Free**, **Grow**, and **Run** - and switch between them.
-- Start the **Grow trial** (30 days, no card required, one per organization).
-- Add or remove **plan add-ons** such as **Website**.
-- Track your **usage** against plan quotas (active members and marketing messages).
-- Open the **Stripe billing portal** to manage payment methods, invoices, and cancellations.
+- **The header** - what you pay per period (or **Free**), the subscription status, and **Renews on** with the next renewal date. A cancelled subscription shows its **End date** instead, and a trial shows **Trial ends on**. **Manage billing** opens the [Stripe billing portal](#billing-portal).
+- **One line per location** - the location's plan (or Free), what it adds to your member allowance (for example **200 members**, **Unlimited members**, or **Adds no members**), and its price or **No charge**. Paid add-ons the location carries are listed under it. Click **Upgrade** on a location on Free, or **Plan & add-ons** on a paid location, to change its plan.
+- **Discounts** - when a coupon applies, a **Subtotal** and each discount appear, so the total matches your invoice.
+- **The footer** - your active members against your organization's combined allowance (for example "180 of 200 members across your organization"), with a progress bar that turns amber from 85%, the number of locations, and **Add Club** to create a new location.
 
-Viewing the page requires the `settings.read.organization` permission. Changing your plan, managing add-ons, or opening the billing portal requires `settings.manage.organization`.
+Viewing the page requires the `settings.read.organization` permission. Changing a plan, managing add-ons, or opening the billing portal requires `settings.manage.organization`.
+
+<Note>
+Some older subscriptions are billed for the whole organization rather than per location. They show a single **All clubs** line with **Change plan**, which opens the organization-wide **Choose a plan** cards, and their add-ons appear as lines under it. If some locations show "included (legacy)" at no charge, they are covered while your account moves to per-location billing.
+</Note>
 
 ## Switching plans
 
 1. Go to **Settings** > **Organization** > **Subscription**.
-2. In **Available plans**, choose **Monthly** or **Yearly**.
-3. For **Run**, drag the **active members** slider to the tier that covers your member count.
-4. Click the button on the plan card:
-   - **Select plan** / **Upgrade** on a paid plan opens **Stripe Checkout**. Your existing subscription stays active until checkout completes, so there is no gap. On success you return to the subscription page with a "Plan updated successfully!" confirmation.
-   - **Downgrade** to **Free** asks you to confirm ("Downgrade to Free?"). Confirming cancels your paid subscription and moves you to Free. You lose access to paid features including messaging, campaigns, and extended member limits.
-   - **Upgrade** or **Downgrade** on the same Run plan (moving the slider to a different tier) changes your tier.
+2. On the location's line, click **Upgrade** (a location on Free) or **Plan & add-ons** (a paid location). The full-screen **Plan and add-ons for** picker opens for that location.
+3. If you are not paying yet, choose **Monthly** or **Yearly**.
+4. Click **Select** on a plan card. For **Run**, drag the slider to the size that covers your members. The plan the location is already on shows **Current Plan**.
+5. Turn on any add-ons the selected plan offers in the bar at the bottom, and check the running total.
+6. Click **Confirm changes**.
 
-The button shows **Current plan** and is disabled for the plan and tier you are already on.
+What happens next depends on where you are:
+
+- **Not paying yet** (Free or the Grow trial) - choosing a paid plan opens **Stripe Checkout** and starts your subscription with that location on it. Your other locations stay on Free. On success you return to the subscription page with a "Plan updated successfully!" confirmation.
+- **Already paying** - the change is applied to your existing subscription and billed with it.
+- **Moving a location to Free** - picking **Free** moves just that location to Free. If it is your only paid location, this is the organization-wide downgrade instead: you confirm **Downgrade to Free?**, your paid subscription is cancelled, and you lose paid features such as messaging and extended member limits.
+
+A location billed on a custom price set up for your account cannot be changed here. Contact 1Club to change its plan.
 
 ## Plan add-ons
 
-A **plan add-on** is an optional capability you attach to your platform plan. The first add-on is **Website** - the public-facing storefront you publish for your club. Relative to your current plan, each add-on is in one of three states:
+A **plan add-on** is an optional capability a location carries on top of its platform plan. The first add-on is **Website** - the public-facing website you publish for that location. Each add-on is resolved against the location's own plan, in one of three states:
 
-- **Included** - bundled with your plan at no extra charge. Shown with an "Included with {plan}" badge and a crossed-out price.
-- **Available** - purchasable on your plan as a paid recurring line item. Shown with its price and an **Add** button.
-- **Not available** - not offered on your plan. Shown with an "Available with {plans}" chip so you can see which plans to upgrade to.
+- **Included** - bundled with the location's plan at no extra charge, shown as "Included with {plan}".
+- **Available** - purchasable on the location's plan as a paid recurring line item, shown with its price.
+- **Not available** - not offered on the location's plan. A location on Free has no add-ons.
 
-### Adding an add-on
+A website tied to a location is live when that location has the Website add-on. A website for the whole organization is covered when any location has it.
 
-1. In the **Your subscription** panel, find the add-on under **Plan Add-ons**.
-2. Click **Add**.
-3. Confirm in the dialog. It shows the add-on price and explains that your next invoice will include a prorated charge for the rest of the current billing period. No immediate mid-cycle charge is taken.
+### Adding or removing an add-on
 
-### Removing an add-on
+1. On the location's line, click **Plan & add-ons** (or **Upgrade** for a location on Free, and pick a paid plan).
+2. In the bar at the bottom of the picker, turn the add-on on or off. The running total updates.
+3. Click **Confirm changes**.
 
-Active paid add-ons appear as line items in your subscription. Click **Remove** next to the line and confirm. Your next invoice includes a prorated credit for the unused portion of the period. You cannot remove an **Included** add-on - it comes with the plan.
+You cannot remove an **Included** add-on - it comes with the plan.
+
+On an older subscription billed for the whole organization, add-ons appear as lines under **All clubs**. Click **Add** with the add-on name (for example **Add Website**) next to an available add-on and confirm: your next invoice includes a prorated charge for the rest of the current billing period. Click **Remove** next to a paid add-on and confirm: your next invoice includes a prorated credit for the unused portion.
 
 <Note>
-1Club never silently starts charging you. If a plan change turns an add-on that was previously **Included** into merely **Available (paid)** on the new plan, the add-on is dropped rather than converted into a paid line item. Charging can stop silently; it never starts silently.
+1Club never silently starts charging you. If a location's plan change turns an add-on that was previously **Included** into merely **Available (paid)** on the new plan, the add-on is dropped rather than converted into a paid line item. A location moving to a plan that includes the add-on, or that does not sell it, drops its paid add-on too. The picker warns you which add-ons will be turned off before you confirm. Charging can stop silently; it never starts silently.
 </Note>
 
-Adding a paid add-on requires an active paid subscription first - you cannot attach a paid add-on while on Free or during the card-free trial, because there is no Stripe subscription to add it to.
+A paid add-on needs a paid plan on its location. During the card-free trial or on Free, you buy add-ons together with a location's paid plan, at Stripe Checkout.
 
 <Note>
 A plan add-on (org buys from 1Club) is not a [booking add-on](/sales/plans) (a member buys at checkout, like a towel or smoothie). Different audience, different billing.
@@ -117,14 +136,14 @@ A plan add-on (org buys from 1Club) is not a [booking add-on](/sales/plans) (a m
 
 Your plan sets quotas that 1Club tracks as you use the platform. The two tracked dimensions are:
 
-- **Active members** - the number of member or drop-in contacts. Free is capped; Grow is unlimited; Run is capped by your selected tier.
+- **Active members** - the number of member or drop-in contacts. Free is capped; Grow is unlimited; Run is capped by the selected size. With several paid locations, their allowances add up.
 - **Marketing messages** - a daily and monthly send allowance. Free includes no marketing messages; Grow and Run include allowances.
 
-A usage widget shows your current members and messages against your limits, with a progress bar per dimension. When you hit the daily message cap you see "Daily limit reached. Resets tomorrow."
+Admins see a **Usage** widget in the sidebar with **Billable members** and **Messages** against your limits, and a progress bar for each. When you hit the daily message cap you see "Daily limit reached. Resets tomorrow." The subscription page footer shows your members against your combined allowance.
 
 ### How Run tiers handle overflow
 
-Run tiers carry a 10% buffer above the tier boundary before enforcement bites. For example, on **Run 100** you can grow slightly past 100 active members (up to roughly 110) before the limit is enforced, which nudges you toward the next tier rather than hard-stopping you mid-month. The widget shows the tier boundary (for example 100); enforcement allows the buffer on top.
+Member allowances carry a 10% buffer above the limit before enforcement bites. For example, on **Run 100** you can grow slightly past 100 active members (up to roughly 110) before the limit is enforced, which nudges you toward the next tier rather than hard-stopping you mid-month. The page and widget show the allowance (for example 100); enforcement allows the buffer on top.
 
 <Tip>
 Live card payments to your members are gated on a paid plan. An organization on Free or still in the Grow trial cannot run live Stripe charges - it must be on a proper paid subscription first. Plan the upgrade before you go live with member billing. See [Stripe integration](/settings/integrations/stripe).
@@ -132,7 +151,7 @@ Live card payments to your members are gated on a paid plan. An organization on 
 
 ## Billing portal
 
-Click **Manage billing** in the **Your subscription** panel to open Stripe's secure customer portal in a new tab. There you can:
+Click **Manage billing** at the top of the subscription page to open Stripe's secure customer portal in a new tab. There you can:
 
 - Update your payment methods.
 - View and download invoices.
@@ -158,30 +177,32 @@ Your subscription status reflects where you are in the billing lifecycle:
 
 ## Worked examples
 
-**A padel club trials Grow, then commits.** A new padel club signs up on Free and starts the 30-day Grow trial to try automations and campaigns - no card needed. Before running their first member blast they verify their email domain so trial sending is unblocked. On day 25 they click **Upgrade** on the Grow card, complete Stripe Checkout, and move to a paid Grow subscription. Their trial end date stays on record, so they cannot start a second trial later.
+**A padel gym trials Grow, then commits.** A new padel gym signs up and gets the 30-day Grow trial to try automations - no card needed. Before running their first member blast they verify their email domain so trial sending is unblocked. On day 25 they click **Upgrade** on their location, select Grow, click **Confirm changes**, complete Stripe Checkout, and move to a paid Grow subscription. Their trial end date stays on record, so they cannot get a second trial later.
 
-**A growing jiu-jitsu academy on Run picks a tier.** A martial arts academy with 180 active members selects **Run** and drags the active-members slider to the **Run 200** tier. As they add members they briefly cross 200 during a promotion; the 10% buffer (up to ~220) keeps them running while they decide to move up to **Run 400**.
+**A growing jiu-jitsu academy on Run picks a tier.** A martial arts academy with 180 active members opens its location's plan picker, selects **Run**, and drags the slider to the **Run 200** size. As they add members they briefly cross 200 during a promotion; the 10% buffer (up to ~220) keeps them running while they decide to move up to **Run 400**.
 
-**A yoga studio adds a Website.** A pilates and yoga studio on a paid plan wants a public storefront. Under **Plan Add-ons** the **Website** add-on shows as **Available** with a monthly price. They click **Add**, confirm the prorated charge, and the Website add-on appears as a line item in their subscription. Months later they downgrade a tier where Website is **Included** - the separate paid line item is dropped and no longer charged.
+**A yoga studio adds a Website.** A pilates and yoga studio on a paid plan wants a public website. They click **Plan & add-ons** on their location, turn on **Website** in the bar at the bottom with its monthly price, and click **Confirm changes**. The Website add-on now appears under the location's line. Months later they move the location to a plan where Website is **Included** - the separate paid add-on is dropped and no longer charged.
 
-**A climbing gym downgrades for the off-season.** A climbing gym on Grow decides to pause paid features over a quiet stretch. They click **Downgrade** on the Free card and confirm. Their paid subscription is cancelled, they move to Free, and any paid add-ons become unavailable. Their data stays intact for when they upgrade again.
+**A climbing gym downgrades for the off-season.** A climbing gym with one location on Grow decides to pause paid features over a quiet stretch. They open **Plan & add-ons**, pick **Free**, and confirm **Downgrade to Free**. Their paid subscription is cancelled, they move to Free, and any paid add-ons are dropped. Their data stays intact for when they upgrade again.
 
 ## Tips and best practices
 
-- **Start the trial deliberately.** You only get one Grow trial per organization, and the end date is permanent. Start it when you are ready to actually evaluate the paid features.
-- **Verify your domain before trialing campaigns.** Trial sending needs a verified email domain, so set that up first.
+- **Use the trial deliberately.** You only get one Grow trial per organization, it starts at signup, and the end date is permanent. Evaluate the paid features you care about within the 30 days.
+- **Verify your domain before sending during the trial.** Trial sending needs a verified email domain, so set that up first.
 - **Pick Run tiers with headroom.** Choose a tier that covers your expected member count for the period; the 10% buffer is a cushion, not a plan.
-- **Use yearly billing for stable clubs.** If your plan is unlikely to change, yearly billing shows a lower per-month equivalent.
+- **Put each location on the plan it needs.** A small satellite can stay on Free while your flagship carries the paid features for the whole organization, but Free locations add no members to your allowance.
+- **Use yearly billing for stable gyms.** If your plan is unlikely to change, yearly billing shows a lower per-month equivalent.
 - **Manage payment details in the portal.** Cards, invoices, and cancellations all live in the Stripe billing portal, not on the settings page.
 
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| Cannot start the Grow trial | The organization has already used its one trial (the trial end date is on record). | Select a paid plan directly instead; there is no second trial. |
+| No Grow trial | The trial is granted once, at signup, and the organization has already used it (or was created from a 1Club network listing). | Select a paid plan directly instead; there is no second trial. |
 | Messages are blocked during the trial | Trialing organizations must have a verified email domain to send. | Verify your [email sending domain](/settings/email-sending), or move to a paid (active) plan. |
 | "Payment is required" banner after the trial | The trial ended with no payment method on file, so the subscription is incomplete or expired. | Open **Manage billing** and add a payment method, or select a paid plan to check out. |
-| **Add** on an add-on is missing or fails | No active paid subscription exists (you are on Free or trialing), or the add-on is not available on your plan. | Upgrade to a plan that offers the add-on first, then add it. |
+| An add-on is missing from a location's picker | The location is on Free, or its plan does not sell the add-on. | Select a plan that offers the add-on for that location, then turn it on. |
+| A location's plan cannot be changed | The location is billed on a custom price set up for your account. | Contact 1Club to change its plan. |
 | Live card payments to members are rejected | Live Stripe mode is gated on a paid plan; Free and trialing organizations cannot run live charges. | Move to a paid subscription, then configure [Stripe](/settings/integrations/stripe). |
 | Plan price looks different from a colleague's | Prices are shown in your organization's currency (USD, EUR, or GBP). | Confirm your organization currency under [Organization settings](/settings/organization). |
 | Downgraded but still see a paid add-on charge | Prorated credits and charges settle on the next invoice, not immediately. | Check the upcoming invoice in the billing portal; the credit appears there. |

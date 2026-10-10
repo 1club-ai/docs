@@ -23,11 +23,12 @@ integrations are unaffected.
 
 Use a value that identifies **the operation**, not the attempt - a UUID you generate
 once and reuse across retries, or something derived from your own booking id. Keys
-are scoped to your organization and can be up to 255 characters.
+are scoped to your organization, not to an endpoint, and can be up to 255 characters.
+A longer key is refused with `400`.
 
 Do not reuse a key for a different operation. The key is remembered together with a
-fingerprint of the request, so reusing it with a different body is treated as a
-mistake rather than a new write.
+fingerprint of the request - its method, path, and body - so reusing it for a
+different request is treated as a mistake rather than a new write.
 
 ## What each outcome means
 
@@ -36,7 +37,7 @@ mistake rather than a new write.
 | First request with this key              | Executes normally                                     |
 | Same key, same request, already finished | The original response, with `Idempotent-Replay: true` |
 | Same key, still in flight                | `409` - retry shortly                                 |
-| Same key, different request body         | `409` - the key was already used for something else   |
+| Same key, different request              | `409` - the key was already used for something else   |
 | Previous attempt failed                  | Executes normally; a failed attempt frees the key     |
 
 A replayed response carries the original status code and body, including the
@@ -65,5 +66,6 @@ request, so retries should happen well inside that window.
 
 <Note>
   Cancelling a booking is already idempotent without a key: cancelling an
-  already-cancelled booking succeeds and returns the same response.
+  already-cancelled booking succeeds with `status: "cancelled"` and records no
+  second refund unless you send an explicit `refund`.
 </Note>

@@ -7,7 +7,7 @@ Before creating bookings, discover the areas you can sell and read their availab
 
 ## List areas
 
-Returns the organization's bookable areas. Filter by club or sport to get just the padel courts.
+Returns the organization's bookable areas. Filter by club or sport to get just the padel courts. An area is listed only while it is `active`, `Public`, and of a bookable area type (or of no type). An area under maintenance or not publicly visible is absent here, but still readable by id.
 
 ```bash
 curl "https://api.1club.ai/v1/platform/areas?sport=padel" \
@@ -26,7 +26,11 @@ Response:
   {
     "id": 51,
     "name": "Court 1",
+    "description": null,
     "clubId": 8,
+    "areaTypeId": 3,
+    "status": "active",
+    "visibility": "Public",
     "sports": ["padel"],
     "pricePerHour": 24,
     "maxConcurrentBookings": 1,
@@ -46,6 +50,15 @@ expressed in. Convert a local wall time in it when you send `startTime` and
 `endTime` - a booking sent in the wrong zone lands an hour out twice a year, at
 the daylight-saving boundary, and looks correct the rest of the time. Map it once
 when you map the courts.
+
+## Get an area
+
+Requires the `areas:read` scope. Returns one area by id, in the same shape as the list, whatever its state. Unlike the list, it resolves an area that is under maintenance, inactive, or not publicly visible, and `status` and `visibility` say which case it is.
+
+```bash
+curl "https://api.1club.ai/v1/platform/areas/51" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
 
 ## Area availability
 
@@ -124,6 +137,8 @@ curl "https://api.1club.ai/v1/platform/availability?clubId=8&sport=padel&from=20
 ```
 
 Query parameters: `clubId` (optional), `sport` (optional), `from`/`to` (required, ≤ 31 days), `slotMinutes` (optional).
+
+The grid returns at most 60 areas per request. For a larger organization, filter by `clubId` or `sport`.
 
 ```json
 {
@@ -204,6 +219,40 @@ Keep paging while `hasMore` is `true`.
   rejection gracefully - and use [webhooks](/api-reference/channel-integration/webhooks)
   plus this feed to keep the snapshot fresh.
 </Note>
+
+## Create and update areas
+
+Requires the `areas:write` scope. Use these to add a court, a studio, or a lane, or to change one.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/areas" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: area-court-5" \
+  -d '{ "name": "Court 5", "clubId": 8, "areaTypeId": 3 }'
+```
+
+- `name`, `clubId`, and `areaTypeId` are required on create. `clubId` comes from `GET /v1/platform/clubs` and `areaTypeId` from [Area types](#area-types). Both must belong to your organization.
+- The other fields are `description`, `status` (`active`, `maintenance`, or `inactive`; defaults to `active`), `visibility` (`Private`, `Member_only`, or `Public`; defaults to `Public`), `pricePerHour`, `operatingHours`, and `maxConcurrentBookings` (1 to 100). Unknown fields are rejected.
+- Create returns `201` with the area. `PATCH /v1/platform/areas/{areaId}` takes the same fields except `clubId`, which cannot change. Send only what changes.
+
+Setting `status` to `maintenance` or `inactive`, or narrowing `visibility`, takes the area out of availability. That is the durable way to close a court indefinitely, where a [block](#area-blocks) closes it for a stated window. There is no delete: an area carries booking history.
+
+A new area, and any edit to its hours, status, visibility, capacity, or area type, emits an availability change, so the [change feed](#availability-change-feed) and [webhooks](/api-reference/channel-integration/webhooks) pick it up.
+
+## Area types
+
+An **area type** is a kind of bookable space, such as "Padel court". Every area of the type inherits its sports, default price, and default number of players.
+
+- `GET /v1/platform/area-types` - every area type, as `{ "data": [...] }` with no paging. Types with `isBookable: false` are included, so do not build bookable inventory on one. Requires `areas:read`.
+- `GET /v1/platform/area-types/{id}` - one area type, with `areaCount`. Requires `areas:read`.
+- `POST /v1/platform/area-types` and `PATCH /v1/platform/area-types/{id}` - create and update one. Fields include `name`, `sports`, `isBookable`, `defaultPricePerHour`, `defaultMaxPlayers`, `allowsSingles`, `maxConcurrentBookings`, `revenueAccountId`, and `bookingAudience`. Requires `areas:write`.
+
+<Warning>
+  Editing an area type is the widest write on this API. Changing its sports, price,
+  players, or bookability reprices or re-sports every area of that type at once,
+  and emits an availability change for each of them.
+</Warning>
 
 ## Area blocks
 

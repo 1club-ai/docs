@@ -8,8 +8,10 @@ An **instructor** is a coach on the gym's staff. Attach one to a booking when th
 session is coached rather than a bare court hire - a lesson, a personal training
 slot, a padel clinic.
 
-These endpoints are read-only. Instructors are staff records created and managed by
-the gym in 1Club, so this API never creates or edits them.
+Reading instructors requires `instructors:read`. With `instructors:write` you can
+also create and edit a coach's bookable profile. The write scope never grants anyone
+access to the gym's staff portal: an instructor created through this API has no
+login and is never invited.
 
 ## Search instructors
 
@@ -24,8 +26,10 @@ Query parameters:
 
 - `search` (optional) - matches on the instructor's name
 - `clubId` (optional) - only instructors assigned to that gym
+- `instructorTypeId` (optional) - only instructors of that [instructor type](#instructor-types)
 - `sport` (optional) - only instructors who list that sport, for example `padel`
-- `bookableOnly` (optional) - `true` or `false`; when `true`, only instructors who take one-on-one bookings
+- `bookableOnly` (optional) - `true` or `false`; when `true`, only instructors customers may book one-on-one (`bookability` other than `Admin_only`)
+- `includeInactive` (optional) - `true` to include retired instructors, which are hidden by default
 - `limit` (optional) - 1 to 100, defaults to 25
 - `offset` (optional) - defaults to 0
 
@@ -38,11 +42,17 @@ Response:
       "id": 42,
       "name": "Maya Ivanova",
       "clubId": 5,
+      "instructorTypeId": 3,
       "sports": ["padel"],
       "hourlyRate": 30,
+      "priceIncludesArea": false,
+      "bookability": "Public",
       "isBookable": true,
       "maxConcurrentBookings": 1,
-      "operatingHours": {}
+      "maxPlayers": 4,
+      "operatingHours": {},
+      "visibility": "Public",
+      "isActive": true
     }
   ],
   "total": 1,
@@ -54,7 +64,7 @@ Response:
 Name matching works the same way as
 [contact search](/api-reference/channel-integration/contacts#matching-is-case-insensitive-and-cross-script):
 case-insensitive and cross-script, so `maya` finds `Мая`. Only active instructors
-are returned.
+are returned unless you pass `includeInactive=true`.
 
 ## Open an instructor
 
@@ -65,22 +75,64 @@ curl "https://api.1club.ai/v1/platform/instructors/42" \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
-Returns the same object as one row of the search response. A `404` means no active
-instructor with that id exists in your organization.
+Returns the same object as one row of the search response, retired instructors
+included - `isActive` says which. A `404` means no instructor with that id exists in
+your organization.
+
+## Create an instructor
+
+Requires the `instructors:write` scope. The coach must already be a contact - resolve or create them through [Contacts](/api-reference/channel-integration/contacts) first.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/instructors" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: instructor-contact-301" \
+  -d '{
+    "contactId": 301,
+    "sports": ["padel"],
+    "hourlyRate": 30,
+    "bookability": "Public"
+  }'
+```
+
+Only `contactId` is required, and it cannot be changed afterwards. The other fields are `clubId`, `instructorTypeId`, `sports`, `displayName`, `hourlyRate`, `bookability`, `priceIncludesArea`, `maxConcurrentBookings` (1 to 100), `operatingHours`, `visibility` (`Private`, `Member_only`, or `Public`), and `isActive`. `clubId` and `instructorTypeId` must belong to your organization.
+
+Returns `201` with the instructor. Unknown fields are rejected. `sendInvitation`, `organizationUserId`, `role`, `color`, `isBookable`, and `maxPlayers` are refused by name with a `400` that says what to do instead. A contact that already has an instructor profile is a `409` naming that profile - edit it instead, including to bring a retired one back.
+
+## Update an instructor
+
+Requires the `instructors:write` scope. Send only the fields that change, from the same list as create except `contactId`. Set `isActive` to `false` to retire a coach.
+
+```bash
+curl -X PATCH "https://api.1club.ai/v1/platform/instructors/42" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "hourlyRate": 35 }'
+```
 
 ## Fields that affect booking
 
-<Note>
-  **`isBookable`** decides whether the coach can be attached to a booking at
-  all. An instructor with `isBookable: false` does not take one-on-one bookings,
-  and a booking naming them is always rejected. Nothing overrides this, so
-  filter on it before offering a coach for sale.
-</Note>
+**`bookability`** is who may book one-to-one sessions with the coach: `Public`,
+`Member_only`, or `Admin_only`, where the gym reserves those bookings to its own
+staff. Your API key acts for the gym, so a booking through this API is not refused
+on `bookability`. Respect it in what you offer customers anyway: filter with
+`bookableOnly=true` so a coach the gym books only from its own desk never reaches
+your booking flow. `isBookable` is the older form of the same setting - `true`
+unless `bookability` is `Admin_only` - and is kept for existing integrations.
+
+**`isActive`** is `false` for a retired coach. A booking naming an inactive
+instructor is rejected with `400`.
 
 **`hourlyRate`** is added to the area's price when 1Club prices the booking. A one
 hour court at 24 with a coach at 30 is priced at 54 unless you send an explicit
-`payment.amount`. See
+`payment.amount`. When **`priceIncludesArea`** is `true`, the hourly rate is an
+all-in price and the area's price is not added on top. See
 [How the amount is calculated](/api-reference/channel-integration/bookings#how-the-amount-is-calculated).
+
+**`maxPlayers`** is how many people one session with the coach may bring, the
+person booking included. It is read-only here and set on the
+[instructor type](#instructor-types).
 
 **`clubId`** is the gym the instructor belongs to, or `null` when they work across
 the whole organization.
@@ -106,10 +158,31 @@ beyond it is a genuine conflict and is rejected.
 </Steps>
 
 The coach's own calendar is respected: a booking that would double-book them, or
-exceed `maxConcurrentBookings`, is rejected with a `409`.
+exceed `maxConcurrentBookings`, is rejected with a `400` and `details.conflicts` - see
+[Conflicts](/api-reference/channel-integration/bookings#conflicts). Their working
+hours are not applied, as with the rest of the gym's booking rules.
 
 <Note>
   Attaching an instructor also feeds the gym's instructor pay records
   automatically, so a coached booking you create is compensated the same way one
   booked in 1Club is. You do not need to report anything extra.
 </Note>
+
+## Instructor types
+
+An **instructor type** groups coaches by kind, such as "Padel coach" or "Personal trainer". Instructor types use the instructors scopes.
+
+- `GET /v1/platform/instructor-types` - every instructor type, as `{ "data": [...] }` with no paging. Requires `instructors:read`.
+- `GET /v1/platform/instructor-types/{id}` - one instructor type. Requires `instructors:read`.
+- `POST /v1/platform/instructor-types` and `PATCH /v1/platform/instructor-types/{id}` - create and update one. Requires `instructors:write`.
+
+`maxPlayers` is set here and read live by every coach of the type, so changing it changes all of their sessions.
+
+## Pay rate policies
+
+A **pay rate policy** is what the gym pays a coach, not what a customer pays for one. These endpoints use the instructors scopes: `instructors:read` to list and read, `instructors:write` for the rest.
+
+- `GET /v1/platform/pay-rate-policies` and `GET /v1/platform/pay-rate-policies/{id}` - list and read policies
+- `POST /v1/platform/pay-rate-policies` and `PATCH /v1/platform/pay-rate-policies/{id}` - create and update a policy
+- `POST /v1/platform/pay-rate-policies/{id}/instructors` - put instructors on a policy
+- `DELETE /v1/platform/pay-rate-policies/{id}/instructors/{instructorId}` - take an instructor off a policy

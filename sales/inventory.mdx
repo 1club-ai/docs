@@ -35,9 +35,9 @@ Stock is held separately for each location (your organization's clubs). The same
 Go to **Settings** > **Sales** > **Inventory Management** (`/settings/operations/inventory`) and toggle inventory on. The setting is organization-wide and controls whether the **Stock**, **Ingredients**, and **Deliveries** tabs appear under **Sales** > **Products**, and whether stock panels and the **Recipe** action appear on your products.
 
 <Note>
-  Enabling inventory changes the product detail page: a stock panel appears and,
-  for products you build from ingredients, a **Recipe** action becomes
-  available. With inventory off, neither shows.
+  Enabling inventory changes the product dialog: a stock panel appears on an
+  existing product and, if you can manage inventory, a **Recipe** button
+  becomes available. With inventory off, neither shows.
 </Note>
 
 Reading stock requires the `inventory.read.club` permission; receiving, adjusting, and editing recipes require `inventory.manage.club`. Turning the feature on or off requires `settings.manage.organization`.
@@ -60,7 +60,9 @@ Conversions stay within the same dimension. You cannot convert a weight into a v
 
 The stock page at **Sales** > **Products** > **Stock** (`/billing/products/stock`) lists the current quantity on hand for every product and ingredient, at every location you can access. Each row shows whether it is a product or an ingredient, its name, the location, and the on-hand quantity in its base unit.
 
-Click a row to open the underlying product or ingredient. Click **Add stock** to record a delivery, or use the row action to adjust a count.
+Click **Add Inventory** to receive stock. Click a row, or use its edit action, to adjust that count.
+
+To remove stock records you no longer need, select rows with the checkboxes and click **Delete**. This removes their stock entries and on-hand quantity and cannot be undone. Records that have sales history are kept.
 
 ## Stock movements
 
@@ -73,13 +75,13 @@ Every change to stock is written to an immutable ledger as a movement. A movemen
 
 ### Receiving stock
 
-Click **Add stock** on the stock page, pick the product or ingredient, choose the location, and enter the quantity and unit. 1Club creates a `receive` movement and increases the on-hand level.
+Click **Add Inventory** on the stock page, pick the **Product or ingredient**, choose the location, and enter the quantity and unit. You can also choose **Add** > **Add Inventory** on the **Products** tab. 1Club creates a `receive` movement and increases the on-hand level.
 
 This is the quick way to book a single item. For a supplier delivery, record it as a [delivery](/sales/deliveries) instead: attach the invoice, review the lines it reads off the document, and post once so the stock and the expense are written together.
 
 ### Adjusting and writing off stock
 
-Use the row action on the stock page to open the adjustment dialog. Enter a signed quantity (positive to add, negative to remove), pick **Adjustment** or **Waste** as the type, and give a reason. The reason is mandatory so the ledger stays auditable.
+Click a row on the stock page to open the adjustment dialog. Enter a signed quantity (positive to add, negative to remove), pick **Adjustment** or **Waste** as the type, and give a reason. The reason is mandatory so the ledger stays auditable.
 
 ## How a sale decrements stock
 
@@ -95,9 +97,11 @@ Consumption is idempotent per order line, so re-processing an order never double
 
 A recipe defines what a sellable product is made of. Build one when a product is not resold as-is but assembled from ingredients - a latte, a cocktail, a protein shake.
 
-On the product detail page, click **Recipe** to add ingredient lines. Each line names an ingredient, a quantity, and a unit, expressed as the amount needed for one unit of the product. For example, a latte recipe might be 18 g of coffee beans and 150 ml of milk.
+Open the product from **Sales** > **Products** and click **Recipe** in its dialog to add ingredient lines. Each line names an ingredient, a quantity, and a unit, expressed as the amount needed for one unit of the product. For example, a latte recipe might be 18 g of coffee beans and 150 ml of milk.
 
-Ingredients live at **Sales** > **Products** > **Ingredients** (`/billing/products/ingredients`). From there you can create ingredients, set each one's base unit, and open an ingredient to manage its stock. An ingredient cannot be deleted while any recipe still uses it.
+Ingredients live at **Sales** > **Products** > **Ingredients** (`/billing/products/ingredients`). The list shows each ingredient's **Name** and **Base unit**. Click **Add Ingredient** to create one and set its base unit. An ingredient cannot be deleted while any recipe still uses it.
+
+Click an ingredient to open its details page. It shows the ingredient's base unit and its stock at each location with recent movements. Use **Recipe** to build a [sub-recipe](#sub-recipes) for the ingredient, and **Edit** to rename it.
 
 ### Sub-recipes
 
@@ -107,7 +111,7 @@ An ingredient can itself have a recipe, letting you model prepped components. A 
 
 For a product built from ingredients, 1Club computes how many whole units you could sell right now at each location. It expands the recipe to its leaf ingredients and takes the lowest number the on-hand stock of any single ingredient allows. If you have milk for 40 lattes but beans for only 12, availability is 12.
 
-The product detail page shows this availability alongside the product's recent movements, scoped to the location you have selected. Products with a direct stock level show that count; products that are neither stocked nor recipe-backed show as not tracked.
+The **Stock** section in the product dialog shows this availability alongside the product's recent movements, scoped to the location you have selected. Products with a direct stock level show that count; products that are neither stocked nor recipe-backed show as not tracked.
 
 ## Inventory movements report
 
@@ -131,8 +135,8 @@ Filter by movement type to focus on one kind of change - for example show only *
     ingredients and quantities it consumes per unit.
   </Step>
   <Step title="Receive opening stock">
-    On the stock page, click **Add stock** to record what you have on hand at
-    each location.
+    On the stock page, click **Add Inventory** to record what you have on hand
+    at each location.
   </Step>
   <Step title="Sell as normal">
     Ring up products at the point of sale. Sales decrement ingredient or product

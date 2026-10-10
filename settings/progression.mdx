@@ -4,7 +4,7 @@ description: "Track member skill progression with tracks and levels - martial-ar
 keywords: ["progression", "progression track", "level", "belt", "stripes", "skill level", "bjj belts", "swim levels", "promote member", "assign level", "fork template", "progression history", "sessions per level", "promotion requirement", "eligible for promotion", "sessions to next belt"]
 ---
 
-A progression track is a named ladder of skill levels that a member advances through over time: the belt system in a jiu-jitsu academy, the graded levels in a kids swim program, or the skill tiers in a tennis club. Each track belongs to one sport and holds an ordered list of levels (for example White, Blue, Purple, Brown, Black). Members are assigned a current level on any enabled track, optionally with stripes and notes, and every change is kept as a dated history entry. You set up the tracks once, and staff assign and promote members from their member profile.
+A progression track is a named ladder of skill levels that a member advances through over time: the belt system in a jiu-jitsu academy, the graded levels in a kids swim program, or the skill tiers in a tennis gym. Each track belongs to one sport and holds an ordered list of levels (for example White, Blue, Purple, Brown, Black). Members are assigned a current level on any enabled track, optionally with stripes and notes, and every change is kept as a dated history entry. You set up the tracks once, and staff assign and promote members from their member profile.
 
 ## When to use it
 
@@ -28,7 +28,7 @@ A **track** has:
 - **Description** - optional context shown on the track card.
 - **Stripes per level** - the maximum number of stripes a member can earn within a single level, from 0 to 10. Set it to 0 to turn stripes off entirely; set it to 4 for the classic jiu-jitsu belt system.
 
-Which classes count toward a track is set on the class type, not the track: a [class type's](/settings/class-types#counting-toward-a-progression-track) **Counts toward** field links it to one track. Each track card shows the class types linked to it, or "All sessions count toward this track" when none are.
+Which classes count toward a track is set on the class type, not the track: a [class type's](/settings/class-types#counting-toward-a-progression-track) **Counts toward** field links it to one track. Each enabled track's card shows the class types linked to it ("Counts sessions of: ..."), or "All sessions count toward this track" when none are.
 
 A **level** has:
 
@@ -49,7 +49,7 @@ You manage tracks and levels under **Settings** > **Members** > **Progression Le
 
 Flip the **toggle** on a global template's card to enable it for your organization. Enabled tracks become available for member assignment and show a highlighted card border.
 
-To turn one off, flip the toggle again. You are asked to confirm, because disabling a track stops new level assignments on it. Existing member assignments are kept but hidden. Class types linked to the track keep their link, so turning it back on restores the same counting; their form shows the track as disabled until you do. A track that still has active member assignments cannot be disabled - you see "Cannot disable track: there are active member assignments" and must clear those assignments first.
+To turn one off, flip the toggle again and confirm with **Remove**. Disabling a track stops new level assignments on it. Class types linked to the track keep their link, so turning it back on restores the same counting; their **Counts toward** field shows the track as disabled until you do. A track that any member has a progression entry on (a current level or a history entry) cannot be disabled - you see "Cannot disable track: there are active member assignments" and must delete those entries from the members' progression history first.
 
 ### Customize (fork) a template
 
@@ -77,7 +77,7 @@ Open a custom track (or a global template's Customize view) to edit its levels.
 - For each row, fill in the **Skill**, an optional **Level** label, and pick a **Color**.
 - Enter **Sessions** on any level after the first to set how many sessions it takes (see [Sessions to the next level](#sessions-to-the-next-level)). Leave it empty for no requirement.
 - Drag the handle to reorder rows into the correct progression sequence - order is the ladder.
-- Use the delete icon to remove a row. A level cannot be deleted while a member is currently assigned to it; remove or reassign those members first.
+- Use the delete icon to remove a row. A level cannot be deleted while any member's progression history uses it; you see "Level is currently assigned to one or more members". Delete those history entries first.
 - Set **Stripes per level** for the whole track at the bottom of the dialog.
 - Click **Save** to persist all additions, edits, reorders, and deletions together.
 
@@ -85,13 +85,15 @@ Open a custom track (or a global template's Customize view) to edit its levels.
 
 Progression is managed from the member profile, not the settings page. A member (contact) does not need a linked user account to be assigned a level.
 
-1. Open the member's profile and go to the progression section (**Current progression levels**).
-2. Click **Manage progression** (or click an existing track card to focus it).
-3. In the dialog, click **Assign level**, then:
+1. Open the member's profile. The **Progression Levels** tile (titled **Progress** when assessments are also on) shows the member's current levels.
+2. Click the plus icon on the tile and choose **Assign Level**, or click a level on the tile to open the member's progression and history.
+3. In the dialog, click **Assign Level**, then:
    - Pick a **Track** (skipped automatically when only one track is enabled).
    - Pick a **Level** - the picker shows each level's skill, its color, and its level chip.
    - If the track allows stripes, choose the number of **Stripes** (0 up to the track's stripes-per-level cap).
+   - Set the **Date earned**. It defaults to today and can't be in the future. Backdate it to record a grading that already happened.
    - Add optional **Notes** (for example "Promoted at winter grading").
+   - When the save promotes the member to a new level or awards a stripe, **Email the member about this promotion** (or **Email the member about this stripe**) appears, ticked by default. Untick it to save without emailing. It doesn't appear for a member's first level, or when the date earned is before their current level.
 4. **Save**.
 
 Promoting a member is the same flow: pick the new level (and stripes) and save. Only tracks enabled for your organization can be assigned.
@@ -100,7 +102,7 @@ Promoting a member is the same flow: pick the new level (and stripes) and save. 
 
 Every save appends a dated entry to the member's progression timeline - level changes, stripe-only changes, and note edits all create a history row. The row is the event: a member's current level on a track is simply the most recent entry for that track.
 
-The history list under the assign form shows each entry's date, track, level (with belt/line and stripes), and notes, newest first. Delete an individual entry with its trash icon; if you delete the most recent entry, the next-most-recent one becomes the member's current level automatically.
+The history list under the assign form shows each entry's date, track, level (with belt/line and stripes), and notes, newest first. Click an entry's pencil icon to correct its **Date earned**. Delete an individual entry with its trash icon; if you delete the most recent entry, the next-most-recent one becomes the member's current level automatically.
 
 ## Sessions to the next level
 
@@ -166,9 +168,9 @@ For a `muay-thai` program, author levels mirroring the prajioud armband colors (
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | A global template's levels cannot be edited | Global templates are read-only and shared across organizations | Click **Customize** to fork it into an editable org-owned copy, then edit and save |
-| "Cannot disable track: there are active member assignments" | The track still has members assigned to a level on it | Reassign or clear those members' assignments, then toggle the track off |
+| "Cannot disable track: there are active member assignments" | A member has a current level or a history entry on the track | Delete those entries from the members' progression history, then toggle the track off |
 | A track will not delete | The custom track has assigned members (the assignment history references its levels) | Remove the members' assignments first, then delete the track |
-| A level will not delete | A member is currently assigned to that level | Reassign those members to another level, then delete the level |
+| A level will not delete | A member's progression history uses that level | Delete those history entries, then delete the level |
 | A member's session count dropped or jumped | A class type was linked to or unlinked from the track, which recounts every member's sessions | Expected. Link every class type that trains for the track under **Settings** > **Clubs** > **Class Types**, or unlink them all to count every session |
 | A track does not appear in the member assign dialog | The track is not enabled for your organization | Enable the global template, or confirm the custom track exists, under **Settings** > **Members** > **Progression Levels** |
 | The Stripes selector is missing when assigning a level | The track's **Stripes per level** is set to 0 | Edit the track and set stripes per level to 1 or more |

@@ -10,7 +10,7 @@ Every record in 1Club belongs to an **organization** - the top-level tenant that
 
 - **Opening a second location** - add it as another club in the same organization, so the two share memberships, billing, and branding while each keeps its own address, hours, sports, and amenities.
 - **Running two separate businesses** - keep them as two organizations under one login, each with its own Stripe account and member base, and move between them with the organization switcher.
-- **Comparing locations** - admins switch to **All clubs** for the org-wide picture, while front-desk staff work within one club.
+- **Comparing locations** - admins switch to **All clubs** for the org-wide picture, while other staff work in one club at a time.
 - **A member visits two locations** - members belong to the organization, not to a club, so front desk at either location finds the same member record instead of creating a duplicate.
 - **Data that seems to be missing** - most "missing data" reports are really the wrong organization or club selected.
 
@@ -21,8 +21,8 @@ An organization is your 1Club account. Its identity and account-wide settings li
 The organization owns:
 
 - **Identity** - name, slug, and description used in emails, member portals, and admin headers. The organization **Email** is the fallback sender for organization-wide mail; see [Email sending](/settings/email-sending).
-- **Locale and formatting** - time zone, currency, supported locales, and default locale. The time zone is the default for every date-related feature: today/this-week widgets, recurring jobs, and exports.
-- **Billing and branding** - Stripe mode and connection, plan, and brand assets apply to the whole org and are shared by all of its clubs.
+- **Locale and formatting** - time zone, currency, supported locales, and default locale. The time zone is the default for every date-related feature: today/this-week widgets, recurring jobs, and exports. A club can run on its own time zone instead (see [Creating or editing a club](#creating-or-editing-a-club)).
+- **Billing and branding** - plan, brand assets, and billing entities belong to the whole org. Payment providers such as Stripe are connected per billing entity, and every club bills through the organization's default billing entity unless you assign it another one. See [Billing entities](/settings/billing-entities).
 - **People** - members, contacts, staff, and the users who can sign in to the admin. A member belongs to the organization, not to one of its clubs: their memberships, bookings, check-ins, and orders each carry their own club.
 
 Because everything is scoped by `organizationId`, a member, booking, or invoice created in one organization is invisible in another - even if the same person administers both.
@@ -62,12 +62,15 @@ Click **Add** on the Clubs list to create a club, or open a card to edit one. Th
 - **Subtitle** and **Description** - short tagline and richer copy shown on public booking pages.
 - **Status** - **Active**, **Hidden**, or **Closed**. **Active** is visible to everyone. **Hidden** keeps the club fully open to your staff (schedule, bookings, and reports keep working) but takes it off your website, the member portal, and the 1Club marketplace. **Closed** retires it: it leaves the schedule, the club switcher, and every club picker. Use **Set closing date** on the club page to close it automatically on a given day.
 - **Club type** - an optional preset (for example a racket-sports or fitness template) that seeds sensible defaults.
+- **Billing entity** - which company invoices and takes payments for this club. Only shown when your organization has more than one billing entity. Leave it on the organization default unless this club is a separate company. See [Billing entities](/settings/billing-entities).
 - **Club managers** - staff contacts who receive contact-form messages sent to this club. When empty, those messages fall back to organization-level staff.
 
 **Contact information**
 
 - **Phone**, **Email**, and **Website** - the location's public contact details. **Email** does double duty: it is also the **From** address on most member email for this club, so keep it on a domain you have verified. See [Email sending](/settings/email-sending).
 - **Address** - typed or picked from autocomplete; latitude and longitude are stored so the location can be mapped and its time zone derived.
+- **Map location** - where members are sent. Drag the pin if it is not exactly on your entrance. A pin you place by hand is never moved by an address edit or a Google import.
+- **Timezone** - the clock this club runs on. Operating hours, class times, and prices are shown and saved in this zone. It is set from the club address and re-derived whenever the address changes. Clear it to use the organization time zone instead.
 - **Social profiles** - links shown on public pages.
 
 **Media**
@@ -90,7 +93,6 @@ Editing uses a floating save bar: change any field and **Save** appears at the b
 - **Daily summary** - toggle **Send to admins** and pick a send time to email a per-club daily summary.
 - **Google Business Profile** - connect a club to import Google reviews, ratings, and business data. See [Google Business](/settings/integrations/google-business).
 - **OpenStreetMap** - connect to enrich the club with address, sports, amenities, opening hours, and contact details.
-- **Visibility** - a club can be Public or Private, controlling whether its public page is reachable.
 - **Booking labels** - your own names for the booking cards members choose from. See [Booking labels](#booking-labels).
 
 ### Booking labels
@@ -128,7 +130,7 @@ To translate a label, click the **Translations** icon beside its field. Use **Au
 
 When an organization has more than one club staff are running, the club is the first crumb of the breadcrumb at the top of each page (for example **All clubs** > **Sales** > **Finance** > **Invoices**). Click it to switch. Switching club re-scopes club-specific views (bookings, schedule, areas, and analytics) to the selected location. A **Hidden** club stays in the list with a badge, because staff still run it.
 
-Users with organization-wide operations access (admins by default) can also select **All clubs** to see aggregated data across every club at once - useful for comparing locations in analytics. Other roles work within a single club. Your last selection is remembered per organization, so switching orgs and back returns you to where you were.
+Admins and owners can also select **All clubs** to see aggregated data across every club at once - useful for comparing locations in analytics. Other roles, Manager included, work in one club at a time and switch between clubs from the breadcrumb. Your last selection is remembered per organization, so switching orgs and back returns you to where you were.
 
 ### Deleting a club
 
@@ -137,7 +139,7 @@ Deleting a club is available from the club detail page. A club that still has as
 ## Why the split matters
 
 - **Permissions and access** - Roles (Admin, Manager, Front desk, Instructor, Member) are assigned per organization. When you invite a user you place them in an organization with a role; they see only that organization's data when it is selected. Permission scope (`organization` includes `club` includes `own`) then decides whether they see all clubs, one club, or only their own records. See [Roles and permissions](/reference/roles-permissions).
-- **Billing and branding** - Stripe, plan, branding, member portal, and marketplace listing are configured at the organization level, so every club under the org shares the same billing account and brand.
+- **Billing and branding** - plan, branding, member portal, and marketplace listing are configured at the organization level, so every club under the org shares the same brand. Clubs share the organization's default billing entity unless you assign a club to another one.
 - **Reporting** - Analytics can be broken down by club so you can compare locations, and admins can flip to "All clubs" for the org-wide picture. See [Clubs analytics](/analytics/clubs).
 - **Operations** - Bookings, areas, classes, and check-ins are club-scoped, so front-desk staff always act in the context of one location. Members are not: member permissions are always organization-scoped, so every location's desk sees the same member list.
 
@@ -149,7 +151,7 @@ You run one padel venue. You keep a single organization with one club. Members n
 
 ### Multi-location fitness brand
 
-You operate three gyms under one brand. You create one organization and three clubs (for example "Central", "Riverside", and "Harbor"). Shared plans, branding, and Stripe live at the org level, so a membership sold at one gym is recognized across the brand. Front-desk staff at each location get the Front desk role scoped to their club, while regional managers use "All clubs" to compare performance. Each gym sets its own address and operating hours.
+You operate three gyms under one brand. You create one organization and three clubs (for example "Central", "Riverside", and "Harbor"). Shared plans, branding, and Stripe live at the org level, so a membership sold at one gym is recognized across the brand. Front-desk staff get the Front desk role and select their own club in the breadcrumb, managers switch between the clubs they run, and admins use "All clubs" to compare performance. Each gym sets its own address and operating hours.
 
 ### Martial arts school plus affiliate gym
 
@@ -161,7 +163,7 @@ You run a yoga studio and open a second reformer Pilates space nearby. You add i
 
 ## Tips & best practices
 
-- **One org per brand and billing account.** Use separate organizations only when you need genuinely separate billing, branding, or member bases. Otherwise add clubs, which share plans and Stripe.
+- **One org per brand and member base.** Use separate organizations only when you need genuinely separate branding or member bases. Otherwise add clubs, which share plans. If one location is a separate company but shares your members and brand, keep it in the same organization and give its club its own [billing entity](/settings/billing-entities).
 - **Add clubs, do not clone orgs, for new locations.** Locations that share memberships and billing belong in the same organization as additional clubs.
 - **Set the time zone and currency at the org level early.** They drive dates and money everywhere; changing them later shifts how history is reported.
 - **Prefer Closed over Delete for clubs.** A club with any associated data cannot be deleted anyway. Closed removes it from the switcher and every club picker while preserving its history.
@@ -192,11 +194,11 @@ You run a yoga studio and open a second reformer Pilates space nearby. You add i
 
 **Issue**: The wrong currency or time zone shows across the admin.
 
-**Solution**: Those are organization settings, not per-club. Update them under **Settings** > **Organization** > **Details**.
+**Solution**: Currency is an organization setting under **Settings** > **Billing** > **General**. The organization time zone is under **Settings** > **Organization** > **Details**, but a club can override it: check the club's **Timezone** under **Settings** > **Clubs** > **Clubs**.
 
 ## Related
 
-- [Organization settings](/settings/organization) - Edit org identity, time zone, currency, and locales.
+- [Organization settings](/settings/organization) - Edit org identity, time zone, and locales.
 - [Settings overview](/settings/overview) - Where organization and club settings live.
 - [Roles and permissions](/reference/roles-permissions) - How roles and permission scope decide what each user sees.
 - [Areas](/settings/areas) - Bookable spaces within a club.

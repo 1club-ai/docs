@@ -18,12 +18,15 @@ Typical uses:
 - **Four friends booking a padel court** - you add an area booking for the next hour and a few drinks, take one payment, and the booking is checked in as the order completes.
 - **A coffee for a passer-by** - a product-only order completes without a member attached.
 - **An order to finish later** - a member is not ready to pay yet, so you save the order as a draft and load it back from the **Orders** button when they are.
+- **A bar tab** - a team orders drinks after a match, you open a tab, add rounds to it through the evening, and charge it once at the end.
 
 ## Opening the register
 
 Go to **Point of Sale** in the left rail. The URL is `/pos`. The register is its own rail item, separate from **Sales**, where you manage the catalog and review orders and payments afterwards.
 
 The POS only appears when it is turned on for your organization. If you do not see it, an admin can enable it under **Settings** > **Sales** > **Point of Sale** (see [POS settings](#pos-settings) below).
+
+A sale has to happen at a gym. If your organization has several gyms and **All clubs** is selected in the top bar, choose the gym you are selling at before taking payment. Until you do, you can still browse prices and look up orders.
 
 ## The register layout
 
@@ -34,7 +37,7 @@ The register has two panes:
 
 ### Catalog tabs
 
-The catalog is split into tabs so you can find what you are selling quickly:
+The catalog is split into tabs so you can find what you are selling quickly. A tab is hidden when it has nothing to sell:
 
 - **Products** - retail products, grouped by [category](/sales/products).
 - **Rentals** - gear you lend out rather than sell, with what is still out listed below it so you can take items back. Shown when [rentals](/sales/rentals) are on, or while gear is still out.
@@ -48,6 +51,14 @@ The catalog is split into tabs so you can find what you are selling quickly:
 
 Click any card to add it to the order. Products, passes, packages, and event tickets can be added more than once and show a quantity stepper in the cart.
 
+### Search and barcode scanning
+
+Type in **Search or scan** to filter the catalog. A handheld USB or Bluetooth barcode scanner works at the till with no setup:
+
+- Scanning a product, plan, or package [barcode](/sales/products) adds it to the order.
+- Scanning a [member card](/members/member-cards) opens a **Member card** check with a verdict (**Valid**, **Needs attention**, or **Not valid**) and the reason, for example an unsigned waiver or no active membership. Click **Add to order** to make that member the order's customer.
+- Scanning a code that matches nothing opens **Code not recognised**. If your gym issues member cards and you can issue them, you can **Issue to a member** right there, since an unknown code is usually a blank card.
+
 ### Building the order
 
 Each line in the order summary can be adjusted before you take payment:
@@ -57,22 +68,27 @@ Each line in the order summary can be adjusted before you take payment:
 - **Booking date and time** - area and instructor bookings default to the next full hour; adjust with the date and time picker. Class and event bookings inherit their time from the class or event.
 - **Entrance method** - every booking line needs one: pay directly, use one of the member's eligible memberships, or use an external program. The price updates to match the method you pick (a membership entry resolves to zero, direct payment uses the resource price).
 - **Notes** - add a per-product note (for example a preparation instruction), and an order-level note for the whole ticket (for example kitchen instructions or a buzzer number).
+- **Who the line is for** - use the line's actions menu and **Assign to member** (or **Change member**) when a line is for someone other than the customer, for example a parent paying for two children's memberships. The customer still pays for the whole order. Two lines can't put the same person in the same class.
 
 The sidebar shows a live **subtotal**, **tax**, and **total**, recalculated on the server as you change the cart.
 
 ### The member
 
-Use the contact selector at the top of the sidebar to attach the order to a member, or click the add button to create a new contact without leaving the register.
+Use the contact selector at the top of the sidebar to attach the order to a member, or click the add button to create a new contact without leaving the register. Opening the selected member shows a quick view of their details, active memberships, and any documents they still have to sign, with a shortcut to sell them a membership.
 
-A member is required when the cart contains a booking, a membership, or a package (packages can deconstruct into memberships). Product-only orders can be completed without a member attached.
+A member is required when the cart contains a membership, a booking, a package (packages can deconstruct into memberships), or a rental. Product-only orders can be completed without a member attached.
 
 ## Completing an order
 
-Click **Complete** to open the confirmation dialog, then confirm. Completing an order runs three steps in sequence:
+Click **Charge** (it shows the amount, for example **Charge 45.00**, or reads **Complete** when nothing is left to pay) to open the **Confirm order** dialog, then click **Confirm and complete**. Completing an order runs three steps in sequence:
 
 1. **Create and execute the order** - the line items become real bookings, memberships, and product charges.
 2. **Take payment** - a payment is recorded against the generated charges using the payment method you selected.
-3. **Check in** (optional) - when "check in on complete" is on, each booking created by the order is checked in immediately. This is on by default, since the whole party is usually standing at the desk.
+3. **Check in** (optional) - when **Check in contact for new bookings and memberships** is ticked, each booking created by the order is checked in immediately. This is on by default, since the whole party is usually standing at the desk. Some classes are recorded as walk-in attendance and checked in regardless of this setting.
+
+When the order completes, a confirmation links to the new order with **View order**. If you just sold a membership to someone with no member card and your gym issues cards, you can issue one from the same message.
+
+Only one booking per order can be paid with a plan or pass sold in that order. To use a newly sold pass for a second booking, complete the order first, then start another.
 
 ### Payment methods
 
@@ -81,7 +97,7 @@ The payment method selector appears whenever the order has an amount left to pay
 - **Cash and other manual methods** - recorded by the operator at the desk.
 - **Member wallet credit** - draws down the member's wallet balance.
 - **Card via Stripe** - charged online through Stripe.
-- **Card on a terminal** - card tenders settled on a connected payment terminal (for example myPOS).
+- **Card on a terminal** - card tenders settled on a connected [payment terminal](/settings/payment-terminals). You choose the terminal at this gym's counter, and the amount is pushed to the device. The dialog stays open while the customer taps their card, and can only be closed once the provider has answered.
 
 If a promotion brings the payable total to zero (for example a 100%-off pass code), the order completes without asking for a payment method.
 
@@ -93,17 +109,30 @@ When the cart has a booking or membership line and a member is selected, you can
 
 You do not have to finish an order in one go:
 
-- **Save and close** stores the order as a **draft** you can resume later.
+- **New order** saves the current order as a **draft** under **Orders** and starts a fresh one. You can resume the draft any time.
 - If you owe money but have not chosen a payment method, completing instead saves the order as a draft.
 - **Discard** removes the current order.
 
-The **Orders** button above the catalog lists your in-progress drafts. Pick one to load it back into the register, or open **All orders** to jump to the full [Orders](/sales/orders) list.
+The **Orders** button above the catalog shows how many orders you can resume and lists them, open tabs first, then drafts. Pick one to load it back into the register, or open **All orders** to jump to the full [Orders](/sales/orders) list. The cross icon on a row discards a draft, or cancels an open tab, which needs billing permission because it reverses a real sale.
+
+### Open tabs
+
+A tab is an order that stays open while the customer keeps ordering, such as a bar tab. Build the first round and click **Open tab** instead of **Charge**. Each item is fulfilled as soon as it is added, and the tab is saved under **Orders** with the status **Open**.
+
+To add to it later, pick the tab from the **Orders** button. Its existing lines show read-only above the cart, with the tab total so far. Add the new items and click **Add to tab**, or click **Charge** to take payment for everything on the tab. You can also close a tab from its page under **Sales** > **Orders** with **Close order**. See [Orders](/sales/orders#closing-an-open-order).
+
+When **Accept unpaid orders from the online shop** is on (see [POS settings](#pos-settings)), orders members place in the online shop without paying also open as tabs, marked **Placed online**, so you can settle them at the till.
 
 ## POS settings
 
 POS is a per-organization feature you turn on and off.
 
-Go to **Settings** > **Sales** > **Point of Sale** and toggle it on. When off, the **Point of Sale** rail item is hidden and the register is unavailable.
+Go to **Settings** > **Sales** > **Point of Sale** and turn on **Enable Point of Sale**. When off, the **Point of Sale** rail item is hidden and the register is unavailable.
+
+The same page has two more settings:
+
+- **Accept unpaid orders from the online shop** - members can place a shop order without paying online, and it opens as a tab to settle at the till. Switch it off to require online payment before an order moves stock.
+- **Listen for a barcode scanner** (under **Barcode scanning**) - reads barcodes typed by a scanner at the counter. Turn it off only if fast typing at the counter is being mistaken for a scan.
 
 Turning POS on or off requires organization settings permission. Viewing the setting requires read access to settings.
 
@@ -111,8 +140,10 @@ Turning POS on or off requires organization settings permission. Viewing the set
 
 The POS is permission-gated, not role-gated. Staff need POS or billing permissions for the location they are selling at:
 
-- Reading the register and its catalog uses read access to POS or billing.
-- Creating, completing, and cancelling orders uses create access to POS or billing.
+- Reading the register and its catalog uses read access to POS or billing. Without permission to take payment, the register opens view-only: you can browse prices and look up orders.
+- Creating and completing orders, and discarding drafts, uses create access to POS or billing.
+- Cancelling an open tab or a completed order reverses a real sale, so it needs create access to billing.
+- Checking members in on completion needs check-in permission or create access to POS.
 - Lending rental gear also needs create access to rentals.
 
 Front-desk staff have these permissions by default. See [Roles and permissions](/reference/roles-permissions) for the full model.

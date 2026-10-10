@@ -26,7 +26,7 @@ The **Orders** tab is the record of every basket your organization has assembled
 Typical uses:
 
 - **A court plus a racket rental** - a padel member books an hour on court and rents a racket at the desk, paid by card in one order, with each line linked to the booking and charge it produced.
-- **A drop-in who changes their mind** - a jiu-jitsu visitor pays cash for a mat session and a bottle of water, then decides not to train, so you cancel the completed order to void its charges and refund the cash from the payment record.
+- **A drop-in who changes their mind** - a jiu-jitsu visitor pays for a mat session and a bottle of water, then decides not to train, so you cancel the completed order, which voids its charges and refunds what they paid.
 - **A membership with a joining fee** - a Pilates client joins a monthly reformer plan, and the order carries the membership and its signup fee as separate lines.
 
 See [Worked examples](#worked-examples) for more.
@@ -61,13 +61,14 @@ Open **Sales** > **Orders**. The list shows every order with these columns:
 
 - **#** - The order number.
 - **Member** - The contact the order belongs to (blank for anonymous product-only sales).
-- **Status** - Draft, Completed, or Cancelled.
-- **Payment status** - The rolled-up payment state across the order's charges (hidden while the order is still a draft with no live charges).
+- **Status** - Draft, Open, Completed, or Cancelled.
+- **Payment Status** - The rolled-up payment state across the order's charges (hidden while the order is still a draft with no live charges).
+- **Source** - Where the sale came from, for example the till, the member portal, or your website.
 - **Items** - How many line items the order holds.
 - **Total** - The order total, shown tax-exclusive in the admin grid.
 - **Created at** - When the order was opened.
 
-Tabs across the top filter by status: **All**, **Draft**, **Completed**, and **Cancelled**, each with a live count. Sort defaults to newest first. The row action menu offers **View** and, unless the order is already cancelled, **Cancel**. The **Point of sale** button in the top right jumps to the POS to start a new sale.
+Tabs across the top filter by status: **All**, **Draft**, **Open**, **Completed**, and **Cancelled**, each with a live count. Sort defaults to newest first. The row action menu offers **View** and, unless the order is already cancelled, **Cancel**. The **Point of Sale** button in the top right jumps to the POS to start a new sale.
 
 <Note>
   Orders are created from the point of sale, from member checkout in the portal, or from a booking flow - not from an "Add order" button on this tab. The Orders tab is where you review and resolve those orders after they exist.
@@ -75,17 +76,19 @@ Tabs across the top filter by status: **All**, **Draft**, **Completed**, and **C
 
 ## Order status and the lifecycle
 
-There are exactly three order statuses:
+There are four order statuses:
 
 - **Draft** - The basket is assembled but not yet paid or fulfilled. Nothing has been booked or charged. Draft orders can still be edited (their line items, member, club, and note replaced).
+- **Open** - A running tab started at the [point of sale](/pos/point-of-sale). Items can still be added, and each one is fulfilled as soon as it is added. The tab stays open until someone closes it.
 - **Completed** - The order has been executed: its lines are now real bookings, memberships, and charges, and payment has been recorded (or left pending for pay-on-arrival).
 - **Cancelled** - The order has been voided. For a draft this is just a status change; for a completed order it reverses everything the order created.
 
 The allowed transitions are:
 
 - **Draft -> Completed** when you complete (execute) the order.
+- **Open -> Completed** when you close the tab.
 - **Draft -> Cancelled** when you discard a draft.
-- **Completed -> Cancelled** when you reverse a finished order.
+- **Open -> Cancelled** or **Completed -> Cancelled** when you reverse the order.
 
 A cancelled order is terminal - it cannot be re-opened, and attempting to cancel it again is rejected.
 
@@ -116,10 +119,25 @@ The in-app help reads: "Add a payment method and complete the order to create bo
   If you choose pay-on-arrival, the booking is confirmed but its charge is left **pending** - no wallet debit and no card charge. Collect payment on site later. The order still moves to **Completed**; only its payment status stays open.
 </Note>
 
+## Closing an open order
+
+Open the order and click **Close order**. Any line not yet fulfilled is fulfilled first, then the order moves to **Completed**. Closing doesn't depend on payment: a closed order can still carry an outstanding balance, which you collect from its charges.
+
+## Issuing an invoice or pro-forma for an order
+
+From an order that has a member, you can issue a numbered document for the sale. Use **Issue invoice** or **Issue pro-forma** in the order's header. Each takes the next number in its series.
+
+- A sale can carry one document of each type.
+- **Issue pro-forma** is not offered once the order is paid, because a pro-forma asks to be paid up front.
+- While an unpaid pro-forma is outstanding, **Issue invoice** is not offered. Once the pro-forma is paid, use **Convert pro-forma to invoice** to issue the invoice from it. The pro-forma is kept as sent.
+
+Issuing documents needs the **billing.create.organization** permission. See [Invoices](/sales/invoices).
+
 ## Cancelling an order
 
 1. Open the order and click **Cancel**, or use the **Cancel** row action in the list.
 2. Confirm in the **Cancel order** dialog ("Are you sure you want to cancel this order? This action cannot be undone.").
+3. If the order has been paid, pick where the refund goes under **Refund to**: **Original payment method** or **Wallet balance**. The dialog shows the **Refund amount**, and the button reads **Cancel and refund**. If only one destination is possible, it is picked for you.
 
 What cancelling does depends on the order's state:
 
@@ -127,7 +145,7 @@ What cancelling does depends on the order's state:
 - **Completed** - Each booking line is cancelled through the standard booking-cancellation flow, each membership line is cancelled immediately, and every related charge is voided. Then the order status becomes **Cancelled**. This reversal is idempotent, so an already-cancelled booking or already-voided charge is skipped rather than erroring.
 
 <Note>
-  Cancelling a completed order does not by itself hand cash back. A booking that was paid may generate a wallet-credit refund through the cancellation flow (subject to your cancellation policy), and voiding the charge stops it counting toward revenue. To reverse a specific card or cash payment, use the refund action on that payment - see [Payments](/sales/payments).
+  A paid order can't be cancelled without refunding it, so the money never stays with your gym after the sale is erased. When a card payment can't be reversed through the card provider, the refund can only go to the wallet, and the dialog says so. When no automatic refund is available at all, the dialog tells you to refund it from the charge first and then cancel. See [Payments](/sales/payments).
 </Note>
 
 ## Editing a draft
@@ -151,7 +169,7 @@ A visitor pays for a single mat session and grabs a bottle of water.
 
 - Built at the point of sale as a **product**-only or booking-plus-product order.
 - Take **Cash**; the order completes and its charges are marked paid.
-- If they later decide not to train, cancel the completed order to void the charges, then refund the cash from the payment record.
+- If they later decide not to train, cancel the completed order and choose where the refund goes.
 
 ### Pilates membership with a signup fee
 
@@ -187,7 +205,7 @@ A yoga studio sells a 10-class pass.
 
 **Issue**: The **Complete order** button is missing.
 
-**Solution**: It only shows for **draft** orders. A completed or cancelled order has nothing left to execute.
+**Solution**: It only shows for **draft** orders. An open order shows **Close order** instead, and a completed or cancelled order has nothing left to execute.
 
 **Issue**: Completing the order fails with a message about a required payment method.
 
@@ -201,9 +219,9 @@ A yoga studio sells a 10-class pass.
 
 **Solution**: The order was taken pay-on-arrival, so its charges are still open. Record the payment against those charges to move it to **Paid** - see [Payments](/sales/payments).
 
-**Issue**: I cancelled a completed order but the member still expects their money back.
+**Issue**: I can't cancel a paid order - the dialog says no automatic refund is available.
 
-**Solution**: Cancelling voids the charges and may credit wallet through the cancellation flow, but it does not automatically reverse a specific card or cash payment. Refund the payment from its record on the [Payments](/sales/payments) tab.
+**Solution**: None of the order's payments can be returned automatically. Refund it from the charge first, then cancel the order. See [Charges](/sales/charges).
 
 **Issue**: The payment-status chip is missing on a draft.
 

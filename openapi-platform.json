@@ -3,7 +3,7 @@
   "info": {
     "title": "1club Platform API",
     "version": "1.0.0",
-    "description": "The 1club Platform API lets you programmatically access and manage your organization's data.\n\n## Official API Contract\n\nThis documentation is the official source of truth for the 1club Platform API.\nIf an integration relies on undocumented endpoints, fields, response shapes, or internal behavior outside this spec, we can't guarantee backward compatibility.\nBuild against what's documented here to stay stable as the platform evolves.\n\n## Authentication\n\nAll requests require a customer API key passed as a Bearer token:\n\n```\nAuthorization: Bearer 1club_sk_live_...\n```\n\nGenerate API keys from the admin portal under **Settings > API Tokens**.\nThe key is tied to your organization - all responses are scoped to your org's data.\n\n## Rate Limiting\n\n- **100 requests per minute** per API key\n- When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header\n- Rate limit headers are included in every response:\n  - `X-RateLimit-Limit` - max requests per window\n  - `X-RateLimit-Remaining` - requests remaining\n  - `X-RateLimit-Reset` - seconds until the window resets\n\n## Errors\n\n| Status | Meaning |\n|--------|---------|\n| `400` | Invalid request parameters |\n| `401` | Missing or invalid API key |\n| `404` | Resource not found (or doesn't belong to your organization) |\n| `429` | Rate limit exceeded |\n| `500` | Internal server error |",
+    "description": "The 1club Platform API lets you programmatically access and manage your organization's data.\n\n## Official API Contract\n\nThis documentation is the official source of truth for the 1club Platform API.\nIf an integration relies on undocumented endpoints, fields, response shapes, or internal behavior outside this spec, we can't guarantee backward compatibility.\nBuild against what's documented here to stay stable as the platform evolves.\n\n## Authentication\n\nAll requests require a customer API key passed as a Bearer token:\n\n```\nAuthorization: Bearer 1club_sk_live_...\n```\n\nGenerate API keys from the admin portal under **Settings > API Tokens**.\nThe key is tied to your organization - all responses are scoped to your org's data.\n\nAgents and MCP connectors can instead send an OAuth access token (the `platformOAuth` scheme), requesting only the scopes the task needs.\n\n## Rate Limiting\n\n- **100 requests per minute** per API key\n- When exceeded, the API returns `429 Too Many Requests` with a `Retry-After` header\n- Rate limit headers are included in every response:\n  - `X-RateLimit-Limit` - max requests per window\n  - `X-RateLimit-Remaining` - requests remaining\n  - `X-RateLimit-Reset` - seconds until the window resets\n\n## Errors\n\n| Status | Meaning |\n|--------|---------|\n| `400` | Invalid request parameters |\n| `401` | Missing or invalid API key |\n| `404` | Resource not found (or doesn't belong to your organization) |\n| `429` | Rate limit exceeded |\n| `500` | Internal server error |",
     "contact": {
       "name": "1club API Support",
       "email": "support@1club.ai"
@@ -21,6 +21,54 @@
         "type": "http",
         "scheme": "bearer",
         "description": "Organization-scoped bearer credential: a customer API key (1club_sk_live_...) or an MCP OAuth access token."
+      },
+      "platformOAuth": {
+        "type": "oauth2",
+        "description": "OAuth 2.1 authorization code flow with PKCE (S256), as used by MCP connectors. Register a client dynamically (RFC 7591) at https://api.1club.ai/v1/mcp/oauth/register. Each scope grants one capability; request only what the integration needs.",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.1club.ai/oauth/authorize",
+            "tokenUrl": "https://api.1club.ai/v1/mcp/oauth/token",
+            "scopes": {
+              "*": "Full access - read and manage everything in this organization, including capabilities added later",
+              "classes:read": "View classes and schedules",
+              "classes:write": "Create, reschedule, and cancel classes, and maintain the class types they are run as",
+              "checkins:read": "View attendance records",
+              "checkins:write": "Check attendees in to their bookings",
+              "content:read": "View published content",
+              "content:write": "Create, edit and delete content - posts, FAQs, documents and reusable blocks",
+              "website:read": "View your website: pages, sections, layout, styles and publish history",
+              "website:write": "Edit your website - pages, sections, navigation and styles. Edits stay unpublished until published.",
+              "website:publish": "Publish your website, making unpublished edits visible to the public, and roll back to an earlier version",
+              "media:read": "View your media library",
+              "media:write": "Add images and videos to your media library and edit their names and descriptions",
+              "media:delete": "Permanently delete files from your media library",
+              "clubs:read": "View club information",
+              "transactions:read": "View financial transactions",
+              "transactions:write": "Record revenue collected outside 1club, such as a marketplace payout for your bookings, and refunds of it. Nothing is charged to anyone.",
+              "invoices:read": "View your invoices - who they were issued to, their amounts and status - and how much was invoiced over a period",
+              "areas:read": "View areas and availability",
+              "areas:write": "Create and update areas and area types, and block or unblock an area",
+              "bookings:read": "View bookings",
+              "bookings:write": "Create and cancel bookings",
+              "contacts:read": "View contacts and members",
+              "contacts:write": "Create and update contacts",
+              "contacts:delete": "Archive contacts, which cancels their active memberships and all their future bookings. Separate from creating and updating because those cancellations are not undone by restoring the contact.",
+              "instructors:read": "View instructors and their availability",
+              "instructors:write": "Create and update instructors (coaches) and the instructor types they are grouped by, including what members pay for a one-to-one session and how you pay the coach. Does not grant admin-portal access: an instructor created this way has no login and is never invited to your staff portal.",
+              "plans:read": "View membership plans and pricing",
+              "plans:write": "Create, update, and retire membership plans",
+              "memberships:read": "View memberships",
+              "memberships:write": "Create and update memberships",
+              "products:read": "View the product catalogue and its categories, including prices and how many are left to sell",
+              "products:write": "Create and edit products and product categories",
+              "forms:read": "View your forms and their questions, and how many people have completed each. Not the answers themselves.",
+              "forms:write": "Create and edit forms and their questions, including sign-up forms that sell your plans and products. Forms are public as soon as they are created or changed. Does not delete forms.",
+              "organization:write": "Change organization-wide settings, which take effect immediately. That includes which languages you offer, across your website, the member portal, the mobile app and email, and what your clubs call their booking cards (private training, group activities, areas) wherever members book.",
+              "revenue-accounts:write": "Add accounts to your chart of accounts and edit them, including which one sales post to by default. Reading the chart needs no scope of its own - any of plans, products or transactions admits it."
+            }
+          }
+        }
       }
     },
     "schemas": {
@@ -6469,6 +6517,9 @@
   "security": [
     {
       "customerApiAuth": []
+    },
+    {
+      "platformOAuth": []
     }
   ],
   "paths": {

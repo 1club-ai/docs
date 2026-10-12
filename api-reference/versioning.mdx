@@ -1,0 +1,40 @@
+---
+title: "Versioning and deprecation"
+description: "How the 1Club Platform API is versioned, how breaking changes ship, and how deprecated operations are marked and announced."
+keywords: [versioning, deprecation, breaking changes, api version, v1, platform api]
+---
+
+The 1Club Platform API is versioned in the URL path. Every endpoint lives under `/v1/platform/...`, so the version you build against is part of each request and doesn't change under you.
+
+## Changes within a version
+
+Changes that keep existing integrations working ship within the current version. Examples are a new endpoint, a new optional parameter, or a new field in a response.
+
+Build your integration so it keeps working as the version grows:
+
+- Ignore response fields you don't recognize.
+- Send only the fields an endpoint documents.
+- Rely only on documented behavior. See [Official API contract](/api-reference/introduction#official-api-contract).
+
+## Breaking changes
+
+A breaking change ships as a new version in the path, such as `/v2`, instead of changing `v1` in place. Breaking changes include:
+
+- Removing or renaming an endpoint or a field
+- Changing a field's type or meaning
+- Making an optional parameter required
+
+## Deprecation
+
+Before an operation is removed, it's deprecated first:
+
+- **Marked in the spec** - the operation is flagged `deprecated: true` in the [OpenAPI spec](https://docs.1club.ai/openapi-platform.json), and this reference shows it as deprecated.
+- **Announced in the changelog** - the [changelog](/changelog) announces the deprecation with advance notice before the operation stops working.
+
+A deprecated operation keeps working during the notice period. Plan your move away from it before it's removed.
+
+## Stay up to date
+
+- Check the [changelog](/changelog) for API announcements.
+- If you generate a client from the [OpenAPI spec](https://docs.1club.ai/openapi-platform.json), look for operations flagged `deprecated` when you regenerate it.
+- Contact [support@1club.ai](mailto:support@1club.ai) if a deprecation affects your integration and you need help planning the move.

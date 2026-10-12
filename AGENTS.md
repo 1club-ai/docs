@@ -62,4 +62,6 @@ The product code lives in a sibling repo at `../1club` (GitHub: `1club-ai/1club`
 
 When code introduces a new concept that doesn't fit any existing page, add the page, add the nav entry in `docs.json`, and add the new mapping to `../1club/.agents/docs-map.yml` so future changes route to it.
 
+`llms.txt` at the repo root is hand-curated: it replaces the file Mintlify would generate (which grew past 70,000 characters, over the 30,000 an agent index should stay under). When you add, move or retitle a page that belongs among the most important ones, update its line in `llms.txt` too, and keep the file under 30,000 characters. Everything else is reached through the generated `llms-full.txt`.
+
 Run `mint broken-links` after structural changes to catch dangling cross-links.

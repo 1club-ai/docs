@@ -19,16 +19,18 @@ You need:
 The admin MCP address is:
 
 ```text
-https://mcp.1club.ai/admin
+https://mcp.1club.ai
 ```
 
-The public discovery server is `https://mcp.1club.ai/discovery`. It searches published marketplace data and does not require sign-in.
+An assistant you connected at the earlier address, `https://mcp.1club.ai/admin`, keeps working; you do not need to reconnect it.
+
+The public discovery server is `https://mcp.1club.me`. It searches published marketplace data and does not require sign-in.
 
 ## Connect the admin server
 
 <Steps>
   <Step title="Add a custom MCP connection">
-    Open your assistant's apps, connectors, or MCP settings. Create a custom remote MCP connection and enter `https://mcp.1club.ai/admin`.
+    Open your assistant's apps, connectors, or MCP settings. Create a custom remote MCP connection and enter `https://mcp.1club.ai`.
   </Step>
 
   <Step title="Start the connection">
@@ -69,7 +71,7 @@ Claude and Claude Desktop support OAuth-based remote MCP connectors.
 
 1. Open **Settings** > **Connectors**.
 2. Select **Add custom connector**.
-3. Enter a name such as "1Club" and the URL `https://mcp.1club.ai/admin`.
+3. Enter a name such as "1Club" and the URL `https://mcp.1club.ai`.
 4. Add the connector, then select **Connect**.
 5. Complete the 1Club sign-in and authorization flow.
 6. Enable the 1Club tools from Claude's tools menu when you want to use them.
@@ -81,10 +83,10 @@ Team and Enterprise workspace owners may need to add the connector for the organ
 Claude Code speaks OAuth over HTTP MCP, so one command is enough and no header is needed:
 
 ```bash
-claude mcp add --transport http 1club-admin https://mcp.1club.ai/admin
+claude mcp add --transport http 1club-admin https://mcp.1club.ai
 ```
 
-The sign-in and authorization pages open when you first use the server. Run `claude mcp list` to confirm it is connected. For the anonymous marketplace server, use the same command with `https://mcp.1club.ai/discovery`.
+The sign-in and authorization pages open when you first use the server. Run `claude mcp list` to confirm it is connected. For the anonymous marketplace server, use the same command with `https://mcp.1club.me`.
 
 ## ChatGPT
 
@@ -92,7 +94,7 @@ ChatGPT exposes custom MCP connections as apps. Availability and write-action su
 
 1. Ask a workspace admin to enable developer mode or custom MCP apps if required.
 2. Open **Settings** > **Apps** and create a custom app.
-3. Enter `https://mcp.1club.ai/admin` as the MCP endpoint.
+3. Enter `https://mcp.1club.ai` as the MCP endpoint.
 4. Choose OAuth authentication, then scan the tools.
 5. Complete the 1Club sign-in and authorization flow.
 6. Enable the app and select it from the tools menu in a new chat.
@@ -104,7 +106,7 @@ See [OpenAI's developer mode and MCP apps guide](https://help.openai.com/en/arti
 Use the same endpoint and choose OAuth when the client asks how to authenticate:
 
 ```text
-https://mcp.1club.ai/admin
+https://mcp.1club.ai
 ```
 
 1Club supports dynamic client registration, the authorization code flow with PKCE, access-token refresh, and revocation. A compatible client discovers all of it from the endpoint alone, with no manual URLs and no client secret.
@@ -118,7 +120,7 @@ If you are building the client rather than configuring one, this is what it will
 | Authorization server  | `https://auth.1club.ai`, named by that metadata document rather than by the 401 itself  |
 | Client authentication | None. Clients are public and register themselves                                        |
 | PKCE                  | Required, `S256` only                                                                   |
-| Resource indicator    | `https://mcp.1club.ai/admin`, required on the authorize and token requests              |
+| Resource indicator    | `https://mcp.1club.ai`, required on the authorize and token requests. A client connected at `https://mcp.1club.ai/admin` sends that instead, and its metadata is `https://mcp.1club.ai/.well-known/oauth-protected-resource/admin` |
 | Grant types           | `authorization_code`, `refresh_token`                                                   |
 
 A request without a valid bearer token gets a `401` whose `WWW-Authenticate` header names the resource metadata document. That is the normal way to start the flow, not an error to work around.
@@ -153,15 +155,14 @@ To move an existing connection to OAuth:
 
 ## Local stdio setup
 
-A developer can also run the MCP server locally over stdio, which is what an editor or a script on your own machine talks to. This path has no OAuth: it authenticates with a [Platform API key](/settings/api-tokens) and is meant for local development.
+A developer can also run the MCP servers locally over stdio, which is what an editor or a script on your own machine talks to. This path has no OAuth and is meant for local development.
 
-The server is not published to a package registry, so build it from the `mcp-server` workspace of the product repository and start it with `npm start`. It reads these environment variables:
+The servers are not published to a package registry, so build one from the product repository and start it with `npm start`: `admin-mcp` for your organization's data, or `public-mcp` for anonymous marketplace search. Install the shared package first (`npm install --prefix ../mcp-shared`), then `npm install` and `npm run build` in the server's own folder. They read these environment variables:
 
-| Variable              | Purpose                                                                                             |
-| --------------------- | --------------------------------------------------------------------------------------------------- |
-| `ONECLUB_API_KEY`     | Your `1club_sk_...` key. The admin surface refuses to start without it                              |
-| `BASE_URL`            | The API to call. Set it to `https://api.1club.ai`, or it defaults to `http://localhost:8000`        |
-| `ONECLUB_MCP_SURFACE` | `admin` or `discovery`. Defaults to `admin` when a key is set and `discovery` when it is not         |
+| Variable          | Purpose                                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------------------------- |
+| `ONECLUB_API_KEY` | Your `1club_sk_...` [Platform API key](/settings/api-tokens). `admin-mcp` refuses to start without it; `public-mcp` needs none |
+| `BASE_URL`        | The API to call. Set it to `https://api.1club.ai`, or it defaults to `http://localhost:8000`            |
 
 Set `BASE_URL` explicitly. Left unset it points at a local API rather than failing, so an assistant aimed at production will simply find nothing there.
 

@@ -1,0 +1,231 @@
+---
+title: "Membership policies"
+description: "Decide how members cancel and pause their own memberships - the notice they give, what leaving before a minimum term costs, and how long and how often they can pause - under Settings > Billing > Membership Policies."
+keywords:
+  - membership policy
+  - cancel membership online
+  - notice period
+  - minimum term
+  - commitment
+  - early cancellation charge
+  - early termination fee
+  - pause membership online
+  - freeze membership
+  - booked pause
+  - cancellation reason
+---
+
+A membership policy sets the rules for the changes members make to their own memberships: whether they can cancel online, how much notice a cancellation needs, what ending before a minimum term costs, and whether they can pause, for how long, and how often. Owners and admins set policies up. Members meet the rules when they cancel or pause from the member portal, your gym's website, 1club.me, or the 1club app. Staff see the same rules as warnings, never as a block.
+
+## When to use it
+
+Without a policy, members can stop their membership renewing online, and only staff can pause one. Add a policy when your house rules ask for more than that, so the front desk doesn't have to enforce notice periods, contract terms, or holiday freezes by hand.
+
+Typical uses:
+
+- **A 12-month contract, then month to month** - a strength gym sells a monthly plan with a 12-month [minimum term](#the-minimum-term-is-set-on-the-plan). Members can schedule their end for month 12 at any time, and leaving sooner costs half of what is left with 6 or more months to go, a quarter with 3 or more, and nothing in the last 3 months.
+- **A notice period** - a climbing gym asks for 30 days' notice. A member who cancels today picks from the period ends at least 30 days away, and keeps renewing until the date they chose.
+- **Holiday freezes members book themselves** - a CrossFit box lets members pause for up to 30 days, twice a year, starting today or on a later day, without calling the front desk.
+- **Staff-only cancellation for one plan** - a martial arts school keeps its kids' program cancellable only through the office, while adult plans can be cancelled online.
+
+## How it works
+
+A membership policy is the membership counterpart of a [booking policy](/settings/booking-policies): one decides what members may do with their bookings, the other what they may do with their memberships. The early cancellation charge is set up exactly like a booking policy's refund rules, as a ladder of rules with a timeline drawn underneath.
+
+- **Which policy applies.** A policy covers every membership, or only memberships on the plans or [plan categories](/sales/plans#plan-categories) you pick. When more than one policy covers a membership, the most specific one wins: a policy that names the membership's plan beats one that names its category, which beats one that names neither. Among equals, the most recently created policy wins. A membership no policy covers gets the defaults: members can stop renewal online, only staff can pause, and there is no notice period and no way to pay to leave early.
+- **Members choose when their membership ends.** A membership ends with a billing period, so a member cancelling picks one of the coming period ends. The membership keeps renewing until that date, then stops (a scheduled cancellation). Until then they can withdraw it.
+- **The minimum term belongs to the plan, not the policy.** The policy decides what leaving before the term is met costs. See [The minimum term is set on the plan](#the-minimum-term-is-set-on-the-plan).
+- **Rules for members, warnings for staff.** Staff cancelling or pausing from the admin dashboard are offered every date, see the charge, and are warned when a change goes against the policy. The change still goes through. See [What staff see](#what-staff-see).
+
+## Managing membership policies
+
+### Viewing all policies
+
+1. Go to **Settings** > **Billing** > **Membership Policies**.
+2. Each policy appears as a card showing which memberships it covers (**All memberships**, or its plans and plan categories), its cancellation terms (**Members can cancel online** or **Only staff can cancel**, plus any notice period), its pause terms (**Members can pause online** or **Only staff can pause**, plus any limits), and a timeline of its early cancellation charge.
+3. Click a policy to open it, or click **Add** to create one. Use the copy icon on a card to duplicate a policy.
+
+Viewing policies needs the **settings.read.organization** permission. Creating, editing, duplicating, and deleting them needs **settings.manage.organization**.
+
+### Creating or editing a policy
+
+1. Click **Add** in the top right (or click an existing policy to open it).
+2. Fill in the sections on the page: **General**, **Cancellation**, and **Pauses**. The two self-service switches live in the **Member self-service** panel on the right.
+3. Click **Save** in the save bar when done.
+
+From an existing policy you can also **Duplicate** or **Delete** it from the page header. When you delete a policy, the memberships it covered fall back to the next matching policy, or to the defaults.
+
+## General
+
+- **Policy Name** - a name for your own reference, for example "12-month contracts".
+- **Plans** - the plans whose memberships the policy covers. Leave it on **All plans** to name none.
+- **Plan categories** - the categories whose plans the policy covers. Leave it on **All categories** to name none.
+
+Leave both empty to cover every membership. A membership is covered when its plan is listed, or when its plan sits in a listed category.
+
+## Member self-service
+
+The **Member self-service** panel on the right holds two switches.
+
+### Members can cancel online
+
+> Members can cancel from the portal, website or app, choosing the period end it stops on. It stays active until then.
+
+When off, members see "To cancel this membership, please contact the club." and only staff can cancel.
+
+### Members can pause online
+
+> Members can pause their membership themselves, until a date they choose. Billing and access stop while it is paused.
+
+When off, members see "To pause this membership, please contact the club." and only staff can pause. See [How members pause](#how-members-pause).
+
+## Cancellation
+
+### Notice period
+
+How many days of notice a member's own cancellation needs. The membership ends no sooner than the first period end after the notice. Leave it on **No notice** to let members end with the current period.
+
+For example, with 30 days' notice on a plan that renews on the 1st of each month, a member who cancels on 10 March can end on 1 May at the earliest, because 1 April is less than 30 days away.
+
+### Ending before the commitment
+
+A single dropdown decides whether members can pay to leave before their minimum term is met:
+
+- **Not allowed online** - Members can't end before the term is met. They can still schedule the end for the day the term is met, at any time. This is the default.
+- **Charge by months left** - Members can end sooner, for an early cancellation charge set by a ladder of rules.
+
+A timeline under the rules shows the charge at each point, from **More months left** on the left to **Commitment met** on the right.
+
+#### Charge by months left
+
+Click **Add rule** to add a rule for each band. For each rule:
+
+- **Months left** - how many whole months of the minimum term are still ahead on the day the membership would end.
+- **Charge %** - what share of the remaining payments the member pays to leave.
+
+The first rule the months left reach decides the charge. With fewer months left than every rule, leaving early costs nothing. To always charge something, add a rule at 0 months.
+
+Rules must step down: the share may not go up as the months left go down. Each rule needs its own number of months, from 0 to 120, and a policy holds at most 12 rules.
+
+Example - two rules, `6 months / 50%` and `3 months / 25%`:
+
+- 6 or more months left - 50% of the remaining payments
+- 3 to 6 months left - 25%
+- Fewer than 3 months left - free
+
+The charge is added to what the member owes, like any other balance, and staff can waive it. See [How the charge is calculated](#how-the-charge-is-calculated).
+
+## Pauses
+
+- **Longest pause** (days) - the longest a single pause may last. Members can't pause for longer online, and staff are warned. Leave it on **No limit** for any length.
+- **Pauses per year** - how many times a membership may be paused in any 12 months. Staff pauses and booked pauses count too. Once the limit is reached, members can't pause online, and staff are warned. Leave it on **No limit** for no cap.
+
+These limits only matter while **Members can pause online** is on, or as warnings for staff.
+
+## The minimum term is set on the plan
+
+A minimum term, also called a commitment, is how long a member commits to from their start date, for example 12 months and then month to month. You set it on the plan, in the **Minimum term** field of the plan dialog (see [Plans](/sales/plans#pricing)). Every membership sold on the plan carries the term from the day the member starts.
+
+- Staff can change the term for one member in the membership dialog, and a pause moves the date the term is met by the paused days.
+- Members see the term before they buy, for example "12-month minimum term, then cancel anytime from your account".
+- A member can always schedule their end for the day the term is met, whatever the policy says about leaving earlier.
+- The policy decides what leaving before then costs: nothing is possible online under **Not allowed online**, and the early cancellation charge applies under **Charge by months left**.
+
+## How the charge is calculated
+
+The early cancellation charge is the rule's share of the payments the member would still have made until the minimum term is met:
+
+> charge = remaining payments x price per period x charge %
+
+- **Remaining payments** are the billing periods between the day the membership ends and the day the term is met.
+- **Months left** are counted the same way, a month at a time, and pick the rule. On a monthly plan, months left and remaining payments are the same number.
+- The amount the member is shown is what they pay, tax included. It is recorded against the plan's revenue account and its tax rate, so it shows on invoices and in revenue reports with the plan's other income.
+
+### Worked example
+
+A member joins a monthly plan at 50 per month on 1 January, with a 12-month minimum term, so the term is met on 1 January next year. Their policy charges 50% with 6 or more months left and 25% with 3 or more.
+
+| The member ends on  | Remaining payments        | Rule           | Charge               |
+| ------------------- | ------------------------- | -------------- | -------------------- |
+| 1 July              | 6 (July to December)      | 6 months / 50% | 6 x 50 x 50% = 150   |
+| 1 October           | 3 (October to December)   | 3 months / 25% | 3 x 50 x 25% = 37.50 |
+| 1 November          | 2 (November and December) | none reached   | free                 |
+| 1 January next year | 0, term met               | -              | free                 |
+
+In each case the membership keeps renewing until the date the member chose, so they keep paying and using it until then.
+
+## What members see
+
+Members manage their memberships on the **Memberships & passes** page of their account, in the member portal, on your gym's website, on 1club.me, and in the 1club app.
+
+### How members cancel
+
+1. The member clicks **Cancel membership** and chooses when their membership ends from **Membership ends on**. Only dates their policy allows are offered: from the first period end the notice period reaches, and no sooner than the minimum term is met unless the policy sets an early cancellation charge.
+2. A date before the term is met shows its charge, for example "1 July - early cancellation charge 150", and how many payments are left on the commitment.
+3. They choose a reason from **Why are you leaving?**: **Moving away**, **Too expensive**, **I don't use it enough**, **Injury or health**, **Switching to another club**, **Unhappy with the service**, or **Something else**. **Something else** asks them to tell you more.
+4. They confirm with **Cancel membership**, or **Cancel and accept** the charge.
+
+The membership keeps renewing until the chosen date and shows "Ends" with that date. Until then the member can click **Turn renewal back on** to withdraw the cancellation, and an unpaid early cancellation charge is dropped with it. If they have already paid the charge, they are asked to contact the gym.
+
+When the membership can't be cancelled online, the member is told why: the gym only allows staff to cancel, or the membership has a minimum commitment until a date and the policy sets no charge for leaving sooner.
+
+### How members pause
+
+1. The member clicks **Pause membership** and picks **Pause from** (today, or a later day up to 90 days ahead) and **Resume on** (up to the **Longest pause**).
+2. Before confirming, they see the pauses they have left ("Pauses used this year: 1 of 2") and where their next payment, end date, and minimum term move.
+3. They confirm with **Pause membership**, or **Book pause** for a pause that starts later.
+
+A pause starting today starts at once. A pause on a later day is booked, and the membership runs as normal until that day. A membership can hold one booked pause at a time. Members can **End pause** early on a pause they started, or **Call off pause** on one they booked. A pause staff started can only be changed by the gym.
+
+### Staff are notified
+
+Admins and managers get an in-app and email notification whenever a member cancels or pauses their own membership, naming the plan and the day it ends or resumes. The reason the member gave is recorded on the membership. Choose who gets them under [Notifications](/settings/notifications).
+
+## What staff see
+
+Staff are never blocked by a membership policy. The policy governs self-service, and a gym overriding its own terms for one member is a decision, not a mistake.
+
+- **Cancel** - The [cancel dialog](/sales/memberships#cancel) asks **Why is the membership ending?**, then offers every date in **Membership ends**: **Today (ends immediately)** and each coming period end. A date that carries an early cancellation charge shows it, with **Waive the charge** to record the cancellation without it. Ending today forfeits the rest of the paid period, so it counts the same remaining payments as ending when that period does.
+- **Pause** - The [pause dialog](/sales/memberships#pause-and-resume) offers any length, starting today or on a later day.
+- **Warnings** - When a change goes against the policy, the dialog says so before you confirm. For example: "This membership has a minimum commitment until 1 January 2028, so this ends it early.", or that the policy asks for 30 days of notice, allows pauses of up to 30 days, or allows 2 pauses a year. The change still goes through.
+
+The self-service switches themselves (**Members can cancel online** and **Members can pause online**) never produce a warning, because they only decide what members can do on their own.
+
+Integrations that cancel or pause through the [Memberships API](/api-reference/channel-integration/memberships) act as staff too: the policy never refuses them, and no early cancellation charge is raised.
+
+## Tips & best practices
+
+- **Start with one policy** - A single policy covering every membership is easiest to reason about. Add plan-specific policies only where a plan needs different terms.
+- **Put the term on the plan, the price of leaving on the policy** - A minimum term without a charge rule means members can only schedule their end for when the term is met. Add rules when you want to let them buy their way out.
+- **Step the charge down** - A charge that falls as the term runs out reads as fair to members, and keeps the last months cheap enough that nobody needs to call the front desk.
+- **Read the reasons** - Every cancellation is recorded with its reason, so you can see what drives members to leave.
+
+## Troubleshooting
+
+**Issue**: A member says they can't cancel online.
+
+**Solution**: Check the policy that covers their plan. Either **Members can cancel online** is off, or the membership has a minimum term that is not yet met and the policy is on **Not allowed online**. They can still schedule their end for the day the term is met, or staff can cancel for them.
+
+**Issue**: The earliest end date a member is offered is further out than expected.
+
+**Solution**: The **Notice period** counts from the day they cancel, and the membership ends on the first period end after it. Lower or clear the notice period if that is not your intent.
+
+**Issue**: A member was charged for leaving early, and you want to let them off.
+
+**Solution**: When staff cancel, turn on **Waive the charge** in the cancel dialog. If the member cancelled themselves, the charge is a normal unpaid charge on their membership: void or adjust it from [Charges](/sales/charges).
+
+**Issue**: Members can't pause, even though **Members can pause online** is on.
+
+**Solution**: The membership has reached **Pauses per year** (staff pauses and booked pauses count), or it already has a pause booked. Only active memberships can be paused.
+
+**Issue**: Two policies seem to cover the same membership.
+
+**Solution**: The more specific one wins: a policy that names the plan beats one that names its category, which beats one that covers all memberships. Among equals, the most recently created policy wins.
+
+## Related
+
+- [Memberships](/sales/memberships) - cancelling, pausing, and resuming memberships from the admin dashboard.
+- [Plans](/sales/plans) - where the minimum term is set.
+- [Booking policies](/settings/booking-policies) - the same kind of rules for bookings.
+- [Notifications](/settings/notifications) - who is told when a member cancels or pauses.
+- [Charges](/sales/charges) - how the early cancellation charge is collected.

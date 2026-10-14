@@ -8,6 +8,10 @@ keywords:
   - resume membership
   - renew membership
   - cancel membership
+  - scheduled cancellation
+  - early cancellation charge
+  - minimum term
+  - booked pause
   - usage allowance
   - class pack
   - auto-renew
@@ -25,6 +29,7 @@ Typical uses:
 - **A class pack that counts down** - a reformer studio sells a 10-class pack, each booking takes one use, and a cancelled booking gives it back.
 - **Court hours** - a padel gym sells 20 court hours a month, and a 90-minute booking takes 1.5 hours off the allowance.
 - **A hold for an injury or a holiday** - a jiu-jitsu member tears a ligament, so you pause the membership and they lose none of the time they paid for.
+- **A 12-month contract** - a strength gym sells a monthly plan with a 12-month minimum term. A member who leaves after five months owes an early cancellation charge, which the front desk can waive.
 
 See [Worked examples](#worked-examples) for how each of these is set up.
 
@@ -88,19 +93,20 @@ Click **Add Membership**. The dialog lets you:
 2. **Pick the plan.** Fields auto-populate from the plan: price, billing frequency, signup fee, max uses, and scope (which classes, areas, or instructors the membership covers).
 3. **Adjust the start date.** The end date and renewal date are computed from the billing frequency, but you can override them.
 4. **Set auto-renew.** Only available for recurring frequencies; defaults from the plan.
-5. **Apply a discount (optional).** Enter a promotion code or pick a discount in the price section. The discount lowers the saved price, so recurring renewals inherit the reduced amount going forward. Only discount-type promotions apply here, not wallet vouchers.
-6. **Take payment (optional).** If the plan requires payment upfront, the payment section opens automatically. You can still save without a payment: the dialog notes that the plan is normally paid when sold, and the amount stays as an outstanding balance to collect from the member's profile. The signup fee is charged as a separate charge and is not reduced by a discount.
+5. **Check the minimum term.** On a recurring plan, **Minimum term** defaults to the plan's term, marked "(plan)". Change it to give one member a different commitment, or pick **None**. Under the field you see the date the term is met and how many payments it commits the member to. See [Membership policies](/settings/membership-policies#the-minimum-term-is-set-on-the-plan).
+6. **Apply a discount (optional).** Enter a promotion code or pick a discount in the price section. The discount lowers the saved price, so recurring renewals inherit the reduced amount going forward. Only discount-type promotions apply here, not wallet vouchers.
+7. **Take payment (optional).** If the plan requires payment upfront, the payment section opens automatically. You can still save without a payment: the dialog notes that the plan is normally paid when sold, and the amount stays as an outstanding balance to collect from the member's profile. The signup fee is charged as a separate charge and is not reduced by a discount.
 
 ## The membership detail page
 
 Click a row to open a membership's detail page. It shows:
 
-- A **Membership Details** card with the plan, status, price, signup fee, any discount, billing frequency, auto-renew, sharing, usage, and payment status, plus pause details and any days it was **Extended** by, with the reason.
+- A **Membership Details** card with the plan, status, price, signup fee, any discount, billing frequency, auto-renew, sharing, usage, and payment status, plus pause details and any days it was **Extended** by, with the reason. When they apply, it also shows the **Minimum term** and the date it is met (with any days added by pauses), a **Booked pause**, and for a scheduled cancellation the **Ends on (cancellation scheduled)** date, the **Cancellation reason**, and any **Early cancellation charge** (marked "waived" when staff waived it).
 - A **Payment** card with the **Total**, what is **Paid**, and what is **Still owed**.
 - A **Member** card linking to the holder.
 - Tabs for the membership's **Charges**, **Bookings**, and **Check-in History**, each with a count.
 
-While a charge on the membership is unpaid, **Add Payment** leads the header so you can collect it in one click. **Edit** sits beside it. The more-actions menu holds **Renew**, **Extend**, **Reconcile bookings**, **Pause**, **Resume**, **Cancel**, and **Delete**, each shown only when it applies.
+While a charge on the membership is unpaid, **Add Payment** leads the header so you can collect it in one click. **Edit** sits beside it. The more-actions menu holds **Renew**, **Extend**, **Reconcile bookings**, **Pause**, **Resume**, **Call off booked pause**, **Withdraw cancellation**, **Cancel**, and **Delete**, each shown only when it applies.
 
 ### Editing a membership
 
@@ -120,10 +126,17 @@ Use **Pause** (available only from **Active**) to put a membership on hold. Bill
 
 The pause dialog offers:
 
+- **Start the pause on a later day** - toggle it on to book the pause for a **Pause starts on** date. It starts as that day begins, and until then the membership runs as normal. Leave it off to pause today.
 - **Schedule an auto-resume date** - toggle it on to set a **Resume On** date; the membership resumes automatically on that date. Leave it off for an indefinite pause that requires manual resumption.
 - **Reason (optional)** - a free-text note (e.g. vacation, injury, medical leave), up to 500 characters.
 
-When you **Resume** (available only from **Paused**), the end date and renewal date shift forward by the pause duration so the member recovers exactly the time they paid for. The resume dialog previews the new dates before you confirm. Resuming does not itself create a new charge; the billing engine seeds the next renewal charge from the shifted renewal date once it falls due.
+If the pause goes against the membership's [policy](/settings/membership-policies) - longer than its **Longest pause**, or past its **Pauses per year** - the dialog warns you before you confirm. The pause still goes through.
+
+A booked pause shows on the detail page as **Booked pause**. Use **Call off booked pause** from the more-actions menu to cancel it before it starts.
+
+When you **Resume** (available only from **Paused**), the end date, the renewal date, and any minimum term shift forward by the pause duration so the member recovers exactly the time they paid for. The resume dialog previews the new dates before you confirm. Resuming does not itself create a new charge; the billing engine seeds the next renewal charge from the shifted renewal date once it falls due.
+
+Members can pause their own membership too, today or from a later day, when their membership policy allows it. They can end a pause they started early, or call off one they booked. See [How members pause](/settings/membership-policies#how-members-pause).
 
 ### Renew
 
@@ -142,15 +155,32 @@ Extend is available on any membership that has an end or renewal date and is not
 
 ### Cancel
 
-**Cancel** is available for any membership that is not already cancelled or expired. What the dialog offers depends on auto-renew:
+**Cancel** is available for any membership that is not already cancelled or expired. The dialog asks two things:
 
-- **Auto-renewing memberships** get a choice of two modes:
-  - **Cancel at end of period** - the membership stays active until the current period ends, then will not renew. The row shows "Cancelling on {date}". This is the default.
-  - **Cancel immediately** - the status flips to cancelled, the end date is set to today, and access is revoked at end of day.
-- **Non-renewing memberships** (including one-time packs) are cancelled immediately - there is no future period to cancel against.
-- **Season passes** open their own dialog instead. Ending one has to release the courts and close the pass together, so the generic cancel is refused for them. See [Cancelling a season pass](/schedule/season-passes#cancelling-a-season-pass).
+- **Why is the membership ending?** - pick a reason: **Moving away**, **Too expensive**, **Not using it**, **Injury or health**, **Switching to another club**, **Unhappy with the service**, **Club's decision**, or **Other**. **Other** needs a note. You can add a **Note (optional)** to any reason.
+- **Membership ends** - when it ends:
+  - **Today (ends immediately)** - the status flips to cancelled, the end date is set to today, and access is revoked at end of day.
+  - **A coming period end** - the end of the current period is preselected: the membership stops renewing and stays active until then. Pick a later period end and it keeps renewing until that date, then stops; the detail page shows the date under **Ends on (cancellation scheduled)**.
 
-Either mode voids any pending future recurrence charges so the member is not billed again. A membership already scheduled to cancel at period end can be flipped to immediate cancellation from the same dialog.
+A membership that does not auto-renew (including one-time packs) can only end today - there is no future period to cancel against.
+
+**Season passes** open their own dialog instead. Ending one has to release the courts and close the pass together, so the generic cancel is refused for them. See [Cancelling a season pass](/schedule/season-passes#cancelling-a-season-pass).
+
+Either way, any pending recurrence charges after the end date are voided so the member is not billed again.
+
+#### Minimum terms and the early cancellation charge
+
+When a membership has a minimum term that the chosen date doesn't meet, its [membership policy](/settings/membership-policies) decides what leaving early costs. A date that carries a charge shows it in the list, for example "1 July 2027 - 150.00 early cancellation charge", and the dialog explains how many committed payments ending then leaves unmade. Turn on **Waive the charge** to record the cancellation without it. Otherwise the charge is added to what the member owes, as a charge on the membership. Ending today counts the same remaining payments as ending when the current period does, because the rest of that period is already paid.
+
+You are offered every date, even ones the member could not choose online. When a date goes against the policy - it ends before the minimum term is met, or sooner than the notice period allows - the dialog warns you, and the cancellation still goes through. See [What staff see](/settings/membership-policies#what-staff-see).
+
+#### Changing or withdrawing a cancellation
+
+To move a scheduled cancellation to another date, cancel again and pick the new date. The new cancellation replaces the old one, and a charge the member has already paid counts towards the new one, so they are never charged twice.
+
+To take a cancellation back, choose **Withdraw cancellation** from the more-actions menu on the detail page. The membership renews again, and an unpaid early cancellation charge is voided. A charge that was already paid stays paid, for you to refund or keep.
+
+Members can cancel their own memberships when their policy allows it: they choose the end date, give a reason, and can withdraw the cancellation until that date. See [How members cancel](/settings/membership-policies#how-members-cancel). You are notified when they do.
 
 Cancelling needs the memberships delete permission, not just update, because it ends the subscription and triggers its refunds.
 
@@ -233,6 +263,15 @@ A jiu-jitsu gym runs an "Unlimited Monthly" plan. A member tears a ligament and 
 - Enter a **Reason** of "injury" and either schedule the resume date six weeks out or leave it indefinite.
 - Billing stops and the scheduled renewal charge is voided. On resume, the renewal date shifts forward by the exact pause length, so the member loses none of the time they paid for.
 
+### 12-month contract with an early cancellation charge (Strength gym)
+
+A gym sells "Monthly Membership" at 50 per month with a 12-month minimum term.
+
+- On the [plan](/sales/plans#pricing), set **Minimum term** to 12 months. Every membership sold on it carries the term from its start date.
+- Under [Membership policies](/settings/membership-policies), set **Ending before the commitment** to **Charge by months left**, with rules `6 months / 50%` and `3 months / 25%`.
+- A member who joined on 1 January and cancels to end on 1 July has 6 payments left, so they owe 6 x 50 x 50% = 150. Ending on 1 November, with 2 left, is free.
+- If a member is moving abroad and the gym agrees to let them go, staff cancel from the detail page and turn on **Waive the charge**.
+
 ## Tips & best practices
 
 - **Let the plan carry the defaults.** Configure price, use limits, scope, and default auto-renewal on the [plan](/sales/plans) so every sale snapshots consistent terms. Only override on the membership for genuine exceptions.
@@ -267,6 +306,12 @@ A jiu-jitsu gym runs an "Unlimited Monthly" plan. A member tears a ligament and 
 
 **Fix**: Always use the **Pause** action - it voids pending recurrence charges. If a charge already settled, handle it through the refund flow in [Charges](/sales/charges).
 
+**Issue**: A member says they can't cancel or pause online.
+
+**Cause**: Their [membership policy](/settings/membership-policies) only lets staff do it, the membership has a minimum term that is not yet met, or the member has used all their pauses for the year.
+
+**Fix**: Cancel or pause it for them from the detail page. You are warned about the policy, and the change still goes through.
+
 **Issue**: The **Delete** action is missing or fails.
 
 **Cause**: Either you lack the delete permission, or the membership has charges.
@@ -282,6 +327,7 @@ A jiu-jitsu gym runs an "Unlimited Monthly" plan. A member tears a ligament and 
 ## Related
 
 - [Plans](/sales/plans) - the plan templates memberships are built from.
+- [Membership policies](/settings/membership-policies) - notice periods, early cancellation charges, and what members can cancel and pause themselves.
 - [Member profile](/members/member-profiles) - per-member memberships, on the member's Memberships tab.
 - [Attendance](/schedule/attendance) - check-ins, usage counting, and the pre-booked-versus-walk-in distinction.
 - [Charges](/sales/charges) - the charges memberships generate, and how they are paid.

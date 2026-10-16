@@ -2877,6 +2877,34 @@
               ]
             }
           },
+          "byAccount": {
+            "type": "array",
+            "description": "Which revenue account the money was filed to; a sale stored with no account counts as the default account. Absent when the report is narrowed to one account.",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/PlatformRevenueBreakdown"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "revenueAccountId": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "accountName": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "accountCode": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              ]
+            }
+          },
           "byPaymentMethod": {
             "type": "array",
             "description": "What collected the money. A sale paid by several methods counts under the one that paid most; 'Unattributed' is collected with no real-money payment behind it.",
@@ -14715,7 +14743,7 @@
       "get": {
         "operationId": "getRevenueReport",
         "summary": "Revenue report for a period",
-        "description": "What the organization earned over a period, and from what, where and how it compares - in one request rather than a walk of the transactions list.\n\nRevenue is recognised ex-tax on the day of the sale, on the organization's own clock, net of refunds and of anything Wallet credit paid for. `collected` is the part of it already paid, on the same basis, so `uncollected` is what the period sold that has not been paid yet. These are the figures of the admin's daily revenue chart for the same days.\n\nThe period is compared with the same number of days just before it (`compare=previous_period`, the default) or the same dates a year earlier (`previous_year`); every breakdown row then carries its revenue in that period and the change, and `movers` lists the streams, clubs and items that moved most. Breakdowns: by revenue stream (bookings, memberships, passes, drop-ins, products, other), by club (unless `clubId` narrows the report to one), by the payment method that collected the money, and the top items sold (a class or court, a plan, a product). `trend` buckets the period by day, week (starting Monday) or month - by default a month or less by day, up to six months by week, anything longer by month.\n\nAmounts are in the organization's `currency`. A period may span at most 366 days. Reports have their own limit of 20 requests a minute, on top of the platform's.\n",
+        "description": "What the organization earned over a period, and from what, where and how it compares - in one request rather than a walk of the transactions list.\n\nRevenue is recognised ex-tax on the day of the sale, on the organization's own clock, net of refunds and of anything Wallet credit paid for. `collected` is the part of it already paid, on the same basis, so `uncollected` is what the period sold that has not been paid yet. These are the figures of the admin's daily revenue chart for the same days.\n\nThe period is compared with the same number of days just before it (`compare=previous_period`, the default) or the same dates a year earlier (`previous_year`); every breakdown row then carries its revenue in that period and the change, and `movers` lists the streams, clubs and items that moved most. Breakdowns: by revenue stream (bookings, memberships, passes, drop-ins, products, other), by club (unless `clubId` narrows the report to one), by revenue account (unless `revenueAccountId` narrows it to one), by the payment method that collected the money, and the top items sold (a class or court, a plan, a product). `trend` buckets the period by day, week (starting Monday) or month - by default a month or less by day, up to six months by week, anything longer by month.\n\nAmounts are in the organization's `currency`. A period may span at most 366 days. Reports have their own limit of 20 requests a minute, on top of the platform's.\n",
         "tags": [
           "Reports"
         ],
@@ -14760,6 +14788,14 @@
               "type": "integer"
             },
             "description": "Only the revenue of this selling company, for an organization that trades through more than one."
+          },
+          {
+            "in": "query",
+            "name": "revenueAccountId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only the revenue filed to this account, e.g. coach time on a separate line from court hire. A sale stored with no account counts as the default account."
           },
           {
             "in": "query",

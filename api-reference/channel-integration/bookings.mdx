@@ -109,10 +109,11 @@ That is what lets you record a schedule as it stands, including sessions in the 
 
 <Warning>
   Physical constraints always apply and are never overridden: a genuine
-  double-booking, the area's concurrency capacity, a court the gym has **blocked**
-  for maintenance or a private hire, a live event on the court, the coach's own
-  calendar, and the slot alignment the area requires. A booking that breaks one of these is rejected -
-  see [Conflicts](#conflicts). There is no override parameter.
+  double-booking, the area's concurrency capacity (a live event on the court takes
+  one of its places, like a booking), a court the gym has **blocked** for
+  maintenance or a private hire, the coach's own calendar, and the slot alignment
+  the area requires. A booking that breaks one of these is rejected - see
+  [Conflicts](#conflicts). There is no override parameter.
 </Warning>
 
 ## How contacts sync
@@ -228,8 +229,14 @@ for a class or an event, and `areas:read` for a block. A `bookings:write`-only k
 told that the hour is taken, and not by whom.
 
 The codes you can see today are `AREA_AT_CAPACITY`, `AREA_BLOCKED`,
-`AREA_RUNNING_EVENT`, `INSTRUCTOR_AT_CAPACITY`, `INSTRUCTOR_TEACHING_CLASS`, and
-`INSTRUCTOR_RUNNING_EVENT`.
+`INSTRUCTOR_AT_CAPACITY`, and `INSTRUCTOR_TEACHING_CLASS`.
+
+A live event takes one place on each court and coach it is assigned to, like a
+booking, so it counts toward `AREA_AT_CAPACITY` and `INSTRUCTOR_AT_CAPACITY` and
+appears in `details.conflicts` with `subject: event`. A court or coach that takes
+several bookings at once can still be booked during an event while places remain.
+`AREA_RUNNING_EVENT` and `INSTRUCTOR_RUNNING_EVENT`, which refused any booking
+during an event, are no longer returned.
 
 <Tip>
   **Detect a taken slot on the presence of a populated `details.conflicts`, not on

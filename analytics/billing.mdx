@@ -2,7 +2,7 @@
 title: Revenue analytics
 sidebarTitle: Revenue
 description: Revenue, payments, outstanding balances, and average charge value, broken down by source, revenue account, and plan over time.
-keywords: [revenue analytics, revenue dashboard, payments report, invoices dashboard, revenue by plan, revenue account, collection rate, outstanding, CSV export]
+keywords: [revenue analytics, revenue dashboard, payments report, invoices dashboard, revenue by plan, revenue account, revenue account filter, coach revenue, court hire, collection rate, outstanding, CSV export]
 ---
 
 The **Revenue** category in the **Analytics** hub is the financial snapshot of your organization. It shows what you billed, what you collected, and what is still outstanding, broken down by where the revenue came from (bookings, memberships, passes, drop-ins, or other), by revenue account, by plan, and by payment method. Owners and managers use it to track how the business is doing.
@@ -16,6 +16,7 @@ Use it for the higher-level "how are we doing this month?" view, without exporti
 - **Did collection keep up with a billing spike?** - a large gym reads paid versus unpaid by day to catch a stretch of annual renewals where collection lagged.
 - **What did each payment method take in?** - a front desk checks the **By Items** tab at month end to see every sale grouped under the card terminal, cash, or bank transfer that collected it.
 - **Is revenue landing in the right accounts?** - a reformer studio maps class and retail revenue to its revenue accounts and exports the month for its bookkeeper.
+- **How much did coaching earn apart from court hire?** - a padel gym files coach time on a **Coaches** account and picks it in the **Revenue account** filter to read coaching revenue and collection on their own.
 
 For day-to-day invoice and payment work, use [Sales > Finance > Invoices](/sales/invoices) or [Sales > Finance > Payments](/sales/payments) instead. See [Worked examples](#worked-examples) for more.
 
@@ -42,6 +43,7 @@ Every report shares the same filter bar and exports to CSV where an **Export** b
 
 - **Date range** - Sets the reporting period. Defaults to the last 30 days. Pick a preset or a custom range on the calendar, and step through periods with the arrows.
 - **Billing entity** - On the **Revenue**, **Revenue Report**, and **Invoices Dashboard** reports, narrows the figures to one company's money. It only appears when your organization has two or more [billing entities](/settings/billing-entities).
+- **Revenue account** - On the **Revenue**, **Revenue Report**, and **Payments Report** reports, narrows the figures to the money filed to one [revenue account](/settings/billing-general#revenue-accounts), for example coach time apart from court hire. A charge stored with no account counts as your default account. It only appears when your organization has two or more active revenue accounts. The drill-down and the **Export** follow it.
 - **Club** - There is no club control on the report. Reports follow the club selected in the breadcrumb at the top of the admin; **All clubs** shows the whole organization.
 
 ## Revenue dashboard
@@ -72,11 +74,17 @@ Within each source, the **paid** portion is drawn solid and the **unpaid** porti
 The **Revenue report** (**Analytics** > **Revenue** > **Revenue Report**) has four tabs. The first three are month-by-month matrices; click any month cell to drill down into the charges behind that figure.
 
 - **By Source** - Revenue grouped by **Revenue Source** (for example Bookings, Memberships, Passes, Drop-Ins, Products, and Other).
-- **By Account** - Revenue grouped by **Revenue Account**, showing each account's name and code. Charges with no revenue account fall into an **Unassigned** row. Use this for bookkeeping and for mapping revenue to your chart of accounts.
+- **By Account** - Revenue grouped by **Revenue Account**, showing each account's name and code. A charge stored with no revenue account counts under your default account. Use this for bookkeeping and for mapping revenue to your chart of accounts.
 - **By Plan** - Revenue grouped by **Plan**, with each plan's billing frequency shown. Use this to see which membership plans drive the most revenue.
 - **By Items** - Every sold line item (bookings, memberships, packages, products) as its own row with its type, contact, date, and amount, grouped under the payment method that collected it, with a subtotal per method and a **Grand Total**. Items not yet paid fall under **Unpaid / Outstanding**, and items marked paid with no payment record under **Manual / Other**. When a package was sold in the period, a **List value** column and a **Package discount** line show what bundling took off.
 
 The **Export** button downloads the tab you are viewing, as Excel or CSV.
+
+### Coach revenue on its own account
+
+A court booked with a coach is two sales: the court half posts to the [area type's](/settings/area-types) revenue account, and the coach half to the [instructor type's](/settings/instructor-types) revenue account. This holds however the booking was paid for or changed afterwards. To report coaching apart from court hire, create a **Coaches** revenue account and pick it as the **Revenue Account** of your coach instructor type. Nothing else needs to change. The **By Account** tab then shows the two lines side by side, and the **Revenue account** filter reads either one on its own.
+
+A season pass is one sale on its plan's revenue account, whether or not its slot comes with a coach.
 
 ## Payments report
 
@@ -116,6 +124,8 @@ Reports with an **Export** button download what is on screen as Excel (.xlsx) or
 
 **Martial arts - collecting on overdue invoices.** A muay-thai gym checks the **Invoices dashboard**, sees a rising **Overdue invoices** count and a collection rate under 90%, and kicks off a [bill run](/sales/bill-runs) to chase the overdue balances.
 
+**Padel - coaching apart from court hire.** A padel gym keeps court rentals on **Revenue** (4000) and coach time on **Coaches** (4100). The **By Account** tab shows both lines each month, and picking **Coaches** in the **Revenue account** filter on the **Payments report** shows how much coaching was billed and how much of it is still unpaid.
+
 **Pilates / Yoga - reconciling the month.** A reformer studio uses the **Revenue report** **By Account** tab to map class and retail revenue to the right revenue accounts, drills into a month cell to verify a large figure, and exports it for their bookkeeper.
 
 **Gym / Fitness - watching cash collection.** A large fitness club uses the **Payments report** to track paid versus unpaid by day across the month, catching a stretch where billed amounts spiked (annual renewals) but collection lagged, then follows up on the unpaid invoices.
@@ -133,9 +143,11 @@ Reports with an **Export** button download what is on screen as Excel (.xlsx) or
 ## Troubleshooting
 
 - **Total payments is lower than total revenue.** Some charges in the period are not paid yet. Look at the translucent (unpaid) portions of the revenue trend bars to find the gap. Remember that total payments includes tax and total revenue does not, so when everything is paid, payments run higher than revenue.
-- **A number is zero when you know you transacted.** Check the date range first (it defaults to 30 days), then the club selected in the breadcrumb and the billing entity filter.
+- **A number is zero when you know you transacted.** Check the date range first (it defaults to 30 days), then the club selected in the breadcrumb and the billing entity and revenue account filters.
 - **Refunds seem to change the totals.** Money refunded back out to a card comes off both the revenue and the payments figures for that sale. A sale paid with wallet credit never counts as revenue in the first place.
-- **Revenue by account has an Unassigned row.** Charges without a revenue account fall into **Unassigned**. Map them on the plan, product, or pricing rule so future revenue lands in the right account.
+- **Revenue by account has an Unassigned row.** A charge stored with no revenue account counts under your default account, so **Unassigned** only appears when no account is marked default. Mark one as **Default Revenue Account** in [Settings > Billing > General](/settings/billing-general#revenue-accounts).
+- **Coach time shows under the court's account.** The coach half of a booking posts to the instructor type's revenue account. Check that the coach's instructor type has its **Revenue Account** set; **None (use default)** files coach time on the default account.
+- **There is no Revenue account filter.** It only appears once your organization has two or more active revenue accounts.
 - **The Export button is disabled.** There are no rows for the current filters. Widen the date range or clear a filter, then export.
 
 ## Who can see this

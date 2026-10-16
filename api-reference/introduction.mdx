@@ -87,7 +87,7 @@ Grant only the scopes the integration actually needs. The Platform API supports 
 | Content | `content:read`, `content:write` |
 | Website | `website:read`, `website:write`, `website:publish` |
 | Media library | `media:read`, `media:write`, `media:delete` |
-| Clubs | `clubs:read` |
+| Clubs | `clubs:read`, `clubs:write` |
 | Transactions | `transactions:read`, `transactions:write` |
 | Invoices | `invoices:read` |
 | Areas, area types, and area blocks | `areas:read`, `areas:write` |
@@ -107,8 +107,13 @@ Grant only the scopes the integration actually needs. The Platform API supports 
 | Events | `events:read`, `events:write` |
 | Messages (drafts only) | `messages:read`, `messages:write` |
 | Analytics | `analytics:read` |
+| Payment methods | `payment-methods:write` |
+| Staff and roles | `staff:read`, `staff:write` |
+| Notification settings | `notifications:read`, `notifications:write` |
 
 `transactions:write` records a settlement (revenue collected outside 1Club, reported as one sum for a gym) and refunds of it. Nothing is charged to anyone.
+
+Payment methods are read with `transactions:read`; `payment-methods:write` adds, renames and removes them. `staff:write` is accepted only from a signed-in person over OAuth: an API key that holds it is still refused.
 
 `GET /v1/platform/me` needs no scope and returns the scopes a key holds - see [Verify a key](/api-reference/channel-integration/authentication#verify-a-key).
 

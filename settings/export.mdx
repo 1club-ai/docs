@@ -98,14 +98,22 @@ The QuickBooks option is intended as **preparation** for QuickBooks Online, not 
 
 1. Open `customers.csv` and reconcile the **Display Name** values against existing customers in QBO. Create or update customers as needed so the names match exactly.
 2. Open `invoices.csv` and confirm every `Customer` value matches a Display Name in QBO. If not, QBO will create duplicate customers on import.
-3. In QBO, go to **Settings** > **Import data** > **Invoices** and import `invoices.csv`. If you have more than 100 invoices, you'll need to split the file (see "QBO limits" below).
+3. In QBO, go to **Settings** > **Import data** > **Invoices** and import `invoices.csv`. If you have more than 100 invoices, you'll need to split the file (see "QBO limits" below). When the import asks how item amounts treat tax, choose **Exclusive of tax** (see [Tax and amounts](#tax-and-amounts)).
 4. Use `payments-reference.csv` to verify the paid/open status of each invoice after import, or feed it into a bridge tool that supports payment imports.
 
 ### QBO limits to know
 
 - **100 invoices per file / 1,000 rows per file** - QuickBooks Online's native invoice CSV import enforces this. If your `invoices.csv` exceeds either, either split the file before importing, or use a bridge tool such as SaasAnt Transactions that doesn't enforce the per-file limit.
-- **Sales tax** - The `ItemTaxCode` column is filled from your 1Club tax rate name. QBO's CSV tax import has limitations and varies by region. Test in a QBO sandbox before importing to your production books.
+- **Sales tax** - The `ItemTaxCode` column is filled from your 1Club tax rate name. QBO's CSV tax import has limitations and varies by region. Test in a QBO sandbox before importing to your production books. How the amounts treat tax is covered in [Tax and amounts](#tax-and-amounts).
 - **Payments are reference-only** - As above, payments don't import natively. The file is there for audit, reconciliation, or feeding a bridge tool.
+
+### Tax and amounts
+
+`ItemRate` and `ItemAmount` are always **exclusive** of tax, even when your 1Club prices include it. `ItemTaxAmount` is the tax on top. A 120.00 sale with 20.00 of VAT included exports as `ItemAmount` 100.00 and `ItemTaxAmount` 20.00.
+
+When the import asks how item amounts treat tax, choose **Exclusive of tax**. In a bridge tool such as SaasAnt, set its Global Tax Calculation to the tax-exclusive option. That mode needs a tax code on every line: a line with an empty `ItemTaxCode` is an untaxed sale, so put your zero-rated QuickBooks tax code in it before importing, or the import rejects the file. A file with no tax on any line can instead be imported with the tax calculation set to not applicable.
+
+**Upgrading from an earlier bundle:** earlier bundles wrote amounts as your prices were stored, so with tax-inclusive prices `ItemAmount` carried the tax. If you imported those as **Inclusive of tax**, switch to **Exclusive of tax** now. Keeping the old setting takes the tax out of the new amounts a second time and understates your revenue. If you imported them as **Exclusive of tax**, those earlier imports counted the tax twice, so correct them in QuickBooks.
 
 ### The Display Name join key
 
@@ -142,7 +150,7 @@ If you need to give someone outside the admin role access to a recurring export,
 **Solution**: The Display Name in `invoices.csv` did not match the customer name in QBO. Open `customers.csv`, reconcile the Display Name values against QBO first, then re-import.
 
 **Issue**: Tax amounts look wrong in QBO after importing invoices.
-**Solution**: QBO's CSV tax import has region-specific behavior. The export fills `ItemTaxCode` from your 1Club tax rate name; QBO needs a matching tax code on its side. Verify in a QBO sandbox before doing this on your production books.
+**Solution**: QBO's CSV tax import has region-specific behavior. The export fills `ItemTaxCode` from your 1Club tax rate name; QBO needs a matching tax code on its side. Also check that you chose **Exclusive of tax** for the item amounts (see [Tax and amounts](#tax-and-amounts)). Verify in a QBO sandbox before doing this on your production books.
 
 **Issue**: Excel shows a cell starting with a single quote, like `'=SUM(...)`.
 **Solution**: That's intentional. The export prefixes cells that look like spreadsheet formulas with a single quote to prevent formula injection. The quote is displayed in the formula bar but won't appear when the cell is printed or copied as a value.

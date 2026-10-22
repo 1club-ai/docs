@@ -1,7 +1,7 @@
 ---
-title: "1Club MCP server overview"
+title: "1club MCP server overview"
 sidebarTitle: "Overview"
-description: "Connect Claude, ChatGPT, and other AI assistants to 1Club through the Model Context Protocol, so they can answer questions and take actions against your gym's real data."
+description: "Connect Claude, ChatGPT, and other AI assistants to 1club through the Model Context Protocol, so they can answer questions and take actions against your gym's real data."
 keywords:
   [
     mcp,
@@ -15,20 +15,20 @@ keywords:
   ]
 ---
 
-The Model Context Protocol (MCP) is an open standard that lets an AI assistant call real software instead of guessing. 1Club runs MCP servers so an assistant like Claude or ChatGPT can look up your classes, check availability, read your transactions, and create bookings, using your own data and your own permissions.
+The Model Context Protocol (MCP) is an open standard that lets an AI assistant call real software instead of guessing. 1club runs MCP servers so an assistant like Claude or ChatGPT can look up your classes, check availability, read your transactions, and create bookings, using your own data and your own permissions.
 
-You connect once, and from then on you can ask an assistant things like "which classes next week still have space?" or "book court 2 on Thursday at 18:00 for Maria" and it uses 1Club to answer, rather than making something up.
+You connect once, and from then on you can ask an assistant things like "which classes next week still have space?" or "book court 2 on Thursday at 18:00 for Maria" and it uses 1club to answer, rather than making something up.
 
 ## Two servers, two audiences
 
-1Club exposes **two separate MCP servers**. Each has its own address, and an assistant connected to one never sees the other's tools.
+1club exposes **two separate MCP servers**. Each has its own address, and an assistant connected to one never sees the other's tools.
 
 | Server        | Address                | Who it is for                                    | Authentication                             |
 | ------------- | ---------------------- | ------------------------------------------------ | ------------------------------------------ |
-| **Admin**     | `https://mcp.1club.ai` | Your gym's staff and internal systems            | 1Club OAuth sign-in, or a Platform API key |
+| **Admin**     | `https://mcp.1club.ai` | Your gym's staff and internal systems            | 1club OAuth sign-in, or a Platform API key |
 | **Discovery** | `https://mcp.1club.me` | Anyone searching the public 1club.me marketplace | None                                       |
 
-- The **admin server** reads and writes one organization's own data. You sign in to 1Club, choose the organization, and approve the requested access. Every response is limited to that organization. This is the one you want for running your gym. A developer-managed client that cannot sign in interactively can send a [Platform API key](/settings/api-tokens) as a bearer token instead; OAuth is the recommended path for everyone else.
+- The **admin server** reads and writes one organization's own data. You sign in to 1club, choose the organization, and approve the requested access. Every response is limited to that organization. This is the one you want for running your gym. A developer-managed client that cannot sign in interactively can send a [Platform API key](/settings/api-tokens) as a bearer token instead; OAuth is the recommended path for everyone else.
 - The **discovery server** searches the public marketplace across all listed gyms and finds bookable court times. It is anonymous by design, read-only, and can never reach a single organization's private data.
 
 Pick the one that matches what you are trying to do, then follow [Connect an assistant](/mcp/connect).
@@ -78,13 +78,13 @@ The discovery server answers three questions about the public marketplace: when 
 
 - **There is no member-facing server.** The admin connection acts on an organization. It does not sign in as a member or expose a member's private portal session.
 - **MCP follows the Platform API.** Automations, promotions, payments, access control, and staff administration are not exposed. Messages can be drafted but not sent, and invoices are read-only. Anything absent from the [Tools reference](/mcp/tools) is unreachable through MCP today.
-- **Check-in creation is booking-based.** The assistant can check in an existing booking. Front-desk walk-ins and payment collection remain in 1Club.
-- **Stock is read-only.** An assistant can see how many of a product are left to sell, but receiving a delivery, correcting a count, and writing off damage stay in 1Club.
+- **Check-in creation is booking-based.** The assistant can check in an existing booking. Front-desk walk-ins and payment collection remain in 1club.
+- **Stock is read-only.** An assistant can see how many of a product are left to sell, but receiving a delivery, correcting a count, and writing off damage stay in 1club.
 - **Some things are deliberately not deletable.** Contacts (archive them instead), memberships, products, and forms have no delete tool. Retire a product with its update tool instead, which takes it off the till and keeps its sales history.
 
 ## Security model
 
-- **OAuth keeps credentials out of setup.** You sign in directly on 1Club's authorization page. You do not paste a password or API token into the assistant.
+- **OAuth keeps credentials out of setup.** You sign in directly on 1club's authorization page. You do not paste a password or API token into the assistant.
 - **Read-only is the default.** A client that requests no scopes gets a read-only connection, and every write capability a client does request is a checkbox on the authorization page that starts unchecked. Approving without ticking anything leaves the assistant able to look things up and nothing more.
 - **Anything beyond reading is a deliberate opt-in, per capability.** Tick only what the assistant actually needs. That covers the writes and the three that go further - `media:delete` removes a file permanently, `website:publish` makes draft edits public, and `organization:write` changes settings such as your languages everywhere at once and immediately, rather than into a draft. Content the assistant reads - a member note, a website page - can contain text that tries to steer it, so these belong only on a connection you supervise.
 - **Scopes are the limit.** An assistant can only use tools its granted scopes allow. A connection with `classes:read` cannot create or update a class. The set cannot be changed after approval: revoke the connection and authorize it again with different boxes ticked.

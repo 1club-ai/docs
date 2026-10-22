@@ -16,7 +16,7 @@ Turn inventory on when you sell physical goods and want to know what is left at 
 Typical uses:
 
 - **A pro-shop with bottled drinks and merchandise** - each bottle of water or branded t-shirt you ring up takes one unit off that location's count.
-- **A cafe that makes drinks to order** - a latte recipe of 18 g of coffee beans and 150 ml of milk draws down both ingredients on each sale, and if you have milk for 40 lattes but beans for only 12, 1Club shows 12 available.
+- **A cafe that makes drinks to order** - a latte recipe of 18 g of coffee beans and 150 ml of milk draws down both ingredients on each sale, and if you have milk for 40 lattes but beans for only 12, 1club shows 12 available.
 - **Keeping counts honest** - you record a spilled or spoiled item as waste, correct the count after a physical stock-take, and you review write-offs in the movements report.
 
 See [A typical pro-shop and cafe workflow](#a-typical-pro-shop-and-cafe-workflow) for how to set this up end to end.
@@ -52,7 +52,7 @@ Each ingredient has a base unit of measure that is fixed when you create it and 
 | `ml`      | Anything poured (milk, syrup, spirits)    | Volume    |
 | `each`    | Anything counted (cups, bottles, patties) | Count     |
 
-When you receive or adjust stock you can enter quantities in a friendlier unit and 1Club converts to the base unit for you: grams accept `g` or `kg`, milliliters accept `ml` or `l`, and counted items accept `each`. Products, which are always counted, only accept `each`.
+When you receive or adjust stock you can enter quantities in a friendlier unit and 1club converts to the base unit for you: grams accept `g` or `kg`, milliliters accept `ml` or `l`, and counted items accept `each`. Products, which are always counted, only accept `each`.
 
 Conversions stay within the same dimension. You cannot convert a weight into a volume or a count - milliliters never become grams. Pick the base unit that matches how you actually measure the ingredient.
 
@@ -75,7 +75,7 @@ Every change to stock is written to an immutable ledger as a movement. A movemen
 
 ### Receiving stock
 
-Click **Add Inventory** on the stock page, pick the **Product or ingredient**, choose the location, and enter the quantity and unit. You can also choose **Add** > **Add Inventory** on the **Products** tab. 1Club creates a `receive` movement and increases the on-hand level.
+Click **Add Inventory** on the stock page, pick the **Product or ingredient**, choose the location, and enter the quantity and unit. You can also choose **Add** > **Add Inventory** on the **Products** tab. 1club creates a `receive` movement and increases the on-hand level.
 
 This is the quick way to book a single item. For a supplier delivery, record it as a [delivery](/sales/deliveries) instead: attach the invoice, review the lines it reads off the document, and post once so the stock and the expense are written together.
 
@@ -85,13 +85,13 @@ Click a row on the stock page to open the adjustment dialog. Enter a signed quan
 
 ## How a sale decrements stock
 
-When an order that contains a product is fulfilled, 1Club consumes stock for each line automatically, inside the same transaction that records the order. What gets consumed depends on how the product is set up:
+When an order that contains a product is fulfilled, 1club consumes stock for each line automatically, inside the same transaction that records the order. What gets consumed depends on how the product is set up:
 
 - **A product with a recipe** (a cafe or bar item) is exploded into its ingredients, and each ingredient's stock is decremented by the amount the recipe calls for, multiplied by the quantity sold. A single informational `sale` movement is also recorded against the product itself, so the product's history reads "sold N" rather than a scattered list of ingredient draws.
 - **A product with no recipe but a direct stock level** (packaged resale, like bottled water) has its own count decremented by one per unit sold.
 - **A product that is neither stocked nor recipe-backed** consumes nothing - selling a service or a non-tracked good is a no-op for inventory.
 
-Consumption is idempotent per order line, so re-processing an order never double-counts. If a sale would take stock below zero, it is still recorded and the on-hand level goes negative; 1Club logs a warning rather than blocking the sale, so the point of sale is never held up by a stock discrepancy.
+Consumption is idempotent per order line, so re-processing an order never double-counts. If a sale would take stock below zero, it is still recorded and the on-hand level goes negative; 1club logs a warning rather than blocking the sale, so the point of sale is never held up by a stock discrepancy.
 
 ## Recipes and ingredients for cafe and bar
 
@@ -105,11 +105,11 @@ Click an ingredient to open its details page. It shows the ingredient's base uni
 
 ### Sub-recipes
 
-An ingredient can itself have a recipe, letting you model prepped components. A "house syrup" ingredient can be built from sugar and water, and any drink recipe that calls for house syrup will explode all the way down to sugar and water when it sells. Recipes can nest several levels deep, and 1Club guards against cycles and runaway depth.
+An ingredient can itself have a recipe, letting you model prepped components. A "house syrup" ingredient can be built from sugar and water, and any drink recipe that calls for house syrup will explode all the way down to sugar and water when it sells. Recipes can nest several levels deep, and 1club guards against cycles and runaway depth.
 
 ## Availability
 
-For a product built from ingredients, 1Club computes how many whole units you could sell right now at each location. It expands the recipe to its leaf ingredients and takes the lowest number the on-hand stock of any single ingredient allows. If you have milk for 40 lattes but beans for only 12, availability is 12.
+For a product built from ingredients, 1club computes how many whole units you could sell right now at each location. It expands the recipe to its leaf ingredients and takes the lowest number the on-hand stock of any single ingredient allows. If you have milk for 40 lattes but beans for only 12, availability is 12.
 
 The **Stock** section in the product dialog shows this availability alongside the product's recent movements, scoped to the location you have selected. Products with a direct stock level show that count; products that are neither stocked nor recipe-backed show as not tracked.
 

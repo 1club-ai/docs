@@ -1,19 +1,19 @@
 ---
-title: "Connect an AI assistant to 1Club"
+title: "Connect an AI assistant to 1club"
 sidebarTitle: "Connect an assistant"
-description: "Connect Claude, ChatGPT, or another remote MCP client to 1Club with OAuth, and keep an existing API-key connection working."
+description: "Connect Claude, ChatGPT, or another remote MCP client to 1club with OAuth, and keep an existing API-key connection working."
 keywords: [mcp setup, connect claude, claude code, chatgpt app, oauth, api key, remote mcp]
 ---
 
-Connect your assistant directly to 1Club with OAuth. You do not need to create, copy, or store an API token. If you already connected an assistant with an API key, that connection keeps working - see [Existing API-key connections](#existing-api-key-connections).
+Connect your assistant directly to 1club with OAuth. You do not need to create, copy, or store an API token. If you already connected an assistant with an API key, that connection keeps working - see [Existing API-key connections](#existing-api-key-connections).
 
 ## Before you start
 
 You need:
 
-- A 1Club account with access to the organization you want to connect.
+- A 1club account with access to the organization you want to connect.
 - The **settings.manage.organization** permission, which is what lets you authorize a connection. Owners and admins hold it.
-- A paid 1Club plan. MCP and API access are locked on free plans and during a trial.
+- A paid 1club plan. MCP and API access are locked on free plans and during a trial.
 - A client that supports remote MCP servers over HTTP, with OAuth.
 
 The admin MCP address is:
@@ -34,11 +34,11 @@ The public discovery server is `https://mcp.1club.me`. It searches published mar
   </Step>
 
   <Step title="Start the connection">
-    Select **Connect**, **Authenticate**, or the equivalent action. The client discovers 1Club's OAuth configuration automatically.
+    Select **Connect**, **Authenticate**, or the equivalent action. The client discovers 1club's OAuth configuration automatically.
   </Step>
 
-  <Step title="Sign in to 1Club">
-    Sign in on the 1Club authorization page. If you manage more than one organization, pick the one the assistant should access. A connection is bound to exactly one organization.
+  <Step title="Sign in to 1club">
+    Sign in on the 1club authorization page. If you manage more than one organization, pick the one the assistant should access. A connection is bound to exactly one organization.
   </Step>
 
   <Step title="Review and authorize access">
@@ -48,7 +48,7 @@ The public discovery server is `https://mcp.1club.me`. It searches published mar
   </Step>
 
   <Step title="Test the connection">
-    Ask: "Which 1Club organization are you connected to?" The assistant should call `get_account` and return the selected organization and granted scopes.
+    Ask: "Which 1club organization are you connected to?" The assistant should call `get_account` and return the selected organization and granted scopes.
   </Step>
 </Steps>
 
@@ -71,10 +71,10 @@ Claude and Claude Desktop support OAuth-based remote MCP connectors.
 
 1. Open **Settings** > **Connectors**.
 2. Select **Add custom connector**.
-3. Enter a name such as "1Club" and the URL `https://mcp.1club.ai`.
+3. Enter a name such as "1club" and the URL `https://mcp.1club.ai`.
 4. Add the connector, then select **Connect**.
-5. Complete the 1Club sign-in and authorization flow.
-6. Enable the 1Club tools from Claude's tools menu when you want to use them.
+5. Complete the 1club sign-in and authorization flow.
+6. Enable the 1club tools from Claude's tools menu when you want to use them.
 
 Team and Enterprise workspace owners may need to add the connector for the organization before individual users can connect it. See [Anthropic's remote MCP connector guide](https://support.anthropic.com/en/articles/11175166-about-custom-integrations-using-remote-mcp).
 
@@ -96,7 +96,7 @@ ChatGPT exposes custom MCP connections as apps. Availability and write-action su
 2. Open **Settings** > **Apps** and create a custom app.
 3. Enter `https://mcp.1club.ai` as the MCP endpoint.
 4. Choose OAuth authentication, then scan the tools.
-5. Complete the 1Club sign-in and authorization flow.
+5. Complete the 1club sign-in and authorization flow.
 6. Enable the app and select it from the tools menu in a new chat.
 
 See [OpenAI's developer mode and MCP apps guide](https://help.openai.com/en/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt-beta) for current plan and workspace requirements.
@@ -109,7 +109,7 @@ Use the same endpoint and choose OAuth when the client asks how to authenticate:
 https://mcp.1club.ai
 ```
 
-1Club supports dynamic client registration, the authorization code flow with PKCE, access-token refresh, and revocation. A compatible client discovers all of it from the endpoint alone, with no manual URLs and no client secret.
+1club supports dynamic client registration, the authorization code flow with PKCE, access-token refresh, and revocation. A compatible client discovers all of it from the endpoint alone, with no manual URLs and no client secret.
 
 If you are building the client rather than configuring one, this is what it will find:
 
@@ -186,8 +186,8 @@ Connections appear here no matter who created them, because an assistant is auth
 ## Disconnect or revoke
 
 - Disconnecting in the MCP client removes the connection from that client.
-- Revoking it in 1Club ends access immediately. The client must complete OAuth again to reconnect.
-- There is nothing to rotate on an OAuth connection. The access and refresh credentials are managed by the client and 1Club, and never handled by you. An access token lasts an hour, and the client refreshes it silently. Each refresh issues a fresh pair, so an assistant in regular use stays connected indefinitely and 30 days is the idle limit, not a deadline.
+- Revoking it in 1club ends access immediately. The client must complete OAuth again to reconnect.
+- There is nothing to rotate on an OAuth connection. The access and refresh credentials are managed by the client and 1club, and never handled by you. An access token lasts an hour, and the client refreshes it silently. Each refresh issues a fresh pair, so an assistant in regular use stays connected indefinitely and 30 days is the idle limit, not a deadline.
 - **An approved scope set cannot be edited afterwards.** To give an assistant a capability you did not tick, or to take one back, revoke the connection and authorize it again with the boxes you want.
 
 Two things also revoke a connection without anyone pressing a button:

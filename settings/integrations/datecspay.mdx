@@ -17,7 +17,7 @@ keywords:
   ]
 ---
 
-DatecsPay is a card payment provider you can use instead of Stripe or myPOS, built on BORICA's hosted checkout. When a customer pays for a booking, class, membership, or outstanding balance, they are redirected to BORICA's secure page to enter their card details (with EMV 3-D Secure), then return to 1Club once the payment completes. An owner or admin sets it up once with your gym's own BORICA credentials.
+DatecsPay is a card payment provider you can use instead of Stripe or myPOS, built on BORICA's hosted checkout. When a customer pays for a booking, class, membership, or outstanding balance, they are redirected to BORICA's secure page to enter their card details (with EMV 3-D Secure), then return to 1club once the payment completes. An owner or admin sets it up once with your gym's own BORICA credentials.
 
 <Note>
   If your organization trades through more than one company, each company
@@ -30,7 +30,7 @@ DatecsPay is a card payment provider you can use instead of Stripe or myPOS, bui
 
 ## When to use it
 
-DatecsPay suits a gym whose bank or acquirer has provisioned a BORICA terminal. Card data never touches 1Club servers, and every request is signed with your own RSA key. Payment status comes back on its own: through the cardholder's browser on return, a signed BORICA notification, and a reconciliation sweep that catches anyone who closes the tab early.
+DatecsPay suits a gym whose bank or acquirer has provisioned a BORICA terminal. Card data never touches 1club servers, and every request is signed with your own RSA key. Payment status comes back on its own: through the cardholder's browser on return, a signed BORICA notification, and a reconciliation sweep that catches anyone who closes the tab early.
 
 Unlike Stripe and myPOS, DatecsPay has no free shared sandbox. Both the **Test** and **Live** environments run against BORICA with your own credentials. Only the terminal and gateway differ between them.
 
@@ -53,7 +53,7 @@ Typical uses:
 
 ## Where to get your DatecsPay credentials
 
-DatecsPay credentials come from **BORICA** (through your bank or acquirer), not from 1Club. When your DatecsPay/BORICA terminal is provisioned you receive:
+DatecsPay credentials come from **BORICA** (through your bank or acquirer), not from 1club. When your DatecsPay/BORICA terminal is provisioned you receive:
 
 | Credential                          | What it is                                                                                                                                      |
 | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -62,12 +62,12 @@ DatecsPay credentials come from **BORICA** (through your bank or acquirer), not 
 | **RSA private key (PEM)**           | The private half of your signing key pair, used to sign requests to BORICA. You generate the key pair and register the public half with BORICA. |
 | **BORICA public certificate (PEM)** | BORICA's certificate, used to verify the responses coming back from the gateway. The test and production certificates are different.            |
 
-Generate your key pair and register it with BORICA before you configure 1Club, and download the matching BORICA certificate for the environment you are setting up.
+Generate your key pair and register it with BORICA before you configure 1club, and download the matching BORICA certificate for the environment you are setting up.
 
 ## Activate DatecsPay
 
 1. Go to **Settings** > **Integrations**.
-2. Under **Payments**, click **Activate** next to DatecsPay. 1Club opens the DatecsPay page. Nothing is saved until you click **Save**.
+2. Under **Payments**, click **Activate** next to DatecsPay. 1club opens the DatecsPay page. Nothing is saved until you click **Save**.
 3. Choose an **Environment**:
    - **Test** - runs against BORICA's test gateway.
    - **Live** - processes real payments against BORICA production.
@@ -75,8 +75,8 @@ Generate your key pair and register it with BORICA before you configure 1Club, a
    BORICA gives you different credentials for each environment, so enter the set that matches the one you choose.
 
 4. Enter your **Terminal ID (TID)** and **Merchant ID (MID)**.
-5. Check the **Merchant name** and **Merchant website**. 1Club pre-fills these from your organization's name and website, but you can edit them if BORICA registered a different name or URL.
-6. Paste your **Merchant private key (PEM)** and **BORICA public certificate (PEM)**. If your key file is protected with a passphrase, enter it in **Private key passphrase**. 1Club uses it once to decrypt the key and never stores it.
+5. Check the **Merchant name** and **Merchant website**. 1club pre-fills these from your organization's name and website, but you can edit them if BORICA registered a different name or URL.
+6. Paste your **Merchant private key (PEM)** and **BORICA public certificate (PEM)**. If your key file is protected with a passphrase, enter it in **Private key passphrase**. 1club uses it once to decrypt the key and never stores it.
 7. Click **Save**. The page shows **Active** and the environment, **Test** or **Live**, next to the title.
 8. Click **Test configuration** to check that the stored key and certificate are well-formed. The button is available once DatecsPay is saved.
 
@@ -87,7 +87,7 @@ Generate your key pair and register it with BORICA before you configure 1Club, a
   a value if you are replacing it.
 </Note>
 
-Your country and time-zone offset are not part of this form. 1Club derives them automatically from your organization settings and sends them to BORICA at checkout.
+Your country and time-zone offset are not part of this form. 1club derives them automatically from your organization settings and sends them to BORICA at checkout.
 
 ## Configuration fields
 
@@ -126,12 +126,12 @@ The **Test configuration** button checks that your saved credentials are complet
 
 ## What syncs
 
-- Payments created in 1Club open a BORICA hosted-checkout page that the customer is redirected to.
-- After payment, the status returns to 1Club through up to three paths, so a payment settles even if one path fails:
-  1. **Browser return** - BORICA posts the signed result back through the cardholder's browser when they return to 1Club, and 1Club verifies the signature and settles the payment.
-  2. **Signed notification** - BORICA can also notify 1Club server to server. The notification's signature is verified against your BORICA certificate before it is processed.
+- Payments created in 1club open a BORICA hosted-checkout page that the customer is redirected to.
+- After payment, the status returns to 1club through up to three paths, so a payment settles even if one path fails:
+  1. **Browser return** - BORICA posts the signed result back through the cardholder's browser when they return to 1club, and 1club verifies the signature and settles the payment.
+  2. **Signed notification** - BORICA can also notify 1club server to server. The notification's signature is verified against your BORICA certificate before it is processed.
   3. **Reconciliation** - a background job runs every 5 minutes and confirms any payment still pending (for example because the customer closed the tab before returning) with a direct status check to BORICA.
-- The payment status and BORICA transaction references are recorded on the 1Club payment, and any linked charges and bookings are settled automatically.
+- The payment status and BORICA transaction references are recorded on the 1club payment, and any linked charges and bookings are settled automatically.
 - Every path is matched to the same payment by a unique reference, so a redelivered notification or an overlapping reconciliation never double-charges or double-settles.
 
 ## Payment links
@@ -140,7 +140,7 @@ DatecsPay has no shareable payment link. The **Send myPOS payment link** action 
 
 ## Refunds
 
-1Club does not push refunds to BORICA. Refund a DatecsPay payment from your BORICA/acquirer side, then reconcile the charge in 1Club.
+1club does not push refunds to BORICA. Refund a DatecsPay payment from your BORICA/acquirer side, then reconcile the charge in 1club.
 
 ## Deactivate
 
@@ -148,7 +148,7 @@ DatecsPay has no shareable payment link. The **Send myPOS payment link** action 
 2. Click **Deactivate** at the top of the DatecsPay page.
 3. Confirm in the **Deactivate DatecsPay?** dialog. It says DatecsPay stops working and its settings are deleted. With more than one billing entity, it also says the change applies to the selected company only.
 
-You stay on the DatecsPay page afterwards, with the form reset. Your stored credentials for that company are cleared, so activating again means entering them again. If 1Club can't deactivate DatecsPay, the reason shows in the dialog.
+You stay on the DatecsPay page afterwards, with the form reset. Your stored credentials for that company are cleared, so activating again means entering them again. If 1club can't deactivate DatecsPay, the reason shows in the dialog.
 
 ## Troubleshooting
 
@@ -156,7 +156,7 @@ You stay on the DatecsPay page afterwards, with the form reset. Your stored cred
 - **Test configuration fails** - confirm the **Merchant private key (PEM)** and **BORICA public certificate (PEM)** are valid PEM and that you pasted the certificate for the environment you selected (test and production certificates differ).
 - **Save asks for the key and certificate again** - you changed **Environment**. BORICA issues a separate set per environment, so paste the key and certificate for the environment you selected.
 - **Customers see a signature error on the checkout page** - the public key registered with BORICA doesn't match the private key on file, or the TID belongs to a different environment. Re-check the key pair registered with BORICA and confirm the TID matches your selected environment.
-- **Payment succeeded on BORICA but the charge stays unpaid in 1Club** - this usually resolves on its own: the reconciliation job confirms pending checkouts within a few minutes. If it persists beyond that, re-check that your BORICA certificate is current.
+- **Payment succeeded on BORICA but the charge stays unpaid in 1club** - this usually resolves on its own: the reconciliation job confirms pending checkouts within a few minutes. If it persists beyond that, re-check that your BORICA certificate is current.
 - **Live payments fail but test works** - confirm you are in the **Live** environment and entered live credentials (a production TID and the production BORICA certificate, not the test ones).
 - **"myPOS is already enabled"** - only one hosted-checkout provider can be active per company. Deactivate myPOS for that company, or untick its **Online** capability, then save DatecsPay again.
 
@@ -164,7 +164,7 @@ You stay on the DatecsPay page afterwards, with the form reset. Your stored cred
 
 **Bulgarian gym already banking with BORICA.** A fitness gym whose bank issued it a BORICA e-commerce terminal generates an RSA key pair, registers the public key with BORICA, and downloads the production certificate. It activates DatecsPay, selects **Live**, enters its TID and MID, pastes the private key and certificate, saves, and runs **Test configuration**. One real court booking confirms hosted checkout settles the charge.
 
-**A member who closes the tab mid-payment.** A member pays for a membership on BORICA's page but closes the browser before returning to 1Club, so the payment briefly shows as pending. Within a few minutes the reconciliation job checks the status with BORICA, confirms the charge, and settles the membership, with no staff action needed.
+**A member who closes the tab mid-payment.** A member pays for a membership on BORICA's page but closes the browser before returning to 1club, so the payment briefly shows as pending. Within a few minutes the reconciliation job checks the status with BORICA, confirms the charge, and settles the membership, with no staff action needed.
 
 ## Tips & best practices
 

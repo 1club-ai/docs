@@ -4,7 +4,7 @@ description: "Search, open, create, update, and archive the customers your booki
 keywords: [contacts, customers, crm, search, contactId, platform api]
 ---
 
-Every booking belongs to a **contact** in the gym's 1Club CRM. Use these endpoints to
+Every booking belongs to a **contact** in the gym's 1club CRM. Use these endpoints to
 resolve a customer you only know by name into the `contactId` you pass when
 [creating a booking](/api-reference/channel-integration/bookings#create-a-booking),
 to create the customer when they are new, and to keep their details current.
@@ -158,7 +158,7 @@ Returns the updated contact.
 - The display `name` is always recomputed from `firstName` and `lastName`, and the phone is canonicalized as on create.
 - A contact must keep at least one of `email` or `phone`.
 - An `email` already used by another contact in the organization is a `409`.
-- The `email` of a contact whose address is also their 1Club login cannot be changed (`400`). The person changes it themselves.
+- The `email` of a contact whose address is also their 1club login cannot be changed (`400`). The person changes it themselves.
 - Clearing a field the organization marks as required for staff is a `400` naming the field.
 - An archived contact cannot be edited.
 - `pipelineStageId` moves the contact in the sales pipeline, and `null` takes them out of it. A contact who has never been a customer is a lead while they are in the pipeline, so this can change `type`.
@@ -172,10 +172,10 @@ curl -X DELETE "https://api.1club.ai/v1/platform/contacts/300" \
   -H "Authorization: Bearer 1club_sk_live_..."
 ```
 
-Nothing is destroyed. The contact is archived: they drop out of search, their history stays intact, and the response is the contact itself with `type: "archived"`. Archiving also releases everything they hold on the forward schedule: active memberships, bookings they organized, and bookings they are only a player on. Restoring the contact in 1Club does not restore any of these.
+Nothing is destroyed. The contact is archived: they drop out of search, their history stays intact, and the response is the contact itself with `type: "archived"`. Archiving also releases everything they hold on the forward schedule: active memberships, bookings they organized, and bookings they are only a player on. Restoring the contact in 1club does not restore any of these.
 
 - **Paid future bookings.** When the cancellation policy would keep money from a paid future booking, pass `keepCancellationCharge`: `false` refunds it in full, and `true` applies the policy. Without it, such an archive is refused with `409` and `code: "CANCELLATION_CHARGE_DECISION_REQUIRED"`, and nothing changes.
-- **Refused contacts.** A staff member or owner who can reach the admin portal, an instructor whose profile still has upcoming classes, and a contact paying part of a split bill on a future booking are refused with `409` and `code: "CONFLICT"`. Resolve those in 1Club first.
+- **Refused contacts.** A staff member or owner who can reach the admin portal, an instructor whose profile still has upcoming classes, and a contact paying part of a split bill on a future booking are refused with `409` and `code: "CONFLICT"`. Resolve those in 1club first.
 - **Partial release.** If a membership or booking fails to release, the contact is still archived, and the response is `409` with `code: "ARCHIVE_INCOMPLETE"` and the unreleased items in `details.outstanding`. Repeat the same request to finish the job. Read `code` to tell this apart from a refusal: one means nothing happened, the other means the archive did.
 
 ## Pipeline stages and contact sources
@@ -211,7 +211,7 @@ curl "https://api.1club.ai/v1/platform/pipeline-stages" \
 
 ## What this API does not do
 
-- **No hard deletes.** Archiving retires a contact and keeps their history. Restoring an archived contact is done in 1Club.
-- **No merging.** If duplicates appear, they are resolved inside 1Club.
-- **One-way sync.** 1Club never pushes contact changes back to you.
+- **No hard deletes.** Archiving retires a contact and keeps their history. Restoring an archived contact is done in 1club.
+- **No merging.** If duplicates appear, they are resolved inside 1club.
+- **One-way sync.** 1club never pushes contact changes back to you.
 - **Archived contacts cannot be booked.** Archiving is how a gym retires a contact. An archived contact is hidden from search and rejected as the person a booking is for, or as a player on one.

@@ -1,7 +1,7 @@
 ---
-title: "1Club MCP tools reference"
+title: "1club MCP tools reference"
 sidebarTitle: "Tools reference"
-description: "Every tool the 1Club admin and discovery MCP servers expose, what it returns, and the OAuth scope each one requires."
+description: "Every tool the 1club admin and discovery MCP servers expose, what it returns, and the OAuth scope each one requires."
 keywords:
   [
     mcp tools,
@@ -22,11 +22,11 @@ keywords:
   ]
 ---
 
-This is the complete tool list for both 1Club MCP servers. An assistant sees only the tools of the server it is connected to.
+This is the complete tool list for both 1club MCP servers. An assistant sees only the tools of the server it is connected to.
 
 ## Admin server
 
-`https://mcp.1club.ai` - authenticated, normally with 1Club OAuth. Every tool is scoped to one organization and needs the listed scope. A call whose scope is missing fails with a permission error, not with empty data.
+`https://mcp.1club.ai` - authenticated, normally with 1club OAuth. Every tool is scoped to one organization and needs the listed scope. A call whose scope is missing fails with a permission error, not with empty data.
 
 | Tool | What it does | Scope required |
 | --- | --- | --- |
@@ -207,7 +207,7 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
 | `delete_message_draft` | Permanently deletes a draft message | `messages:write` |
 
 <Note>
-  The transaction tools work on the records the 1Club admin and member apps call
+  The transaction tools work on the records the 1club admin and member apps call
   **Charges**. The tool and scope names keep the Platform API's word. See
   [Charges](/sales/charges).
 </Note>
@@ -247,7 +247,7 @@ This is the complete tool list for both 1Club MCP servers. An assistant sees onl
   **Booking labels are titles only, and they are per gym.** Ask an assistant to
   "call private training Coaching" and it changes the card title on that gym's
   website, member portal, mobile app, and 1club.me page at once, with no publish
-  step. The line under each card stays 1Club's, and a card named after an area
+  step. The line under each card stays 1club's, and a card named after an area
   type keeps that type's name. With more than one gym, say which one, or the
   assistant should ask. A good assistant also translates the new title into the
   languages you offer. See [Booking labels](/reference/organization-clubs#booking-labels).
@@ -275,7 +275,7 @@ An assistant that authenticates with a [Platform API key](/settings/api-tokens) 
   it: the wildcard is expanded into the concrete scopes that exist at that
   moment, so the authorization page can list each one and you can leave the
   destructive ones unticked. A connection therefore does not silently gain new
-  powers as 1Club adds scopes - reconnect when you want the newer ones. For a
+  powers as 1club adds scopes - reconnect when you want the newer ones. For a
   key, [explicit scopes are the better
   choice](/settings/api-tokens#token-scopes) unless the integration is fully
   trusted and internally managed.
@@ -319,15 +319,15 @@ The admin server is built strictly on the documented Platform API, so anything t
 
 Some areas are covered only in part:
 
-- **Messages** can be drafted, edited, and read, but not sent. A draft created with `create_message_draft` is sent from the 1Club inbox.
-- **Invoices** are read-only. Issuing, sending, charging, and voiding invoices stay in the 1Club dashboard.
+- **Messages** can be drafted, edited, and read, but not sent. A draft created with `create_message_draft` is sent from the 1club inbox.
+- **Invoices** are read-only. Issuing, sending, charging, and voiding invoices stay in the 1club dashboard.
 - **Reports** are summaries for a period (`get_revenue_report`, `get_activity_report`, `get_memberships_report`, `get_members_report`), not the full analytics screens.
 - **Contacts** can be created, edited, and archived, but not deleted. **Memberships** are readable, creatable, and editable, but not deletable.
 - **Forms** go live as soon as they are created or edited, and can't be deleted here, because deleting a form deletes every submission made through it.
-- **Classes**: individual occurrences can be managed through their write tools; recurring-series creation remains in the 1Club dashboard.
+- **Classes**: individual occurrences can be managed through their write tools; recurring-series creation remains in the 1club dashboard.
 
-Media can be registered but not uploaded: `create_media` records a file that is already hosted, so putting a new image online still happens in 1Club or through your own hosting.
+Media can be registered but not uploaded: `create_media` records a file that is already hosted, so putting a new image online still happens in 1club or through your own hosting.
 
-Products and product categories can be created, edited, and retired, but not deleted - deleting a product destroys its sales history. Stock is read-only: `get_product_availability` reports how many are left to sell, while booking a delivery in, correcting a count after a stocktake, and writing off damaged stock stay in the 1Club dashboard. See [Products](/api-reference/channel-integration/products).
+Products and product categories can be created, edited, and retired, but not deleted - deleting a product destroys its sales history. Stock is read-only: `get_product_availability` reports how many are left to sell, while booking a delivery in, correcting a count after a stocktake, and writing off damaged stock stay in the 1club dashboard. See [Products](/api-reference/channel-integration/products).
 
 If you need one of these, the [Platform API](/api-reference/introduction) is where coverage grows first, and MCP follows it.

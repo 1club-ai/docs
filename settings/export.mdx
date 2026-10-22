@@ -8,13 +8,13 @@ Export downloads your organization's data as an Excel workbook or a CSV file: co
 
 ## When to use it
 
-Use an export when your data needs to leave 1Club - for your accountant, a spreadsheet, or another reporting tool. You pick one dataset and a date range, preview exactly what you'll get, and download a file that opens cleanly in Excel, Numbers, or Google Sheets.
+Use an export when your data needs to leave 1club - for your accountant, a spreadsheet, or another reporting tool. You pick one dataset and a date range, preview exactly what you'll get, and download a file that opens cleanly in Excel, Numbers, or Google Sheets.
 
 Typical uses:
 
 - **Handing the period to your accountant** - a yoga studio downloads the QuickBooks bundle for the quarter, so the accountant can reconcile customers and import invoices into QuickBooks Online.
 - **Reconciling a month** - a padel gym exports bookings and payments for the same month and cross-checks them side by side.
-- **Attendance analysis outside 1Club** - a gym exports bookings by class start time to analyze attendance or reconcile against third-party reporting.
+- **Attendance analysis outside 1club** - a gym exports bookings by class start time to analyze attendance or reconcile against third-party reporting.
 
 ## What you can export
 
@@ -104,12 +104,12 @@ The QuickBooks option is intended as **preparation** for QuickBooks Online, not 
 ### QBO limits to know
 
 - **100 invoices per file / 1,000 rows per file** - QuickBooks Online's native invoice CSV import enforces this. If your `invoices.csv` exceeds either, either split the file before importing, or use a bridge tool such as SaasAnt Transactions that doesn't enforce the per-file limit.
-- **Sales tax** - The `ItemTaxCode` column is filled from your 1Club tax rate name. QBO's CSV tax import has limitations and varies by region. Test in a QBO sandbox before importing to your production books. How the amounts treat tax is covered in [Tax and amounts](#tax-and-amounts).
+- **Sales tax** - The `ItemTaxCode` column is filled from your 1club tax rate name. QBO's CSV tax import has limitations and varies by region. Test in a QBO sandbox before importing to your production books. How the amounts treat tax is covered in [Tax and amounts](#tax-and-amounts).
 - **Payments are reference-only** - As above, payments don't import natively. The file is there for audit, reconciliation, or feeding a bridge tool.
 
 ### Tax and amounts
 
-`ItemRate` and `ItemAmount` are always **exclusive** of tax, even when your 1Club prices include it. `ItemTaxAmount` is the tax on top. A 120.00 sale with 20.00 of VAT included exports as `ItemAmount` 100.00 and `ItemTaxAmount` 20.00.
+`ItemRate` and `ItemAmount` are always **exclusive** of tax, even when your 1club prices include it. `ItemTaxAmount` is the tax on top. A 120.00 sale with 20.00 of VAT included exports as `ItemAmount` 100.00 and `ItemTaxAmount` 20.00.
 
 When the import asks how item amounts treat tax, choose **Exclusive of tax**. In a bridge tool such as SaasAnt, set its Global Tax Calculation to the tax-exclusive option. That mode needs a tax code on every line: a line with an empty `ItemTaxCode` is an untaxed sale, so put your zero-rated QuickBooks tax code in it before importing, or the import rejects the file. A file with no tax on any line can instead be imported with the tax calculation set to not applicable.
 
@@ -150,14 +150,14 @@ If you need to give someone outside the admin role access to a recurring export,
 **Solution**: The Display Name in `invoices.csv` did not match the customer name in QBO. Open `customers.csv`, reconcile the Display Name values against QBO first, then re-import.
 
 **Issue**: Tax amounts look wrong in QBO after importing invoices.
-**Solution**: QBO's CSV tax import has region-specific behavior. The export fills `ItemTaxCode` from your 1Club tax rate name; QBO needs a matching tax code on its side. Also check that you chose **Exclusive of tax** for the item amounts (see [Tax and amounts](#tax-and-amounts)). Verify in a QBO sandbox before doing this on your production books.
+**Solution**: QBO's CSV tax import has region-specific behavior. The export fills `ItemTaxCode` from your 1club tax rate name; QBO needs a matching tax code on its side. Also check that you chose **Exclusive of tax** for the item amounts (see [Tax and amounts](#tax-and-amounts)). Verify in a QBO sandbox before doing this on your production books.
 
 **Issue**: Excel shows a cell starting with a single quote, like `'=SUM(...)`.
 **Solution**: That's intentional. The export prefixes cells that look like spreadsheet formulas with a single quote to prevent formula injection. The quote is displayed in the formula bar but won't appear when the cell is printed or copied as a value.
 
 ## Related
 
-- [Import](/settings/overview) - The mirror flow for bringing data into 1Club.
-- [Billing overview](/sales/overview) - How invoices and payments work in 1Club, useful context when reading the exported files.
+- [Import](/settings/overview) - The mirror flow for bringing data into 1club.
+- [Billing overview](/sales/overview) - How invoices and payments work in 1club, useful context when reading the exported files.
 - [Invoices](/sales/invoices) - Invoice fields and statuses you'll see in `invoices-export.csv`.
 - [Payments](/sales/payments) - Payment records and how they link to invoices.

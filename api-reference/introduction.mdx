@@ -1,10 +1,10 @@
 ---
-title: "1Club Platform API reference"
+title: "1club Platform API reference"
 sidebarTitle: "Introduction"
-description: "Integrate with the 1Club platform to access clubs, classes, bookings, contacts, content, and transactions."
+description: "Integrate with the 1club platform to access clubs, classes, bookings, contacts, content, and transactions."
 ---
 
-The 1Club Platform API lets you programmatically access and manage your organization's data - clubs, classes, bookings, contacts, memberships, content, transactions, and more - from your own websites, integrations, and back-office scripts.
+The 1club Platform API lets you programmatically access and manage your organization's data - clubs, classes, bookings, contacts, memberships, content, transactions, and more - from your own websites, integrations, and back-office scripts.
 
 ## Base URL
 
@@ -29,7 +29,7 @@ Tools and AI agents can read the API and its companion services directly:
 
 ## Official API contract
 
-This documentation is the official source of truth for the 1Club Platform API.
+This documentation is the official source of truth for the 1club Platform API.
 If an integration relies on undocumented endpoints, fields, response shapes, or internal behavior outside this spec, we can't guarantee backward compatibility.
 Build against what's documented here to stay stable as the platform evolves.
 See [Versioning and deprecation](/api-reference/versioning) for how changes and deprecations ship.
@@ -111,14 +111,14 @@ Grant only the scopes the integration actually needs. The Platform API supports 
 | Staff and roles | `staff:read`, `staff:write` |
 | Notification settings | `notifications:read`, `notifications:write` |
 
-`transactions:write` records a settlement (revenue collected outside 1Club, reported as one sum for a gym) and refunds of it. Nothing is charged to anyone.
+`transactions:write` records a settlement (revenue collected outside 1club, reported as one sum for a gym) and refunds of it. Nothing is charged to anyone.
 
 Payment methods are read with `transactions:read`; `payment-methods:write` adds, renames and removes them. `staff:write` is accepted only from a signed-in person over OAuth: an API key that holds it is still refused.
 
 `GET /v1/platform/me` needs no scope and returns the scopes a key holds - see [Verify a key](/api-reference/channel-integration/authentication#verify-a-key).
 
 <Note>
-  A transaction in this API is the record the 1Club admin and member apps call a
+  A transaction in this API is the record the 1club admin and member apps call a
   **Charge**: what a payer owes for one thing, such as a booking, a membership
   period, or a product. `/v1/platform/transactions` returns the same records
   staff see under **Sales** > **Finance** > **Charges**. See
@@ -195,9 +195,9 @@ Most errors return a JSON body of the shape `{ "error": "...", "message": "...",
 
 ## Using this API from an AI assistant
 
-The same Platform API is exposed over the Model Context Protocol at `https://mcp.1club.ai`. The normal way to connect a remote MCP client is 1Club OAuth: you sign in on 1Club's authorization page and nothing is pasted into the assistant. An API key created above is still accepted on the same endpoint when the client sends it as `Authorization: Bearer 1club_sk_live_...`, which is how developer-managed clients that cannot complete an interactive sign-in connect. The MCP tools are thin wrappers over these endpoints, with the same scopes, rate limits, and error shapes. See [Connect an assistant](/mcp/connect).
+The same Platform API is exposed over the Model Context Protocol at `https://mcp.1club.ai`. The normal way to connect a remote MCP client is 1club OAuth: you sign in on 1club's authorization page and nothing is pasted into the assistant. An API key created above is still accepted on the same endpoint when the client sends it as `Authorization: Bearer 1club_sk_live_...`, which is how developer-managed clients that cannot complete an interactive sign-in connect. The MCP tools are thin wrappers over these endpoints, with the same scopes, rate limits, and error shapes. See [Connect an assistant](/mcp/connect).
 
-See the [MCP overview](/mcp/overview) for the two servers 1Club runs, and [Connect an assistant](/mcp/connect) for setup.
+See the [MCP overview](/mcp/overview) for the two servers 1club runs, and [Connect an assistant](/mcp/connect) for setup.
 
 ## Need help?
 

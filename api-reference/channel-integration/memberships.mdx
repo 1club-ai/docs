@@ -69,18 +69,18 @@ See [Idempotency](/api-reference/channel-integration/idempotency).
 The membership starts life according to what is owed, not according to what you
 declare:
 
-- **`paid`** - 1Club records a payment against a payment method named after your API key (no card is charged) and the membership becomes `active`, or `pending` when it starts in the future. The customer is not sent a payment receipt for it - you issue your own.
-- **`unpaid`** - the charge is left outstanding and the membership sits at `pending_payment`. It grants no access until the money is settled in 1Club.
+- **`paid`** - 1club records a payment against a payment method named after your API key (no card is charged) and the membership becomes `active`, or `pending` when it starts in the future. The customer is not sent a payment receipt for it - you issue your own.
+- **`unpaid`** - the charge is left outstanding and the membership sits at `pending_payment`. It grants no access until the money is settled in 1club.
 - **Nothing owed** - a free plan with no joining fee is `active` straight away. There is no payment to wait for.
 
 <Warning>
   An `unpaid` membership does not give the customer access. If they are already
-  training, either send `paid` or settle the charge in 1Club. This differs from
+  training, either send `paid` or settle the charge in 1club. This differs from
   bookings, where an unpaid booking still stands - a membership grants ongoing
   access, so it waits for the money.
 </Warning>
 
-Collection and refunds stay with you. 1Club never charges a card for these
+Collection and refunds stay with you. 1club never charges a card for these
 memberships.
 
 ### Overriding the plan
@@ -154,7 +154,7 @@ is a `400`, not an empty list.
 
 ## Get a membership
 
-Requires the `memberships:read` scope. Returns one membership by its 1Club id,
+Requires the `memberships:read` scope. Returns one membership by its 1club id,
 including `usesRemaining` - the sessions the customer has left.
 
 ```bash
@@ -191,12 +191,12 @@ configures it:
 either with the wrong status is a `400` rather than being quietly ignored.
 
 <Note>
-  Statuses 1Club works out for itself - `expired`, `used`, `pending_payment` -
+  Statuses 1club works out for itself - `expired`, `used`, `pending_payment` -
   cannot be set here. They follow from dates, usage, and payment.
 </Note>
 
 ## What this API does not do
 
-- **No plan changes.** Moving a customer to a different plan is a priced change needing proration, invoicing, and possibly a refund. Do it in 1Club.
+- **No plan changes.** Moving a customer to a different plan is a priced change needing proration, invoicing, and possibly a refund. Do it in 1club.
 - **No refunds.** Cancelling releases the membership; it never returns money.
 - **No deletes.** Cancel it instead, so the history stays intact.

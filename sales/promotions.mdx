@@ -1,7 +1,7 @@
 ---
 title: Promotions
 description: Create vouchers and discounts with schedules, codes, audience targeting, and usage caps
-keywords: [promotions, vouchers, discounts, promo codes, coupons, discount codes, auto-apply, trials, intro offers, wallet credit, happy hour, off-peak offer, buy one get one, 2 for 1, time of day discount, booking calendar]
+keywords: [promotions, vouchers, discounts, promo codes, coupons, discount codes, auto-apply, trials, intro offers, wallet credit, happy hour, off-peak offer, buy one get one, 2 for 1, time of day discount, booking calendar, members price, tagged after booking, discount at payment, add payment]
 ---
 
 Promotions are time-bound offers. They come in two flavours - **Vouchers** credit a member's wallet when the member redeems a code, and **Discounts** reduce the price of a booking or product order at checkout. Both share the same controls for scheduling, codes, redemption caps, audience targeting and scope. Owners and managers create promotions, staff can apply them on a member's behalf, and members redeem them in the portal or at checkout.
@@ -131,6 +131,27 @@ With **First purchase only** on, the discount only fires for a contact who has *
 
 When more than one auto-apply promotion could fire for the same plan and contact, the one with the **largest computed savings** wins. Only one applies.
 
+### Members who qualify after booking
+
+Auto-apply is decided at checkout, against who the member is at that moment. A booking made before the member qualified is charged the regular price - for example, someone who booked a court and was given your "Members" tag afterwards.
+
+When you take payment for that booking with **Add Payment**, the payment dialog offers the discount instead of applying it silently. It shows the promotion's name, the regular price struck through and the discounted price, with an **Apply** button:
+
+1. Click **Apply**. The booking is re-priced and the amount to pay drops to the discounted price. Your chosen payment method stays selected.
+2. Click **Undo** if you applied it by mistake. The booking goes back to its regular price.
+3. Take the payment as usual.
+
+Charging the regular price is your call: if you skip **Apply**, the booking keeps the price it was made at.
+
+The offer appears only when the payment settles the whole booking and the booking could still take a discount by hand:
+
+- Nothing has been paid against it, it hasn't been invoiced, and no wallet credit has been spent on it.
+- It has no discount yet, and its price isn't split between players.
+- It isn't covered by a membership, pass or external program, isn't part of a recurring series, and wasn't sold as part of an order.
+- You can edit the booking. Someone who can take payments but not edit bookings doesn't see the offer.
+
+When several auto-apply discounts fit, the one that takes the most off is offered, as at checkout.
+
 ### How it shows up on plan cards
 
 The public plan API computes a `firstTimeOffer` for each plan and contact, which the member-facing apps use to render badges like **"Try free"** or **"Save 20%"** on plan cards. The card shows both the original price and the effective price after the discount.
@@ -216,7 +237,8 @@ Staff can apply promotions on a member's behalf:
 
 - **Vouchers** - open the contact and use **Redeem voucher**. Enter the code; the credit posts to their wallet.
 - **Discounts** - when creating a booking or order in the admin, paste the code into the promotion field on the dialog. The dashboard validates it inline and tells you why a code is rejected if it is.
-- **Discounts in the booking dialog** - **Add discount** lists every discount; the ones that don't fit this booking are greyed out. A time-of-day or booking-length discount becomes selectable once the booking's time and length match it, and the amount shown is what checkout will take off - for a court booked with a coach and a courts-only discount, that is the court's share only.
+- **Discounts in the booking dialog** - **Add discount** lists every discount; the ones that don't fit this booking are greyed out. Each one that fits shows what it takes off this booking - for a court booked with a coach and a courts-only discount, that is the court's share only. A time-of-day or booking-length discount becomes selectable once the booking's time and length match it. **New discount** at the top of the list creates a promotion without leaving the dialog.
+- **Discounts on an existing booking** - open the booking and use **Add discount** under **Discount** to put a discount on, swap it, or click the **x** on it to take it off. A confirmation appears each time, and the booking's unpaid charge is re-priced. This works until money is taken or the charge is invoiced; after that, lowering the price is a refund. To catch members who qualified for an auto-apply discount after booking, see [Members who qualify after booking](#members-who-qualify-after-booking).
 
 ## Analytics
 

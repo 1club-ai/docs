@@ -84,7 +84,9 @@
               "staff:read": "View your staff accounts, their roles, and what each role is allowed to do",
               "staff:write": "Change a staff member's role, and what the manager, front desk and instructor roles are allowed to do. Only a signed-in person can use it, with the same limits as in 1club: an API key is always refused.",
               "notifications:read": "View which notifications each role gets by default, and on which channels",
-              "notifications:write": "Change which notifications each role gets and on which channels, and apply those defaults to everyone in a role, replacing their own choices"
+              "notifications:write": "Change which notifications each role gets and on which channels, and apply those defaults to everyone in a role, replacing their own choices",
+              "competitors:read": "View the competitors you follow, their prices and Google ratings, and how your prices compare with the market",
+              "competitors:write": "Add, edit and remove the competitors you follow, and have their websites read again"
             }
           }
         }
@@ -12149,6 +12151,566 @@
           },
           "offset": {
             "type": "integer"
+          }
+        }
+      },
+      "PlatformCompetitor": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string",
+            "nullable": true,
+            "description": "The website the weekly watch reads"
+          },
+          "googlePlaceId": {
+            "type": "string",
+            "nullable": true
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "Their logo, as the last reading of their website found it"
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The organization's club it competes with; null for all of them"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastCheckedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When their website was last read; null until the first reading lands (about a minute after adding)"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "google": {
+            "type": "object",
+            "nullable": true,
+            "description": "The club's Google rating, read live and cached for a day at most. Null when it has no Google place or Google did not answer.",
+            "properties": {
+              "rating": {
+                "type": "number",
+                "nullable": true,
+                "description": "Out of 5"
+              },
+              "ratingCount": {
+                "type": "integer",
+                "nullable": true,
+                "description": "How many reviews the rating rests on"
+              }
+            }
+          },
+          "latestChanges": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "One thing a reading found changed on the website since the reading before.",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "price_changed",
+                    "price_added",
+                    "price_removed",
+                    "offer_added",
+                    "offer_removed",
+                    "service_added",
+                    "service_removed"
+                  ]
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The price, offer or service, as the website names it"
+                },
+                "before": {
+                  "type": "string",
+                  "description": "The price before, on `price_changed` and `price_removed`"
+                },
+                "after": {
+                  "type": "string",
+                  "description": "The price now, on `price_changed` and `price_added`"
+                }
+              }
+            },
+            "description": "What the latest reading found changed on their website"
+          }
+        }
+      },
+      "PlatformCompetitorDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PlatformCompetitor"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "snapshots": {
+                "type": "array",
+                "description": "The latest readings of their website, newest first (at most 12)",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "capturedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "sourceUrls": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "The pages, files and searches the reading was made from"
+                    },
+                    "facts": {
+                      "type": "object",
+                      "properties": {
+                        "prices": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "price": {
+                                "type": "string",
+                                "description": "As the website writes it"
+                              },
+                              "period": {
+                                "type": "string"
+                              },
+                              "kind": {
+                                "type": "string",
+                                "enum": [
+                                  "membership",
+                                  "pass",
+                                  "drop_in",
+                                  "court_hour",
+                                  "private_session"
+                                ]
+                              },
+                              "amount": {
+                                "type": "number"
+                              },
+                              "currency": {
+                                "type": "string"
+                              },
+                              "sport": {
+                                "type": "string"
+                              },
+                              "concession": {
+                                "type": "boolean",
+                                "description": "A child's, student's, senior's, family's or group's price"
+                              },
+                              "source": {
+                                "type": "string",
+                                "description": "The page it was read from"
+                              }
+                            }
+                          }
+                        },
+                        "offers": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "services": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "changes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "description": "One thing a reading found changed on the website since the reading before.",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "enum": [
+                              "price_changed",
+                              "price_added",
+                              "price_removed",
+                              "offer_added",
+                              "offer_removed",
+                              "service_added",
+                              "service_removed"
+                            ]
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "The price, offer or service, as the website names it"
+                          },
+                          "before": {
+                            "type": "string",
+                            "description": "The price before, on `price_changed` and `price_removed`"
+                          },
+                          "after": {
+                            "type": "string",
+                            "description": "The price now, on `price_changed` and `price_added`"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PlatformCompetitorList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformCompetitor"
+            },
+            "description": "Every competitor on the list, by name"
+          },
+          "ownClubs": {
+            "type": "array",
+            "description": "The organization's own clubs' Google standing, to compare against",
+            "items": {
+              "type": "object",
+              "properties": {
+                "clubId": {
+                  "type": "integer"
+                },
+                "clubName": {
+                  "type": "string"
+                },
+                "onGoogle": {
+                  "type": "boolean",
+                  "description": "Whether the club is linked to its Google place"
+                },
+                "logoUrl": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "rating": {
+                  "type": "number",
+                  "nullable": true
+                },
+                "ratingCount": {
+                  "type": "integer",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "importableFromReport": {
+            "type": "integer",
+            "description": "Clubs the latest AI visibility report suggested that are not on the list yet"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many competitors the list holds at most"
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Whether the plan has Competitors (Grow). Without it the list can be read, edited and pruned, but nothing is added and no website is read."
+          }
+        }
+      },
+      "PlatformCompetitorCreate": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "website": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500,
+            "description": "The club's own website, not a social profile. Changing it discards the readings of the old one."
+          },
+          "googlePlaceId": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 300,
+            "description": "Their Google place id, for the rating and reviews. On create without a website, the website comes from the place."
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The organization's club it competes with; null for all of them"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000
+          }
+        }
+      },
+      "PlatformCompetitorUpdate": {
+        "type": "object",
+        "minProperties": 1,
+        "description": "Send only what changes; a field left out is left alone.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "website": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500,
+            "description": "The club's own website, not a social profile. Changing it discards the readings of the old one."
+          },
+          "googlePlaceId": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 300,
+            "description": "Their Google place id, for the rating and reviews. On create without a website, the website comes from the place."
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The organization's club it competes with; null for all of them"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000
+          }
+        }
+      },
+      "PlatformCompetitorMarket": {
+        "type": "object",
+        "description": "Every club's prices compared, competitors and the organization's own. A benchmark is one thing two or more clubs price, in one unit; each club is compared at its cheapest regular price.",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "The organization's currency, which every amount is in"
+          },
+          "benchmarks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "membership",
+                    "pass",
+                    "drop_in",
+                    "court_hour",
+                    "private_session"
+                  ]
+                },
+                "term": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    "month",
+                    "term",
+                    "year",
+                    null
+                  ],
+                  "description": "A membership's length: `month`, `term` (3 to 9 months) or `year`"
+                },
+                "sport": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "median": {
+                  "type": "number",
+                  "description": "The market median, per unit"
+                },
+                "min": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "count": {
+                  "type": "integer",
+                  "description": "How many clubs list it"
+                }
+              }
+            }
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "own": {
+                  "type": "boolean",
+                  "description": "One of the organization's own clubs"
+                },
+                "clubId": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "competitorId": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "name": {
+                  "type": "string"
+                },
+                "logoUrl": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "rating": {
+                  "type": "number",
+                  "nullable": true
+                },
+                "reviews": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "prices": {
+                  "type": "object",
+                  "description": "Its price for each benchmark it lists, by benchmark key",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "benchmark": {
+                        "type": "string"
+                      },
+                      "kind": {
+                        "type": "string",
+                        "enum": [
+                          "membership",
+                          "pass",
+                          "drop_in",
+                          "court_hour",
+                          "private_session"
+                        ]
+                      },
+                      "term": {
+                        "type": "string",
+                        "nullable": true,
+                        "enum": [
+                          "month",
+                          "term",
+                          "year",
+                          null
+                        ],
+                        "description": "A membership's length: `month`, `term` (3 to 9 months) or `year`"
+                      },
+                      "sport": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "unitAmount": {
+                        "type": "number",
+                        "description": "Per month, visit, hour or session"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "As the competitor's website writes it; null for the organization's own"
+                      },
+                      "concession": {
+                        "type": "boolean"
+                      },
+                      "source": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    }
+                  }
+                },
+                "priceIndex": {
+                  "type": "integer",
+                  "nullable": true,
+                  "description": "Its prices against the market median, where 100 is the median: 88 is 12% below the market. The median of its ratios across every benchmark it lists."
+                }
+              }
+            }
+          },
+          "refreshing": {
+            "type": "boolean",
+            "description": "Readings made before prices were compared this way are being redone; read again in a minute"
+          }
+        }
+      },
+      "PlatformCompetitorAnalysis": {
+        "type": "object",
+        "properties": {
+          "reviews": {
+            "type": "object",
+            "description": "What the competitor's latest Google reviews say",
+            "properties": {
+              "loved": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "complaints": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "count": {
+                "type": "integer",
+                "description": "How many reviews were read"
+              }
+            }
+          },
+          "comparison": {
+            "type": "object",
+            "description": "The organization against the competitor, from both clubs' reviews and websites",
+            "properties": {
+              "ahead": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "behind": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "nextSteps": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }
@@ -29184,6 +29746,588 @@
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/competitors": {
+      "get": {
+        "operationId": "listCompetitors",
+        "summary": "List competitors",
+        "description": "Every competitor the organization follows, by name: its website, its Google rating (read live, cached for a day), when its website was last read and what that reading found changed. `ownClubs` is the organization's own clubs' Google standing to compare against. `available` is false when the plan does not have Competitors (Grow): the list can still be read, edited and pruned, but nothing is added and no website is read. Requires `competitors:read`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The organization's competitors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCompetitorList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createCompetitor",
+        "summary": "Add a competitor",
+        "description": "Adds a club to follow. Its website is read in the background within about a minute, then every week; `lastCheckedAt` stays null until the first reading lands. Give its own website, not a social profile (400, code `competitor_website_invalid`), or its Google place id, which brings the website with it. A club already on the list by place or website is a 409 (code `competitor_exists`); a full list of 10 is a 400 (code `competitor_limit`). Requires `competitors:write`. Supports the `Idempotency-Key` header.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformCompetitorCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The competitor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCompetitor"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:write` scope, or the plan does not have Competitors (code `plan_not_grow`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "This club is already on the list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/competitors/market": {
+      "get": {
+        "operationId": "getCompetitorMarket",
+        "summary": "Compare prices with the market",
+        "description": "Every club's prices side by side, competitors and the organization's own, in the organization's currency. Prices are grouped into benchmarks - one thing two or more clubs price, in one unit (a monthly membership, a visit, an hour of a padel court) - and each club is compared at its cheapest regular price, a concession only where it lists nothing else.\n\n`priceIndex` is a club's prices against the market median, where 100 is the median: 88 means 12% below the market. Read it with the club's Google `rating` for its value: a club rated above the market but priced below it gives more than it charges for. A caller holding `competitors:write` also has outdated readings redone in the background (`refreshing` is then true). Requires `competitors:read`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The market comparison",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCompetitorMarket"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/competitors/import-ai-report": {
+      "post": {
+        "operationId": "createCompetitorImportAiReport",
+        "summary": "Import competitors from the AI report",
+        "description": "Adds the nearby clubs the organization's latest AI visibility report found, skipping those already on the list, up to the list's limit of 10. Their websites are read in the background. Requires `competitors:write`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "How many were added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "imported": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:write` scope, or the plan does not have Competitors (code `plan_not_grow`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/competitors/{id}": {
+      "get": {
+        "operationId": "getCompetitor",
+        "summary": "Get a competitor",
+        "description": "One competitor with its latest readings of its website, newest first: the prices, offers and services each found, the pages it read them from, and what changed since the reading before. Requires `competitors:read`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Competitor id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The competitor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCompetitorDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateCompetitor",
+        "summary": "Update a competitor",
+        "description": "Changes what is stored about a competitor; send only what changes. A new website discards the readings of the old one, which describe another site, and is read again. Requires `competitors:write`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Competitor id"
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformCompetitorUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The competitor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCompetitor"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "description": "Another competitor on the list has this place or website",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteCompetitor",
+        "summary": "Remove a competitor",
+        "description": "Takes a competitor off the list, with its price history. Requires `competitors:write`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Competitor id"
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed"
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/competitors/{id}/analysis": {
+      "get": {
+        "operationId": "listCompetitorAnalysis",
+        "summary": "Analyse a competitor's reviews",
+        "description": "What the competitor's latest Google reviews praise and complain about, and how the organization compares: where it is ahead, where the competitor is, and what to do next. Written by a model in `language` and cached while the reviews and readings behind it stay the same. 503 (code `ai_unavailable`) when the model is not available. At most 30 new analyses an hour per organization; one already written does not count. Requires `competitors:read`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Competitor id"
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "bg",
+                "es",
+                "fr",
+                "de",
+                "cs"
+              ],
+              "default": "en"
+            },
+            "description": "The language the analysis is written in"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The analysis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCompetitorAnalysis"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/competitors/{id}/refresh": {
+      "post": {
+        "operationId": "createCompetitorRefresh",
+        "summary": "Read a competitor's website again",
+        "description": "Asks Google for the competitor's rating again and reads its website now rather than at the next weekly reading. Once every few minutes per competitor: sooner is a 429 (code `competitor_refresh_cooldown`). Requires `competitors:write`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Competitor id"
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Read again"
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:write` scope, or the plan does not have Competitors (code `plan_not_grow`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "description": "Read a few minutes ago, or the rate limit was exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           }
         }
       }

@@ -12431,9 +12431,44 @@
           }
         }
       },
-      "PlatformCompetitorWrite": {
+      "PlatformCompetitorCreate": {
         "type": "object",
-        "description": "A competitor. `name` is required on create; on update send only what changes.",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "website": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500,
+            "description": "The club's own website, not a social profile. Changing it discards the readings of the old one."
+          },
+          "googlePlaceId": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 300,
+            "description": "Their Google place id, for the rating and reviews. On create without a website, the website comes from the place."
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The organization's club it competes with; null for all of them"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000
+          }
+        }
+      },
+      "PlatformCompetitorUpdate": {
+        "type": "object",
+        "description": "Send only what changes; a field left out is left alone.",
         "properties": {
           "name": {
             "type": "string",
@@ -29787,7 +29822,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PlatformCompetitorWrite"
+                "$ref": "#/components/schemas/PlatformCompetitorCreate"
               }
             }
           }
@@ -29798,7 +29833,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlatformCompetitorDetail"
+                  "$ref": "#/components/schemas/PlatformCompetitor"
                 }
               }
             }
@@ -30039,7 +30074,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PlatformCompetitorWrite"
+                "$ref": "#/components/schemas/PlatformCompetitorUpdate"
               }
             }
           }
@@ -30050,7 +30085,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlatformCompetitorDetail"
+                  "$ref": "#/components/schemas/PlatformCompetitor"
                 }
               }
             }
@@ -30154,7 +30189,7 @@
       "get": {
         "operationId": "listCompetitorAnalysis",
         "summary": "Analyse a competitor's reviews",
-        "description": "What the competitor's latest Google reviews praise and complain about, and how the organization compares: where it is ahead, where the competitor is, and what to do next. Written by a model in `language` and cached while the reviews and readings behind it stay the same. 503 (code `ai_unavailable`) when the model is not available. Requires `competitors:read`.\n",
+        "description": "What the competitor's latest Google reviews praise and complain about, and how the organization compares: where it is ahead, where the competitor is, and what to do next. Written by a model in `language` and cached while the reviews and readings behind it stay the same. 503 (code `ai_unavailable`) when the model is not available. At most 30 an hour per organization. Requires `competitors:read`.\n",
         "tags": [
           "Competitors"
         ],

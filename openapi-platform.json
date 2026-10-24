@@ -55,8 +55,8 @@
               "contacts:read": "View contacts, their tags and custom field values, and your sales pipeline stages and sources",
               "contacts:write": "Create and update contacts and tag them, and maintain your tags, smart tag rules and contact custom fields",
               "contacts:delete": "Archive contacts, which cancels their active memberships and all their future bookings. Separate from creating and updating because those cancellations are not undone by restoring the contact.",
-              "instructors:read": "View instructors and their availability",
-              "instructors:write": "Create and update instructors (coaches) and the instructor types they are grouped by, including what members pay for a one-to-one session and how you pay the coach. Does not grant admin-portal access: an instructor created this way has no login and is never invited to your staff portal.",
+              "instructors:read": "View instructors, their availability, the staff roster and their time off",
+              "instructors:write": "Create and update instructors (coaches) and the instructor types they are grouped by, including what members pay for a one-to-one session and how you pay the coach, and manage the staff roster (shifts, rotations) and their time off. Does not grant admin-portal access: an instructor created this way has no login and is never invited to your staff portal.",
               "plans:read": "View plans and pricing",
               "plans:write": "Create, edit and delete plans and plan categories",
               "memberships:read": "View memberships",
@@ -457,6 +457,10 @@
           "requirePaymentUpfront": {
             "type": "boolean"
           },
+          "featured": {
+            "type": "boolean",
+            "description": "Highlight the plan as \"Most popular\" on the club's price lists. A flag, not a single choice: mark the same tier at each billing period it is sold at."
+          },
           "sports": {
             "type": "array",
             "items": {
@@ -509,6 +513,73 @@
                 "type": "array",
                 "items": {
                   "type": "integer"
+                }
+              }
+            }
+          },
+          "allowances": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "description": "The plan's session counters, sent instead of `maxUses`, `sessionUnit` and `validFor`: several for a plan like 5 Yoga + 4 Pilates a month. Two allowances may not cover the same type in the same scope, and only one may have no scopes (the one a check-in without a booking spends). On an update, an `id` from the plan's `allowances` keeps that allowance; one left out is removed. A single entry makes an ordinary plan.",
+            "items": {
+              "type": "object",
+              "required": [
+                "validFor",
+                "maxUses"
+              ],
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "An existing allowance's `allowanceId`, to keep it."
+                },
+                "validFor": {
+                  "type": "object",
+                  "properties": {
+                    "scopes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "classes",
+                          "areas",
+                          "instructors"
+                        ]
+                      }
+                    },
+                    "classTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "areaTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "instructorTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                },
+                "maxUses": {
+                  "type": "number",
+                  "nullable": true,
+                  "minimum": 0,
+                  "description": "Sessions it grants each period; null for unlimited."
+                },
+                "sessionUnit": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    "booking",
+                    "hour"
+                  ]
                 }
               }
             }
@@ -613,6 +684,10 @@
           "requirePaymentUpfront": {
             "type": "boolean"
           },
+          "featured": {
+            "type": "boolean",
+            "description": "Highlight the plan as \"Most popular\" on the club's price lists. A flag, not a single choice: mark the same tier at each billing period it is sold at."
+          },
           "sports": {
             "type": "array",
             "items": {
@@ -665,6 +740,73 @@
                 "type": "array",
                 "items": {
                   "type": "integer"
+                }
+              }
+            }
+          },
+          "allowances": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "description": "The plan's session counters, sent instead of `maxUses`, `sessionUnit` and `validFor`: several for a plan like 5 Yoga + 4 Pilates a month. Two allowances may not cover the same type in the same scope, and only one may have no scopes (the one a check-in without a booking spends). On an update, an `id` from the plan's `allowances` keeps that allowance; one left out is removed. A single entry makes an ordinary plan.",
+            "items": {
+              "type": "object",
+              "required": [
+                "validFor",
+                "maxUses"
+              ],
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "An existing allowance's `allowanceId`, to keep it."
+                },
+                "validFor": {
+                  "type": "object",
+                  "properties": {
+                    "scopes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "classes",
+                          "areas",
+                          "instructors"
+                        ]
+                      }
+                    },
+                    "classTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "areaTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "instructorTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                },
+                "maxUses": {
+                  "type": "number",
+                  "nullable": true,
+                  "minimum": 0,
+                  "description": "Sessions it grants each period; null for unlimited."
+                },
+                "sessionUnit": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    "booking",
+                    "hour"
+                  ]
                 }
               }
             }
@@ -748,7 +890,7 @@
       },
       "PlatformClass": {
         "type": "object",
-        "description": "One class occurrence. A weekly class materializes a row per session, linked by `recurrenceId` and `occurrenceIndex`, so `id` is what a booking's `classId` points at - and what distinguishes two groups running in the same hour. Read the roster with GET /v1/platform/classes/{id}/bookings.",
+        "description": "One class occurrence. A weekly class materializes a row per session, linked by `recurrenceId` and `occurrenceIndex`, so `id` is what a booking's `classId` points at - and what distinguishes two groups running in the same hour. Read the staff roster with GET /v1/platform/classes/{id}/bookings.",
         "properties": {
           "id": {
             "type": "integer"
@@ -1067,13 +1209,10 @@
           "bookingId": {
             "type": "integer"
           },
-          "classId": {
-            "type": "integer"
-          },
           "contactId": {
             "type": "integer",
             "nullable": true,
-            "description": "Null for an anonymous seat - a pass sold without naming who would use it. `bookerName` is then who paid for it."
+            "description": "Null for an anonymous seat - a pass or a guest ticket sold without naming who would use it. `bookerName` is then who paid for it."
           },
           "contactName": {
             "type": "string",
@@ -1108,22 +1247,12 @@
           },
           "checkedIn": {
             "type": "boolean",
-            "description": "Whether the attendee was checked in for this class."
+            "description": "Whether the attendee was checked in."
           },
           "checkedInAt": {
             "type": "string",
             "format": "date-time",
             "nullable": true
-          },
-          "membershipId": {
-            "type": "integer",
-            "nullable": true,
-            "description": "The membership the seat was drawn from, when it was covered by one."
-          },
-          "entranceMethod": {
-            "type": "string",
-            "nullable": true,
-            "description": "How the seat was paid for (direct_payment, membership, external_program)."
           },
           "payment": {
             "type": "object",
@@ -1135,7 +1264,7 @@
                   "unpaid",
                   "no_charge"
                 ],
-                "description": "Classified exactly as on `PlatformBooking`. A class seat covered by a membership or an external program is `no_charge` - it owes nothing even though it carries a price - so do not read it as an outstanding balance."
+                "description": "Classified exactly as on `PlatformBooking`. A seat covered by a membership or an external program is `no_charge` - it owes nothing even though it carries a price - so do not read it as an outstanding balance."
               },
               "amount": {
                 "type": "number",
@@ -1168,6 +1297,19 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "classId": {
+            "type": "integer"
+          },
+          "membershipId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The membership the seat was drawn from, when it was covered by one."
+          },
+          "entranceMethod": {
+            "type": "string",
+            "nullable": true,
+            "description": "How the seat was paid for (direct_payment, membership, external_program)."
           }
         }
       },
@@ -1178,6 +1320,141 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlatformClassBooking"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total attendees matching the filters, ignoring pagination"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
+      },
+      "PlatformEventBooking": {
+        "type": "object",
+        "description": "One seat at an event: a registration, or a guest ticket bought with one. Every seat is its own booking row, resolved with the attendee's name, ticket, check-in and payment.",
+        "properties": {
+          "bookingId": {
+            "type": "integer"
+          },
+          "contactId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Null for an anonymous seat - a pass or a guest ticket sold without naming who would use it. `bookerName` is then who paid for it."
+          },
+          "contactName": {
+            "type": "string",
+            "nullable": true
+          },
+          "bookerName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Who paid, when the seat is anonymous and was sold through an order - so a roster reads \"Anonymous (Ivan Petrov)\" rather than an opaque booking number."
+          },
+          "contactEmail": {
+            "type": "string",
+            "nullable": true,
+            "description": "Null unless the key also holds `contacts:read` - an email address is contact PII, gated as it is on the contacts resource."
+          },
+          "status": {
+            "type": "string",
+            "description": "Booking status (confirmed, pending, checked_in, cancelled)."
+          },
+          "source": {
+            "type": "string",
+            "nullable": true,
+            "description": "Channel that created it (admin, portal, app, api, kiosk, …)."
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "checkedIn": {
+            "type": "boolean",
+            "description": "Whether the attendee was checked in."
+          },
+          "checkedInAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "payment": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "paid",
+                  "unpaid",
+                  "no_charge"
+                ],
+                "description": "Classified exactly as on `PlatformBooking`. A seat covered by a membership or an external program is `no_charge` - it owes nothing even though it carries a price - so do not read it as an outstanding balance."
+              },
+              "amount": {
+                "type": "number",
+                "nullable": true
+              },
+              "paidAmount": {
+                "type": "number",
+                "description": "What has been collected on the booking, gross, before any refund. `0` when nothing has."
+              },
+              "refundedAmount": {
+                "type": "number",
+                "description": "What has been returned to the customer, across every refund recorded. `paidAmount - refundedAmount` is what the club kept."
+              },
+              "reference": {
+                "type": "string",
+                "nullable": true,
+                "description": "The collecting partner's own id for the payment, when one reported it through this API (`payment.reference`); null for money 1club collected itself."
+              },
+              "fee": {
+                "type": "number",
+                "nullable": true,
+                "description": "What the collecting partner kept out of the amount, when it reported one (`payment.fee`)."
+              }
+            }
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eventId": {
+            "type": "integer"
+          },
+          "ticket": {
+            "type": "object",
+            "nullable": true,
+            "description": "The ticket the seat was sold on; null on an event that sells none.",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "PlatformEventBookingPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformEventBooking"
             }
           },
           "total": {
@@ -1305,6 +1582,33 @@
               "type": "string"
             },
             "description": "Map of social network keys (e.g. 'instagram') to profile URLs."
+          },
+          "subtitle": {
+            "type": "string",
+            "nullable": true,
+            "description": "In the requested `locale` when the club has a translation for it."
+          },
+          "description": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "The club description as an Editor.js block tree (`{ blocks: [...] }`), its text in the requested `locale` when the club has a translation for it."
+          },
+          "gettingThere": {
+            "type": "string",
+            "nullable": true,
+            "description": "How to reach the club, in the club's own words. In the requested `locale` when translated."
+          },
+          "operatingHours": {
+            "type": "object",
+            "nullable": true,
+            "description": "Opening hours per weekday (`monday` … `sunday`), each `{ enabled, openTime, closeTime }` in the club's own clock.",
+            "additionalProperties": true
+          },
+          "timezone": {
+            "type": "string",
+            "nullable": true,
+            "description": "The club's IANA timezone, which `operatingHours` are read in."
           },
           "privateTrainingLabel": {
             "type": "string",
@@ -2068,6 +2372,7 @@
               "color",
               "image",
               "image_list",
+              "date",
               "entity",
               "entity_list",
               "object_list",
@@ -2094,18 +2399,24 @@
               "layout",
               "style",
               "advanced"
-            ]
+            ],
+            "description": "Where the admin editor places the field. Advisory and editor-driven: a field may move between groups as the editor changes, so do not key behaviour on it."
           },
           "prominence": {
             "type": "string",
             "enum": [
               "card",
-              "panel"
+              "panel",
+              "site"
             ]
           },
           "order": {
             "type": "integer",
             "description": "Ascending display order. A conditional field always sorts after the field its condition names."
+          },
+          "primary": {
+            "type": "boolean",
+            "description": "The section’s defining choice - the one that reshapes the whole section, such as a hero’s `variant`. At most one per section type."
           },
           "width": {
             "type": "string",
@@ -2380,12 +2691,29 @@
           "classId": {
             "type": "integer",
             "nullable": true,
-            "description": "The class occurrence this booking attends, when it is a class booking. Every attendee holds their own booking row against the same `classId`, and `classes` rows are per-occurrence - so this is what tells two classes running in the same hour apart. Join it against GET /v1/platform/classes, or read the roster with GET /v1/platform/classes/{id}/bookings."
+            "description": "The class occurrence this booking attends, when it is a class booking. Every attendee holds their own booking row against the same `classId`, and `classes` rows are per-occurrence - so this is what tells two classes running in the same hour apart. Join it against GET /v1/platform/classes, or read the staff roster with GET /v1/platform/classes/{id}/bookings."
           },
           "eventId": {
             "type": "integer",
             "nullable": true,
-            "description": "The event this booking attends, when it is an event booking"
+            "description": "The event this booking attends, when it is an event booking. Read the attendee list with GET /v1/platform/events/{id}/bookings."
+          },
+          "eventTicketId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The event ticket the seat was sold on, when the event sells tickets"
+          },
+          "orderId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The order the booking was sold on: one per sale, holding the customer's seat and any guests'. Every class enrolment and event registration made through this API has one; null for a booking sold on none (a court or coach booked through POST /v1/platform/bookings)."
+          },
+          "seatBookingIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Every seat the sale holds, the customer's own first. Only on the answer to a seat sale (POST /v1/platform/classes/{id}/bookings, POST /v1/platform/events/{id}/bookings); the guests' seats carry no contact, and the class's or the event's roster lists them all."
           },
           "maxPlayers": {
             "type": "integer",
@@ -5329,15 +5657,50 @@
           "maxUses": {
             "type": "number",
             "nullable": true,
-            "description": "Session allowance snapshotted from the plan; null when unlimited."
+            "description": "Session allowance snapshotted from the plan; null when unlimited. With several `allowances`, their total."
           },
           "usesRemaining": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "description": "Sessions left; with several `allowances`, their total."
           },
           "usesAdjustment": {
             "type": "number",
             "description": "Sessions staff gave (or took back) this allowance period, on top of maxUses. Why usesRemaining can exceed maxUses."
+          },
+          "allowances": {
+            "type": "array",
+            "description": "Its session counters: one for an ordinary membership, several for one sold from a plan like 5 Yoga + 4 Pilates, each with its own balance.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "allowanceId": {
+                  "type": "integer",
+                  "nullable": true,
+                  "description": "Null on a membership with one allowance."
+                },
+                "validFor": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "description": "What this allowance covers."
+                },
+                "maxUses": {
+                  "type": "number",
+                  "nullable": true
+                },
+                "usesRemaining": {
+                  "type": "number",
+                  "nullable": true
+                },
+                "usesAdjustment": {
+                  "type": "number"
+                },
+                "sessionUnit": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            }
           },
           "commitmentEndsAt": {
             "type": "string",
@@ -5429,12 +5792,12 @@
           "maxUses": {
             "type": "number",
             "nullable": true,
-            "description": "Session allowance a membership gets; null when unlimited."
+            "description": "Session allowance a membership gets; null when unlimited. With several `allowances`, their total."
           },
           "sessionUnit": {
             "type": "string",
             "nullable": true,
-            "description": "What a use is counted in - a booking or an hour."
+            "description": "What a use is counted in - a booking or an hour. Null when the plan has several `allowances`."
           },
           "validityPeriod": {
             "type": "integer",
@@ -5450,6 +5813,10 @@
           },
           "requirePaymentUpfront": {
             "type": "boolean"
+          },
+          "featured": {
+            "type": "boolean",
+            "description": "Whether the club highlights this plan as \"Most popular\" on its price lists."
           },
           "customPeriod": {
             "type": "integer",
@@ -5481,7 +5848,35 @@
           "validFor": {
             "type": "object",
             "additionalProperties": true,
-            "description": "Booking resource scopes and optional type filters covered by the plan."
+            "nullable": true,
+            "description": "Booking resource scopes and optional type filters covered by the plan. Null when it has several `allowances`."
+          },
+          "allowances": {
+            "type": "array",
+            "description": "The plan's session counters: one for an ordinary plan, several for one like 5 Yoga + 4 Pilates a month. Their coverage never overlaps.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "allowanceId": {
+                  "type": "integer",
+                  "nullable": true,
+                  "description": "Null on a plan with one allowance, which lives on the plan itself."
+                },
+                "validFor": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "maxUses": {
+                  "type": "number",
+                  "nullable": true,
+                  "description": "Sessions it grants each period; null when unlimited."
+                },
+                "sessionUnit": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            }
           },
           "sports": {
             "type": "array",
@@ -6988,7 +7383,16 @@
             "nullable": true,
             "minimum": 0,
             "maximum": 100,
-            "description": "Individual policies: a share of what the session took."
+            "description": "Individual policies: a share of what the session took (see `sessionRevenueBase`)."
+          },
+          "sessionRevenueBase": {
+            "type": "string",
+            "enum": [
+              "session",
+              "coach_charge"
+            ],
+            "default": "session",
+            "description": "Individual policies: what `sessionRevenuePercentage` is a share of. `session` (the default) is the whole session's price, court included. `coach_charge` is only the coach's own charge - the coach half of a court booked with a coach - so 100% pays a coach exactly the fee the member paid for them. Left out of an update, it stays as it was."
           },
           "perClass": {
             "type": "number",
@@ -7194,6 +7598,566 @@
           }
         }
       },
+      "PlatformPayLedgerLine": {
+        "type": "object",
+        "description": "One unit of work a coach is paid for - a private session, a class, or an attendee of a class - and what it paid under the coach's pay rate policy. `pending` is work the paid-booking gate is holding back: `totalAmount` is what it will pay once the member settles, and nothing is owed yet.",
+        "properties": {
+          "instructorId": {
+            "type": "integer"
+          },
+          "instructorName": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "individual_booking",
+              "class_booking",
+              "class_session",
+              "class_checkin"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "earned",
+              "pending"
+            ]
+          },
+          "bookingId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "checkinId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "classId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "className": {
+            "type": "string",
+            "nullable": true
+          },
+          "classTypeId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "club": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "area": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "entranceMethod": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "direct_payment",
+              "membership",
+              "external_program"
+            ]
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "revenueBase": {
+            "type": "number",
+            "nullable": true,
+            "description": "What the work took, before the coach was paid - the base a revenue percentage applies to."
+          },
+          "components": {
+            "type": "array",
+            "description": "How `totalAmount` was reached: each rate that applied and what it added.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "number"
+                },
+                "rate": {
+                  "type": "number",
+                  "nullable": true
+                },
+                "baseAmount": {
+                  "type": "number",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "totalAmount": {
+            "type": "number"
+          }
+        }
+      },
+      "PlatformShiftBreak": {
+        "type": "object",
+        "required": [
+          "name",
+          "startTime",
+          "endTime"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Lunch"
+          },
+          "startTime": {
+            "type": "string",
+            "example": "12:00",
+            "description": "Wall-clock `HH:mm` on a template; an ISO instant on a shift."
+          },
+          "endTime": {
+            "type": "string",
+            "example": "12:30"
+          }
+        }
+      },
+      "PlatformShiftTemplate": {
+        "type": "object",
+        "description": "A named shift a roster is built from, on the wall clock of the club it is worked at.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Null means every club of the organization."
+          },
+          "name": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "string",
+            "example": "06:00"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "14:00"
+          },
+          "color": {
+            "type": "string"
+          },
+          "displayOrder": {
+            "type": "integer"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "breaks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformShiftBreak"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PlatformShiftTemplateWrite": {
+        "type": "object",
+        "description": "A shift template. On create `name`, `startTime` and `endTime` are required; on update send only what changes, and `breaks`, when sent, replaces the whole set.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "startTime": {
+            "type": "string",
+            "example": "06:00",
+            "description": "`HH:mm`, 24-hour"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "14:00",
+            "description": "`HH:mm`, 24-hour, after `startTime`"
+          },
+          "color": {
+            "type": "string"
+          },
+          "displayOrder": {
+            "type": "integer"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "breaks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformShiftBreak"
+            },
+            "description": "Each inside the shift window."
+          }
+        }
+      },
+      "PlatformShiftRotationSlot": {
+        "type": "object",
+        "required": [
+          "weekIndex",
+          "dayOfWeek"
+        ],
+        "properties": {
+          "weekIndex": {
+            "type": "integer",
+            "description": "Zero-based week of the cycle, below `cycleWeeks`."
+          },
+          "dayOfWeek": {
+            "type": "string",
+            "enum": [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday"
+            ]
+          },
+          "shiftTemplateId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The shift worked that day. Null, or a day with no slot, is a day off."
+          },
+          "shiftTemplateName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        }
+      },
+      "PlatformShiftRotation": {
+        "type": "object",
+        "description": "A weekly pattern of shifts, one to twelve weeks long, that coaches are assigned to.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "cycleWeeks": {
+            "type": "integer"
+          },
+          "weekStartsOn": {
+            "type": "integer",
+            "description": "0 is Sunday, 1 Monday."
+          },
+          "anchorDate": {
+            "type": "string",
+            "format": "date",
+            "description": "The first day of week 1 of the cycle."
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "slots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformShiftRotationSlot"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PlatformShiftRotationWrite": {
+        "type": "object",
+        "description": "A rotation. On create `name` and `cycleWeeks` are required; on update send only what changes, and `slots`, when sent, replaces the whole pattern.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "cycleWeeks": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "weekStartsOn": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "anchorDate": {
+            "type": "string",
+            "format": "date",
+            "description": "First day of week 1. Defaults to today."
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "slots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformShiftRotationSlot"
+            }
+          }
+        }
+      },
+      "PlatformShiftRotationAssignment": {
+        "type": "object",
+        "description": "A coach on a rotation over a range of days.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "instructorId": {
+            "type": "integer"
+          },
+          "instructorName": {
+            "type": "string"
+          },
+          "rotationId": {
+            "type": "integer"
+          },
+          "rotationName": {
+            "type": "string"
+          },
+          "cycleOffset": {
+            "type": "integer",
+            "description": "Zero-based week of the cycle the coach starts on."
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveTo": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Null is open-ended."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PlatformShiftRotationAssignmentResult": {
+        "type": "object",
+        "properties": {
+          "assignment": {
+            "$ref": "#/components/schemas/PlatformShiftRotationAssignment"
+          },
+          "generated": {
+            "type": "object",
+            "description": "Shifts materialized on the staff roster by this write.",
+            "properties": {
+              "created": {
+                "type": "integer"
+              },
+              "updated": {
+                "type": "integer"
+              },
+              "skipped": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "PlatformInstructorShift": {
+        "type": "object",
+        "description": "One shift on the staff roster: when a coach works on one day. This is what their availability reads.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "instructorId": {
+            "type": "integer"
+          },
+          "instructorName": {
+            "type": "string",
+            "nullable": true
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "The day the shift starts on, on the club clock."
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "breaks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformShiftBreak"
+            }
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "rotation",
+              "manual"
+            ]
+          },
+          "rotationAssignmentId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "cancelled"
+            ]
+          },
+          "isOverride": {
+            "type": "boolean",
+            "description": "Edited by hand: regenerating the rotation leaves it as it is."
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PlatformInstructorTimeOff": {
+        "type": "object",
+        "description": "A window a coach cannot be booked in, whatever their staff roster says.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "instructorId": {
+            "type": "integer"
+          },
+          "instructorName": {
+            "type": "string",
+            "nullable": true
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PlatformInstructorTimeOffConflict": {
+        "type": "object",
+        "description": "A booking or class already on the coach diary inside a time-off window. Time off leaves it in place.",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "booking",
+              "class"
+            ]
+          },
+          "id": {
+            "type": "integer",
+            "description": "The booking id, or the class id."
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "className": {
+            "type": "string",
+            "nullable": true
+          },
+          "areaName": {
+            "type": "string",
+            "nullable": true
+          },
+          "attendeeCount": {
+            "type": "integer"
+          },
+          "seasonId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Set on a week of a contracted Season Slot, which is moved to another coach rather than cancelled."
+          }
+        }
+      },
       "PlatformPlanCategory": {
         "type": "object",
         "description": "How membership plans are grouped - the headings on a price list and the sections of a plans page.",
@@ -7328,6 +8292,12 @@
             "type": "string",
             "nullable": true,
             "maxLength": 200
+          },
+          "gettingThere": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 1000,
+            "description": "How to reach the club, in the club's own words - parking, the nearest stop and station. Plain text; line breaks are kept. Shown on the club's website page."
           },
           "description": {
             "type": "string",
@@ -7998,7 +8968,7 @@
       },
       "PlatformSmartTagSettings": {
         "type": "object",
-        "description": "The smart tag rules, by category. Each tagged category is `{ enabled, tags: [{ id, name, color, ...threshold }] }`; `interest` is `{ enabled, minBookings }`; `scoring` is `{ enabled, weights: { financial, services, physical, engagement } (summing to 100), timeWindows }`. On a PATCH, send only the categories that change.",
+        "description": "The smart tag rules, by category. Each tagged category is `{ enabled, tags: [{ id, name, color, ...threshold }] }`; `engagement` (attendance) also carries the `period` in days its tiers count visits over; `interest` is `{ enabled, minBookings }`; `scoring` is `{ enabled }`, switching on the engagement score, which is read from visits over the attendance period. On a PATCH, send only the categories that change.",
         "properties": {
           "engagement": {
             "type": "object",
@@ -8045,6 +9015,22 @@
             "additionalProperties": true
           },
           "assessment": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "trend": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "birthday": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "spending": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "atRisk": {
             "type": "object",
             "additionalProperties": true
           },
@@ -12736,6 +13722,16 @@
           }
         }
       },
+      "PlatformForbidden": {
+        "description": "The API key is missing the scope this endpoint requires",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PlatformError"
+            }
+          }
+        }
+      },
       "PlatformNotFound": {
         "description": "The requested resource does not exist in this organization",
         "content": {
@@ -15055,7 +16051,7 @@
       "post": {
         "operationId": "cancelBooking",
         "summary": "Cancel a booking",
-        "description": "Cancels the booking by its 1club id. Idempotent: cancelling an already-cancelled booking succeeds.\n\nWhich bookings are cancellable depends on the credential. An API key may cancel only the bookings it created (`source: api`); anything else is reported as not found. A staff member acting through an authorized 1club assistant may cancel any of the organization's bookings, as they can in the admin portal.\n\nRefunds follow the money. On a booking this API created, 1club never held the payment, so it moves none - but it records what you gave back, so the club's revenue matches yours. Cancelling with an API key records a refund of everything collected unless `refund.amount` says otherwise: send the amount you actually returned to keep a cancellation fee, or `0` if you kept it all, and your own refund id as `refund.reference`. Over a staff credential nothing is recorded unless `refund` is sent. On a booking taken through 1club (member portal, app, front desk), the club is the one cancelling: an unpaid booking owes nothing unless `keepCancellationCharge` is true. A paid booking the cancellation policy would keep money from needs an explicit `keepCancellationCharge` - `false` refunds it in full, `true` applies the policy - and without one the call is refused (409 `CANCELLATION_CHARGE_DECISION_REQUIRED`), exactly as the admin portal asks. `refund` is ignored there.\n\nA booking that has already been checked in cannot be cancelled (409) - voiding a check-in is an admin-portal action. One occurrence of a recurring booking is cancelled, not the series.\n",
+        "description": "Cancels the booking by its 1club id. Idempotent: cancelling an already-cancelled booking succeeds.\n\nWhich bookings are cancellable depends on the credential. An API key may cancel only the bookings it created (`source: api`); anything else is reported as not found. A staff member acting through an authorized 1club assistant may cancel any of the organization's bookings, as they can in the admin portal.\n\nRefunds follow the money. On a booking this API created, 1club never held the payment, so it moves none - but it records what you gave back, so the club's revenue matches yours. Cancelling with an API key records a refund of everything collected unless `refund.amount` says otherwise: send the amount you actually returned to keep a cancellation fee, or `0` if you kept it all, and your own refund id as `refund.reference`. Over a staff credential nothing is recorded unless `refund` is sent. On a booking taken through 1club (member portal, app, front desk), the club is the one cancelling: an unpaid booking owes nothing unless `keepCancellationCharge` is true. A paid booking the cancellation policy would keep money from needs an explicit `keepCancellationCharge` - `false` refunds it in full, `true` applies the policy - and without one the call is refused (409 `CANCELLATION_CHARGE_DECISION_REQUIRED`), exactly as the admin portal asks. `refund` is ignored there.\n\nA class enrolment or an event registration made with guests (POST /v1/platform/classes/{id}/bookings, POST /v1/platform/events/{id}/bookings) is one purchase: cancelling any of its seats cancels all of them, and `refund.amount` is what came back for the whole registration, recorded across its seats in proportion to what each was paid.\n\nA booking that has already been checked in cannot be cancelled (409) - voiding a check-in is an admin-portal action. One occurrence of a recurring booking is cancelled, not the series.\n",
         "tags": [
           "Bookings"
         ],
@@ -15311,7 +16307,7 @@
             }
           },
           "400": {
-            "description": "Invalid request, or an edit that cannot hold: `BOOKING_CANCELLED`, `BOOKING_ON_CLASS_NOT_RESCHEDULABLE`, `BOOKING_NEEDS_RESOURCE`, `BOOKING_COVERED_CANNOT_PRICE`, `CLASS_AT_CAPACITY`, `AREA_NOT_FOUND`, `CONTACT_NOT_FOUND`, `RECURRENCE_REQUIRES_SERIES_SCOPE` (a `recurrence` sent to an occurrence without `scope=all_future`), `RECURRENCE_NOT_AVAILABLE_TO_MANAGING_KEY`, or a taken slot, which carries `details.conflicts[]` as on create.\n",
+            "description": "Invalid request, or an edit that cannot hold: `BOOKING_CANCELLED`, `BOOKING_ON_CLASS_NOT_RESCHEDULABLE`, `BOOKING_NEEDS_RESOURCE`, `BOOKING_COVERED_CANNOT_PRICE`, `CLASS_AT_CAPACITY`, `AREA_NOT_FOUND`, `CONTACT_NOT_FOUND`, `RECURRENCE_REQUIRES_SERIES_SCOPE` (a `recurrence` sent to an occurrence without `scope=all_future`), `RECURRENCE_NOT_AVAILABLE_TO_MANAGING_KEY`, `DISCOUNTED_BOOKING_TO_SERIES` (a `recurrence` sent to a booking that carries a discount - take the discount off first), `PROMOTION_NOT_REDEEMABLE` in `error` (a `contactId` the booking's discount cannot pass to, with the reason in `code`), or a taken slot, which carries `details.conflicts[]` as on create.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -16387,7 +17383,7 @@
       "post": {
         "operationId": "createClassBooking",
         "summary": "Book a customer into a class",
-        "description": "Enrols one customer in a class occurrence - the booking the club's own staff make when they add someone to a class. The seat takes the class's time, club and price; capacity, the class's booking policy, a waitlist entry the customer already holds (converted into this booking) and the \"already on this class\" check all apply exactly as they do in the admin portal. Identify the customer with `contactId` (resolve it via GET /v1/platform/contacts) or with an inline `customer` matched to a contact by email and created if new - exactly one of the two.\n\nPayment works as on POST /v1/platform/bookings: `paid` records the seat as settled against a payment method named after your API key (no gateway call), `unpaid` leaves it outstanding, and `amount` is the price. With `unpaid` and no `amount`, the seat is paid for the way the club's own staff would default it: a membership of the customer's that covers the class is used (one session is spent and nothing is owed), and otherwise the class price is recorded as owed. With an API key that needs the customer named by `contactId`: an inline `customer` never spends a membership, and the class price is recorded as owed.\n\nA full class, a cancelled one and one that has already run are refused; nothing here overrides them. Returns the same booking as POST /v1/platform/bookings, with `classId` set.\n",
+        "description": "Enrols one customer in a class occurrence, with any guests they bring - the booking the club's own staff make when they add someone to a class. Every seat takes the class's time, club and price; capacity for the whole party, the class type's party size (`CLASS_PARTY_TOO_LARGE`), the class's booking policy, a waitlist entry the customer already holds (converted into this booking) and the \"already on this class\" check all apply exactly as they do in the admin portal. Identify the customer with `contactId` (resolve it via GET /v1/platform/contacts) or with an inline `customer` matched to a contact by email and created if new - exactly one of the two.\n\n`quantity` counts the places, the customer's own included: `3` is the customer and two guests. The seats are sold as one order, so the guests' seats carry no contact, show the customer as who bought them, and are released with the customer's seat when it is cancelled.\n\nPayment works as on POST /v1/platform/bookings: `paid` records the seats as settled against a payment method named after your API key (no gateway call), with your `reference` on each seat's payment and your `fee` shared over them; `unpaid` leaves them outstanding. `amount` is what the whole enrolment cost, shared over the seats in proportion to their price. With `unpaid` and no `amount`, the customer's seat is paid for the way the club's own staff would default it: a membership of the customer's that covers the class is used (one session is spent and nothing is owed), and otherwise the class price is recorded as owed; a guest's seat always owes the class price. With an API key that needs the customer named by `contactId`: an inline `customer` never spends a membership, and the class price is recorded as owed.\n\nA full class, a cancelled one and one that has already run are refused; nothing here overrides them. Returns the customer's own seat, as POST /v1/platform/bookings returns a booking, with `classId`, `orderId` and `seatBookingIds` (every seat of the enrolment) set.\n",
         "tags": [
           "Classes"
         ],
@@ -16426,6 +17422,13 @@
                   "payment"
                 ],
                 "properties": {
+                  "quantity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 50,
+                    "default": 1,
+                    "description": "How many places, the customer's own included. Capped by the class type's party size."
+                  },
                   "contactId": {
                     "type": "integer",
                     "description": "Existing contact to book for (from GET /v1/platform/contacts). Mutually exclusive with `customer`."
@@ -16468,7 +17471,7 @@
                       "amount": {
                         "type": "number",
                         "maximum": 1000000,
-                        "description": "The price of the seat, in the club's currency, before any fee you kept. Defaults to the class price (or, for an `unpaid` seat, nothing when a membership covers it). Stated the way the club states its prices: where the club's tax rate is exclusive, tax is added on top.\n"
+                        "description": "What the whole enrolment cost, in the club's currency, before any fee you kept; shared over the seats in proportion to their price. Defaults to the class price per seat (or, for the customer's `unpaid` seat, nothing when a membership covers it). Stated the way the club states its prices: where the club's tax rate is exclusive, tax is added on top.\n"
                       },
                       "reference": {
                         "type": "string",
@@ -16816,7 +17819,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Locale for amenity translations"
+            "description": "Locale for the club's translated text (subtitle, description, getting there) and amenity names"
           }
         ],
         "responses": {
@@ -17028,6 +18031,588 @@
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/competitors": {
+      "get": {
+        "operationId": "listCompetitors",
+        "summary": "List competitors",
+        "description": "Every competitor the organization follows, by name: its website, its Google rating (read live, cached for a day), when its website was last read and what that reading found changed. `ownClubs` is the organization's own clubs' Google standing to compare against. `available` is false when the plan does not have Competitors (Grow): the list can still be read, edited and pruned, but nothing is added and no website is read. Requires `competitors:read`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The organization's competitors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCompetitorList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createCompetitor",
+        "summary": "Add a competitor",
+        "description": "Adds a club to follow. Its website is read in the background within about a minute, then every week; `lastCheckedAt` stays null until the first reading lands. Give its own website, not a social profile (400, code `competitor_website_invalid`), or its Google place id, which brings the website with it. A club already on the list by place or website is a 409 (code `competitor_exists`); a full list of 10 is a 400 (code `competitor_limit`). Requires `competitors:write`. Supports the `Idempotency-Key` header.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformCompetitorCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The competitor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCompetitor"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:write` scope, or the plan does not have Competitors (code `plan_not_grow`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "This club is already on the list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/competitors/market": {
+      "get": {
+        "operationId": "getCompetitorMarket",
+        "summary": "Compare prices with the market",
+        "description": "Every club's prices side by side, competitors and the organization's own, in the organization's currency. Prices are grouped into benchmarks - one thing two or more clubs price, in one unit (a monthly membership, a visit, an hour of a padel court) - and each club is compared at its cheapest regular price, a concession only where it lists nothing else.\n\n`priceIndex` is a club's prices against the market median, where 100 is the median: 88 means 12% below the market. Read it with the club's Google `rating` for its value: a club rated above the market but priced below it gives more than it charges for. A caller holding `competitors:write` also has outdated readings redone in the background (`refreshing` is then true). Requires `competitors:read`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The market comparison",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCompetitorMarket"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/competitors/import-ai-report": {
+      "post": {
+        "operationId": "createCompetitorImportAiReport",
+        "summary": "Import competitors from the AI report",
+        "description": "Adds the nearby clubs the organization's latest AI visibility report found, skipping those already on the list, up to the list's limit of 10. Their websites are read in the background. Requires `competitors:write`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "How many were added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "imported": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:write` scope, or the plan does not have Competitors (code `plan_not_grow`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/competitors/{id}": {
+      "get": {
+        "operationId": "getCompetitor",
+        "summary": "Get a competitor",
+        "description": "One competitor with its latest readings of its website, newest first: the prices, offers and services each found, the pages it read them from, and what changed since the reading before. Requires `competitors:read`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Competitor id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The competitor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCompetitorDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateCompetitor",
+        "summary": "Update a competitor",
+        "description": "Changes what is stored about a competitor; send only what changes. A new website discards the readings of the old one, which describe another site, and is read again. Requires `competitors:write`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Competitor id"
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformCompetitorUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The competitor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCompetitor"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "description": "Another competitor on the list has this place or website",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteCompetitor",
+        "summary": "Remove a competitor",
+        "description": "Takes a competitor off the list, with its price history. Requires `competitors:write`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Competitor id"
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed"
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/competitors/{id}/analysis": {
+      "get": {
+        "operationId": "listCompetitorAnalysis",
+        "summary": "Analyse a competitor's reviews",
+        "description": "What the competitor's latest Google reviews praise and complain about, and how the organization compares: where it is ahead, where the competitor is, and what to do next. Written by a model in `language` and cached while the reviews and readings behind it stay the same. 503 (code `ai_unavailable`) when the model is not available. At most 30 new analyses an hour per organization; one already written does not count. Requires `competitors:read`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Competitor id"
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "bg",
+                "es",
+                "fr",
+                "de",
+                "cs"
+              ],
+              "default": "en"
+            },
+            "description": "The language the analysis is written in"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The analysis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCompetitorAnalysis"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/competitors/{id}/refresh": {
+      "post": {
+        "operationId": "createCompetitorRefresh",
+        "summary": "Read a competitor's website again",
+        "description": "Asks Google for the competitor's rating again and reads its website now rather than at the next weekly reading. Once every few minutes per competitor: sooner is a 429 (code `competitor_refresh_cooldown`). Requires `competitors:write`.\n",
+        "tags": [
+          "Competitors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Competitor id"
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Read again"
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `competitors:write` scope, or the plan does not have Competitors (code `plan_not_grow`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "description": "Read a few minutes ago, or the rate limit was exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
           }
         }
       }
@@ -18810,7 +20395,7 @@
       "get": {
         "operationId": "listEvents",
         "summary": "List events",
-        "description": "Returns the organization's events - one-off occasions such as an open day, a social or a tournament weekend, sold through tickets - in start order, earliest first.\n\n`status` is `draft` (not visible to members), `live` (published) or `cancelled`. `from` and `to` select the events that overlap the window, so an event already running at `from` is included. Each accepts an ISO date (`2026-05-01`, read as midnight UTC) or date-time.\n\nEach event carries `bookedCount`, its active bookings across all tickets. Who booked is not served here: attendees are personal data, and are reachable through the bookings resource with its own scope.\n",
+        "description": "Returns the organization's events - one-off occasions such as an open day, a social or a tournament weekend, sold through tickets - in start order, earliest first.\n\n`status` is `draft` (not visible to members), `live` (published) or `cancelled`. `from` and `to` select the events that overlap the window, so an event already running at `from` is included. Each accepts an ISO date (`2026-05-01`, read as midnight UTC) or date-time.\n\nEach event carries `bookedCount`, its active bookings across all tickets. Who booked is not served here: attendees are personal data, read with GET /v1/platform/events/{id}/bookings on the `bookings:read` scope.\n",
         "tags": [
           "Events"
         ],
@@ -18991,7 +20576,7 @@
       "get": {
         "operationId": "getEvent",
         "summary": "Get an event",
-        "description": "Returns one event with its tickets, coaches and areas. Each ticket carries `soldCount`, its active bookings, so what is left to sell is `capacity - soldCount` for a ticket with a capacity. Counts only: the attendee list is not served by this resource.\n",
+        "description": "Returns one event with its tickets, coaches and areas. Each ticket carries `soldCount`, its active bookings, so what is left to sell is `capacity - soldCount` for a ticket with a capacity. Counts only: the attendee list is GET /v1/platform/events/{id}/bookings.\n",
         "tags": [
           "Events"
         ],
@@ -19493,6 +21078,300 @@
         }
       }
     },
+    "/v1/platform/events/{id}/bookings": {
+      "get": {
+        "operationId": "listEventBookings",
+        "summary": "List an event's attendees",
+        "description": "Returns who holds a seat at one event, on which ticket, whether they were checked in, and what they paid - the attendee list, from the event side. Every seat is its own booking row against the event. A guest ticket bought on someone else's order has no contact; `bookerName` is who bought it.\n\nDo not expect `total` to equal the event's `bookedCount`: that counts `confirmed`, `pending` and `checked_in`, while this list also keeps `no_show`. Cancelled seats are left out unless `status=cancelled` asks for them.\n\nRequires `bookings:read`, as a class's roster does. `contactEmail` additionally needs `contacts:read` and is null without it.\n",
+        "tags": [
+          "Events"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "1club event id"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only seats with this booking status (e.g. confirmed, checked_in, no_show, cancelled). Defaults to every status but cancelled."
+          },
+          {
+            "in": "query",
+            "name": "ticketId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only seats sold on this ticket"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100
+            },
+            "description": "Maximum number of attendees to return"
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "Number of attendees to skip"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of attendees",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformEventBookingPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `bookings:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createEventBooking",
+        "summary": "Register a customer for an event",
+        "description": "Registers one customer at a live, bookable event, with any guests they bring - the registration the club's own staff make. Every place is a seat on one of the event's tickets, at the event's time and club and the ticket's price; the event's capacity and each ticket's apply. Identify the customer with `contactId` (resolve it via GET /v1/platform/contacts) or with an inline `customer` matched to a contact by email and created if new - exactly one of the two. A customer may register more than once, so registering them again books more places.\n\nPlaces are `ticketId` with a `quantity` (`3` is the customer and two guests), or `tickets` across several ticket types; the customer's own seat is the first place of the first ticket, and the guests' seats carry no contact. A ticket is required for every place when the event sells tickets, which every bookable event does; read the ticket ids and what is left on each (`capacity - soldCount`) from GET /v1/platform/events/{id}.\n\nPayment works as on POST /v1/platform/bookings: `paid` records the places as settled against a payment method named after your API key (no gateway call), with your `reference` on each seat's payment and your `fee` shared over them; `unpaid` leaves them outstanding. `amount` is what the whole registration cost, shared over the seats in proportion to their ticket price. No membership ever covers an event, so an `unpaid` registration with no `amount` owes the ticket prices.\n\nA draft or cancelled event (`EVENT_NOT_LIVE`), one that takes no bookings (`EVENT_NOT_BOOKABLE`), one that has ended (`BOOKING_ALREADY_ENDED`) and a ticket or event without room for every place are refused; nothing here overrides them. Returns the customer's own seat, as POST /v1/platform/bookings returns a booking, with `eventId`, `eventTicketId` and `seatBookingIds` (every seat of the registration) set. Cancelling any seat with POST /v1/platform/bookings/{id}/cancel cancels the whole registration.\n",
+        "tags": [
+          "Events"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "1club event id"
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "payment"
+                ],
+                "properties": {
+                  "ticketId": {
+                    "type": "integer",
+                    "description": "The ticket the places are sold on, from the event's `tickets`. Required when the event sells tickets, unless `tickets` is sent."
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 50,
+                    "default": 1,
+                    "description": "How many places on `ticketId`, the customer's own included."
+                  },
+                  "tickets": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 20,
+                    "description": "Places across several ticket types, instead of `ticketId` and `quantity`. Each ticket once; at most 50 places in all. The customer's own seat is the first place of the first entry.\n",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "ticketId",
+                        "quantity"
+                      ],
+                      "properties": {
+                        "ticketId": {
+                          "type": "integer"
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 50
+                        }
+                      }
+                    }
+                  },
+                  "contactId": {
+                    "type": "integer",
+                    "description": "Existing contact to book for (from GET /v1/platform/contacts). Mutually exclusive with `customer`."
+                  },
+                  "customer": {
+                    "type": "object",
+                    "description": "Inline find-or-create by email. Mutually exclusive with `contactId`.",
+                    "required": [
+                      "email"
+                    ],
+                    "properties": {
+                      "email": {
+                        "type": "string",
+                        "format": "email"
+                      },
+                      "firstName": {
+                        "type": "string"
+                      },
+                      "lastName": {
+                        "type": "string"
+                      },
+                      "phone": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "payment": {
+                    "type": "object",
+                    "required": [
+                      "status"
+                    ],
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "paid",
+                          "unpaid"
+                        ]
+                      },
+                      "amount": {
+                        "type": "number",
+                        "maximum": 1000000,
+                        "description": "What the whole registration cost, in the club's currency, before any fee you kept; shared over the seats in proportion to their ticket price. Defaults to the ticket prices. Stated the way the club states its prices: where the club's tax rate is exclusive, tax is added on top.\n"
+                      },
+                      "reference": {
+                        "type": "string",
+                        "maxLength": 128,
+                        "description": "Your own id for the payment you collected. Requires `status` paid."
+                      },
+                      "fee": {
+                        "type": "number",
+                        "maximum": 1000000,
+                        "description": "What you kept out of `amount` - your commission. Requires `status` paid and an explicit `amount` it cannot exceed.\n"
+                      }
+                    }
+                  },
+                  "notes": {
+                    "type": "string",
+                    "maxLength": 2000
+                  },
+                  "notifyCustomer": {
+                    "type": "boolean",
+                    "description": "Tell the customer they are booked - email plus the in-app, WhatsApp and SMS notification. Off by default for an API key, on by default over an OAuth connection, as on POST /v1/platform/bookings.\n"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Booking created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformBooking"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request; the event is not live (`EVENT_NOT_LIVE`), takes no bookings (`EVENT_NOT_BOOKABLE`) or has ended (`BOOKING_ALREADY_ENDED`); the ticket is missing (`EVENT_TICKET_REQUIRED`) or not one of the event's (`EVENT_TICKET_NOT_ON_EVENT`); or the contact cannot be booked.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `bookings:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "description": "A ticket does not have room for its places (`EVENT_TICKET_SOLD_OUT`), or the event does not (`EVENT_FULL`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
     "/v1/platform/forms": {
       "get": {
         "operationId": "listForms",
@@ -19850,6 +21729,792 @@
                 }
               }
             }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/instructor-shifts": {
+      "get": {
+        "operationId": "listInstructorShifts",
+        "summary": "List the staff roster",
+        "description": "Returns the shifts coaches are on between two days, both included, spanning at most 93 days. These are what a coach's availability reads: a coach on a rotation is bookable only within a shift, less its breaks. Cancelled shifts are left out unless asked for.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "in": "query",
+            "name": "instructorId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "clubId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "includeCancelled",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of the shifts in the window, by day and start time",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformInstructorShift"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "limit": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createInstructorShift",
+        "summary": "Add a shift",
+        "description": "Puts a coach on one extra shift, outside any rotation - cover for someone, an extra session. The day it is filed on is the day it starts on the coach's clock. Breaks are wall-clock `HH:mm` inside the shift.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "instructorId",
+                  "startTime",
+                  "endTime"
+                ],
+                "properties": {
+                  "instructorId": {
+                    "type": "integer"
+                  },
+                  "clubId": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Defaults to the coach's own club"
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "endTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "breaks": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PlatformShiftBreak"
+                    }
+                  },
+                  "note": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The created shift",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformInstructorShift"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/instructor-shifts/{id}": {
+      "get": {
+        "operationId": "getInstructorShift",
+        "summary": "Get a shift",
+        "description": "Returns one shift on the staff roster, with its breaks as instants, where it came from (a rotation or added by hand) and whether it was edited by hand.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The shift",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformInstructorShift"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateInstructorShift",
+        "summary": "Edit a shift",
+        "description": "Changes one shift's times, breaks, status or note. The shift becomes an override that regenerating its rotation leaves alone. Moving the start without sending `breaks` moves the existing breaks with it.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "minProperties": 1,
+                "properties": {
+                  "startTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "endTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "scheduled",
+                      "cancelled"
+                    ]
+                  },
+                  "breaks": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PlatformShiftBreak"
+                    }
+                  },
+                  "note": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated shift",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformInstructorShift"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteInstructorShift",
+        "summary": "Delete a shift",
+        "description": "Removes a shift from the staff roster. Meant for a shift added by hand: a generated one deleted here comes back the next time its rotation is regenerated, so cancel it instead.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/instructor-shifts/{id}/cancel": {
+      "post": {
+        "operationId": "cancelInstructorShift",
+        "summary": "Cancel a shift",
+        "description": "Takes the coach off one shift. The shift stays on the staff roster as cancelled, so regenerating the rotation does not put it back. Bookings already inside it are left as they are.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The cancelled shift",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformInstructorShift"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/instructor-time-off": {
+      "get": {
+        "operationId": "listInstructorTimeOff",
+        "summary": "List instructor time off",
+        "description": "Returns the time off overlapping two days on the organization's clock, both included, spanning at most 93 days. A coach cannot be booked inside their time off, whatever their staff roster says.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "in": "query",
+            "name": "instructorId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of the time off in the window, by start",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformInstructorTimeOff"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "limit": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createInstructorTimeOff",
+        "summary": "Book a coach off",
+        "description": "Stops new bookings with the coach inside the window. What is already on their diary there is not moved or cancelled: it comes back as `conflicts`, for the caller to reassign or cancel through the bookings and classes endpoints.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "instructorId",
+                  "startTime",
+                  "endTime"
+                ],
+                "properties": {
+                  "instructorId": {
+                    "type": "integer"
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "endTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "note": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The time off, and what it collides with",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PlatformInstructorTimeOff"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "conflicts": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PlatformInstructorTimeOffConflict"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/instructor-time-off/{id}": {
+      "patch": {
+        "operationId": "updateInstructorTimeOff",
+        "summary": "Change instructor time off",
+        "description": "Moves, shortens or extends the window. Like booking a coach off, it leaves existing bookings in place and returns everything the window now covers as `conflicts`.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "minProperties": 1,
+                "properties": {
+                  "startTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "endTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "note": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated time off, and everything its window now collides with",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PlatformInstructorTimeOff"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "conflicts": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PlatformInstructorTimeOffConflict"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteInstructorTimeOff",
+        "summary": "Remove instructor time off",
+        "description": "The coach becomes bookable again inside the window, as their staff roster allows.",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
           },
           "404": {
             "$ref": "#/components/responses/PlatformNotFound"
@@ -22255,11 +24920,168 @@
         }
       }
     },
+    "/v1/platform/pay-ledger": {
+      "get": {
+        "operationId": "listPayLedger",
+        "summary": "List what coaches earned",
+        "description": "Returns the pay ledger for a period: one line per unit of work a coach is paid for (a private session, a class, an attendee of a class), with what it paid under their pay rate policy and how. A pay rate policy is the rule; this is the money it produced.\n\nThe period is whole days on the organization's clock, both included, at most 93 days, and a line is dated by when the work happened. Work the paid-booking gate is still holding back is `pending`, at what it will pay once the member settles; `totals` keeps it apart from what is `earned`, and covers every page.\n\nNeeds `transactions:read` (the lines are per booking and per coach, which the totals-only `analytics:read` does not cover) and `staff:read` (it is what each member of staff is paid).\n",
+        "tags": [
+          "Pay Rate Policies"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "First day of the period, e.g. 2026-09-01"
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Last day of the period, included, e.g. 2026-09-30"
+          },
+          {
+            "in": "query",
+            "name": "instructorId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "earned",
+                "pending"
+              ]
+            },
+            "description": "Only earned lines, or only pending ones. Totals are unaffected."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of ledger lines, and the period's totals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformPayLedgerLine"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "limit": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totals": {
+                      "type": "object",
+                      "properties": {
+                        "earned": {
+                          "type": "number"
+                        },
+                        "pending": {
+                          "type": "number"
+                        },
+                        "byInstructor": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "instructorId": {
+                                "type": "integer"
+                              },
+                              "instructorName": {
+                                "type": "string"
+                              },
+                              "earned": {
+                                "type": "number"
+                              },
+                              "pending": {
+                                "type": "number"
+                              },
+                              "lines": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing `transactions:read`, or `staff:read` (`requiredScope` names which)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
     "/v1/platform/pay-rate-policies": {
       "get": {
         "operationId": "listPayRatePolicies",
         "summary": "List pay rate policies",
-        "description": "Returns the organization's pay rate policies - the rules for what the club pays its coaches. This is not an instructor's `hourlyRate`, which is what a member pays for an hour of their time; the two travel in opposite directions.\n\nA policy earns a coach either a flat amount per unit of work (a private session, a class, an attendee) or a percentage of what that work took, and covers a slice of the schedule described by three independent filters. Each one means **everything** when it is empty: no `instructors` named makes it the organization's default policy, applying to every coach who has none of their own; no `classTypes` covers every kind of class; no `entranceScopes` covers every way an attendee got in.\n\nFiltering by `instructorId` returns the policies that actually decide that coach's pay - the ones naming them, plus the default policies that would otherwise apply.\n\nThere is no paging: an organization has a handful of these. The pay ledger - what a coach has actually accrued - is not on this API.\n",
+        "description": "Returns the organization's pay rate policies - the rules for what the club pays its coaches. This is not an instructor's `hourlyRate`, which is what a member pays for an hour of their time; the two travel in opposite directions.\n\nA policy earns a coach either a flat amount per unit of work (a private session, a class, an attendee) or a percentage of what that work took, and covers a slice of the schedule described by three independent filters. Each one means **everything** when it is empty: no `instructors` named makes it the organization's default policy, applying to every coach who has none of their own; no `classTypes` covers every kind of class; no `entranceScopes` covers every way an attendee got in.\n\nFiltering by `instructorId` returns the policies that actually decide that coach's pay - the ones naming them, plus the default policies that would otherwise apply.\n\nThere is no paging: an organization has a handful of these. What a coach has actually accrued is the pay ledger, `GET /v1/platform/pay-ledger`.\n",
         "tags": [
           "Pay Rate Policies"
         ],
@@ -22316,7 +25138,7 @@
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `instructors:read` scope",
+            "description": "Missing the required `instructors:read` scope, or, for a member of staff signed in over MCP, `staff:read` (`requiredScope` names which)",
             "content": {
               "application/json": {
                 "schema": {
@@ -22449,7 +25271,7 @@
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
           "403": {
-            "description": "API key is missing the required `instructors:read` scope",
+            "description": "Missing the required `instructors:read` scope, or, for a member of staff signed in over MCP, `staff:read` (`requiredScope` names which)",
             "content": {
               "application/json": {
                 "schema": {
@@ -25065,7 +27887,7 @@
       "get": {
         "operationId": "getRevenueReport",
         "summary": "Revenue report for a period",
-        "description": "What the organization earned over a period, and from what, where and how it compares - in one request rather than a walk of the transactions list.\n\nRevenue is recognised ex-tax on the day of the sale, on the organization's own clock, net of refunds and of anything Wallet credit paid for. `collected` is the part of it already paid, on the same basis, so `uncollected` is what the period sold that has not been paid yet. These are the figures of the admin's daily revenue chart for the same days.\n\nThe period is compared with the same number of days just before it (`compare=previous_period`, the default) or the same dates a year earlier (`previous_year`); every breakdown row then carries its revenue in that period and the change, and `movers` lists the streams, clubs and items that moved most. Breakdowns: by revenue stream (bookings, memberships, passes, drop-ins, products, other), by club (unless `clubId` narrows the report to one), by revenue account (unless `revenueAccountId` narrows it to one), by the payment method that collected the money, and the top items sold (a class or court, a plan, a product). `trend` buckets the period by day, week (starting Monday) or month - by default a month or less by day, up to six months by week, anything longer by month.\n\nAmounts are in the organization's `currency`. Readable with either `transactions:read` or `analytics:read`. A period may span at most 366 days. Reports have their own limit of 20 requests a minute, on top of the platform's.\n",
+        "description": "What the organization earned over a period, and from what, where and how it compares - in one request rather than a walk of the transactions list.\n\nRevenue is recognised ex-tax on the day of the sale, on the organization's own clock, net of refunds and of anything Wallet credit paid for. `collected` is the part of it already paid, on the same basis, so `uncollected` is what the period sold that has not been paid yet. These are the figures of the admin's daily revenue chart for the same days.\n\nThe period is compared with the same number of days just before it (`compare=previous_period`, the default) or the same dates a year earlier (`previous_year`); every breakdown row then carries its revenue in that period and the change, and `movers` lists the streams, clubs and items that moved most. Breakdowns: by revenue stream (bookings, memberships, passes, drop-ins including paid walk-in check-ins, products, other), by club (unless `clubId` narrows the report to one), by revenue account (unless `revenueAccountId` narrows it to one), by the payment method that collected the money, and the top items sold (a class or court, a plan, a product). `trend` buckets the period by day, week (starting Monday) or month - by default a month or less by day, up to six months by week, anything longer by month.\n\nAmounts are in the organization's `currency`. Readable with either `transactions:read` or `analytics:read`. A period may span at most 366 days. Reports have their own limit of 20 requests a minute, on top of the platform's.\n",
         "tags": [
           "Reports"
         ],
@@ -25757,6 +28579,899 @@
                 }
               }
             }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/shift-rotation-assignments": {
+      "get": {
+        "operationId": "listShiftRotationAssignments",
+        "summary": "List rotation assignments",
+        "description": "Returns which coach is on which rotation, and over which days.",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "instructorId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "rotationId",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The assignments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformShiftRotationAssignment"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createShiftRotationAssignment",
+        "summary": "Assign a coach to a rotation",
+        "description": "Puts a coach on a rotation from `effectiveFrom` (to `effectiveTo`, or open-ended) and materializes their shifts on the staff roster: to the end date, or eight weeks ahead for an open-ended assignment, extended nightly. From then on the coach is bookable only within those shifts. A coach is on one rotation at a time: dates overlapping another of their assignments are refused with a 409.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "instructorId",
+                  "rotationId",
+                  "effectiveFrom"
+                ],
+                "properties": {
+                  "instructorId": {
+                    "type": "integer"
+                  },
+                  "rotationId": {
+                    "type": "integer"
+                  },
+                  "cycleOffset": {
+                    "type": "integer",
+                    "description": "Zero-based week of the cycle the coach starts on. Defaults to 0."
+                  },
+                  "effectiveFrom": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "effectiveTo": {
+                    "type": "string",
+                    "format": "date",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The assignment, and the shifts it generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformShiftRotationAssignmentResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "description": "The coach already has an assignment overlapping these dates; `details.assignmentId` names it",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/shift-rotation-assignments/{id}": {
+      "patch": {
+        "operationId": "updateShiftRotationAssignment",
+        "summary": "Update a rotation assignment",
+        "description": "Moves the coach to another rotation, shifts where in the cycle they start, or changes the dates, then regenerates their staff roster. Shifts edited by hand are left as they are.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "minProperties": 1,
+                "properties": {
+                  "rotationId": {
+                    "type": "integer"
+                  },
+                  "cycleOffset": {
+                    "type": "integer"
+                  },
+                  "effectiveFrom": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "effectiveTo": {
+                    "type": "string",
+                    "format": "date",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The assignment, and the shifts it generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformShiftRotationAssignmentResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "description": "The new dates overlap another of the coach's assignments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteShiftRotationAssignment",
+        "summary": "Remove a rotation assignment",
+        "description": "Takes the coach off the rotation and removes the shifts it generated. Shifts edited or added by hand stay on the staff roster.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/shift-rotations": {
+      "get": {
+        "operationId": "listShiftRotations",
+        "summary": "List shift rotations",
+        "description": "Returns the weekly shift patterns coaches are assigned to. A rotation is one to twelve weeks long; each slot puts a shift template on one weekday of one week of the cycle, and a day with no slot is a day off.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "clubId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only rotations for this club, and those for every club"
+          },
+          {
+            "in": "query",
+            "name": "includeInactive",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The organization's rotations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformShiftRotation"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createShiftRotation",
+        "summary": "Create a shift rotation",
+        "description": "Adds a weekly shift pattern. Nobody works it until a coach is assigned with `POST /v1/platform/shift-rotation-assignments`.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PlatformShiftRotationWrite"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "cycleWeeks"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The created rotation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformShiftRotation"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/shift-rotations/{id}": {
+      "get": {
+        "operationId": "getShiftRotation",
+        "summary": "Get a shift rotation",
+        "description": "Returns one rotation with its full pattern - which shift template falls on which weekday of each week of the cycle.",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The rotation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformShiftRotation"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateShiftRotation",
+        "summary": "Update a shift rotation",
+        "description": "Send only what changes; `slots`, when sent, replaces the whole pattern. The staff roster of every coach on the rotation is regenerated from the new pattern, leaving shifts edited by hand as they are.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformShiftRotationWrite"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated rotation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformShiftRotation"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteShiftRotation",
+        "summary": "Delete a shift rotation",
+        "description": "Refused with a 409 while any coach is still assigned to it; remove the assignments first.",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PlatformConflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/shift-templates": {
+      "get": {
+        "operationId": "listShiftTemplates",
+        "summary": "List shift templates",
+        "description": "Returns the named shifts the staff roster is built from (\"Morning, 06:00-14:00\", with its breaks). A template's times are the wall clock of the club the shift is worked at. Inactive templates are left out unless asked for.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "clubId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only templates for this club, and those for every club"
+          },
+          {
+            "in": "query",
+            "name": "includeInactive",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The organization's shift templates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformShiftTemplate"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createShiftTemplate",
+        "summary": "Create a shift template",
+        "description": "Adds a named shift with its breaks. On its own it puts nobody to work: place it on the days of a rotation, then assign coaches to the rotation.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PlatformShiftTemplateWrite"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "startTime",
+                      "endTime"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The created template",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformShiftTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/shift-templates/{id}": {
+      "get": {
+        "operationId": "getShiftTemplate",
+        "summary": "Get a shift template",
+        "description": "Returns one shift template with its breaks, on the wall clock of the club it is worked at.",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The shift template",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformShiftTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateShiftTemplate",
+        "summary": "Update a shift template",
+        "description": "Send only what changes; `breaks`, when sent, replaces the whole set. Shifts already on the staff roster keep the times they were generated with until their rotation is next regenerated.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformShiftTemplateWrite"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated template",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformShiftTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteShiftTemplate",
+        "summary": "Delete a shift template",
+        "description": "Deletes the template, or, when a rotation still places it on a day, deactivates it instead so that rotation keeps its pattern; `deactivated` says which happened.\n",
+        "tags": [
+          "Staff Roster"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted, or deactivated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "deactivated": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"
@@ -29588,7 +33303,7 @@
       "put": {
         "operationId": "updateWebsiteLayout",
         "summary": "Update the site header or footer",
-        "description": "The header and footer are site-level and render on every page. Config is merged into what is there, creating the slot if the site has none.\nThe link arrays (`navItems` on the header, `linkCategories`/`links` on the footer) **replace** rather than merge - read the current layout from `GET /v1/platform/website` and send the complete array, or you will drop the links you left out.\n",
+        "description": "The header and footer are site-level and render on every page. Config is merged into what is there, creating the slot if the site has none.\nThe link arrays (`navItems` on the header, `linkCategories`/`links` on the footer) **replace** rather than merge - read the current layout from `GET /v1/platform/website` and send the complete array, or you will drop the links you left out. Keep each link's `_id` when you send it back: translations are keyed on it, and a link without one gets a new id and loses its translations.\n`translations` localizes the header or footer the way it does a page section, and like there it **replaces** the slot's whole locale map. A link is addressed by its `_id`, which `GET /v1/platform/website` returns on every item: `navItems.<_id>.label`, `navItems.<_id>.children.<_id>.label`, `linkCategories.<_id>.links.<_id>.label`.\n",
         "tags": [
           "Website"
         ],
@@ -29631,6 +33346,10 @@
                   "config": {
                     "type": "object",
                     "description": "Header or footer config. See GET /section-types for the fields."
+                  },
+                  "translations": {
+                    "type": "object",
+                    "description": "Per-locale overrides of this slot's config, keyed by locale then field path: `{ \"en\": { \"ctaTitle\": \"…\", \"navItems.<_id>.label\": \"…\" } }`. Replaces the whole map; omit it to keep the current one. Leave `config` in the language the site is written in.\n"
                   }
                 }
               }
@@ -29746,588 +33465,6 @@
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/competitors": {
-      "get": {
-        "operationId": "listCompetitors",
-        "summary": "List competitors",
-        "description": "Every competitor the organization follows, by name: its website, its Google rating (read live, cached for a day), when its website was last read and what that reading found changed. `ownClubs` is the organization's own clubs' Google standing to compare against. `available` is false when the plan does not have Competitors (Grow): the list can still be read, edited and pruned, but nothing is added and no website is read. Requires `competitors:read`.\n",
-        "tags": [
-          "Competitors"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The organization's competitors",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformCompetitorList"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `competitors:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      },
-      "post": {
-        "operationId": "createCompetitor",
-        "summary": "Add a competitor",
-        "description": "Adds a club to follow. Its website is read in the background within about a minute, then every week; `lastCheckedAt` stays null until the first reading lands. Give its own website, not a social profile (400, code `competitor_website_invalid`), or its Google place id, which brings the website with it. A club already on the list by place or website is a 409 (code `competitor_exists`); a full list of 10 is a 400 (code `competitor_limit`). Requires `competitors:write`. Supports the `Idempotency-Key` header.\n",
-        "tags": [
-          "Competitors"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "Idempotency-Key",
-            "schema": {
-              "type": "string",
-              "maxLength": 255
-            },
-            "description": "Retry-safe key; a repeat of the same request replays the first response"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PlatformCompetitorCreate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The competitor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformCompetitor"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `competitors:write` scope, or the plan does not have Competitors (code `plan_not_grow`)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "This club is already on the list",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/competitors/market": {
-      "get": {
-        "operationId": "getCompetitorMarket",
-        "summary": "Compare prices with the market",
-        "description": "Every club's prices side by side, competitors and the organization's own, in the organization's currency. Prices are grouped into benchmarks - one thing two or more clubs price, in one unit (a monthly membership, a visit, an hour of a padel court) - and each club is compared at its cheapest regular price, a concession only where it lists nothing else.\n\n`priceIndex` is a club's prices against the market median, where 100 is the median: 88 means 12% below the market. Read it with the club's Google `rating` for its value: a club rated above the market but priced below it gives more than it charges for. A caller holding `competitors:write` also has outdated readings redone in the background (`refreshing` is then true). Requires `competitors:read`.\n",
-        "tags": [
-          "Competitors"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The market comparison",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformCompetitorMarket"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `competitors:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/competitors/import-ai-report": {
-      "post": {
-        "operationId": "createCompetitorImportAiReport",
-        "summary": "Import competitors from the AI report",
-        "description": "Adds the nearby clubs the organization's latest AI visibility report found, skipping those already on the list, up to the list's limit of 10. Their websites are read in the background. Requires `competitors:write`.\n",
-        "tags": [
-          "Competitors"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "Idempotency-Key",
-            "schema": {
-              "type": "string",
-              "maxLength": 255
-            },
-            "description": "Retry-safe key; a repeat of the same request replays the first response"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "How many were added",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "imported": {
-                      "type": "integer"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `competitors:write` scope, or the plan does not have Competitors (code `plan_not_grow`)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/competitors/{id}": {
-      "get": {
-        "operationId": "getCompetitor",
-        "summary": "Get a competitor",
-        "description": "One competitor with its latest readings of its website, newest first: the prices, offers and services each found, the pages it read them from, and what changed since the reading before. Requires `competitors:read`.\n",
-        "tags": [
-          "Competitors"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Competitor id"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The competitor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformCompetitorDetail"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `competitors:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/PlatformNotFound"
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      },
-      "patch": {
-        "operationId": "updateCompetitor",
-        "summary": "Update a competitor",
-        "description": "Changes what is stored about a competitor; send only what changes. A new website discards the readings of the old one, which describe another site, and is read again. Requires `competitors:write`.\n",
-        "tags": [
-          "Competitors"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Competitor id"
-          },
-          {
-            "in": "header",
-            "name": "Idempotency-Key",
-            "schema": {
-              "type": "string",
-              "maxLength": 255
-            },
-            "description": "Retry-safe key; a repeat of the same request replays the first response"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PlatformCompetitorUpdate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The competitor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformCompetitor"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `competitors:write` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/PlatformNotFound"
-          },
-          "409": {
-            "description": "Another competitor on the list has this place or website",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      },
-      "delete": {
-        "operationId": "deleteCompetitor",
-        "summary": "Remove a competitor",
-        "description": "Takes a competitor off the list, with its price history. Requires `competitors:write`.\n",
-        "tags": [
-          "Competitors"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Competitor id"
-          },
-          {
-            "in": "header",
-            "name": "Idempotency-Key",
-            "schema": {
-              "type": "string",
-              "maxLength": 255
-            },
-            "description": "Retry-safe key; a repeat of the same request replays the first response"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Removed"
-          },
-          "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `competitors:write` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/PlatformNotFound"
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/competitors/{id}/analysis": {
-      "get": {
-        "operationId": "listCompetitorAnalysis",
-        "summary": "Analyse a competitor's reviews",
-        "description": "What the competitor's latest Google reviews praise and complain about, and how the organization compares: where it is ahead, where the competitor is, and what to do next. Written by a model in `language` and cached while the reviews and readings behind it stay the same. 503 (code `ai_unavailable`) when the model is not available. At most 30 new analyses an hour per organization; one already written does not count. Requires `competitors:read`.\n",
-        "tags": [
-          "Competitors"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Competitor id"
-          },
-          {
-            "in": "query",
-            "name": "language",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "en",
-                "bg",
-                "es",
-                "fr",
-                "de",
-                "cs"
-              ],
-              "default": "en"
-            },
-            "description": "The language the analysis is written in"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The analysis",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformCompetitorAnalysis"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `competitors:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/PlatformNotFound"
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/competitors/{id}/refresh": {
-      "post": {
-        "operationId": "createCompetitorRefresh",
-        "summary": "Read a competitor's website again",
-        "description": "Asks Google for the competitor's rating again and reads its website now rather than at the next weekly reading. Once every few minutes per competitor: sooner is a 429 (code `competitor_refresh_cooldown`). Requires `competitors:write`.\n",
-        "tags": [
-          "Competitors"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Competitor id"
-          },
-          {
-            "in": "header",
-            "name": "Idempotency-Key",
-            "schema": {
-              "type": "string",
-              "maxLength": 255
-            },
-            "description": "Retry-safe key; a repeat of the same request replays the first response"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Read again"
-          },
-          "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `competitors:write` scope, or the plan does not have Competitors (code `plan_not_grow`)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/PlatformNotFound"
-          },
-          "429": {
-            "description": "Read a few minutes ago, or the rate limit was exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
           }
         }
       }

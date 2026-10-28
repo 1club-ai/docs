@@ -1,10 +1,10 @@
 ---
 title: Automations
-description: Build event-driven workflows that message members, manage tags, and notify staff automatically - with built-in reminders and one-click blueprints.
-keywords: [automations, workflows, triggers, blueprints, win-back, review request, birthday, booking reminder, drip campaign, notify staff]
+description: Build event-driven workflows that message members, manage tags, and notify staff automatically - with trigger filters, goals, built-in reminders, and one-click blueprints.
+keywords: [automations, workflows, triggers, trigger filters, goals, stop when, conversion, blueprints, win-back, review request, birthday, booking reminder, drip campaign, notify staff]
 ---
 
-Automations are event-driven workflows that run in the background. A trigger fires (a booking is created, a membership expires, a payment fails), the contact is checked against the automation's entry conditions, and a sequence of steps then runs for that contact: send a message, wait, branch on a condition, add a tag, notify staff. Owners and managers build them, members receive the messages, and staff get notified when a person needs to follow up.
+Automations are event-driven workflows that run in the background. A trigger fires (a booking is created, a membership expires, a payment fails), the contact is checked against the automation's entry conditions, and a sequence of steps then runs for that contact: send a message, wait, branch on a condition, add a tag, notify staff. Owners and managers build them, members receive the messages, and staff get notified when a person needs to follow up. Give an automation a **goal** (books again, buys a membership, pays) and it stops messaging a member who reaches it, and the **Performance** tab counts how many did.
 
 ## When to use it
 
@@ -23,9 +23,10 @@ See [Worked examples](#worked-examples) for step-by-step versions of these, and 
 
 1. A **trigger** event happens in the system (for example, a booking is created).
 2. The contact is matched against the automation's **entry conditions** (contact type, tags, pipeline stage, source). If they don't match, nothing happens.
-3. A **run** is created and the first step is scheduled.
+3. A **run** is created and the first step is scheduled. A contact is never in the same automation twice at once.
 4. The background worker picks up scheduled steps and executes them in order.
 5. Each step records its outcome. A step that errors is tried up to three times before it and its run are marked failed.
+6. A run ends early when the contact reaches the automation's **goal** or does one of its **stop when** events. See [Goals and stop events](#goals-and-stop-events).
 
 Each row on the automations list shows how many times the automation has run, how many runs failed, and when it last fired.
 
@@ -42,46 +43,108 @@ On the Automations page, click into the assistant bar (**What can I help with?**
 
 ## Triggers
 
-Choose one trigger per automation. Triggers are grouped by domain:
+Choose one trigger per automation. The tables below list every trigger with the filters it takes. Every filter is optional: leave it empty and the trigger runs for everything it covers. [Trigger filters](#trigger-filters) explains each filter.
 
-### Bookings
+### Bookings and visits
 
-- **Booking created** - A member books a class or area.
-- **Booking cancelled** - A booking is cancelled (by the member or staff).
-- **Booking checked in** - A member checks in for their booking.
-- **Booking no-show** - A booking is marked as no-show.
-- **Booking completed** - A booked session is over and was neither cancelled nor missed.
-- **Booking upcoming** - Fires before the booking starts. Configure how far in advance (minutes, hours, or days). Used for reminders.
+| Trigger | Fires when | Filters |
+| --- | --- | --- |
+| **Booking created** | A member books a class or area. | Clubs, class types, area types, booked on, first booking only |
+| **Booking changed** | A booking is moved or changed and the member is told about it. | Clubs, class types, area types, booked on |
+| **Booking cancelled** | A booking is cancelled, by the member or by staff. | Clubs, class types, area types, booked on |
+| **Booking checked in** | A member checks in for their booking, or checks in to a class without one. | Clubs, class types, area types, booked on, first visit only |
+| **Booking no-show** | A booking is marked as no-show. | Clubs, class types, area types, booked on |
+| **Booking completed** | A booked session is over and was neither cancelled nor missed. Fires when the gym's day closes. | Clubs, class types, area types, booked on, first visit only |
+| **Visit completed** | A visit is over: a completed booking, or a member's check-ins on a day with no booking behind them (a door scan, a class rung up at the till). Fires once per visit when the gym's day closes. | Clubs, class types, area types, booked on, first visit only |
+| **Booking upcoming** | A set time before a booking starts (minutes, hours, or days). Used for reminders. | Clubs, class types, area types, booked on |
+| **Check-in failed** | A member's self check-in at a kiosk or check-in tablet doesn't go through. Runs only for a member who was recognized before it failed, since a failure before that has nobody to message. | Clubs |
+
+Use **Visit completed** to follow up on every visit, including members who train without booking. **Booking completed** only reaches members who booked.
 
 ### Memberships
 
-- **Membership created** - A new membership starts for a contact.
-- **Membership cancelled** - A membership is cancelled.
-- **Membership expiring** - Fires before a membership expires. Configure the advance window.
-- **Membership paused** - A membership is paused.
-- **Membership resumed** - A paused membership resumes.
-- **Membership expired** - A membership reaches its end and expires.
+| Trigger | Fires when | Filters |
+| --- | --- | --- |
+| **Membership created** | A new membership starts for a contact. | Plans, clubs, first membership only |
+| **Membership cancelled** | A membership is cancelled. | Plans, clubs |
+| **Membership expiring** | A set time before a membership ends. | Plans, clubs |
+| **Membership renewal upcoming** | One to two days before an auto-renewing membership is charged for its next period. | Plans, clubs, payment method |
+| **Membership paused** | A membership is paused. | Plans, clubs |
+| **Membership resumed** | A paused membership resumes. | Plans, clubs |
+| **Membership expired** | A membership reaches its end and expires. | Plans, clubs |
 
-Every membership trigger except **Membership cancelled** has a **Plans (any of)** filter. Leave it empty to run for every plan.
+Use **Membership renewal upcoming** with **Payment method (any of)** set to **None saved** or **Expired** to ask a member to add a card before the renewal fails, rather than chasing a failed payment afterwards.
 
 ### Payments
 
-- **Payment succeeded** - A payment is successfully captured.
-- **Payment failed** - A payment fails (card declined, insufficient funds, etc.).
+| Trigger | Fires when | Filters |
+| --- | --- | --- |
+| **Payment succeeded** | A payment is captured. | - |
+| **Payment failed** | A payment fails (card declined, insufficient funds, and so on). | - |
+| **Payment method saved** | A contact saves a card or another payment method they can be charged to. | - |
 
 ### Messaging and reviews
 
-- **Message received** - A contact sends an inbound message.
-- **Review submitted** - A member submits a review.
+| Trigger | Fires when | Filters |
+| --- | --- | --- |
+| **Message received** | A contact sends an inbound message. | - |
+| **Review submitted** | A member submits a review. | - |
+
+### Progress
+
+| Trigger | Fires when | Filters |
+| --- | --- | --- |
+| **Promotion or stripe** | A member is promoted to a new level or awarded a stripe on a [progression track](/settings/progression). | Kind: **Promotion** or **Stripe** |
+| **Assessment recorded** | A coach saves an [assessment](/members/assessments) with the member notified. Later edits to the same assessment don't fire it again. | - |
 
 ### Contact lifecycle
 
-- **Contact created** - A new contact is added.
-- **Contact type changed** - A contact's type changes, for example a lead becomes a member. Narrow it with **From type (any of)** and **To type (any of)**.
-- **Pipeline stage changed** - A contact moves to another stage of the [leads pipeline](/members/leads). Narrow it with **From stage (any of)** and **To stage (any of)**.
-- **Contact birthday** - Fires on the contact's birthday.
-- **Tag added** - A tag is added to a contact. Optionally restrict to specific tags with **Tags (any of)**.
-- **Tag removed** - A tag is removed from a contact. Optionally restrict to specific tags with **Tags (any of)**.
+| Trigger | Fires when | Filters |
+| --- | --- | --- |
+| **Contact created** | A new contact is added. | - |
+| **Contact type changed** | A contact's type changes, for example a lead becomes a member. | From type, to type |
+| **Pipeline stage changed** | A contact moves to another stage of the [leads pipeline](/members/leads). | From stage, to stage |
+| **Account activated** | A contact activates their account: they confirm a sign-up, sign up with Google, Apple, or Facebook, or accept an invitation. | - |
+| **Contact birthday** | On the contact's birthday. | - |
+| **Tag added** | A tag is added to a contact, by staff or by a [smart tag](/settings/smart-tagging) rule. | Tags |
+| **Tag removed** | A tag is removed from a contact. | Tags |
+
+### Smart tags as triggers
+
+Many of the moments worth acting on are [smart tags](/settings/smart-tagging), which 1club applies on its own as members' data changes. Pick **Tag added** and the smart tag under **Tags (any of)** to start an automation when a member reaches one.
+
+| Moment | Smart tag | Smart tag category |
+| --- | --- | --- |
+| A pass or class pack is almost used up | **Few Sessions Left** | Sessions Left |
+| A pass ran out and the member hasn't bought another | **No Sessions Left** | Sessions Left |
+| A pause is about to end | **Freeze Ending Soon** | Membership |
+| A membership anniversary is coming up | **Member Anniversary** | Membership |
+| A membership that won't renew is about to end | **Expiring**, **Expiring Soon** | Membership |
+| A member stopped coming | **At Risk** | At Risk |
+| A payment is overdue | **Past Due**, **Overdue** | Financial |
+| A member is ready for their next level | **Eligible for Promotion** | Progression |
+
+A smart tag can come off and go back on, for example when a member books and then cancels. Set **Days before the same contact can be enrolled again** on the trigger so the sequence doesn't start over from its first message each time.
+
+### Trigger filters
+
+Filters narrow which triggers start the automation by what the trigger is about: which booking, which plan, which gym. [Entry conditions](#entry-conditions) narrow it by who the contact is. Each filter matches any of the values you pick.
+
+| Filter | On triggers about | What it reads |
+| --- | --- | --- |
+| **Clubs (any of)** | Bookings, visits, memberships, failed check-ins | The gym the visit takes place in: its class's gym, else its area's, else its event's. For a membership, the gym it was sold for. A membership sold for your whole organization counts in every gym. Shown only when you have more than one gym. |
+| **Class types (any of)** | Bookings and visits | The class type of the booked class or the class checked in to. A booking for an area has no class type, so it doesn't match. |
+| **Area types (any of)** | Bookings and visits | The area type of the booked area, or of the area the class runs in. |
+| **Booked on (any of)** | Bookings and visits | Where the booking was made: **Admin**, **Member portal**, **1club App**, **Branded App**, **1club marketplace**, **Website**, **Kiosk**, **Integration**, or **API**. |
+| **Plans (any of)** | Memberships | The plan the membership is on. |
+| **Payment method (any of)** | Membership renewal upcoming | Whether the member has a payment method the renewal can be charged to: **Saved**, **None saved**, or **Expired**. |
+| **Kind (any of)** | Promotion or stripe | **Promotion** or **Stripe**. |
+| **From type** / **To type** | Contact type changed | The type the contact moved from and to. |
+| **From stage** / **To stage** | Pipeline stage changed | The pipeline stage the contact moved from and to. |
+| **Tags (any of)** | Tag added, Tag removed | The tag that was added or removed. |
+| **First only** | Booking created, Booking checked in, Booking completed, Visit completed, Membership created | Runs for the contact's first booking, first visit, or first membership only. A booking cancelled before it doesn't count as an earlier one. A first visit is the first time they attended, by booking or by check-in. |
+
+A filter whose answer 1club can't read doesn't match. For example, a class type filter never matches a booking for an area.
 
 ## Entry conditions
 
@@ -95,6 +158,40 @@ Entry conditions, shown under **Run only for** in the trigger's settings, filter
 If none is set, the automation runs for every contact the trigger applies to.
 
 Turn on **Stop when the contact no longer matches** to recheck the conditions before every step. The run ends as soon as the contact stops matching, so a nurture sequence for leads stops when the lead becomes a member instead of messaging them after the next wait.
+
+**Days before the same contact can be enrolled again** keeps a contact out of the automation for a number of days after they last entered it, however that run ended. Leave it empty to let a contact enter again as soon as their last run ends.
+
+## Goals and stop events
+
+A **goal** says what the automation is for, and **stop when** lists what ends it early. Both are set on the trigger, below **Run only for**, and both are made of triggers: you pick a trigger type and, optionally, the same filters that trigger takes.
+
+| | Goal | Stop when |
+| --- | --- | --- |
+| **What it is** | What you want the member to do, for example book again or buy a membership | Something that makes the rest of the sequence pointless, for example replying to the message |
+| **While a run is in progress** | Ends the run as completed, records that it reached the goal, and skips the steps left | Ends the run as stopped early |
+| **After the last step** | Still credits the run for a number of days (**Days it still counts after the last step**, up to 30) | Has no effect |
+| **Shown on** | **Reached goal** on the Performance tab, and on the run in the History tab | **Stopped early** with the reason "The contact did something that stops it" |
+
+How they behave:
+
+- **Add a goal event** to set a goal. A run reaches the goal when the contact does any of its events. Remove the last event to clear the goal.
+- **Add an event** under **Stop when** to add a stop event. A contact who does any of them leaves the automation.
+- The trigger that started a run never counts as its goal or as a stop event. An automation that starts on **Booking created** with the goal **Booking created** counts the next booking, not the one that started it.
+- An event that is both a goal and a stop event counts as the goal.
+- The window after the last step matters for win-backs. The last step is usually the message, and the booking it earns comes later: with a 7-day window, a member who books 3 days after the last message still counts as won back.
+- A check-in that staff record after the fact still reaches a goal, since the visit happened. A check-in recorded ahead of the visit doesn't.
+- The scheduled triggers (**Booking upcoming**, **Membership expiring**, **Membership renewal upcoming**, **Contact birthday**) can't be goals or stop events, because they're a date coming round, not something the member did.
+
+Examples:
+
+| Automation | Goal | Window | Stop when |
+| --- | --- | --- | --- |
+| No-show win-back | **Booking created** | 7 days | - |
+| Membership win-back | **Membership created** | 14 days | - |
+| Failed-payment recovery | **Payment succeeded** | 7 days | - |
+| Trial conversion | **Contact type changed** to Member | 14 days | - |
+| At-risk member win-back | **Booking created** or **Booking checked in** | 7 days | - |
+| Lead nurture by message | **Membership created** | 14 days | **Message received** |
 
 ## Steps
 
@@ -222,14 +319,16 @@ A suggestion appears only when all three are true:
 
 The catalog of suggested blueprints:
 
-| Blueprint | Trigger | What it does | Prerequisites |
-| --- | --- | --- | --- |
-| **New-member onboarding drip** | Contact type changed (to Member) | A three-touch welcome series over the first week (welcome, wait 2 days, tips, wait 3 days, "book your first session"), then tags the member as onboarded. | Onboarded tag (created for you) |
-| **Review request** | Booking checked in | Waits 2 hours after the check-in, then sends a review request by email (after the first session and every 10 sessions after that, and never more than one a week). | Gym runs bookings |
-| **No-show win-back** | Booking no-show | Branches on whether the member still has an active membership, then sends a tailored nudge to each path. | Gym runs bookings |
-| **Membership win-back** | Membership cancelled | Tags the member as at-risk, waits 3 days, then sends a win-back message. | Membership plans exist, At risk tag (created for you) |
-| **Birthday celebration** | Contact birthday | Generates a warm, personalized birthday message with AI. The step is set to **Save as draft**, so nothing is sent until you switch it to **Auto-send**. | None |
-| **Failed-payment recovery** | Payment failed | Notifies your admins and managers, then messages the member to update their payment details. | Stripe connected |
+| Blueprint | Trigger | What it does | Goal | Prerequisites |
+| --- | --- | --- | --- | --- |
+| **New-member onboarding drip** | Contact type changed (to Member) | A three-touch welcome series over the first week (welcome, wait 2 days, tips, wait 3 days, "book your first session"), then tags the member as onboarded. | - | Onboarded tag (created for you) |
+| **Review request** | Booking checked in | Waits 2 hours after the check-in, then sends a review request by email (after the first session and every 10 sessions after that, and never more than one a week). | - | Gym runs bookings |
+| **No-show win-back** | Booking no-show | Branches on whether the member still has an active membership, then sends a tailored nudge to each path. | Books again, within 7 days | Gym runs bookings |
+| **Membership win-back** | Membership cancelled | Tags the member as at-risk, waits 3 days, then sends a win-back message. | Buys a membership, within 14 days | Membership plans exist, At risk tag (created for you) |
+| **Birthday celebration** | Contact birthday | Generates a warm, personalized birthday message with AI. The step is set to **Save as draft**, so nothing is sent until you switch it to **Auto-send**. | - | None |
+| **Failed-payment recovery** | Payment failed | Notifies your admins and managers, then messages the member to update their payment details. | The payment succeeds, within 7 days | Stripe connected |
+| **At-risk member win-back** | Tag added (At Risk) | Reaches out over three weeks to a member who stopped coming, and stops when the At Risk tag comes off. | Books or checks in, within 7 days | At Risk smart tag on, membership plans exist |
+| **Trial conversion** | Pipeline stage changed (to your trial stage) | Welcomes the lead, reminds them before their trial, and follows up the morning after depending on whether they came. | Becomes a member, within 14 days | A trial stage in your pipeline, gym runs bookings |
 
 The **Review request** blueprint can also be turned on from the **Marketing** card on [Home](/home/overview): its **Turn on** button creates the automation, activates it straight away, and opens it in the builder. Because it fires on check-in, gyms that don't check members in by hand need **Auto check-in at booking start** in a [booking policy](/settings/booking-policies) for any request to go out.
 
@@ -266,10 +365,12 @@ Picking a template copies its content into the step, so later edits to the templ
 2. Click **Add Automation**.
 3. Give it a name and description.
 4. Select the trigger node, pick a **Trigger type**, and configure its options.
-5. Set **entry conditions** under **Run only for** if you want to limit who the automation runs for.
-6. Add steps from the palette and configure each one in the right sidebar.
-7. For each **Send message** step, choose channels and either write content inline or start from a template.
-8. Click **Save**.
+5. Narrow the trigger with its [filters](#trigger-filters) if it should run only for some gyms, classes, plans, or a contact's first time.
+6. Set **entry conditions** under **Run only for** if you want to limit who the automation runs for.
+7. Set a **Goal** and any **Stop when** events (see [Goals and stop events](#goals-and-stop-events)).
+8. Add steps from the palette and configure each one in the right sidebar.
+9. For each **Send message** step, choose channels and either write content inline or start from a template.
+10. Click **Save**.
 
 A new automation starts with the **Active** switch off, so it is saved paused. Review it, then turn it on when you're ready (see [Activating and pausing](#activating-and-pausing)).
 
@@ -279,6 +380,32 @@ New custom automations and accepted blueprints always land **paused** so you can
 
 Steps run for real once an automation is active - real emails, real SMS, real staff notifications. If you want to see how a workflow behaves before opening it to your whole audience, narrow the entry conditions to a tag that only a test contact carries, turn it on, trigger the event yourself, then widen the conditions once you're happy.
 
+## Performance and history
+
+Open a saved automation and switch from **Workflow** to the **Performance** or **History** tab to see how it's doing.
+
+**Performance** counts the runs that started in the period you pick:
+
+| Card | What it counts |
+| --- | --- |
+| **Enrollments** | Each time a contact entered the automation. A contact who entered twice counts twice. |
+| **In progress** | Contacts in the automation right now, whenever they entered. |
+| **Reached goal** | Runs whose contact reached the goal, while in progress or within the window after, with their share of enrollments. Shown only when the automation has a goal. |
+| **Completed** | Runs that finished their steps, or ended by reaching the goal. |
+| **Stopped early** | Runs that ended before their last step, broken down by reason. |
+| **Failed** | Runs whose step failed after its retries. |
+
+Below the cards, **Enrollments over time** charts entries per day, and **Messages** shows what the automation's messages did on each channel (sent, delivered, clicked, not delivered, unsubscribed).
+
+**History** lists every run with the contact, when they entered, the step they're on, and how the run ended. A run that reached the goal is marked **Reached goal**. Hover a stopped run to see why it stopped:
+
+| Reason | What happened |
+| --- | --- |
+| The contact no longer matched | **Stop when the contact no longer matches** is on and the contact left the entry conditions. |
+| Their step was removed | The step the run was waiting at was deleted from the automation. |
+| The automation was turned off | The automation was paused while the run was in progress. |
+| The contact did something that stops it | The contact did one of the **Stop when** events. |
+
 ## Limits and behavior
 
 - Steps are executed by a background worker that polls every minute. Expect up to a minute of delay between when a step is scheduled and when it runs.
@@ -286,7 +413,7 @@ Steps run for real once an automation is active - real emails, real SMS, real st
 - Messaging steps are skipped when the trigger was recorded without notifying the customer (for example a booking made by a partner platform). Tagging, staff notifications, and conditions still run.
 - For the **Membership expiring** trigger, a **Send message** or **AI message** step is skipped if the membership was renewed, cancelled, or switched to auto-renew between the trigger and the send.
 - Completed and cancelled runs are archived after about 90 days; processed trigger events after about 30 days. Failed runs are kept indefinitely so you can investigate.
-- One trigger event creates at most one run per contact per automation.
+- A contact is in an automation at most once at a time. Two triggers for the same contact that arrive together, such as two bookings made a second apart, start one run, not two.
 
 ## Worked examples
 
@@ -322,10 +449,39 @@ You want reviews from players who actually showed up, without nagging regulars.
 2. A **Condition** on **Has active membership** splits the run: members who missed a class get a light "we missed you, rebook anytime" nudge on the **Yes** path.
 3. Contacts with no active membership take the **No** path and get a stronger win-back offer instead.
 
+### Trial conversion for a CrossFit box
+
+You want leads who take a free trial class to join, and you want to know how many do.
+
+1. Accept the **Trial conversion** blueprint, or build it on **Pipeline stage changed** with **To stage** set to your trial stage.
+2. The steps welcome the lead, remind them before their trial, and follow up the morning after, with a different message for leads who came and leads who didn't.
+3. The goal is **Contact type changed** to **Member** with a 14-day window. A lead who buys a membership midway stops getting trial messages, and one who joins a week after the last follow-up still counts.
+4. Check the **Reached goal** card on the **Performance** tab each month to see your trial conversion rate.
+
+### First-visit welcome for a climbing gym
+
+Your members mostly walk in without booking, and you want to welcome each new member after their first session.
+
+1. Create an automation on **Visit completed**, so it reaches walk-ins as well as bookings.
+2. Turn on **Only the contact's first visit**.
+3. If you run more than one gym, set **Clubs (any of)** so each gym sends its own welcome.
+4. Add a **Wait** of 1 day, then a **Send message** step with a tips-and-next-steps message.
+
+### Pack running low for a pilates studio
+
+You want to sell the next class pack before the current one runs out.
+
+1. Turn on the **Sessions Left** smart tag category and set **Few Sessions Left** to 2 sessions.
+2. Create an automation on **Tag added** with **Tags (any of)** set to **Few Sessions Left**.
+3. Add a **Send message** step offering the next pack.
+4. Set the goal to **Membership created** with **Plans (any of)** set to your class packs, so the run ends when the member buys.
+
 ## Tips and best practices
 
 - **Start from a blueprint.** Even if you plan to customize heavily, accepting a suggested blueprint gives you a correct trigger, timing, and step graph to edit rather than a blank canvas.
 - **Keep automations paused until you've read every step.** Content is copied from templates when you pick them, so proofread inside the builder, not in the template.
+- **Give win-backs and conversions a goal.** It stops the sequence when the member does what you asked, and it's the only way to see on the **Performance** tab whether the automation works.
+- **Filter the trigger, not the audience, for what happened.** To act on a Gold plan sale, use **Plans (any of)** on **Membership created**. An entry condition only asks what the contact holds, so a Gold member buying a day pass would pass it too.
 - **Use entry conditions to avoid overlap.** If two automations react to the same trigger, scope each one with a contact type or tag so a contact doesn't get two messages at once.
 - **Anchor waits deliberately.** On booking triggers a **Wait** can measure from the trigger, the booking start, or the booking end. The wrong anchor sends at the wrong moment.
 - **Pace review requests by sessions, not just by time.** A time cap alone never fills up for an infrequent visitor, so they get asked after every single visit. Set **Sessions between requests** and keep the frequency limit as the ceiling.
@@ -344,10 +500,17 @@ You want reviews from players who actually showed up, without nagging regulars.
 | A member got two messages from one event | Two automations share the trigger | Add non-overlapping entry conditions (contact type or tag) so only one applies. |
 | The review request is on but no requests go out | It fires on check-in, and nobody is checked in | Check members in, or turn on **Auto check-in at booking start** in a [booking policy](/settings/booking-policies). |
 | An AI message step never reaches anyone | Its **Mode** is **Save as draft**, which generates the message without sending it | Switch the step to **Auto-send**. |
+| A trigger with a class type filter never fires for some bookings | The bookings are for areas, which have no class type | Use **Area types (any of)** for area bookings, or add a second automation. |
+| **Only the contact's first booking** skips a new member | They booked before, for example as a lead | Expected - the filter means the first booking ever, at any gym. Use **Contact type changed** to Member for a new-member welcome. |
+| **Reached goal** stays at zero | The goal events don't match what members do, or they act after the window | Check the goal's filters, and lengthen **Days it still counts after the last step** (up to 30). |
+| The trigger that started a run didn't count as its goal | By design: the starting trigger never counts | Expected - the goal counts what the contact does next. |
+| **Check-in failed** never starts a run | Most failures happen before the member is recognized, so there's nobody to message | Expected - only failures after the member scanned their card or code start a run. |
+| A member gets the same sequence again and again | Its smart tag comes off and goes back on | Set **Days before the same contact can be enrolled again** on the trigger. |
 
 ## Related
 
 - [Marketing overview](/marketing/overview) - How automations fit alongside the website, forms, reviews, and the rest of the Marketing section.
+- [Smart tags](/settings/smart-tagging) - The tags 1club applies on its own, which **Tag added** can start an automation on.
 - [Templates](/settings/templates) - Reusable content you can start Send message steps from.
 - [Inbox overview](/inbox/overview) - Conversations and one-off sends.
 - [Member list](/members/member-list) - Tags and segments used in entry conditions and Modify contact steps.

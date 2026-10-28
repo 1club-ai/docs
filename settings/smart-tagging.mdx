@@ -38,13 +38,13 @@ Both types behave identically when you filter or segment. A promotion that targe
 The engine treats contacts differently depending on what they are:
 
 - **Members, drop-ins, lapsed members, and leads** (anyone who has booked, checked in, or held a plan, or who is in your [pipeline](/members/leads)) are eligible for every enabled category.
-- **Contacts with no activity** (never booked, checked in, or held a plan, and not in your pipeline) only receive **Age**, **Contact stages**, **Relationship**, **Language**, and **Payment method**. The activity-based categories (Attendance, Financial, Lifecycle, Loyalty, Membership, Interest, Progression, Assessment) don't apply until the contact becomes a lead or a customer.
+- **Contacts with no activity** (never booked, checked in, or held a plan, and not in your pipeline) only receive **Age**, **Contact stages**, **Relationship**, **Language**, and **Payment method**. The activity-based categories (Attendance, Financial, Lifecycle, Loyalty, Membership, Sessions Left, Interest, Progression, Assessment) don't apply until the contact becomes a lead or a customer.
 - **Staff** (instructors, managers, admins) never receive smart tags. Any auto-tag they picked up before becoming staff is stripped on the next evaluation; their manual tags are kept.
 - **Archived contacts** are frozen - their tags stay as a snapshot and are not recomputed.
 
 ## Categories
 
-Each category has an **Enable this tag category** switch. Within a category, a contact gets at most one tag - the highest matching tier - except **Interest** (one tag per qualifying sport), **Relationship** (a contact can be both Parent and Child), **Payment method** (one tag per kind of saved method), and **Progression** and **Assessment** (a member can carry more than one). Disable a category and every tag it produced is removed on the next sync.
+Each category has an **Enable this tag category** switch. Within a category, a contact gets at most one tag - the highest matching tier - except **Interest** (one tag per qualifying sport), **Relationship** (a contact can be both Parent and Child), **Payment method** (one tag per kind of saved method), **Membership** (Freeze Ending Soon and Member Anniversary apply alongside an expiry tier), and **Sessions Left**, **Progression** and **Assessment** (a member can carry more than one). Disable a category and every tag it produced is removed on the next sync.
 
 The categories below are listed in the order they appear on the page. Five are enabled out of the box: **Financial**, **Lifecycle**, **Membership**, **Contact stages**, and **Payment method**.
 
@@ -72,14 +72,26 @@ Tenure defaults: **Trial** (day 1+), **Probation** (day 15+), **Active** (day 46
 
 ### Membership (enabled by default)
 
-Monitors where a member sits relative to their membership expiry date. The field is labelled **Days Before Expiry**: a **positive** value means days *before* expiry; a **negative** value means days *after*.
+Tags members around three dates of their membership: when it ends, when a pause ends, and its yearly anniversary. The table has a **Rule** column saying which date each row counts to, and a **Days** column.
 
-Defaults: **Expiring** (7 days before), **Expiring Soon** (3 days before), **Expired** (7 days after).
+| Tag | Rule | Days | Default |
+| --- | --- | --- | --- |
+| **Expiring** | Days Before Expiry | A **positive** value means days *before* expiry; a **negative** value means days *after* | 7 days before |
+| **Expiring Soon** | Days Before Expiry | As above | 3 days before |
+| **Expired** | Days Before Expiry | As above | 7 days after |
+| **Freeze Ending Soon** | Days before the pause ends | 0 to 60 | Empty: tags nobody |
+| **Member Anniversary** | Days before the anniversary | 0 to 60 | Empty: tags nobody |
 
-Two behaviours worth knowing:
+The expiry tiers:
 
 - **Before-expiry** tiers only match memberships that are active and **not auto-renewing**. An auto-renewing membership is never flagged as expiring, because it isn't going to lapse.
 - **After-expiry** tiers only apply when the member has **no** active membership at all.
+- A member gets at most one expiry tier, the highest that matches. You can add, rename, recolour, or remove expiry tiers.
+
+**Freeze Ending Soon** and **Member Anniversary** apply alongside the expiry tiers, so a member can be **Expiring** and **Freeze Ending Soon** at once. Each is carried from its number of days ahead of the date through the day itself, on your gym's clock. They ship with **Days** empty and tag nobody until you set it. Both rows are fixed: you can rename, recolour, and set their days, but not delete them.
+
+- **Freeze Ending Soon** - a pause on one of the member's paused memberships, or on one shared with them, ends within the window. Pair it with [Frozen](#lifecycle-enabled-by-default) to welcome a member back before their first day.
+- **Member Anniversary** - the yearly return of the day the member's current stretch with you began, from the first year on, while they hold an active recurring membership or season pass. A member who left and came back counts from their return. A stretch begun on 29 February comes round on 28 February.
 
 ### Loyalty (disabled by default)
 
@@ -92,6 +104,17 @@ Defaults: **Legend** (50+), **Champion** (25+), **Pro** (10+), **Rising Star** (
 Groups members by how often they check in over a recent window. Each tier defines a **Minimum Visits** count and a **Period (Days)**.
 
 Defaults: **All-Star** (16+ visits / 30 days), **Regular** (8+), **Casual** (4+), **Low Activity** (1+), **Inactive** (0 in the period). Thresholds and periods are fully editable.
+
+### Sessions Left (disabled by default)
+
+Tags members whose pass or class pack is almost used up, or ran out recently and hasn't been bought again. Use it to sell the next pack before the current one runs out. It reads every limited allowance on the member's own passes and memberships, so a plan with several allowances (for example 10 classes and 5 open-gym visits) is checked allowance by allowance.
+
+| Tag | Applies when | Field | Default |
+| --- | --- | --- | --- |
+| **Few Sessions Left** | An active pass or membership has a limited allowance with at least 1 and at most this many sessions (or hours) left. An unlimited plan never runs low. | **Sessions left, at most** | 2 |
+| **No Sessions Left** | A pass was used up within this many days, and the member has no active pass of the same plan with sessions left. Buying the next pack takes the tag off. | **Days since it ran out** | 30 |
+
+Both rows are fixed: you can rename, recolour, and set their threshold, but not add or remove rows. A pass past its end date doesn't count for either tag. The tags update when a member books or checks in, as well as in the nightly run.
 
 ### Age (disabled by default)
 
@@ -156,8 +179,8 @@ Sitting at the bottom of the same page, engagement scoring is a related feature 
 2. For each category:
    - Toggle **Enable this tag category** on or off.
    - Edit a tier - adjust the threshold (visits, days, age range, and so on) and rename or recolour the tag.
-   - Add a tier with **Add Tag** (not available for Payment method, Relationship, Language, Interest, Progression, or Assessment, whose rows are fixed or derived).
-   - Delete a tier you don't need (the fixed Unpaid, Frozen, payment method, Parent/Child, language, progression, and assessment rows can't be deleted). Lifecycle's pipeline stage rows are managed under **Settings** > **Members** > **Pipeline**.
+   - Add a tier with **Add Tag** (not available for Payment method, Relationship, Language, Interest, Progression, Assessment, or Sessions Left, whose rows are fixed or derived).
+   - Delete a tier you don't need (the fixed Unpaid, Frozen, Freeze Ending Soon, Member Anniversary, Sessions Left, payment method, Parent/Child, language, progression, and assessment rows can't be deleted). Lifecycle's pipeline stage rows are managed under **Settings** > **Members** > **Pipeline**.
 3. Save with the floating save alert at the bottom of the page.
 
 Tag names must be unique within a category, and the dialog validates thresholds (for example, minimum visits can't be negative and overdue days must be at least 1).

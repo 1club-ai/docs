@@ -18,14 +18,14 @@ https://api.1club.ai
 
 Tools and AI agents can read the API and its companion services directly:
 
-| Resource | URL |
-| --- | --- |
-| OpenAPI spec | [`https://docs.1club.ai/openapi-platform.json`](https://docs.1club.ai/openapi-platform.json) |
-| Admin MCP server (OAuth) | `https://mcp.1club.ai` - see [Connect an AI assistant](/mcp/connect) |
-| Discovery MCP server (no sign-in) | `https://mcp.1club.me` |
+| Resource                          | URL                                                                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| OpenAPI spec                      | [`https://docs.1club.ai/openapi-platform.json`](https://docs.1club.ai/openapi-platform.json)                             |
+| Admin MCP server (OAuth)          | `https://mcp.1club.ai` - see [Connect an AI assistant](/mcp/connect)                                                     |
+| Discovery MCP server (no sign-in) | `https://mcp.1club.me`                                                                                                   |
 | OAuth protected resource metadata | [`https://mcp.1club.ai/.well-known/oauth-protected-resource`](https://mcp.1club.ai/.well-known/oauth-protected-resource) |
-| Agent resource catalog (ARD) | [`https://1club.ai/.well-known/ard.json`](https://1club.ai/.well-known/ard.json) |
-| LLM index | [`https://1club.ai/llms.txt`](https://1club.ai/llms.txt) |
+| Agent resource catalog (ARD)      | [`https://1club.ai/.well-known/ard.json`](https://1club.ai/.well-known/ard.json)                                         |
+| LLM index                         | [`https://1club.ai/llms.txt`](https://1club.ai/llms.txt)                                                                 |
 
 ## Official API contract
 
@@ -73,45 +73,48 @@ Each token is granted access to specific resources. Most resources offer **Read*
 
 - **Read** - allows fetching data (GET requests)
 - **Write** - allows creating and updating data (POST/PUT/PATCH requests, and the deletes a resource allows)
-- **Delete** - `contacts:delete` and `media:delete` only, for archiving a contact and permanently deleting a media file
+- **Delete** - `contacts:delete`, `media:delete`, `transactions:delete` and `bookings:delete` only, for archiving a contact, permanently deleting a media file, voiding or deleting an unpaid charge, and permanently deleting a booking
 - **Publish** - `website:publish` only, for making website edits public
 
 A token can instead hold the single wildcard scope `*`, which grants every scope, including ones added later. Scopes carry no hierarchy: `products:write` does not include `products:read`, so grant both when an integration reads before it writes.
 
 Grant only the scopes the integration actually needs. The Platform API supports these scopes:
 
-| Resource | Scopes |
-| --- | --- |
-| Classes and class types | `classes:read`, `classes:write` |
-| Check-ins | `checkins:read`, `checkins:write` |
-| Content | `content:read`, `content:write` |
-| Website | `website:read`, `website:write`, `website:publish` |
-| Media library | `media:read`, `media:write`, `media:delete` |
-| Clubs | `clubs:read`, `clubs:write` |
-| Transactions | `transactions:read`, `transactions:write` |
-| Invoices | `invoices:read` |
-| Areas, area types, and area blocks | `areas:read`, `areas:write` |
-| Bookings | `bookings:read`, `bookings:write` |
-| Contacts | `contacts:read`, `contacts:write`, `contacts:delete` |
-| Instructors and instructor types | `instructors:read`, `instructors:write` |
-| Plans and plan categories | `plans:read`, `plans:write` |
-| Memberships | `memberships:read`, `memberships:write` |
-| Products and product categories | `products:read`, `products:write` |
-| Forms | `forms:read`, `forms:write` |
-| Organization settings | `organization:write` |
-| Revenue accounts | `revenue-accounts:write` |
-| Pricing rules | `pricing-rules:read`, `pricing-rules:write` |
-| Booking policies | `booking-policies:read`, `booking-policies:write` |
-| Document rules | `document-rules:read`, `document-rules:write` |
-| Message templates | `templates:read`, `templates:write` |
-| Events | `events:read`, `events:write` |
-| Messages (drafts only) | `messages:read`, `messages:write` |
-| Analytics | `analytics:read` |
-| Payment methods | `payment-methods:write` |
-| Staff and roles | `staff:read`, `staff:write` |
-| Notification settings | `notifications:read`, `notifications:write` |
+| Resource                           | Scopes                                                           |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| Classes and class types            | `classes:read`, `classes:write`                                  |
+| Check-ins                          | `checkins:read`, `checkins:write`                                |
+| Content                            | `content:read`, `content:write`                                  |
+| Website                            | `website:read`, `website:write`, `website:publish`               |
+| Media library                      | `media:read`, `media:write`, `media:delete`                      |
+| Clubs                              | `clubs:read`, `clubs:write`                                      |
+| Transactions                       | `transactions:read`, `transactions:write`, `transactions:delete` |
+| Invoices                           | `invoices:read`                                                  |
+| Areas, area types, and area blocks | `areas:read`, `areas:write`                                      |
+| Bookings                           | `bookings:read`, `bookings:write`, `bookings:delete`             |
+| Contacts                           | `contacts:read`, `contacts:write`, `contacts:delete`             |
+| Instructors and instructor types   | `instructors:read`, `instructors:write`                          |
+| Plans and plan categories          | `plans:read`, `plans:write`                                      |
+| Memberships                        | `memberships:read`, `memberships:write`                          |
+| Products and product categories    | `products:read`, `products:write`                                |
+| Forms                              | `forms:read`, `forms:write`                                      |
+| Organization settings              | `organization:write`                                             |
+| Revenue accounts                   | `revenue-accounts:write`                                         |
+| Pricing rules                      | `pricing-rules:read`, `pricing-rules:write`                      |
+| Booking policies                   | `booking-policies:read`, `booking-policies:write`                |
+| Document rules                     | `document-rules:read`, `document-rules:write`                    |
+| External programs                  | `external-programs:read`, `external-programs:write`              |
+| Message templates                  | `templates:read`, `templates:write`                              |
+| Events                             | `events:read`, `events:write`                                    |
+| Messages (drafts only)             | `messages:read`, `messages:write`                                |
+| Analytics                          | `analytics:read`                                                 |
+| Payment methods                    | `payment-methods:write`                                          |
+| Staff and roles                    | `staff:read`, `staff:write`                                      |
+| Notification settings              | `notifications:read`, `notifications:write`                      |
 
 `transactions:write` records a settlement (revenue collected outside 1club, reported as one sum for a gym) and refunds of it. Nothing is charged to anyone.
+
+`transactions:delete` voids an unpaid charge, or deletes one raised by mistake that nothing refers to. A paid charge can't be voided or deleted - refund it instead - and an API key reaches only the charges of bookings it made through the API. `bookings:delete` permanently deletes a booking entered by mistake, with its unpaid charges, check-ins and players, and gives back any pass visit it used. A paid or invoiced booking can't be deleted: cancel and refund it instead. Over OAuth, only admins can delete bookings by default.
 
 Payment methods are read with `transactions:read`; `payment-methods:write` adds, renames and removes them. `staff:write` is accepted only from a signed-in person over OAuth: an API key that holds it is still refused.
 
@@ -170,15 +173,15 @@ curl "https://api.1club.ai/v1/platform/classes?startDate=2026-05-01" \
 
 ## Errors
 
-| Status | Meaning                                                     |
-| ------ | ----------------------------------------------------------- |
-| `400`  | Invalid request parameters                                  |
-| `401`  | Missing or invalid API key                                  |
+| Status | Meaning                                                                                                   |
+| ------ | --------------------------------------------------------------------------------------------------------- |
+| `400`  | Invalid request parameters                                                                                |
+| `401`  | Missing or invalid API key                                                                                |
 | `403`  | Token is missing the required scope for this endpoint, or API access is not available to the organization |
-| `404`  | Resource not found (or doesn't belong to your organization) |
-| `409`  | Conflict, for example an `Idempotency-Key` reused with a different request |
-| `429`  | Rate limit exceeded                                         |
-| `500`  | Internal server error                                       |
+| `404`  | Resource not found (or doesn't belong to your organization)                                               |
+| `409`  | Conflict, for example an `Idempotency-Key` reused with a different request                                |
+| `429`  | Rate limit exceeded                                                                                       |
+| `500`  | Internal server error                                                                                     |
 
 Most errors return a JSON body of the shape `{ "error": "...", "message": "...", "code": "...", "details": { ... } }`, where `code` is a stable, machine-readable reason and `details` carries structured values when the error has them. Authentication, scope, and rate-limit errors return a shorter body:
 

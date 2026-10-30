@@ -47,11 +47,13 @@
               "clubs:write": "Edit your clubs' details - name, contact details, address, opening hours, amenities and sports. Live on your website, member portal, app and 1club.me at once; a club listed on 1club.me sends its listing's changes for review.",
               "transactions:read": "View transactions, revenue reports and your chart of accounts",
               "transactions:write": "Record revenue collected outside 1club, such as a marketplace payout for your bookings, and refunds of it. Nothing is charged to anyone.",
+              "transactions:delete": "Void unpaid charges so they are no longer owed, and delete ones raised by mistake. A never-paid pass whose last charge goes is cancelled with it. Paid charges cannot be voided or deleted, and an API key reaches only the charges of bookings it made.",
               "invoices:read": "View your invoices - who they were issued to, their amounts and status - and how much was invoiced over a period",
               "areas:read": "View areas, area types, blocks and availability",
               "areas:write": "Create and update areas and area types, and block or unblock an area",
               "bookings:read": "View bookings",
               "bookings:write": "Create, change, reschedule and cancel bookings, and add or remove participants",
+              "bookings:delete": "Permanently delete bookings entered by mistake, with their unpaid charges, check-ins and players. A paid or invoiced booking cannot be deleted - cancel and refund it instead.",
               "contacts:read": "View contacts, their tags and custom field values, and your sales pipeline stages and sources",
               "contacts:write": "Create and update contacts and tag them, and maintain your tags, smart tag rules and contact custom fields",
               "contacts:delete": "Archive contacts, which cancels their active memberships and all their future bookings. Separate from creating and updating because those cancellations are not undone by restoring the contact.",
@@ -73,6 +75,8 @@
               "booking-policies:write": "Create, edit, duplicate and delete booking policies. Changes apply to every booking they cover from then on.",
               "document-rules:read": "View document rules - which members are asked to sign or accept which documents, such as waivers",
               "document-rules:write": "Create, edit and delete document rules, which decide who must sign or accept a document and whether it is required for entry",
+              "external-programs:read": "View external programs - third parties such as MultiSport or a corporate wellness scheme that pay for members' visits - and what each covers",
+              "external-programs:write": "Create, edit and remove external programs, including what each pays per visit and which classes, areas and coaches it can be used for",
               "templates:read": "View your email and SMS templates",
               "templates:write": "Create, edit and delete email and SMS templates",
               "events:read": "View events, their tickets and how many are sold",
@@ -104,6 +108,11 @@
         "properties": {
           "clubId": {
             "type": "integer"
+          },
+          "instructorLocationId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Where the class happens, when that is one of its instructors' locations (GET /v1/platform/instructors/{id} `locations`) rather than an area of its club. Required for a Professional's class (`INSTRUCTOR_LOCATION_REQUIRED`), whose club is its business and not a place. The class then takes no `areaId`."
           },
           "areaId": {
             "type": "integer",
@@ -246,6 +255,11 @@
         "properties": {
           "clubId": {
             "type": "integer"
+          },
+          "instructorLocationId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Where the class happens, when that is one of its instructors' locations (GET /v1/platform/instructors/{id} `locations`) rather than an area of its club. Required for a Professional's class (`INSTRUCTOR_LOCATION_REQUIRED`), whose club is its business and not a place. The class then takes no `areaId`."
           },
           "areaId": {
             "type": "integer",
@@ -939,6 +953,11 @@
           },
           "clubId": {
             "type": "integer"
+          },
+          "instructorLocationId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Where the class happens when that is one of its instructors' locations rather than its club: always set for a Professional's class."
           },
           "club": {
             "type": "object",
@@ -1788,6 +1807,24 @@
           }
         }
       },
+      "PostFaq": {
+        "type": "object",
+        "description": "One question of a post's FAQ. Plain text; blank lines separate the answer's paragraphs.",
+        "required": [
+          "question",
+          "answer"
+        ],
+        "properties": {
+          "question": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "answer": {
+            "type": "string",
+            "maxLength": 3000
+          }
+        }
+      },
       "PlatformContent": {
         "type": "object",
         "description": "A content item (FAQ, post, document, block, or how-to guide) for the organization.",
@@ -1909,6 +1946,13 @@
           "featured": {
             "type": "boolean",
             "nullable": true
+          },
+          "faqs": {
+            "type": "array",
+            "description": "A post's questions and answers, shown after its text. Empty for other types.",
+            "items": {
+              "$ref": "#/components/schemas/PostFaq"
+            }
           },
           "authorId": {
             "type": "integer",
@@ -4112,6 +4156,76 @@
                 "description": "A customer again after having lapsed."
               }
             }
+          },
+          "churn": {
+            "type": "object",
+            "nullable": true,
+            "description": "The period's churn, the admin Customer lifecycle report's: contacts whose recurring membership ended in the period with no other recurring membership following within the grace window, whatever the reason. Pass and drop-in holders lapse rather than churn, so they are `lifecycle.lapsed`, never counted here. Null when the caller lacks `contacts:read`.",
+            "properties": {
+              "churned": {
+                "type": "integer",
+                "description": "Contacts whose recurring membership ended in the period with nothing after it within the grace window. Includes a contact who joined and left within the period."
+              },
+              "activeAtStart": {
+                "type": "integer",
+                "description": "Contacts holding a running recurring membership on the period's first day."
+              },
+              "rate": {
+                "type": "number",
+                "nullable": true,
+                "description": "Of the contacts active at the start, the percentage who churned in the period, to one decimal, so never above 100. Null when nobody was active at the start."
+              },
+              "graceDays": {
+                "type": "integer",
+                "description": "Days after a membership's last covered day within which a following recurring membership keeps its holder from counting as churned."
+              },
+              "historyFrom": {
+                "type": "string",
+                "format": "date",
+                "nullable": true,
+                "description": "The first day the membership status history covers, on the organization's clock: `reasons` and `frozen` count from it. Null when the organization has no history yet."
+              },
+              "reasons": {
+                "type": "object",
+                "nullable": true,
+                "description": "The churned contacts by why they left, one count per reason; a breakdown of `churned`, never a filter on it. Null when the period ended before the status history began, since the reason was never recorded. A period across that day breaks down only what ended since.",
+                "properties": {
+                  "cancelled_by_member": {
+                    "type": "integer",
+                    "description": "The member chose to end it."
+                  },
+                  "cancelled_by_staff": {
+                    "type": "integer",
+                    "description": "Staff ended it, changed it to an ended status while editing it, or cancelled its unpaid order."
+                  },
+                  "cancelled_at_period_end": {
+                    "type": "integer",
+                    "description": "Cancelled for the end of its period, with no record of who chose it."
+                  },
+                  "refunded": {
+                    "type": "integer",
+                    "description": "Its order was cancelled and the money that had settled went back."
+                  },
+                  "expired": {
+                    "type": "integer",
+                    "description": "The term ran out: a membership that did not renew, with no cancellation behind it."
+                  },
+                  "other": {
+                    "type": "integer",
+                    "description": "A platform flow ended it with no more specific cause, such as an archived contact."
+                  },
+                  "unknown": {
+                    "type": "integer",
+                    "description": "A move nobody annotated with a reason."
+                  }
+                }
+              },
+              "frozen": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Memberships that went into a freeze in the period. Null when the period ended before the status history began."
+              }
+            }
           }
         }
       },
@@ -4316,6 +4430,26 @@
             "nullable": true,
             "description": "The sales pipeline stage the contact is in, or null when they are not in the pipeline."
           },
+          "pipelineLostReason": {
+            "type": "string",
+            "enum": [
+              "price",
+              "timing",
+              "chose_competitor",
+              "location",
+              "no_response",
+              "not_interested",
+              "not_a_fit",
+              "other"
+            ],
+            "nullable": true,
+            "description": "Why the lead was lost, while they are in the Lost stage. Null outside it, or when no reason was given."
+          },
+          "pipelineLostNote": {
+            "type": "string",
+            "nullable": true,
+            "description": "The note given with the lost reason."
+          },
           "sourceId": {
             "type": "integer",
             "nullable": true,
@@ -4334,7 +4468,7 @@
       },
       "PlatformPipelineStage": {
         "type": "object",
-        "description": "A column of the sales pipeline. Open stages are where leads are worked; the one Cold stage holds leads that went quiet. A lead leaves the pipeline on its own when it pays for something.",
+        "description": "A column of the sales pipeline. Open stages are where leads are worked; the one Lost stage (kind `cold`) holds leads that were lost, each with the reason it was given. A lead leaves the pipeline on its own when it pays for something.",
         "properties": {
           "id": {
             "type": "integer"
@@ -4460,6 +4594,25 @@
             "type": "integer",
             "description": "Put the new contact in this sales pipeline stage (GET /v1/platform/pipeline-stages), which makes them a lead."
           },
+          "pipelineLostReason": {
+            "type": "string",
+            "enum": [
+              "price",
+              "timing",
+              "chose_competitor",
+              "location",
+              "no_response",
+              "not_interested",
+              "not_a_fit",
+              "other"
+            ],
+            "description": "Why the lead was lost. Only with a `pipelineStageId` naming the Lost stage (kind `cold`); sent with any other stage it is refused. Optional: a move to Lost without it reads as unknown. On a contact already in Lost it replaces the recorded reason."
+          },
+          "pipelineLostNote": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "What the reason leaves out. Required when `pipelineLostReason` is `other`."
+          },
           "sourceId": {
             "type": "integer",
             "description": "Where the contact came from (GET /v1/platform/contact-sources)."
@@ -4502,6 +4655,25 @@
             "type": "integer",
             "description": "Move the contact to this sales pipeline stage (GET /v1/platform/pipeline-stages); null takes them out of the pipeline.",
             "nullable": true
+          },
+          "pipelineLostReason": {
+            "type": "string",
+            "enum": [
+              "price",
+              "timing",
+              "chose_competitor",
+              "location",
+              "no_response",
+              "not_interested",
+              "not_a_fit",
+              "other"
+            ],
+            "description": "Why the lead was lost. Only with a `pipelineStageId` naming the Lost stage (kind `cold`); sent with any other stage it is refused. Optional: a move to Lost without it reads as unknown. On a contact already in Lost it replaces the recorded reason."
+          },
+          "pipelineLostNote": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "What the reason leaves out. Required when `pipelineLostReason` is `other`."
           },
           "sourceId": {
             "type": "integer",
@@ -4575,16 +4747,17 @@
           "bookability": {
             "type": "string",
             "enum": [
+              "No_one",
               "Admin_only",
               "Member_only",
               "Public"
             ],
-            "description": "Who may book one-to-one sessions with this instructor. `Admin_only` means the club reserves those bookings to its own staff, so a customer-initiated booking is rejected; an API key acts for the organization and may still create one."
+            "description": "Who may book one-to-one sessions with this instructor. `Admin_only` means the club reserves those bookings to its own staff, so a customer-initiated booking is rejected; an API key acts for the organization and may still create one. `No_one` means nobody may, an API key included: the instructor only teaches classes."
           },
           "isBookable": {
             "type": "boolean",
             "deprecated": true,
-            "description": "Derived from `bookability`: true unless it is `Admin_only`. Prefer `bookability`, which distinguishes members from the public."
+            "description": "Derived from `bookability`: true when it is `Member_only` or `Public`. Prefer `bookability`, which distinguishes members from the public."
           },
           "maxConcurrentBookings": {
             "type": "integer"
@@ -4610,6 +4783,69 @@
           "isActive": {
             "type": "boolean",
             "description": "False for a retired instructor: hidden from the list by default, not bookable, history kept."
+          },
+          "locations": {
+            "type": "array",
+            "description": "Where a Professional (an independent instructor) teaches. Pass an `id` as `instructorLocationId` to schedule a class there. Empty for a coach at a club.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "place",
+                    "address",
+                    "mobile",
+                    "online"
+                  ],
+                  "description": "`mobile`: the instructor travels to the client."
+                },
+                "name": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "The gym or studio, for a `place`."
+                },
+                "placeSlug": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "address": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "city": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "latitude": {
+                  "type": "number",
+                  "nullable": true,
+                  "description": "For `mobile`, the centre of the area served, rounded to about a kilometre."
+                },
+                "longitude": {
+                  "type": "number",
+                  "nullable": true
+                },
+                "radiusKm": {
+                  "type": "number",
+                  "nullable": true,
+                  "description": "For `mobile`, how far from the centre the instructor travels."
+                },
+                "bufferMinutes": {
+                  "type": "integer",
+                  "nullable": true,
+                  "description": "Minutes the instructor keeps free before a session here, to travel to it."
+                },
+                "meetingUrl": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "For `online`, the link a client joins a session by."
+                }
+              }
+            }
           }
         }
       },
@@ -4656,11 +4892,12 @@
           "bookability": {
             "type": "string",
             "enum": [
+              "No_one",
               "Admin_only",
               "Member_only",
               "Public"
             ],
-            "description": "Who may book one-to-one sessions with them. Never outruns `visibility`: narrowing one pulls the other down with it, and deactivating the instructor retires this to `Admin_only`. The read-only `isBookable` is derived from this and cannot be written."
+            "description": "Who may book one-to-one sessions with them. `No_one` means nobody may, staff and API keys included: a coach who only teaches classes. Never outruns `visibility`: narrowing one pulls the other down with it, and deactivating the instructor retires this to `Admin_only` (a `No_one` coach stays `No_one`). The read-only `isBookable` is derived from this and cannot be written."
           },
           "priceIncludesArea": {
             "type": "boolean",
@@ -4726,11 +4963,12 @@
           "bookability": {
             "type": "string",
             "enum": [
+              "No_one",
               "Admin_only",
               "Member_only",
               "Public"
             ],
-            "description": "Who may book one-to-one sessions with them. Never outruns `visibility`: narrowing one pulls the other down with it, and deactivating the instructor retires this to `Admin_only`. The read-only `isBookable` is derived from this and cannot be written."
+            "description": "Who may book one-to-one sessions with them. `No_one` means nobody may, staff and API keys included: a coach who only teaches classes. Never outruns `visibility`: narrowing one pulls the other down with it, and deactivating the instructor retires this to `Admin_only` (a `No_one` coach stays `No_one`). The read-only `isBookable` is derived from this and cannot be written."
           },
           "priceIncludesArea": {
             "type": "boolean",
@@ -5058,6 +5296,10 @@
             "type": "boolean",
             "description": "Fill-in forms only: the person must be signed in to fill it in. Refused on a sign-up form (`FORM_AUTHENTICATION_FILL_IN_ONLY`)."
           },
+          "notifyStaff": {
+            "type": "boolean",
+            "description": "Fill-in forms only: admins and managers get a User Form Submitted alert for every response. Left out on create, it is on for a form that puts people in the pipeline and off otherwise. Refused on a sign-up form (`FORM_NOTIFY_STAFF_FILL_IN_ONLY`), which is announced as a New User Signup instead."
+          },
           "combineSelectionAndDetails": {
             "type": "boolean",
             "description": "Put the \"choose what to buy\" step and the details step on one page. Needs a form that sells something (`FORM_NOTHING_TO_COMBINE`)."
@@ -5288,6 +5530,10 @@
             "type": "boolean",
             "description": "Fill-in forms only: the person must be signed in to fill it in. Refused on a sign-up form (`FORM_AUTHENTICATION_FILL_IN_ONLY`)."
           },
+          "notifyStaff": {
+            "type": "boolean",
+            "description": "Fill-in forms only: admins and managers get a User Form Submitted alert for every response. Left out on create, it is on for a form that puts people in the pipeline and off otherwise. Refused on a sign-up form (`FORM_NOTIFY_STAFF_FILL_IN_ONLY`), which is announced as a New User Signup instead."
+          },
           "combineSelectionAndDetails": {
             "type": "boolean",
             "description": "Put the \"choose what to buy\" step and the details step on one page. Needs a form that sells something (`FORM_NOTHING_TO_COMBINE`)."
@@ -5478,6 +5724,10 @@
           "requiresAuthentication": {
             "type": "boolean",
             "description": "Fill-in forms only: the person must be signed in to fill it in. Refused on a sign-up form (`FORM_AUTHENTICATION_FILL_IN_ONLY`)."
+          },
+          "notifyStaff": {
+            "type": "boolean",
+            "description": "Fill-in forms only: admins and managers get a User Form Submitted alert for every response. Left out on create, it is on for a form that puts people in the pipeline and off otherwise. Refused on a sign-up form (`FORM_NOTIFY_STAFF_FILL_IN_ONLY`), which is announced as a New User Signup instead."
           },
           "combineSelectionAndDetails": {
             "type": "boolean",
@@ -6425,6 +6675,10 @@
             "type": "string",
             "description": "Stable key, derived from the name when a create does not send one. A rename never moves it."
           },
+          "sortOrder": {
+            "type": "integer",
+            "description": "Position in the order staff set in Settings, 1 first. Lists come back in this order; change it with the type's PUT .../order."
+          },
           "description": {
             "type": "string",
             "nullable": true
@@ -6940,6 +7194,10 @@
             "type": "string",
             "description": "Stable key, derived from the name when a create does not send one. A rename never moves it."
           },
+          "sortOrder": {
+            "type": "integer",
+            "description": "Position in the order staff set in Settings, 1 first. Lists come back in this order; change it with the type's PUT .../order."
+          },
           "description": {
             "type": "string",
             "nullable": true
@@ -7230,7 +7488,11 @@
           },
           "custom": {
             "type": "boolean",
-            "description": "True for the organization's own track, or its copy of a template; false for an enabled global template."
+            "description": "True for the organization's own track, or its copy of a template; false for a global template."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the organization uses it: always for its own tracks, and for a template once enabled."
           },
           "levelCount": {
             "type": "integer",
@@ -7252,6 +7514,494 @@
           }
         }
       },
+      "PlatformProgressionLevel": {
+        "type": "object",
+        "description": "One rank on a progression track.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "skill": {
+            "type": "string",
+            "description": "The rank, e.g. \"Blue Belt\"."
+          },
+          "level": {
+            "type": "string",
+            "description": "The step within the rank when the discipline has one, e.g. \"3rd Dan\"; usually empty."
+          },
+          "name": {
+            "type": "string",
+            "description": "`skill` and `level` together, as the dashboard shows them."
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "color": {
+            "type": "string",
+            "nullable": true,
+            "description": "Hex colour, e.g. \"#2563eb\"."
+          },
+          "requiredSessions": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Sessions a member attends at the rank below before they are eligible for this one."
+          },
+          "requiredDays": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Days a member holds the rank below before they are eligible for this one."
+          },
+          "ageOutLevelId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The rank members continue at on the track this one ages out onto; that track's first rank when null."
+          }
+        }
+      },
+      "PlatformProgressionTrackDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PlatformProgressionTrack"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "maxStripes": {
+                "type": "integer",
+                "description": "Most stripes a member earns within a rank; 0 when the discipline has none."
+              },
+              "ageOutAge": {
+                "type": "integer",
+                "nullable": true,
+                "description": "The age at which members continue on `ageOutTrackId`."
+              },
+              "ageOutTrackId": {
+                "type": "integer",
+                "nullable": true
+              },
+              "templateId": {
+                "type": "integer",
+                "nullable": true,
+                "description": "The global template this track was copied from."
+              },
+              "levels": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PlatformProgressionLevel"
+                },
+                "description": "The ladder, lowest rank first."
+              }
+            }
+          }
+        ]
+      },
+      "PlatformProgressionLevelWrite": {
+        "type": "object",
+        "description": "A level in a saved ladder. With `id` an existing level is kept and only the fields sent change; without, a new one is added and `skill` is required.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "skill": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "level": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "color": {
+            "type": "string",
+            "nullable": true
+          },
+          "requiredSessions": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1
+          },
+          "requiredDays": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1
+          },
+          "ageOutLevelId": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "PlatformProgressionTrackUpdate": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "For a global template only, and the only field it takes: start or stop using it."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "sport": {
+            "type": "string",
+            "description": "Canonical sport id, e.g. \"jiu-jitsu\"."
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "maxStripes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "ageOutAge": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "ageOutTrackId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Another track the organization uses, that members continue on at `ageOutAge`."
+          },
+          "levels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformProgressionLevelWrite"
+            },
+            "description": "The whole ladder, lowest rank first. A level left out is removed."
+          }
+        }
+      },
+      "PlatformProgressionTrackCreate": {
+        "type": "object",
+        "description": "A new track needs `name` and `sport`; a copy of a template needs only `fromTemplateId`.",
+        "properties": {
+          "fromTemplateId": {
+            "type": "integer",
+            "description": "A global template to copy into the organization's own. Not with `levels`."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "sport": {
+            "type": "string",
+            "description": "Canonical sport id, e.g. \"jiu-jitsu\"."
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "maxStripes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "ageOutAge": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "ageOutTrackId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "levels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformProgressionLevelWrite"
+            },
+            "description": "The ladder, lowest rank first."
+          }
+        }
+      },
+      "PlatformPromotionProgress": {
+        "type": "object",
+        "nullable": true,
+        "description": "How close a member is to the next rank, against each requirement it sets. Null at the track's top rank, or when the next rank sets no requirement.",
+        "properties": {
+          "nextLevel": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "skill": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "color": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "sessions": {
+            "type": "integer",
+            "description": "Sessions attended since the current rank was earned."
+          },
+          "requiredSessions": {
+            "type": "integer",
+            "nullable": true
+          },
+          "days": {
+            "type": "integer",
+            "description": "Days at the current rank, on the club's clock."
+          },
+          "requiredDays": {
+            "type": "integer",
+            "nullable": true
+          },
+          "learnedItems": {
+            "type": "integer",
+            "description": "Skills of the next rank's curriculum learned."
+          },
+          "requiredItems": {
+            "type": "integer",
+            "nullable": true
+          },
+          "eligible": {
+            "type": "boolean",
+            "description": "Every requirement the next rank sets is met. A signal only: the rank changes when staff give it."
+          }
+        }
+      },
+      "PlatformTrackMember": {
+        "type": "object",
+        "properties": {
+          "contact": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "firstName": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "levelId": {
+            "type": "integer"
+          },
+          "levelName": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string",
+            "nullable": true
+          },
+          "stripes": {
+            "type": "integer"
+          },
+          "earnedOn": {
+            "type": "string",
+            "format": "date",
+            "description": "The calendar date the rank was earned."
+          },
+          "promotionProgress": {
+            "$ref": "#/components/schemas/PlatformPromotionProgress"
+          }
+        }
+      },
+      "PlatformTrackMemberPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformTrackMember"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total members matching the filters, ignoring pagination"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
+      },
+      "PlatformContactProgression": {
+        "type": "object",
+        "properties": {
+          "contactId": {
+            "type": "integer"
+          },
+          "ranks": {
+            "type": "array",
+            "description": "The current rank on each track the organization uses.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "trackId": {
+                  "type": "integer"
+                },
+                "trackName": {
+                  "type": "string"
+                },
+                "levelId": {
+                  "type": "integer"
+                },
+                "levelName": {
+                  "type": "string"
+                },
+                "color": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "stripes": {
+                  "type": "integer"
+                },
+                "earnedOn": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "promotionProgress": {
+                  "$ref": "#/components/schemas/PlatformPromotionProgress"
+                }
+              }
+            }
+          },
+          "timeline": {
+            "type": "array",
+            "description": "Every rank and stripe recorded, latest earned first.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "trackId": {
+                  "type": "integer"
+                },
+                "trackName": {
+                  "type": "string"
+                },
+                "levelId": {
+                  "type": "integer"
+                },
+                "levelName": {
+                  "type": "string"
+                },
+                "stripes": {
+                  "type": "integer"
+                },
+                "earnedOn": {
+                  "type": "string",
+                  "format": "date"
+                }
+              }
+            }
+          }
+        }
+      },
+      "PlatformProgressionRankRequest": {
+        "type": "object",
+        "required": [
+          "contactIds"
+        ],
+        "description": "Exactly one of `levelId` and `next`.",
+        "properties": {
+          "contactIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "minItems": 1,
+            "maxItems": 100
+          },
+          "levelId": {
+            "type": "integer",
+            "description": "The rank to give, a level of this track."
+          },
+          "next": {
+            "type": "boolean",
+            "description": "True for each member's own next rank, stripes back to zero."
+          },
+          "stripes": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Stripes at `levelId`, up to the track's `maxStripes`."
+          },
+          "earnedOn": {
+            "type": "string",
+            "format": "date",
+            "description": "The calendar date it was earned; today when omitted. May be in the past."
+          },
+          "notifyMember": {
+            "type": "boolean",
+            "default": true,
+            "description": "Tell the member about a move forward. False when recording ranks they already hold."
+          }
+        }
+      },
+      "PlatformProgressionRankResult": {
+        "type": "object",
+        "properties": {
+          "assigned": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "contactId": {
+                  "type": "integer"
+                },
+                "levelId": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "skipped": {
+            "type": "array",
+            "description": "Left as they were by `next`: no rank on the track to move up from, or already at its top.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "contactId": {
+                  "type": "integer"
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "no_rank",
+                    "top_rank"
+                  ]
+                }
+              }
+            }
+          },
+          "failed": {
+            "type": "array",
+            "description": "Failed; everyone else was still ranked.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "contactId": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
       "PlatformInstructorType": {
         "type": "object",
         "description": "A kind of coach the organization has. Reference the `id` as `instructorTypeId` on an instructor. One shape for the list, get-by-id, create and update.",
@@ -7265,6 +8015,10 @@
           "slug": {
             "type": "string",
             "description": "Stable key, derived from the name when a create does not send one. A rename never moves it."
+          },
+          "sortOrder": {
+            "type": "integer",
+            "description": "Position in the order staff set in Settings, 1 first. Lists come back in this order; change it with the type's PUT .../order."
           },
           "description": {
             "type": "string",
@@ -7294,6 +8048,25 @@
           "maxPlayers": {
             "type": "integer",
             "description": "How many people one session with a coach of this kind may bring, the person booking included. 1 is one-to-one. A session with them and no area may be booked for any group up to this; a session on an area takes the area's own player limit instead."
+          }
+        }
+      },
+      "PlatformTypeOrder": {
+        "type": "object",
+        "description": "A new order for the organization's instructor, class or area types.",
+        "required": [
+          "orderedIds"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "orderedIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "type": "integer"
+            },
+            "description": "The type ids, first to last. A type left out keeps its place after the listed ones."
           }
         }
       },
@@ -8530,6 +9303,7 @@
               "admin",
               "manager",
               "front_desk",
+              "sales",
               "instructor"
             ]
           },
@@ -8551,6 +9325,7 @@
               "admin",
               "manager",
               "front_desk",
+              "sales",
               "instructor"
             ]
           },
@@ -9124,6 +9899,235 @@
               "Public"
             ],
             "description": "Who may choose it. Defaults to `Private` (staff only) on create."
+          }
+        }
+      },
+      "PlatformMemberAccount": {
+        "type": "object",
+        "description": "A household or company account: the family or employer a group of contacts belongs to, which an invoice can be addressed to.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "household",
+              "company",
+              "organization"
+            ],
+            "description": "`organization` is a legacy type: it is listed, but not created here."
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "primaryContactId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The member the account is addressed to by default"
+          },
+          "legalName": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "taxNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "VAT or tax id"
+          },
+          "registrationNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "Company registration number"
+          },
+          "billingEmail": {
+            "type": "string",
+            "nullable": true,
+            "format": "email"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000
+          },
+          "memberCount": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PlatformMemberAccountDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PlatformMemberAccount"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "members": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "contactId": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "email": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "owner",
+                        "adult",
+                        "dependent",
+                        "admin",
+                        "employee"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PlatformMemberAccountPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformMemberAccount"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total accounts matching the filters, ignoring pagination"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
+      },
+      "PlatformMemberAccountCreate": {
+        "type": "object",
+        "description": "Fields accepted when creating an account. Unknown fields are rejected.",
+        "required": [
+          "type",
+          "contactId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "household",
+              "company"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Required for a company. A household without one is named after its first member."
+          },
+          "contactId": {
+            "type": "integer",
+            "description": "The first member, who becomes the primary contact"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "adult",
+              "dependent",
+              "admin",
+              "employee"
+            ],
+            "description": "The first member's role. Defaults to owner for a household and employee for a company."
+          },
+          "legalName": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "taxNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "VAT or tax id"
+          },
+          "registrationNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "Company registration number"
+          },
+          "billingEmail": {
+            "type": "string",
+            "nullable": true,
+            "format": "email"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000
+          }
+        }
+      },
+      "PlatformMemberAccountUpdate": {
+        "type": "object",
+        "description": "Fields accepted when updating an account. Send only what changes; at least one field is required.",
+        "minProperties": 1,
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "primaryContactId": {
+            "type": "integer",
+            "description": "Must already be a member of the account"
+          },
+          "legalName": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "taxNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "VAT or tax id"
+          },
+          "registrationNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "Company registration number"
+          },
+          "billingEmail": {
+            "type": "string",
+            "nullable": true,
+            "format": "email"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000
           }
         }
       },
@@ -13699,6 +14703,644 @@
             }
           }
         }
+      },
+      "PlatformExternalProgram": {
+        "type": "object",
+        "description": "A third party - MultiSport, a municipal scheme, a corporate wellness card - that pays for members' visits.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "null: honoured at every club."
+          },
+          "club": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "An inactive program cannot be chosen for new bookings or check-ins."
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Private",
+              "Member_only",
+              "Public"
+            ]
+          },
+          "coveredAmountPerVisit": {
+            "type": "number",
+            "nullable": true,
+            "description": "What the program pays per visit. null: the whole visit."
+          },
+          "additionalPricePerVisit": {
+            "type": "number",
+            "nullable": true,
+            "description": "What the member pays on top, per visit."
+          },
+          "validFor": {
+            "type": "object",
+            "properties": {
+              "scopes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "classes",
+                    "areas",
+                    "instructors"
+                  ]
+                },
+                "description": "What members may use it for. No scopes: a program for check-ins only, never offered when booking."
+              },
+              "classTypeIds": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Within `classes`, only these class types. Empty means every one."
+              },
+              "areaTypeIds": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Within `areas`, only these area types. Empty means every one."
+              },
+              "instructorTypeIds": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Within `instructors`, only these instructor types. Empty means every one."
+              }
+            }
+          },
+          "operatingHours": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "openTime": {
+                  "type": "string",
+                  "example": "06:00"
+                },
+                "closeTime": {
+                  "type": "string",
+                  "example": "22:00"
+                },
+                "is24Hours": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "knownProgram": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "multisport",
+              null
+            ]
+          },
+          "cardFormat": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "number",
+              "multisport",
+              null
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PlatformExternalProgramCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "code"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "description": "The club's label for it, shown to staff and members."
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z0-9_-]+$",
+            "description": "Short identifier, unique in the organization: lowercase letters, digits, hyphens and underscores."
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The one club it is honoured at. null: every club."
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Private",
+              "Member_only",
+              "Public"
+            ],
+            "description": "`Public` and `Member_only`: members can choose it themselves. `Private`: only staff can apply it. Defaults to `Public` on create."
+          },
+          "coveredAmountPerVisit": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0.01,
+            "description": "What the program pays per visit, tax included; the member pays the rest of the price. null: the program pays for the whole visit."
+          },
+          "additionalPricePerVisit": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "description": "What the member pays on top, per visit."
+          },
+          "validFor": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "scopes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "classes",
+                    "areas",
+                    "instructors"
+                  ]
+                },
+                "description": "What members may use it for. No scopes: a program for check-ins only, never offered when booking."
+              },
+              "classTypeIds": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Within `classes`, only these class types. Empty means every one."
+              },
+              "areaTypeIds": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Within `areas`, only these area types. Empty means every one."
+              },
+              "instructorTypeIds": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Within `instructors`, only these instructor types. Empty means every one."
+              }
+            },
+            "description": "Replaces the stored value wholesale when sent on an update."
+          },
+          "operatingHours": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": false,
+            "properties": {
+              "monday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "tuesday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "wednesday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "thursday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "friday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "saturday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "sunday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "description": "When it can be used, by weekday. Empty or null: whenever the club is open. Replaces the stored value when sent."
+          },
+          "knownProgram": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "multisport",
+              null
+            ],
+            "description": "Which known program this is, such as MultiSport; null for the club's own. An organization has at most one of each, and it is only offered where its cards are supported (MultiSport: Bulgaria)."
+          },
+          "cardFormat": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "number",
+              "multisport",
+              null
+            ],
+            "description": "The card members carry for it. A known program reads its own card; any other program only `number`. null: no cards."
+          }
+        }
+      },
+      "PlatformExternalProgramUpdate": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "description": "The club's label for it, shown to staff and members."
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z0-9_-]+$",
+            "description": "Short identifier, unique in the organization: lowercase letters, digits, hyphens and underscores."
+          },
+          "clubId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The one club it is honoured at. null: every club."
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Private",
+              "Member_only",
+              "Public"
+            ],
+            "description": "`Public` and `Member_only`: members can choose it themselves. `Private`: only staff can apply it. Defaults to `Public` on create."
+          },
+          "coveredAmountPerVisit": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0.01,
+            "description": "What the program pays per visit, tax included; the member pays the rest of the price. null: the program pays for the whole visit."
+          },
+          "additionalPricePerVisit": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "description": "What the member pays on top, per visit."
+          },
+          "validFor": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "scopes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "classes",
+                    "areas",
+                    "instructors"
+                  ]
+                },
+                "description": "What members may use it for. No scopes: a program for check-ins only, never offered when booking."
+              },
+              "classTypeIds": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Within `classes`, only these class types. Empty means every one."
+              },
+              "areaTypeIds": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Within `areas`, only these area types. Empty means every one."
+              },
+              "instructorTypeIds": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Within `instructors`, only these instructor types. Empty means every one."
+              }
+            },
+            "description": "Replaces the stored value wholesale when sent on an update."
+          },
+          "operatingHours": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": false,
+            "properties": {
+              "monday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "tuesday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "wednesday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "thursday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "friday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "saturday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "sunday": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "openTime": {
+                    "type": "string",
+                    "example": "06:00"
+                  },
+                  "closeTime": {
+                    "type": "string",
+                    "example": "22:00"
+                  },
+                  "is24Hours": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "description": "When it can be used, by weekday. Empty or null: whenever the club is open. Replaces the stored value when sent."
+          },
+          "knownProgram": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "multisport",
+              null
+            ],
+            "description": "Which known program this is, such as MultiSport; null for the club's own. An organization has at most one of each, and it is only offered where its cards are supported (MultiSport: Bulgaria)."
+          },
+          "cardFormat": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "number",
+              "multisport",
+              null
+            ],
+            "description": "The card members carry for it. A known program reads its own card; any other program only `number`. null: no cards."
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "false stops it being chosen for new bookings and check-ins; visits already recorded stay."
+          }
+        }
       }
     },
     "responses": {
@@ -14126,7 +15768,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Every area type in the organization, by name",
+            "description": "Every area type in the organization, in the order staff set in Settings",
             "content": {
               "application/json": {
                 "schema": {
@@ -14359,6 +16001,70 @@
           },
           "409": {
             "description": "An explicit `slug` is already used by another area type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/area-types/order": {
+      "put": {
+        "operationId": "updateAreaTypeOrder",
+        "summary": "Reorder area types",
+        "description": "Sets the order of the organization's area types: the ids, first to last. Every list of them follows it - this API, the 1club admin, the club's website and member apps. A type left out (one added since you read the list) keeps its place after the listed ones. Returns the list as it now stands.\n",
+        "tags": [
+          "Areas"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformTypeOrder"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Every area type in the organization, in the new order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformAreaType"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `areas:write` scope",
             "content": {
               "application/json": {
                 "schema": {
@@ -15802,6 +17508,15 @@
                     "type": "integer",
                     "description": "Instructor leading the session (from GET /v1/platform/instructors), or the whole booking when no `areaId` is sent. Must be bookable for one-on-one sessions."
                   },
+                  "instructorLocationId": {
+                    "type": "integer",
+                    "description": "Where a session with an instructor and no area happens, for an instructor who works at several places: one of the instructor's current `locations` (from GET /v1/platform/instructors/{id}). Left out, an instructor with exactly one place is booked there. Refused with `INSTRUCTOR_LOCATION_NOT_FOUND` when it is not a current location of that instructor, and with `INSTRUCTOR_LOCATION_NOT_APPLICABLE` alongside an `areaId` or without an `instructorId`.\n"
+                  },
+                  "serviceAddress": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "The client's address, for a session at an `instructorLocationId` of kind `mobile` (the instructor goes to the client): required there (`SERVICE_ADDRESS_REQUIRED`), and refused without an `instructorLocationId`.\n"
+                  },
                   "payment": {
                     "type": "object",
                     "required": [
@@ -16172,6 +17887,104 @@
       }
     },
     "/v1/platform/bookings/{id}": {
+      "delete": {
+        "operationId": "deleteBooking",
+        "summary": "Delete a booking",
+        "description": "Permanently removes a booking entered by mistake or as a test, as if it had never been made - unlike cancelling, which keeps it on the books. Its charges and cancellation records are deleted with it, and so are its players, check-ins, the instructor's pay for it and the door access it granted. It cannot be undone.\n\nRefused with `409 BOOKING_HAS_PAYMENTS` while any of its charges was paid or has a payment, invoice, Wallet movement or refund behind it: cancel it and refund instead, so the sale stays in the books. Refused with `409 BOOKING_ON_OPEN_ORDER` (or `409 CHARGE_ON_OPEN_ORDER`) while an open order still holds it or one of its charges, and one seat of a registration with guests with `409 BOOKING_HAS_SEATS` until the registration is cancelled. Charges recorded on its check-ins count as its own. A visit it drew from a pass, the organizer's or a player's, goes back on the pass unless it was cancelled, and its External Program usages are deleted with it. An API key may delete only bookings made through the API, and never one another key manages (`409 BOOKING_EXTERNALLY_MANAGED`). For a member of staff, it needs the Extended level of booking delete, which only admins hold by default.\n",
+        "tags": [
+          "Bookings"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The booking and its charges were deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "deletedTransactionIds"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "The deleted booking's id"
+                    },
+                    "deletedTransactionIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "description": "The charges deleted with it"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid booking ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `bookings:delete` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Paid or invoiced, on an open order, a seat of a live registration, or managed by another key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
       "get": {
         "operationId": "getBooking",
         "summary": "Get a booking",
@@ -16845,7 +18658,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Every class type in the organization, by name",
+            "description": "Every class type in the organization, in the order staff set in Settings",
             "content": {
               "application/json": {
                 "schema": {
@@ -17078,6 +18891,70 @@
           },
           "409": {
             "description": "An explicit `slug` is already used by another class type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/class-types/order": {
+      "put": {
+        "operationId": "updateClassTypeOrder",
+        "summary": "Reorder class types",
+        "description": "Sets the order of the organization's class types: the ids, first to last. Every list of them follows it - this API, the 1club admin, the club's website and member apps. A type left out (one added since you read the list) keeps its place after the listed ones. Returns the list as it now stands.\n",
+        "tags": [
+          "Classes"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformTypeOrder"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Every class type in the organization, in the new order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformClassType"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `classes:write` scope",
             "content": {
               "application/json": {
                 "schema": {
@@ -18621,7 +20498,7 @@
       "get": {
         "operationId": "listContacts",
         "summary": "List and search contacts",
-        "description": "Returns the organization's contacts ordered by name, excluding archived ones. Use `search` to match on name, email, or phone - matching is case-insensitive and cross-script, so `ivan` also matches `Иван`. Resolve a customer here and pass the returned `id` as `contactId` when creating a booking.\n",
+        "description": "Returns the organization's contacts ordered by name, excluding archived ones. Use `search` to match on name, email, or phone - matching is case-insensitive and cross-script, so `ivan` also matches `Иван`. Resolve a customer here and pass the returned `id` as `contactId` when creating a booking. Use `tags` and `excludeTags` to list who carries a tag or who carries none of several - smart tags included, so `tags=Past Due&tags=Overdue` lists who owes money.\n",
         "tags": [
           "Contacts"
         ],
@@ -18639,6 +20516,42 @@
               "maxLength": 120
             },
             "description": "Match on name, email, or phone"
+          },
+          {
+            "in": "query",
+            "name": "tags",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "maxItems": 50,
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": [
+              "Past Due",
+              "Overdue"
+            ],
+            "description": "Tag names as `GET /tags` lists them, in any case, the parameter repeated once per name. Only contacts carrying at least one of them are returned. A smart tag nobody carries yet matches nobody. An unknown name is a 400 suggesting the closest tag names.\n"
+          },
+          {
+            "in": "query",
+            "name": "excludeTags",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "maxItems": 50,
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": [
+              "Card",
+              "SEPA Debit"
+            ],
+            "description": "Tag names, in any case, the parameter repeated once per name. Only contacts carrying none of them are returned. A smart tag nobody carries yet excludes nobody. An unknown name is a 400 suggesting the closest tag names.\n"
           },
           {
             "in": "query",
@@ -18836,7 +20749,7 @@
       "patch": {
         "operationId": "updateContact",
         "summary": "Update a contact",
-        "description": "Edits a contact's name and contact details. Send only what changes - `null` clears `lastName`, `email` or `phone`, and an omitted field is left alone. The display name is always recomputed from `firstName` and `lastName`, the phone is canonicalized, and a contact must keep at least one of `email` or `phone`, so an edit cannot leave the person unreachable. Clearing `lastName` stores an empty string rather than null, so it reads back as `\"\"`.\n\nRefused edits: an `email` already used by another contact in the organization (409); any change to the `email` of a contact whose address is also their 1club login (400) - that address is changed by the person themselves; and clearing a field the organization has marked required for staff (400, naming the `field`). An archived contact cannot be edited. `pipelineStageId` moves the contact in the sales pipeline (from `GET /v1/platform/pipeline-stages`); `null` takes them out of it. A contact who has never been a customer is a Lead while they are in the pipeline, so this can change `type`. `sourceId` and `assignedToId` set where they came from and which staff member follows them up.\n",
+        "description": "Edits a contact's name and contact details. Send only what changes - `null` clears `lastName`, `email` or `phone`, and an omitted field is left alone. The display name is always recomputed from `firstName` and `lastName`, the phone is canonicalized, and a contact must keep at least one of `email` or `phone`, so an edit cannot leave the person unreachable. Clearing `lastName` stores an empty string rather than null, so it reads back as `\"\"`.\n\nRefused edits: an `email` already used by another contact in the organization (409); any change to the `email` of a contact whose address is also their 1club login (400) - that address is changed by the person themselves; and clearing a field the organization has marked required for staff (400, naming the `field`). An archived contact cannot be edited. `pipelineStageId` moves the contact in the sales pipeline (from `GET /v1/platform/pipeline-stages`); `null` takes them out of it. A contact who has never been a customer is a Lead while they are in the pipeline, so this can change `type`. Moving them to the Lost stage takes an optional `pipelineLostReason` (and `pipelineLostNote`, required for `other`); a reason sent with any other stage is refused (400). On a contact already in Lost, the reason replaces the recorded one. `sourceId` and `assignedToId` set where they came from and which staff member follows them up.\n",
         "tags": [
           "Contacts"
         ],
@@ -19240,6 +21153,14 @@
                   },
                   "featured": {
                     "type": "boolean"
+                  },
+                  "faqs": {
+                    "type": "array",
+                    "maxItems": 20,
+                    "description": "Posts only - the post's questions and answers, shown after its text in an accordion and described to search engines as FAQPage data. Plain text; blank lines separate an answer's paragraphs. A 400 for other types.\n",
+                    "items": {
+                      "$ref": "#/components/schemas/PostFaq"
+                    }
                   }
                 }
               }
@@ -19463,6 +21384,14 @@
                   },
                   "featured": {
                     "type": "boolean"
+                  },
+                  "faqs": {
+                    "type": "array",
+                    "maxItems": 20,
+                    "description": "Posts only - replaces the post's questions and answers; an empty list removes them. A 400 for other types.\n",
+                    "items": {
+                      "$ref": "#/components/schemas/PostFaq"
+                    }
                   }
                 }
               }
@@ -21372,6 +23301,372 @@
         }
       }
     },
+    "/v1/platform/external-programs": {
+      "get": {
+        "operationId": "listExternalPrograms",
+        "summary": "List external programs",
+        "description": "The organization's external programs, by name: the third parties - MultiSport, a municipal scheme, a corporate wellness card - that pay for members' visits. A booking or check-in made on one records it as the entrance method, and the club bills the program for those visits.\n",
+        "tags": [
+          "External Programs"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "clubId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only programs tied to this club. Programs honoured at every club are left out."
+          },
+          {
+            "in": "query",
+            "name": "isActive",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "External programs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformExternalProgram"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `external-programs:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createExternalProgram",
+        "summary": "Create an external program",
+        "description": "Adds a program members can use to pay for visits. It starts active, and is offered on a booking only for what `validFor.scopes` names; a program with no scopes is for check-ins only. Every type id in `validFor` must be one of the organization's, and `clubId` one of its clubs.\n\nA `code` another program already has is refused with `409 CONFLICT`. A `knownProgram` the organization already has is refused with `409 KNOWN_PROGRAM_TAKEN`, and one not offered in the club's country with `400 KNOWN_PROGRAM_UNAVAILABLE`. A `cardFormat` the program cannot read is `400 CARD_FORMAT_NOT_ALLOWED`. Supports the `Idempotency-Key` header.\n",
+        "tags": [
+          "External Programs"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformExternalProgramCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "External program created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformExternalProgram"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `external-programs:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The code or the known program is already taken in this organization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/external-programs/{id}": {
+      "get": {
+        "operationId": "getExternalProgram",
+        "summary": "Get an external program",
+        "tags": [
+          "External Programs"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "External program id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The external program",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformExternalProgram"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `external-programs:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateExternalProgram",
+        "summary": "Update an external program",
+        "description": "Edits an external program. Send only what changes; an omitted field is left alone, and an empty body is a 400. `validFor` and `operatingHours` each **replace** the stored value when sent, so read the program first and send the whole value you want.\n\nA new price applies to visits recorded from then on; visits already recorded keep what they were charged. Once members hold cards on the program its `knownProgram` can no longer change (`409 PROGRAM_HAS_CARDS`). The other refusals are as on create.\n",
+        "tags": [
+          "External Programs"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "External program id"
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformExternalProgramUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated external program",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformExternalProgram"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `external-programs:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "description": "The code or the known program is already taken, or members hold cards on it",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteExternalProgram",
+        "summary": "Delete an external program",
+        "description": "Deletes a program nobody has used. A program with visits, bookings or members' cards on it keeps them - the visits are what the club bills the program from - so it is deactivated instead, exactly as `PATCH isActive: false` would; `deleted` says which happened.\n",
+        "tags": [
+          "External Programs"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "External program id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted, or deactivated because it has been used",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "deleted"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "deleted": {
+                      "type": "boolean",
+                      "description": "false: it had been used, so it was deactivated instead."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `external-programs:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
     "/v1/platform/forms": {
       "get": {
         "operationId": "listForms",
@@ -22540,7 +24835,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Every instructor type in the organization, by name",
+            "description": "Every instructor type in the organization, in the order staff set in Settings",
             "content": {
               "application/json": {
                 "schema": {
@@ -22787,11 +25082,75 @@
         }
       }
     },
+    "/v1/platform/instructor-types/order": {
+      "put": {
+        "operationId": "updateInstructorTypeOrder",
+        "summary": "Reorder instructor types",
+        "description": "Sets the order of the organization's instructor types: the ids, first to last. Every list of them follows it - this API, the 1club admin, the club's website and member apps. A type left out (one added since you read the list) keeps its place after the listed ones. Returns the list as it now stands.\n",
+        "tags": [
+          "Instructors"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformTypeOrder"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Every instructor type in the organization, in the new order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlatformInstructorType"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `instructors:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
     "/v1/platform/instructors": {
       "get": {
         "operationId": "listInstructors",
         "summary": "List and search instructors",
-        "description": "Returns the organization's active instructors. Use `search` to match on name - case-insensitive and cross-script, so `maya` also matches `Мая`. Resolve a coach here and pass the returned `id` as `instructorId` when creating a booking. `bookability` says who may book them: `Admin_only` means the club reserves those bookings to its own staff, and an API key acts for the organization itself, so it may still create one. Create one with POST /v1/platform/instructors - which makes a bookable coach and nothing more: no staff-portal login comes with it.\n\nOnly active instructors are listed by default. One retired with `isActive: false` is hidden here until `includeInactive=true` asks for it, and always resolves by id - so the caller that just retired a coach can read them back and undo it. Every row reports `isActive` and `visibility`.\n",
+        "description": "Returns the organization's active instructors. Use `search` to match on name - case-insensitive and cross-script, so `maya` also matches `Мая`. Resolve a coach here and pass the returned `id` as `instructorId` when creating a booking. `bookability` says who may book them: `Admin_only` means the club reserves those bookings to its own staff, and an API key acts for the organization itself, so it may still create one; `No_one` means nobody may, an API key included, because the coach only teaches classes. Create one with POST /v1/platform/instructors - which makes a bookable coach and nothing more: no staff-portal login comes with it.\n\nOnly active instructors are listed by default. One retired with `isActive: false` is hidden here until `includeInactive=true` asks for it, and always resolves by id - so the caller that just retired a coach can read them back and undo it. Every row reports `isActive` and `visibility`.\n",
         "tags": [
           "Instructors"
         ],
@@ -22844,7 +25203,7 @@
                 "false"
               ]
             },
-            "description": "When \"true\", only instructors a customer may book (`bookability` other than `Admin_only`)"
+            "description": "When \"true\", only instructors a customer may book (`bookability` `Member_only` or `Public`)"
           },
           {
             "in": "query",
@@ -23050,7 +25409,7 @@
       "patch": {
         "operationId": "updateInstructor",
         "summary": "Update an instructor",
-        "description": "Edits an instructor's bookable profile - their sports, their member-facing rate, their availability, who may book them. Send only what changes; an omitted field is left alone.\n\nRetire a coach with `isActive: false` and bring them back with `isActive: true`; there is no delete, because an instructor carries bookings, classes and pay history. Two invariants are applied on the way through, so read the response rather than assuming the payload landed verbatim: deactivating always retires `bookability` to `Admin_only`, and `bookability` never outruns `visibility` - making someone `Private` pulls a `Public` bookability down with it.\n\n`contactId` is not editable: the profile is bound to one person, and re-pointing it would silently transfer their bookings and their pay. The staff-portal fields are refused here for the same reasons as on the create.\n",
+        "description": "Edits an instructor's bookable profile - their sports, their member-facing rate, their availability, who may book them. Send only what changes; an omitted field is left alone.\n\nRetire a coach with `isActive: false` and bring them back with `isActive: true`; there is no delete, because an instructor carries bookings, classes and pay history. Two invariants are applied on the way through, so read the response rather than assuming the payload landed verbatim: deactivating always retires `bookability` to `Admin_only` (or leaves it at `No_one`), and `bookability` never outruns `visibility` - making someone `Private` pulls a `Public` bookability down with it.\n\n`contactId` is not editable: the profile is bound to one person, and re-pointing it would silently transfer their bookings and their pay. The staff-portal fields are refused here for the same reasons as on the create.\n",
         "tags": [
           "Instructors"
         ],
@@ -23853,6 +26212,540 @@
                 }
               }
             }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/member-accounts": {
+      "get": {
+        "operationId": "listMemberAccounts",
+        "summary": "List household and company accounts",
+        "description": "The organization's household and company accounts: the family or employer a group of contacts belongs to, which an invoice can be addressed to. Pass `contactId` to see the accounts one contact belongs to. Requires `contacts:read`.\n",
+        "tags": [
+          "Member Accounts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "household",
+                "company"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "description": "Part of the account name"
+          },
+          {
+            "in": "query",
+            "name": "contactId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only accounts this contact is a member of"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of accounts, by name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformMemberAccountPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createMemberAccount",
+        "summary": "Create a household or company account",
+        "description": "Creates an account with its first member, who becomes the primary contact. A company needs a name; a household without one is named after its first member. The first member is owner of a household and employee of a company unless `role` says otherwise - an admin can act for every other member from the member apps, so grant it deliberately.\n\nRequires `contacts:write`. Supports the `Idempotency-Key` header.\n",
+        "tags": [
+          "Member Accounts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformMemberAccountCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformMemberAccountDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/member-accounts/{id}": {
+      "get": {
+        "operationId": "getMemberAccount",
+        "summary": "Get a household or company account",
+        "description": "One account with its members and their roles. Requires `contacts:read`.",
+        "tags": [
+          "Member Accounts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformMemberAccountDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateMemberAccount",
+        "summary": "Update a household or company account",
+        "description": "Renames an account, changes its primary contact (who must already be a member) or its billing details. Send only what changes. Requires `contacts:write`.\n",
+        "tags": [
+          "Member Accounts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformMemberAccountUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The account as saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformMemberAccountDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteMemberAccount",
+        "summary": "Delete a household or company account",
+        "description": "Deletes the account and ungroups its members. The members stay as contacts, and invoices and charges addressed to the account keep their rows without it. Requires `contacts:delete`.\n",
+        "tags": [
+          "Member Accounts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Account deleted"
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/member-accounts/{id}/members": {
+      "post": {
+        "operationId": "createMemberAccountMember",
+        "summary": "Add a member to an account",
+        "description": "Adds an existing contact to the account. Roles are owner, adult or dependent for a household and admin or employee for a company; left out, a household member is an adult (owner when the account has nobody yet) and a company member an employee. A contact may belong to several accounts, but to each only once. Requires `contacts:write`.\n",
+        "tags": [
+          "Member Accounts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "contactId"
+                ],
+                "properties": {
+                  "contactId": {
+                    "type": "integer"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "owner",
+                      "adult",
+                      "dependent",
+                      "admin",
+                      "employee"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The account with its members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformMemberAccountDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "description": "The contact is already a member of this account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/member-accounts/{id}/members/{contactId}": {
+      "patch": {
+        "operationId": "updateMemberAccountMember",
+        "summary": "Change a member's role",
+        "description": "Changes the role of one member, within the roles the account's type allows. Requires `contacts:write`.",
+        "tags": [
+          "Member Accounts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "contactId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "owner",
+                      "adult",
+                      "dependent",
+                      "admin",
+                      "employee"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The account with its members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformMemberAccountDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteMemberAccountMember",
+        "summary": "Remove a member from an account",
+        "description": "Takes a contact out of the account; the contact itself stays. Removing the primary contact leaves the account without one until another member is set as primary. Requires `contacts:write`.\n",
+        "tags": [
+          "Member Accounts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "contactId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The account with its remaining members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformMemberAccountDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PlatformForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"
@@ -24708,7 +27601,7 @@
       "get": {
         "operationId": "listNotificationSettings",
         "summary": "Get notification settings",
-        "description": "For each role (admin, manager, front_desk, instructor, member), the notification categories its people get and, for each, whether it is on, on which channels (`app`, `email`, `sms`), and whether it is locked so people cannot change it themselves. These are defaults: they reach everyone in the role who has not chosen for themselves, and `overriddenUserCount` says how many have. `isConfigured` is false where the organization still has 1club's default. Members' categories begin `user_` (e.g. `user_booking`, their booking confirmations and changes). Requires `notifications:read`.\n",
+        "description": "For each role (admin, manager, front_desk, sales, instructor, member), the notification categories its people get and, for each, whether it is on, on which channels (`app`, `email`, `sms`), and whether it is locked so people cannot change it themselves. These are defaults: they reach everyone in the role who has not chosen for themselves, and `overriddenUserCount` says how many have. `isConfigured` is false where the organization still has 1club's default. Members' categories begin `user_` (e.g. `user_booking`, their booking confirmations and changes). Requires `notifications:read`.\n",
         "tags": [
           "Notifications"
         ],
@@ -24775,6 +27668,7 @@
                       "admin",
                       "manager",
                       "front_desk",
+                      "sales",
                       "instructor",
                       "member"
                     ]
@@ -24861,6 +27755,7 @@
                       "admin",
                       "manager",
                       "front_desk",
+                      "sales",
                       "instructor",
                       "member"
                     ]
@@ -24924,7 +27819,7 @@
       "get": {
         "operationId": "listPayLedger",
         "summary": "List what coaches earned",
-        "description": "Returns the pay ledger for a period: one line per unit of work a coach is paid for (a private session, a class, an attendee of a class), with what it paid under their pay rate policy and how. A pay rate policy is the rule; this is the money it produced.\n\nThe period is whole days on the organization's clock, both included, at most 93 days, and a line is dated by when the work happened. Work the paid-booking gate is still holding back is `pending`, at what it will pay once the member settles; `totals` keeps it apart from what is `earned`, and covers every page.\n\nNeeds `transactions:read` (the lines are per booking and per coach, which the totals-only `analytics:read` does not cover) and `staff:read` (it is what each member of staff is paid).\n",
+        "description": "Returns the pay ledger for a period: one line per unit of work a coach is paid for (a private session, a class, an attendee of a class), with what it paid under their pay rate policy and how. A pay rate policy is the rule; this is the money it produced.\n\nThe period is whole days on the organization's clock, both included, at most 93 days, and a line is in the period its session ended in. Work the paid-booking gate is still holding back is `pending`, at what it will pay once the member settles; `totals` keeps it apart from what is `earned`, and covers every page.\n\nNeeds `transactions:read` (the lines are per booking and per coach, which the totals-only `analytics:read` does not cover) and `staff:read` (it is what each member of staff is paid).\n",
         "tags": [
           "Pay Rate Policies"
         ],
@@ -27836,7 +30731,7 @@
       "get": {
         "operationId": "listProgressionTracks",
         "summary": "List progression tracks",
-        "description": "Returns the progression tracks the organization uses - its own and the global templates it has enabled - each a ladder of ranks in one discipline (a belt system, a swim-stage scheme). Resolve a track here, then pass its `id` as `progressionTrackId` when creating or updating a program to make the sessions of its class types count toward its ranks.\n\nEach track lists the programs counting toward it in `programIds`, and their class types in `classTypeIds`. An empty list means every session counts; once any program with class types is linked, only sessions of those types do. Read-only: tracks and their levels are set up in the 1club admin dashboard. There is no paging: an organization has a handful of these. Carries the `classes` scopes rather than one of its own.\n",
+        "description": "Returns the progression tracks the organization uses - its own and the global templates it has enabled - each a ladder of ranks in one discipline (a belt system, a swim-stage scheme). Pass its `id` as `progressionTrackId` when creating or updating a program to make the sessions of its class types count toward its ranks. With `includeTemplates=true` every global template is listed too, `enabled` saying which the organization uses.\n\nEach track lists the programs counting toward it in `programIds`, and their class types in `classTypeIds`. An empty list means every session counts; once any program with class types is linked, only sessions of those types do. There is no paging: an organization has a handful of these. Carries the `classes` scopes rather than one of its own.\n",
         "tags": [
           "Classes"
         ],
@@ -27845,9 +30740,23 @@
             "customerApiAuth": []
           }
         ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "includeTemplates",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Also list the global templates the organization has not enabled."
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Every progression track the organization uses",
+            "description": "The progression tracks",
             "content": {
               "application/json": {
                 "schema": {
@@ -27864,6 +30773,9 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
           "401": {
             "$ref": "#/components/responses/PlatformUnauthorized"
           },
@@ -27876,6 +30788,445 @@
                 }
               }
             }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createProgressionTrack",
+        "summary": "Create a progression track",
+        "description": "Creates one of the organization's own tracks, with `name`, `sport` and usually its whole ladder in `levels`. Or pass a global template's id as `fromTemplateId` to copy it into the organization's own (what the dashboard's \"Customize\" does): the copy takes the template's levels, members' ranks on the template move onto the copy, programs linked to the template count toward the copy, and the template is disabled. Any other field sent changes the copy, except `levels`: the copy's levels have ids only once it exists, so change them with a PATCH. A save that is refused writes nothing. Supports the `Idempotency-Key` header.\n",
+        "tags": [
+          "Classes"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformProgressionTrackCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The new track and its ladder",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProgressionTrackDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `classes:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/progression-tracks/{id}": {
+      "get": {
+        "operationId": "getProgressionTrack",
+        "summary": "Get a progression track",
+        "description": "One track with its ladder, lowest rank first: each level's name, colour and the promotion requirement members meet at the rank below before they are eligible for it. Answers for a global template the organization has not enabled too, so it can be looked at before it is enabled or copied.\n",
+        "tags": [
+          "Classes"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The track and its ladder",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProgressionTrackDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `classes:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateProgressionTrack",
+        "summary": "Update a progression track",
+        "description": "Changes one of the organization's own tracks. Send only what changes. A `levels` list is the whole ladder, lowest rank first: a level with an `id` is kept (only the fields it sends change), one without is added, and one left out is removed - refused with a 409 when members hold it. Removing a level drops its curriculum.\n\nA global template is read-only: the one field it takes is `enabled`, to start or stop using it. Disabling one members hold ranks on is a 409. To change a template, copy it with `fromTemplateId` on create.\n",
+        "tags": [
+          "Classes"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformProgressionTrackUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The track and its ladder",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProgressionTrackDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `classes:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "description": "A level left out of `levels` is held by members, or a template being disabled still has members ranked on it",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/progression-tracks/{id}/members": {
+      "get": {
+        "operationId": "listProgressionTrackMembers",
+        "summary": "List a track's members",
+        "description": "Everyone whose current rank is on the track, lowest rank first, each with their level, stripes, the date they earned it and how close they are to the next rank against its promotion requirement. `levelId` narrows to one rank (\"every yellow belt\"); `eligibleOnly=true` to those who meet every requirement the next rank sets (\"who is eligible for grading\"). Archived contacts are left out. Requires `contacts:read`.\n",
+        "tags": [
+          "Contacts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "levelId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Only members whose current rank is this level of the track."
+          },
+          {
+            "in": "query",
+            "name": "eligibleOnly",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Only members who meet every requirement the next rank sets."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of the track's members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformTrackMemberPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `contacts:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/progression-tracks/{id}/ranks": {
+      "post": {
+        "operationId": "createProgressionTrackRank",
+        "summary": "Give members a rank",
+        "description": "Gives up to 100 members a rank on the track: one named `levelId` (with `stripes`), or `next: true` for each member's own next rank with stripes back to zero, as after a grading. `earnedOn` backdates it (a club recording belts it awarded before); it defaults to today. Each one is added to the member's timeline as the dashboard does, and a move forward tells the member unless `notifyMember` is false - send false when recording ranks members already hold. One member's failure never stops the rest: the result says who was ranked, skipped and failed. Requires `contacts:write`.\n",
+        "tags": [
+          "Contacts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformProgressionRankRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Who was ranked, skipped and failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProgressionRankResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `contacts:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/contacts/{contactId}/progression": {
+      "get": {
+        "operationId": "getContactProgression",
+        "summary": "Get a contact's ranks",
+        "description": "The member's current rank on each track the organization uses - level, stripes, the date it was earned and how close they are to the next rank - and their timeline of every rank and stripe recorded, latest earned first. Requires `contacts:read`.\n",
+        "tags": [
+          "Contacts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contactId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The contact's ranks and timeline",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformContactProgression"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `contacts:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"
@@ -28234,7 +31585,7 @@
       "get": {
         "operationId": "getMembersReport",
         "summary": "Members report for a period",
-        "description": "The organization's customers over a period: how many Members (holding a recurring membership or season pass) and Drop-ins (holding a pass, or visiting, without one) it has now, with how many contacts hold each contact type (`current.byType`, leads and lapsed included), how many became a customer or a Member for the first time in the period, and how the counts moved.\n\n`newCustomers` is the admin Members dashboard's New customers: contacts who became a Member or a Drop-in for the first time, so a regular coming back after a quiet month is not new. `newMembers` is the same rule for Members alone, so a Drop-in taking their first membership counts. `trend` is the dashboard's growth chart, the counts at the end of each day (a month or less) or week. With `contacts:read` as well, `lifecycle` adds the Customer lifecycle report's moves between contact types: upgrades, downgrades, lapses and win-backs.\n\nOrganization-wide: a contact belongs to the organization, not to one of its clubs. Days are the club's own calendar days, on the organization's clock. A period may span at most 366 days. Reports have their own limit of 20 requests a minute, on top of the platform's.\n",
+        "description": "The organization's customers over a period: how many Members (holding a recurring membership or season pass) and Drop-ins (holding a pass, or visiting, without one) it has now, with how many contacts hold each contact type (`current.byType`, leads and lapsed included), how many became a customer or a Member for the first time in the period, and how the counts moved.\n\n`newCustomers` is the admin Members dashboard's New customers: contacts who became a Member or a Drop-in for the first time, so a regular coming back after a quiet month is not new. `newMembers` is the same rule for Members alone, so a Drop-in taking their first membership counts. `trend` is the dashboard's growth chart, the counts at the end of each day (a month or less) or week. With `contacts:read` as well, `lifecycle` adds the Customer lifecycle report's moves between contact types: upgrades, downgrades, lapses and win-backs, and `churn` adds its churn: the contacts whose recurring membership ended in the period with no other one following within `graceDays`, the `rate` among those active on the first day, and `reasons` for why they left. Pass and drop-in holders lapse rather than churn, so `churn` never counts them. `reasons` and `frozen` come from the membership status history, which began on the day it was introduced, so both are null for a period that ended before `historyFrom`; the figure itself is there for any period.\n\nOrganization-wide: a contact belongs to the organization, not to one of its clubs. Days are the club's own calendar days, on the organization's clock. A period may span at most 366 days. Reports have their own limit of 20 requests a minute, on top of the platform's.\n",
         "tags": [
           "Reports"
         ],
@@ -28572,6 +31923,207 @@
           },
           "409": {
             "description": "Another account in this organization already uses that `code`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/setup-checklist": {
+      "get": {
+        "operationId": "getSetupChecklist",
+        "summary": "Get the club setup checklist",
+        "description": "The steps the organization takes to go live, in seven stages (club, spaces, sales, marketing, members, experience, launch). The spaces stage follows its kind of club (`journey`: racket, gym, studio, martial-arts, climbing, wellness, or general); the rest are the same for every club. An independent coach's organization (`professional`) has its own steps in every stage and no members stage. An `optional` step is left out of `completed` and `total`. Each step is `done` when the organization's data shows it or someone marked it done, `skipped` when someone marked it not needed, and `todo` otherwise; `mark` is what was set by hand. Each step carries the admin page it is done on (`pageUrl`, a full address; `page`, the same as a path) and its guide (`guide`, a docs.1club.ai URL). Requires `clubs:read`.\n",
+        "tags": [
+          "Setup"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The setup checklist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "journey": {
+                      "type": "string",
+                      "enum": [
+                        "racket",
+                        "gym",
+                        "studio",
+                        "martial-arts",
+                        "climbing",
+                        "wellness",
+                        "general",
+                        "professional"
+                      ]
+                    },
+                    "completed": {
+                      "type": "integer",
+                      "description": "Steps done or skipped"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "groups": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "enum": [
+                              "club",
+                              "spaces",
+                              "sales",
+                              "marketing",
+                              "members",
+                              "experience",
+                              "launch"
+                            ]
+                          },
+                          "items": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": {
+                                  "type": "string",
+                                  "example": "court_format"
+                                },
+                                "state": {
+                                  "type": "string",
+                                  "enum": [
+                                    "done",
+                                    "todo",
+                                    "skipped"
+                                  ]
+                                },
+                                "mark": {
+                                  "type": "string",
+                                  "enum": [
+                                    "done",
+                                    "skipped"
+                                  ],
+                                  "nullable": true
+                                },
+                                "optional": {
+                                  "type": "boolean"
+                                },
+                                "page": {
+                                  "type": "string",
+                                  "example": "/settings/clubs/area-types"
+                                },
+                                "pageUrl": {
+                                  "type": "string",
+                                  "example": "https://admin.1club.ai/settings/clubs/area-types"
+                                },
+                                "guide": {
+                                  "type": "string",
+                                  "example": "https://docs.1club.ai/settings/areas"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `clubs:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/setup-checklist/steps/{step}": {
+      "put": {
+        "operationId": "updateSetupChecklistStep",
+        "summary": "Mark a setup step",
+        "description": "Marks one step of the setup checklist `done` (for a step the data cannot show, or one done elsewhere) or `skipped` (not needed at this club), or clears the mark with `null`. A step the data shows done stays done whatever is marked. Applies at once for everyone in the organization. Answers with the whole checklist. Requires `organization:write`.\n",
+        "tags": [
+          "Setup"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "step",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "external_programs"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "mark"
+                ],
+                "properties": {
+                  "mark": {
+                    "type": "string",
+                    "enum": [
+                      "done",
+                      "skipped"
+                    ],
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The setup checklist after the change"
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `organization:write` scope",
             "content": {
               "application/json": {
                 "schema": {
@@ -29483,7 +33035,7 @@
       "get": {
         "operationId": "getStaff",
         "summary": "List staff",
-        "description": "Everyone with access to the organization's admin portal, with their role (`admin`, `manager`, `front_desk` or `instructor`) and whether they are an owner. Members are not listed. Requires `staff:read`.\n",
+        "description": "Everyone with access to the organization's admin portal, with their role (`admin`, `manager`, `front_desk`, `sales` or `instructor`) and whether they are an owner. Members are not listed. Requires `staff:read`.\n",
         "tags": [
           "Staff"
         ],
@@ -29569,6 +33121,7 @@
                       "admin",
                       "manager",
                       "front_desk",
+                      "sales",
                       "instructor"
                     ]
                   },
@@ -29718,6 +33271,7 @@
               "enum": [
                 "manager",
                 "front_desk",
+                "sales",
                 "instructor"
               ]
             }
@@ -29803,6 +33357,7 @@
               "enum": [
                 "manager",
                 "front_desk",
+                "sales",
                 "instructor"
               ]
             }
@@ -31290,6 +34845,104 @@
             }
           }
         }
+      },
+      "delete": {
+        "operationId": "deleteTransaction",
+        "summary": "Delete an unpaid charge",
+        "description": "Removes a charge raised by mistake from the ledger. Only a charge nothing has happened to can be deleted: unpaid (`pending`, `overdue` or `failed`) or already `void`, and with no payment, invoice, Wallet entry, refund or other charge referring to it, and on no open order (`409 CHARGE_ON_OPEN_ORDER`) - anything else is refused with `409 TRANSACTION_HAS_RECORDS`, and should be voided instead. A paid charge is refused with `409 PAID_TRANSACTION_REQUIRES_REFUND`, and a settled or cancelled one with `409 CLOSED_TRANSACTION_NOT_DELETABLE`. An API key reaches only the charges of bookings it made through the API, as on a void.\n\nWhen the charge was the last one of a pass that was never paid, the pass is cancelled with it, with its bookings still ahead; `releasedMembershipIds` names them. Deleting cannot be undone: to keep a record that the charge existed, void it.\n",
+        "tags": [
+          "Transactions"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The charge was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "releasedMembershipIds"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "The deleted transaction's id"
+                    },
+                    "releasedMembershipIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "description": "Never-paid passes cancelled because this was their last charge"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid transaction ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `transactions:delete` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Paid (refund it instead), closed out, or referred to by a payment, invoice or other record (void it instead)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
       }
     },
     "/v1/platform/transactions/{id}/refund": {
@@ -31394,6 +35047,108 @@
           },
           "409": {
             "description": "Already refunded in full, or the reference is already recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/transactions/{id}/void": {
+      "post": {
+        "operationId": "createTransactionVoid",
+        "summary": "Void an unpaid charge",
+        "description": "Marks a charge as never owed: it leaves the member's amount due, bill runs and revenue. Nothing is deleted - the transaction stays in the ledger with `paymentStatus: void`. Only an unpaid charge can be voided (`pending`, `overdue` or `failed`). A paid one is refused with `409 PAID_TRANSACTION_REQUIRES_REFUND`, since voiding it would erase a real sale, and a settled or cancelled one with `409 CLOSED_TRANSACTION_NOT_VOIDABLE`. An API key reaches only the charges of bookings it made through the API, and never another key's managed booking; any other charge is a 404.\n\nWhen the charge was the last one of a pass that was never paid, the pass is cancelled with it, with its bookings still ahead; `releasedMembershipIds` names them.\n",
+        "tags": [
+          "Transactions"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The voided transaction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PlatformTransaction"
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "releasedMembershipIds"
+                      ],
+                      "properties": {
+                        "releasedMembershipIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "integer"
+                          },
+                          "description": "Never-paid passes cancelled because this was their last charge"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid transaction ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `transactions:delete` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already void, paid (refund it instead), or closed out",
             "content": {
               "application/json": {
                 "schema": {

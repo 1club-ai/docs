@@ -104,6 +104,7 @@ Grant only the scopes the integration actually needs. The Platform API supports 
 | Booking policies                   | `booking-policies:read`, `booking-policies:write`                |
 | Document rules                     | `document-rules:read`, `document-rules:write`                    |
 | External programs                  | `external-programs:read`, `external-programs:write`              |
+| Promotions                         | `promotions:read`                                                |
 | Message templates                  | `templates:read`, `templates:write`                              |
 | Events                             | `events:read`, `events:write`                                    |
 | Messages (drafts only)             | `messages:read`, `messages:write`                                |
@@ -117,6 +118,8 @@ Grant only the scopes the integration actually needs. The Platform API supports 
 `transactions:delete` voids an unpaid charge, or deletes one raised by mistake that nothing refers to. A paid charge can't be voided or deleted - refund it instead - and an API key reaches only the charges of bookings it made through the API. `bookings:delete` permanently deletes a booking entered by mistake, with its unpaid charges, check-ins and players, and gives back any pass visit it used. A paid or invoiced booking can't be deleted: cancel and refund it instead. Over OAuth, only admins can delete bookings by default.
 
 Payment methods are read with `transactions:read`; `payment-methods:write` adds, renames and removes them. `staff:write` is accepted only from a signed-in person over OAuth: an API key that holds it is still refused.
+
+`promotions:read` lists your discounts and vouchers with their promo codes, dates and redemptions. Promotions are created and edited in 1club, not through the API.
 
 `GET /v1/platform/me` needs no scope and returns the scopes a key holds - see [Verify a key](/api-reference/channel-integration/authentication#verify-a-key).
 

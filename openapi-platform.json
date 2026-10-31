@@ -90,7 +90,8 @@
               "notifications:read": "View which notifications each role gets by default, and on which channels",
               "notifications:write": "Change which notifications each role gets and on which channels, and apply those defaults to everyone in a role, replacing their own choices",
               "competitors:read": "View the competitors you follow, their prices and Google ratings, and how your prices compare with the market",
-              "competitors:write": "Add, edit and remove the competitors you follow, and have their websites read again"
+              "competitors:write": "Add, edit and remove the competitors you follow, and have their websites read again",
+              "promotions:read": "View your promotions - discounts and vouchers, their promo codes, dates and how often they were redeemed"
             }
           }
         }
@@ -14701,6 +14702,115 @@
                 }
               }
             }
+          }
+        }
+      },
+      "PlatformPromotion": {
+        "type": "object",
+        "properties": {
+          "promotionId": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string",
+            "description": "What members see beside the discounted price"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "discount",
+              "voucher"
+            ],
+            "description": "`discount` comes off what is bought; `voucher` is an amount the member keeps as credit"
+          },
+          "discountFormat": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "percent",
+              "amount",
+              null
+            ],
+            "description": "A discount's form; null on a voucher, whose value is an amount"
+          },
+          "value": {
+            "type": "number",
+            "description": "The percentage off, or the amount in the organization's currency"
+          },
+          "code": {
+            "type": "string",
+            "nullable": true,
+            "description": "The promo code a member types; null when there is none"
+          },
+          "autoApply": {
+            "type": "boolean",
+            "description": "Applies itself at checkout, without a code"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "live",
+              "ended"
+            ],
+            "description": "Where the promotion is in its date range now"
+          },
+          "redemptionCount": {
+            "type": "integer",
+            "description": "How many times it has been redeemed"
+          },
+          "maxRedemptions": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The most it may be redeemed in all; null for no limit"
+          },
+          "maxRedemptionsPerContact": {
+            "type": "integer",
+            "nullable": true,
+            "description": "The most one member may redeem it; null for no limit"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PlatformPromotionPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformPromotion"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total promotions matching the filters, ignoring pagination"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
           }
         }
       },
@@ -31668,6 +31778,166 @@
                 }
               }
             }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/promotions": {
+      "get": {
+        "operationId": "listPromotions",
+        "summary": "List promotions",
+        "description": "The organization's promotions, newest first: money off that a member reaches by typing its promo code or that applies itself at checkout (`autoApply`). A `discount` comes off what is bought, as a percentage or an amount (`discountFormat`); a `voucher` is an amount the member keeps as credit.\n\n`status` places a promotion in its date range: `scheduled` before it starts, `live` while it runs, `ended` after it ends. Promotions are created and edited in 1club, where their audience and conditions are set.\n",
+        "tags": [
+          "Promotions"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "description": "Match on the name or the promo code, case-insensitive"
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "discount",
+                "voucher"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "scheduled",
+                "live",
+                "ended"
+              ]
+            },
+            "description": "Only promotions at this point of their date range"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of promotions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformPromotionPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `promotions:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/promotions/{id}": {
+      "get": {
+        "operationId": "getPromotion",
+        "summary": "Get a promotion",
+        "description": "One promotion, with its promo code, dates and redemptions.",
+        "tags": [
+          "Promotions"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "1club promotion id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The promotion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformPromotion"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `promotions:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
           },
           "429": {
             "$ref": "#/components/responses/PlatformRateLimited"

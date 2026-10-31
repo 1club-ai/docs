@@ -19,6 +19,7 @@ keywords:
     void_transaction,
     delete_booking,
     list_external_programs,
+    list_promotions,
     booking labels,
     availability,
     platform api,
@@ -194,6 +195,8 @@ This is the complete tool list for both 1club MCP servers. An assistant sees onl
 | `create_external_program` | Adds an external program members can use to pay for visits | `external-programs:write` |
 | `update_external_program` | Edits an external program, including what it pays and what it can be used for | `external-programs:write` |
 | `delete_external_program` | Deletes an unused external program, or deactivates one that has visits, bookings or cards | `external-programs:write` |
+| `list_promotions` | Lists your discounts and vouchers, newest first, with their promo codes, dates, and redemptions | `promotions:read` |
+| `get_promotion` | Opens one promotion with its value, promo code, dates, and redemptions | `promotions:read` |
 | `list_templates` | Lists your message templates with their content | `templates:read` |
 | `get_template` | Opens one message template | `templates:read` |
 | `create_template` | Creates a message template | `templates:write` |
@@ -335,12 +338,13 @@ Nothing on this server writes. A booking is completed on 1club.me, which is why 
 
 ## What is not exposed
 
-The admin server is built strictly on the documented Platform API, so anything that API does not cover is unreachable through MCP today. That currently includes automations and promotions, payments, and access control.
+The admin server is built strictly on the documented Platform API, so anything that API does not cover is unreachable through MCP today. That currently includes automations, payments, and access control.
 
 Some areas are covered only in part:
 
 - **Messages** can be drafted, edited, and read, but not sent. A draft created with `create_message_draft` is sent from the 1club inbox.
 - **Invoices** are read-only. Issuing, sending, charging, and voiding invoices stay in the 1club dashboard.
+- **Promotions** are read-only. Creating and editing discounts and vouchers stays in the 1club dashboard.
 - **Reports** are summaries for a period (`get_revenue_report`, `get_activity_report`, `get_memberships_report`, `get_members_report`), not the full analytics screens.
 - **Contacts** can be created, edited, and archived, but not deleted. **Memberships** are readable, creatable, and editable, but not deletable.
 - **Forms** go live as soon as they are created or edited, and can't be deleted here, because deleting a form deletes every submission made through it.

@@ -1,6 +1,6 @@
 ---
 title: Meta
-description: Connect your Meta Business account so your Facebook and Instagram ads are measured on the bookings and revenue they actually produce, not just clicks.
+description: Connect your Meta Business account so your Facebook and Instagram ads are measured on the bookings and revenue they actually produce, not just clicks, and so the leads from your instant forms land in your pipeline.
 keywords:
   [
     meta,
@@ -17,6 +17,9 @@ keywords:
     marketing cookies,
     consent,
     events manager,
+    lead ads,
+    instant forms,
+    leads,
   ]
 ---
 
@@ -80,7 +83,7 @@ The chip on the **Connect Meta** card shows one of:
 - **Inactive** - a connection exists but isn't reporting. Either no dataset is selected yet, or access was removed on Meta's side. Pick a dataset, or click **Reconnect**.
 - **Active** - a dataset is selected and conversions are being reported.
 
-Once connected, the button changes to **Reconnect**, which reruns the Meta popup so you can share more assets or refresh access. Reconnecting keeps your dataset and ad account choices if you still share them, and keeps your switch settings. 1club also checks the connection every day, and sets the status to **Inactive** if Meta no longer accepts it.
+Once connected, the button changes to **Reconnect**, which reruns the Meta popup so you can share more assets or refresh access. Reconnecting keeps your dataset, ad account and Page choices if you still share them, and keeps your switch settings. Lead Ads stays on only if the Page is still shared. 1club also checks the connection every day, and sets the status to **Inactive** if Meta no longer accepts it.
 
 ## Meta assets
 
@@ -88,7 +91,7 @@ The **Meta assets** card shows your business name and lets you change what the c
 
 - **Dataset (pixel)** - where your page views, bookings, and purchases are reported. Nothing is tracked without one.
 - **Ad account** - used for audiences and campaigns. Not needed for tracking, but worth selecting now so you don't have to reconnect later.
-- **Facebook Page** - the Page your ads run from.
+- **Facebook Page** - the Page your ads run from, and the one [Lead Ads](#lead-ads) takes leads from.
 
 Each picker has a **None** option to clear a choice. A choice is saved as soon as you make it, and a **Meta settings saved** message confirms it.
 
@@ -152,6 +155,38 @@ Meta Events Manager has a **Test events** tool that shows conversions arriving i
 3. With **Conversions API** on, make a test booking. It appears in Meta's Test events view within a few seconds.
 4. **Clear the field when you are done**, and click outside it to save. It is only for testing.
 
+## Lead Ads
+
+Lead Ads takes in the leads your Facebook and Instagram instant forms collect. Everyone who fills in one of your Page's lead forms becomes a contact in your [pipeline](/members/leads) within seconds, in the stage you choose, so nobody downloads a CSV from Meta or copies leads over by hand.
+
+### Turn on Lead Ads
+
+1. Under **Meta assets**, choose your **Facebook Page**: the one your lead ads run from. Until a Page is selected, the switch below is greyed out and reads "Choose a Facebook Page first".
+2. On the **Lead Ads** card, turn on **Take in Lead Ads**.
+3. Choose the **Stage for new leads**. Only open stages are offered. Leave it on **Default stage** to use your default stage, or your first open stage if you have no default.
+
+1club asks Meta to send it that Page's leads as you switch it on. If Meta refuses, for example because the Page wasn't shared with 1club, you see Meta's reason and the switch stays off. Click **Reconnect**, share the Page in the popup, and try again.
+
+### What happens to each lead
+
+- **A contact in your pipeline.** The lead's email, phone and name come from the form's answers, and they enter the stage you chose. Your automations on that stage start for them straight away, as for any other lead.
+- **Matched, not added twice.** Someone already on your books is found by email, or, when the form asked for no email, by phone number together with the exact same name. They enter the pipeline too, and what they typed is not written over their details. A customer, such as a member with a live plan, stays a customer.
+- **Where they came from.** Each lead keeps whether it came from **Facebook** or **Instagram**, plus the campaign, ad set, ad and form behind it. A contact with no source is filed under the **Facebook** or **Instagram** source. The campaign is what the **Campaign** grouping of [Leads & Conversion](/analytics/sales#leads-by) reads.
+- **Staff are told.** Admins, managers and sales staff get a **New Ad Lead** notification by default, under the same category as form submissions. Change it in their [notification settings](/settings/notifications).
+- **Missed leads are picked up overnight.** If a lead doesn't come in straight away, for example during an outage on Meta's side, 1club checks your Page's forms every night and takes in any lead from the last 7 days it doesn't have yet. It never takes in leads from before you turned Lead Ads on, so switching it on doesn't flood your pipeline with old leads. A lead picked up this way is dated by when the person filled in the form.
+
+Each lead comes in once, however many times Meta sends it. A lead with neither an email nor a phone number creates no contact, since there is no way to reach them.
+
+### Limits
+
+- **One gym organization per Page.** A Facebook Page's leads go to one 1club organization. Turning Lead Ads on for a Page another organization already takes leads from shows an error. Turn it off there first.
+- **Turning it off** stops new leads coming in. The leads already in your pipeline stay.
+- **Changing the Page** while Lead Ads is on moves it to the new Page. Older leads from the new Page's forms are not imported.
+
+<Note>
+  Lead Ads needs Meta to approve 1club for reading leads. Until it has, turning it on shows a permissions error from Meta. Contact 1club support if you see one.
+</Note>
+
 ## Deactivate
 
 1. On the **Meta** page, click **Deactivate** at the top of the page.
@@ -190,6 +225,10 @@ Your dataset and its history stay in your Meta account. Deactivating removes 1cl
 - **"Your Meta connection was revoked"**, or the status went to **Inactive** on its own - access was removed on Meta's side, or Meta no longer accepts the connection. Click **Reconnect**.
 - **No conversions in Events Manager** - check that the status is **Active**, a dataset is selected, and the **Conversions API** switch is on. Use the test event code to watch events arrive live.
 - **Page views are missing but bookings appear** - that is the cookie banner doing its job. Visitors who decline marketing cookies get no pixel, so browser events are always lower than server events.
+- **Take in Lead Ads is greyed out with "Choose a Facebook Page first"** - no Page is selected. Pick your Page under **Meta assets**.
+- **"Another 1club organization already takes leads from this Facebook Page."** - a Page's leads go to one organization. Turn Lead Ads off in the other organization first.
+- **Lead Ads won't turn on and shows Meta's reason** - the Page wasn't shared with 1club, or Meta hasn't granted the permissions. Click **Reconnect** and share the Page, or contact 1club support.
+- **A lead from my form is missing** - leads that don't arrive straight away are picked up overnight. A lead with no email and no phone number creates no contact.
 
 ## Related
 
@@ -197,3 +236,5 @@ Your dataset and its history stay in your Meta account. Deactivating removes 1cl
 - [Social booking](/settings/integrations/social-booking) - tagged "Book now" links that show which social platforms drive bookings.
 - [Google Tag Manager](/settings/integrations/google-tag-manager) - load your own analytics tags on the portal and website.
 - [Automations](/marketing/automations) - follow up with the members your ads bring in.
+- [Leads](/members/leads) - the pipeline your lead ads fill.
+- [Sales analytics](/analytics/sales) - which campaigns bring leads who buy.

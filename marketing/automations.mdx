@@ -103,7 +103,7 @@ Use **Membership renewal upcoming** with **Payment method (any of)** set to **No
 | --- | --- | --- |
 | **Contact created** | A new contact is added. | - |
 | **Contact type changed** | A contact's type changes, for example a lead becomes a member. | From type, to type |
-| **Pipeline stage changed** | A contact moves to another stage of the [leads pipeline](/members/leads). | From stage, to stage |
+| **Pipeline stage changed** | A contact moves to another stage of the [leads pipeline](/members/leads). | From stage, to stage, lost reason |
 | **Account activated** | A contact activates their account: they confirm a sign-up, sign up with Google, Apple, or Facebook, or accept an invitation. | - |
 | **Contact birthday** | On the contact's birthday. | - |
 | **Tag added** | A tag is added to a contact, by staff or by a [smart tag](/settings/smart-tagging) rule. | Tags |
@@ -123,6 +123,9 @@ Many of the moments worth acting on are [smart tags](/settings/smart-tagging), w
 | A member stopped coming | **At Risk** | At Risk |
 | A payment is overdue | **Past Due**, **Overdue** | Financial |
 | A member is ready for their next level | **Eligible for Promotion** | Progression |
+| A lead went quiet in your pipeline | **Stale Lead** | Stale Lead Tag |
+| Someone answers your messages | **Engaged** | Engaged Tag |
+| Someone never answers your marketing messages | **Unresponsive** | Unresponsive Tag |
 
 A smart tag can come off and go back on, for example when a member books and then cancels. Set **Days before the same contact can be enrolled again** on the trigger so the sequence doesn't start over from its first message each time.
 
@@ -141,6 +144,7 @@ Filters narrow which triggers start the automation by what the trigger is about:
 | **Kind (any of)** | Promotion or stripe | **Promotion** or **Stripe**. |
 | **From type** / **To type** | Contact type changed | The type the contact moved from and to. |
 | **From stage** / **To stage** | Pipeline stage changed | The pipeline stage the contact moved from and to. |
+| **Lost reason (any of)** | Pipeline stage changed | For a move to **Lost**, the [reason](/members/leads#lost-and-lost-reasons) it was given, for example **Price** or **Not the right time**. A move to any other stage doesn't match. |
 | **Tags (any of)** | Tag added, Tag removed | The tag that was added or removed. |
 | **First only** | Booking created, Booking checked in, Booking completed, Visit completed, Membership created | Runs for the contact's first booking, first visit, or first membership only. A booking cancelled before it doesn't count as an earlier one. A first visit is the first time they attended, by booking or by check-in. |
 
@@ -329,6 +333,8 @@ The catalog of suggested blueprints:
 | **Failed-payment recovery** | Payment failed | Notifies your admins and managers, then messages the member to update their payment details. | The payment succeeds, within 7 days | Stripe connected |
 | **At-risk member win-back** | Tag added (At Risk) | Reaches out over three weeks to a member who stopped coming, and stops when the At Risk tag comes off. | Books or checks in, within 7 days | At Risk smart tag on, membership plans exist |
 | **Trial conversion** | Pipeline stage changed (to your trial stage) | Welcomes the lead, reminds them before their trial, and follows up the morning after depending on whether they came. | Becomes a member, within 14 days | A trial stage in your pipeline, gym runs bookings |
+| **Re-engage stale leads** | Tag added (Stale Lead) | When a lead has gone quiet in your pipeline, reaches out over a week to restart the conversation: an email in the morning, a text 3 days later, and a last email on day 7. Stops as soon as they reply, book or move stage, since any of those takes the Stale Lead tag off. A lead can enter again 30 days later. | Replies or books, within 7 days | Stale Lead smart tag on |
+| **Win back lost leads** | Pipeline stage changed (to Lost, for the reasons **Price** or **Not the right time**) | A month after a lead is lost over price or timing, checks in again by email with your plans, then sends a text a week later. Stops once they join, or if staff move them out of Lost. | Becomes a member, within 30 days | Membership plans exist |
 
 The **Review request** blueprint can also be turned on from the **Marketing** card on [Home](/home/overview): its **Turn on** button creates the automation, activates it straight away, and opens it in the builder. Because it fires on check-in, gyms that don't check members in by hand need **Auto check-in at booking start** in a [booking policy](/settings/booking-policies) for any request to go out.
 
@@ -346,6 +352,7 @@ Each blueprint declares typed **prerequisites** - dependencies it needs before i
 | Tag (for example Onboarded, At risk) | Providable | Always - created on accept |
 | Gym runs bookings | Gating | You have at least one class or area |
 | Membership plans exist | Gating | You have at least one plan |
+| Smart tag on (for example At Risk, Stale Lead) | Gating | The tag's [smart tag](/settings/smart-tagging) category is turned on |
 | Stripe connected | Gating | You have a Stripe integration configured |
 
 So a brand-new gym with no classes, no plans, and no payments connected sees only the blueprints that don't depend on those things (for example the onboarding drip and birthday celebration); the win-back and payment-recovery blueprints appear as you set the rest of the product up.

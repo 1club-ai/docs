@@ -1,10 +1,10 @@
 ---
 title: Users
-description: Invite admin staff, assign one of five roles, reset passwords, and manage invitations from Settings > Organization > Users.
+description: Invite admin staff, assign one of six roles, reset passwords, and manage invitations from Settings > Organization > Users.
 keywords: [users, staff, invite user, roles, permissions, owner, admin access, password reset, instructor]
 ---
 
-Users are the people who can sign into your 1club admin, and every organization user holds exactly one of five roles that decides what they can do once they are in. Owners and admins invite and manage them here, and managers manage staff from the **Staff** section. A role is a default bundle of permissions, not a hard-coded wall - what an operation allows is decided by the permission it requires, and an admin can fine-tune each role's permissions in the permission editor. See [Roles and permissions](/reference/roles-permissions) for the full model.
+Users are the people who can sign into your 1club admin, and every organization user holds exactly one of six roles that decides what they can do once they are in. Owners and admins invite and manage them here, and managers manage staff from the **Staff** section. A role is a default bundle of permissions, not a hard-coded wall - what an operation allows is decided by the permission it requires, and an admin can fine-tune each role's permissions in the permission editor. See [Roles and permissions](/reference/roles-permissions) for the full model.
 
 Staff can sign into the admin dashboard with **Google**, **Apple**, **Facebook**, or an email and password. See [Signing in](/reference/sign-in) for all supported methods and how to add a password to an account that was created with a social provider.
 
@@ -25,20 +25,21 @@ This page sits under **Settings**, so opening it needs organization settings acc
 
 ## The roles
 
-1club ships with five roles. Pick the one closest to what the person actually does day-to-day. Each role is a default set of `${module}.${action}.${scope}` permissions.
+1club ships with six roles. Pick the one closest to what the person actually does day-to-day. Each role is a default set of `${module}.${action}.${scope}` permissions.
 
 | Role           | Typical use                          | What it can do                                                                                                                            |
 | -------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | **Admin** (shown as **Administrator**) | Owner or main administrator | Full management of every module (members, messaging, operations, staff, billing, marketing, analytics, settings, inventory) at organization scope. |
 | **Manager**    | Gym or department manager            | Members full management; operations, marketing, analytics, and inventory full management within a location; staff management; billing read, create, and delete. No settings. |
 | **Front desk** | Receptionist or front-of-house staff | Members read, memberships read and create, messaging full, bookings create, read, and update, check-ins create and read, point of sale, billing read and create, inventory read. No settings, no organization analytics. |
+| **Sales**      | Salesperson or membership advisor    | Works the [pipeline](/members/leads): adds and edits contacts, moves and assigns leads, books trials and moves them when asked, writes to leads, signs them up to a membership and takes its payment as the desk does, and reads the Sales analytics. No billing, point of sale, settings or staff access, and deletes nothing by default. Sales staff are listed first when you assign a lead. |
 | **Instructor** | Coach or teacher                     | Manages only their own bookings, classes, and check-ins. Reads their own earnings, analytics, and messages. Reaches their own profile and notification preferences. |
 | **Member**     | End member                           | No admin dashboard permissions. Uses the member portal and public apps.                                                                   |
 
 The full module-by-module matrix lives in [Roles and permissions](/reference/roles-permissions). You can also click the **Roles & permissions** help icon (a question mark) in the invite or edit dialog to see the same grid without leaving the page.
 
 <Note>
-An admin can customise what each role can do in **Settings** > **Organization** > **Permissions** (a per-role permission editor). The five role names are fixed and you cannot add a sixth, but the permissions inside a role are adjustable. The permission editor is admin-only.
+An admin can customise what each role can do in **Settings** > **Organization** > **Permissions** (a per-role permission editor). The six role names are fixed and you cannot add another, but the permissions inside a role are adjustable. The permission editor is admin-only.
 </Note>
 
 ### Owner flag
@@ -50,7 +51,7 @@ Owner is a separate flag on the user, not a sixth role. An Admin can be marked a
 Open **Settings** > **Organization** > **Users**. The page is a single table of every organization user with these tabs across the top:
 
 - **All** - everyone in the organization.
-- **Administrator**, **Manager**, **Front Desk**, **Instructor**, **Member** - filtered by role. The page opens on **Administrator**.
+- **Administrator**, **Manager**, **Front Desk**, **Sales**, **Instructor**, **Member** - filtered by role. The page opens on **Administrator**.
 
 Each tab shows a badge with the count. The search box filters by name or email and resets pagination.
 
@@ -71,7 +72,7 @@ Click **Invite** in the top right. The **Add staff member** dialog opens with a 
 - **Add new user** - enter first name, last name, and email (plus optional contact details).
 - **Select existing contact** - pick someone who already exists in your contact list.
 
-Then choose a **Role** from the five above. If you pick **Administrator**, an **Account Owner** toggle appears - turn it on only if this person should be allowed to delete the organization. Click **Send Invitation**, and 1club sends an invitation email. The user appears in the table with status **Invited** until they accept.
+Then choose a **Role** from the six above. If you pick **Administrator**, an **Account Owner** toggle appears - turn it on only if this person should be allowed to delete the organization. Click **Send Invitation**, and 1club sends an invitation email. The user appears in the table with status **Invited** until they accept.
 
 If you pick **Instructor**, the mode toggle disappears and the dialog shows the instructor fields inline, so the profile is created in the same step. This is so an instructor always has a profile to attach classes, bookings, and schedule slots to. For an instructor you can also toggle **Allow Admin Portal Access** to decide whether they get a login and invitation email (**Create and Invite**) or exist only as a bookable resource (**Create**).
 
@@ -103,11 +104,11 @@ Existing sessions pick up the new role on their next request. There is no force 
 
 ## Who can manage whom
 
-User management is bounded by a role hierarchy (admin is more senior than manager, which is more senior than front desk and instructor, which are more senior than member):
+User management is bounded by a role hierarchy (admin is more senior than manager, which is more senior than front desk, sales and instructor, which are more senior than member):
 
 - **Admins and owners** can manage anyone, assign any role, and grant Admin or account ownership.
-- **Managers** can invite, edit, reset the password of, and remove users whose role is **below** manager (front desk, instructor, member), and can promote someone up to manager. Managers cannot modify themselves, an admin, or another manager, and can never grant the Admin role or account ownership. They do this from **Staff** > **Team** and **Staff** > **Instructors**, which only offer the actions and roles they are allowed.
-- **Front desk, instructor, and member** roles cannot manage users at all.
+- **Managers** can invite, edit, reset the password of, and remove users whose role is **below** manager (front desk, sales, instructor, member), and can promote someone up to manager. Managers cannot modify themselves, an admin, or another manager, and can never grant the Admin role or account ownership. They do this from **Staff** > **Team** and **Staff** > **Instructors**, which only offer the actions and roles they are allowed.
+- **Front desk, sales, instructor, and member** roles cannot manage users at all.
 
 The server enforces this hierarchy, so a blocked action fails even if someone reaches it by a direct link.
 

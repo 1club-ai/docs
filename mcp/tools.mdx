@@ -17,6 +17,9 @@ keywords:
     list_clubs,
     update_club_booking_labels,
     void_transaction,
+    record_payment,
+    charge_saved_card,
+    waive_cancellation_charge,
     delete_booking,
     list_external_programs,
     list_promotions,
@@ -88,6 +91,8 @@ This is the complete tool list for both 1club MCP servers. An assistant sees onl
 | `refund_transaction` | Records money given back out of a settlement | `transactions:write` |
 | `void_transaction` | Voids an unpaid charge, so it is no longer owed | `transactions:delete` |
 | `delete_transaction` | Deletes an unpaid charge raised by mistake that nothing refers to | `transactions:delete` |
+| `record_payment` | Records that a member paid what a charge still owes, with one of your payment methods recorded by hand, such as cash or a bank transfer | `payments:write` |
+| `charge_saved_card` | Charges what a charge still owes to the member's saved card, keeping the bank's decline reason | `payments:write` |
 | `get_invoice_summary` | Totals what was invoiced over a range of days, today by default | `invoices:read` |
 | `list_invoices` | Lists the invoices issued over a range of days, newest first | `invoices:read` |
 | `get_invoice` | Opens one invoice with its line items and payments | `invoices:read` |
@@ -172,6 +177,7 @@ This is the complete tool list for both 1club MCP servers. An assistant sees onl
 | `list_booking_participants` | Lists the extra players on a booking | `bookings:read` |
 | `add_booking_participant` | Adds a player to a booking | `bookings:write` |
 | `remove_booking_participant` | Removes a player from a booking | `bookings:write` |
+| `waive_cancellation_charge` | Waives what a cancelled or missed booking still owes, with a reason | `bookings:write` |
 | `list_pricing_rules` | Lists your pricing rules in the order they win | `rules:read` |
 | `get_pricing_rule` | Opens one pricing rule with its scopes and conditions | `rules:read` |
 | `create_pricing_rule` | Adds a pricing rule | `rules:write` |

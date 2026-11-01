@@ -89,6 +89,7 @@ Grant only the scopes the integration actually needs. The Platform API supports 
 | Media library                      | `media:read`, `media:write`, `media:delete`                      |
 | Clubs                              | `clubs:read`, `clubs:write`                                      |
 | Transactions                       | `transactions:read`, `transactions:write`, `transactions:delete` |
+| Payments                           | `payments:write`                                                 |
 | Invoices                           | `invoices:read`                                                  |
 | Areas, area types, and area blocks | `areas:read`, `areas:write`                                      |
 | Bookings                           | `bookings:read`, `bookings:write`, `bookings:delete`             |
@@ -114,6 +115,8 @@ Grant only the scopes the integration actually needs. The Platform API supports 
 | Notification settings              | `notifications:read`, `notifications:write`                      |
 
 `transactions:write` records a settlement (revenue collected outside 1club, reported as one sum for a gym) and refunds of it. Nothing is charged to anyone.
+
+`payments:write` takes a member's money against a charge: it records a payment collected with one of your own payment methods, such as cash or a bank transfer, and charges a member's saved card. An API key reaches only the charges of bookings it made through the API. `bookings:write` also waives what a cancelled or missed booking still owes, with a reason.
 
 `transactions:delete` voids an unpaid charge, or deletes one raised by mistake that nothing refers to. A paid charge can't be voided or deleted - refund it instead - and an API key reaches only the charges of bookings it made through the API. `bookings:delete` permanently deletes a booking entered by mistake, with its unpaid charges, check-ins and players, and gives back any pass visit it used. A paid or invoiced booking can't be deleted: cancel and refund it instead. Over OAuth, only admins can delete bookings by default.
 

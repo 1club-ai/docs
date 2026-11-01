@@ -48,11 +48,12 @@
               "transactions:read": "View transactions, revenue reports and your chart of accounts",
               "transactions:write": "Record revenue collected outside 1club, such as a marketplace payout for your bookings, and refunds of it. Nothing is charged to anyone.",
               "transactions:delete": "Void unpaid charges so they are no longer owed, and delete ones raised by mistake. A never-paid pass whose last charge goes is cancelled with it. Paid charges cannot be voided or deleted, and an API key reaches only the charges of bookings it made.",
+              "payments:write": "Record a payment against what a member owes, with one of your own payment methods such as cash or a bank transfer, and charge a member's saved card for a charge. An API key reaches only the charges of bookings it made.",
               "invoices:read": "View your invoices - who they were issued to, their amounts and status - and how much was invoiced over a period",
               "areas:read": "View areas, area types, blocks and availability",
               "areas:write": "Create and update areas and area types, and block or unblock an area",
               "bookings:read": "View bookings",
-              "bookings:write": "Create, change, reschedule and cancel bookings, and add or remove participants",
+              "bookings:write": "Create, change, reschedule and cancel bookings, add or remove participants, and waive what a cancelled or missed booking still owes",
               "bookings:delete": "Permanently delete bookings entered by mistake, with their unpaid charges, check-ins and players. A paid or invoiced booking cannot be deleted - cancel and refund it instead.",
               "contacts:read": "View contacts, their tags and custom field values, and your sales pipeline stages and sources",
               "contacts:write": "Create and update contacts and tag them, and maintain your tags, smart tag rules and contact custom fields",
@@ -14991,7 +14992,7 @@
           "coveredAmountPerVisit": {
             "type": "number",
             "nullable": true,
-            "minimum": 0.01,
+            "exclusiveMinimum": 0,
             "description": "What the program pays per visit, tax included; the member pays the rest of the price. null: the program pays for the whole visit."
           },
           "additionalPricePerVisit": {
@@ -15237,7 +15238,7 @@
           "coveredAmountPerVisit": {
             "type": "number",
             "nullable": true,
-            "minimum": 0.01,
+            "exclusiveMinimum": 0,
             "description": "What the program pays per visit, tax included; the member pays the rest of the price. null: the program pays for the whole visit."
           },
           "additionalPricePerVisit": {
@@ -17666,7 +17667,11 @@
                   },
                   "notifyCustomer": {
                     "type": "boolean",
-                    "description": "Tell the customer their booking is confirmed - email plus the in-app, WhatsApp and SMS notification, and the payment receipt for a `paid` booking. Off by default for an API key, since the calling system normally sends its own confirmation; on by default over an OAuth connection, where a staff member is booking through an assistant and their member expects to hear from the club. The club's own staff alerts are sent either way.\n"
+                    "description": "Tell the customer their booking is confirmed - email plus the in-app, WhatsApp and SMS notification, and the payment receipt for a `paid` booking. Off by default for an API key, since the calling system normally sends its own confirmation; on by default over an OAuth connection, where a staff member is booking through an assistant and their member expects to hear from the club. The club's own staff alerts are separate: see `alertStaff`.\n"
+                  },
+                  "alertStaff": {
+                    "type": "boolean",
+                    "description": "Alert the club's staff to this booking (their User Bookings notification). On by default; pass `false` for the club's own writes, such as importing bookings or syncing them from another system, so staff are not alerted once per booking.\n"
                   }
                 }
               }
@@ -17910,7 +17915,11 @@
                   },
                   "notifyCustomer": {
                     "type": "boolean",
-                    "description": "Tell the customer their booking was cancelled - email plus the in-app and WhatsApp notification. Defaults to off for a booking this API created, since callers normally send their own notice, and to on for a booking taken through 1club, whose customer expects to hear it from the club. The club's own staff alerts are sent either way.\n"
+                    "description": "Tell the customer their booking was cancelled - email plus the in-app and WhatsApp notification. Defaults to off for a booking this API created, since callers normally send their own notice, and to on for a booking taken through 1club, whose customer expects to hear it from the club. The club's own staff alerts are separate: see `alertStaff`.\n"
+                  },
+                  "alertStaff": {
+                    "type": "boolean",
+                    "description": "Alert the club's staff to this cancellation (their User Bookings notification). On by default; pass `false` for the club's own writes, such as a sync from another system.\n"
                   },
                   "keepCancellationCharge": {
                     "type": "boolean",
@@ -18257,6 +18266,166 @@
           },
           "409": {
             "description": "The booking is managed by another API key that owns its own records (`BOOKING_EXTERNALLY_MANAGED`, with the managing integration's name in `details.managedBy`); or the new price is below what has already been paid on the booking (`BOOKING_CHARGE_OVERPAID`), which needs a refund rather than an edit; or a part-paid or invoiced charge cannot be rewritten (`BOOKING_CHARGE_NEEDS_ADJUSTMENT`); or an `Idempotency-Key` was reused with a different request body.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/bookings/{id}/cancellation-charge/waive": {
+      "post": {
+        "operationId": "waiveCancellationCharge",
+        "summary": "Waive a booking's Cancellation Charge",
+        "description": "Lets the member off what a cancelled or missed (`no_show`) booking still owes under its cancellation terms, as the club's staff do from the booking: the unpaid charge is withdrawn, anything already taken from the member's Wallet for it is given back, and the reason is recorded on the booking. Money the member paid upfront stays paid. Waiving a booking already waived changes nothing. A booking that is not cancelled or missed, or carries no cancellation terms, is a 404. An API key reaches only the bookings it made through the API, and never another key's managed booking.\n",
+        "tags": [
+          "Bookings"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reason"
+                ],
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000,
+                    "description": "Why it is waived, recorded on the booking."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The booking's cancellation outcome after the waiver",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "bookingId",
+                    "outcome",
+                    "retainedAmount",
+                    "walletDeduction",
+                    "amountDue"
+                  ],
+                  "properties": {
+                    "bookingId": {
+                      "type": "integer"
+                    },
+                    "outcome": {
+                      "type": "string",
+                      "enum": [
+                        "cancelled",
+                        "no_show"
+                      ]
+                    },
+                    "retainedAmount": {
+                      "type": "number",
+                      "description": "What the club keeps for the booking",
+                      "tax included": null
+                    },
+                    "walletDeduction": {
+                      "type": "number",
+                      "description": "Still taken from the Wallet for it (0 once waived)"
+                    },
+                    "amountDue": {
+                      "type": "number",
+                      "description": "What the member still owes for it (0 once waived)"
+                    },
+                    "terms": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "The cancellation terms the booking was accepted on",
+                      "properties": {
+                        "waiver": {
+                          "type": "object",
+                          "properties": {
+                            "at": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "byUserId": {
+                              "type": "integer",
+                              "nullable": true,
+                              "description": "The member of staff who waived it; null for an API key"
+                            },
+                            "reason": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid booking ID, or no reason",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `bookings:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking not found, or it has no Cancellation Charge to waive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Managed by another key",
             "content": {
               "application/json": {
                 "schema": {
@@ -19159,7 +19328,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Case-insensitive match on the class name"
+            "description": "Case-insensitive match on the class name or its class type's name"
           },
           {
             "in": "query",
@@ -19479,6 +19648,10 @@
                   "notifyCustomer": {
                     "type": "boolean",
                     "description": "Tell the customer they are booked - email plus the in-app, WhatsApp and SMS notification. Off by default for an API key, on by default over an OAuth connection, as on POST /v1/platform/bookings.\n"
+                  },
+                  "alertStaff": {
+                    "type": "boolean",
+                    "description": "Alert the club's staff to this booking (their User Bookings notification). On by default; pass `false` for the club's own writes, such as importing bookings or syncing them from another system, so staff are not alerted once per booking.\n"
                   }
                 }
               }
@@ -23352,6 +23525,10 @@
                   "notifyCustomer": {
                     "type": "boolean",
                     "description": "Tell the customer they are booked - email plus the in-app, WhatsApp and SMS notification. Off by default for an API key, on by default over an OAuth connection, as on POST /v1/platform/bookings.\n"
+                  },
+                  "alertStaff": {
+                    "type": "boolean",
+                    "description": "Alert the club's staff to this booking (their User Bookings notification). On by default; pass `false` for the club's own writes, such as importing bookings or syncing them from another system, so staff are not alerted once per booking.\n"
                   }
                 }
               }
@@ -27711,7 +27888,7 @@
       "get": {
         "operationId": "listNotificationSettings",
         "summary": "Get notification settings",
-        "description": "For each role (admin, manager, front_desk, sales, instructor, member), the notification categories its people get and, for each, whether it is on, on which channels (`app`, `email`, `sms`), and whether it is locked so people cannot change it themselves. These are defaults: they reach everyone in the role who has not chosen for themselves, and `overriddenUserCount` says how many have. `isConfigured` is false where the organization still has 1club's default. Members' categories begin `user_` (e.g. `user_booking`, their booking confirmations and changes). Requires `notifications:read`.\n",
+        "description": "For each role (admin, manager, front_desk, sales, instructor, member), the notification categories its people get and, for each, whether it is on, on which channels (`app`, `email`, `sms`), and whether it is locked so people cannot change it themselves. These are defaults: they reach everyone in the role who has not chosen for themselves, and `overriddenUserCount` says how many have. `isConfigured` is false where the organization still has 1club's default. Categories that begin `user_` are staff alerts about members (e.g. `user_booking`, a member booked or cancelled); `booking` is a member's own booking confirmations and changes. Requires `notifications:read`.\n",
         "tags": [
           "Notifications"
         ],
@@ -35419,6 +35596,279 @@
           },
           "409": {
             "description": "Already void, paid (refund it instead), or closed out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/transactions/{id}/record-payment": {
+      "post": {
+        "operationId": "recordPayment",
+        "summary": "Record a payment for a charge",
+        "description": "Records that the member paid what a charge still owes, with one of your organization's own payment methods - money already taken at the desk, such as cash, a card on your own terminal or a bank transfer. The whole outstanding is recorded, the charge becomes `paid` and the member is sent a receipt. Nothing is charged: to take the money from a member's saved card, use `charge-saved-card`. A method that takes the money itself (Stripe, the Wallet) is refused with `400 TENDER_NOT_RECORDABLE`, a charge that owes nothing with `409 CHARGE_NOT_OWED`, and one with no contact with `400 CHARGE_HAS_NO_CONTACT`. An API key reaches only the charges of bookings it made through the API; any other charge is a 404.\n",
+        "tags": [
+          "Transactions"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "paymentMethodDefinitionId"
+                ],
+                "properties": {
+                  "paymentMethodDefinitionId": {
+                    "type": "integer",
+                    "description": "One of your payment methods recorded by hand, from `GET /v1/platform/payment-methods`."
+                  },
+                  "paymentDate": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "The day the money arrived, `YYYY-MM-DD` on the club's clock, never after today. Defaults to now."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The charge, paid, with the payment recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PlatformTransaction"
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "outstanding",
+                        "payment"
+                      ],
+                      "properties": {
+                        "outstanding": {
+                          "type": "number",
+                          "description": "What the charge still owes",
+                          "tax included (0 once recorded)": null
+                        },
+                        "payment": {
+                          "type": "object",
+                          "required": [
+                            "id",
+                            "status"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "status": {
+                              "type": "string",
+                              "enum": [
+                                "succeeded"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request, a payment method that is not recorded by hand, a date after today, or a charge with no contact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `payments:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The charge owes nothing, or another payment for it is being taken right now",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/transactions/{id}/charge-saved-card": {
+      "post": {
+        "operationId": "chargeSavedCard",
+        "summary": "Charge a charge to the member's saved card",
+        "description": "Charges what a charge still owes to the member's saved card, taken from the account of the company the charge belongs to (a guardian's card pays a dependent's charge). The charge is merchant-initiated, with nobody present to authenticate, so a card that needs 3D Secure is declined with `authentication_required`. A same-day retry for the same amount and card is not charged twice. A card the bank refuses is an answer, not an error: `payment.status` is `failed` with Stripe's reason in `payment.failureCode`, such as `insufficient_funds`, `expired_card` or `authentication_required`. A payment Stripe has not finished, or one it could not confirm either way (the card may have been charged), is `pending` (or `processing`), never `failed`: do not take the money another way until it settles. While it is pending, recording a payment for the charge is refused. A charge that owes nothing is refused with `409 CHARGE_NOT_OWED`, one with a payment already pending or processing with `409 PAYMENT_IN_PROGRESS`, a member with no saved card with `409 NO_SAVED_CARD`, and a charge with no contact with `400 CHARGE_HAS_NO_CONTACT`. An API key reaches only the charges of bookings it made through the API; any other charge is a 404.\n",
+        "tags": [
+          "Transactions"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The charge after the attempt, with how the payment went",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PlatformTransaction"
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "outstanding",
+                        "payment"
+                      ],
+                      "properties": {
+                        "outstanding": {
+                          "type": "number",
+                          "description": "What the charge still owes",
+                          "tax included": null
+                        },
+                        "payment": {
+                          "type": "object",
+                          "required": [
+                            "id",
+                            "status",
+                            "failureCode"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "integer",
+                              "nullable": true,
+                              "description": "The payment recorded; null when the card was refused"
+                            },
+                            "status": {
+                              "type": "string",
+                              "enum": [
+                                "succeeded",
+                                "processing",
+                                "pending",
+                                "failed"
+                              ]
+                            },
+                            "failureCode": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Stripe's decline code, or its error code, when `status` is `failed`"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid transaction ID, or a charge with no contact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `payments:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The charge owes nothing, a payment for it is already pending or processing, or the member has no saved card",
             "content": {
               "application/json": {
                 "schema": {

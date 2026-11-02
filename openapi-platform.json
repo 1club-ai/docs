@@ -5952,6 +5952,15 @@
               }
             }
           },
+          "sessionLengthMinutes": {
+            "type": "integer",
+            "nullable": true,
+            "description": "How long one visit lasts at the door, in minutes from its first entry; null until the end of the club's day."
+          },
+          "shareWithAccount": {
+            "type": "boolean",
+            "description": "Whether the people on the holder's account can use it too."
+          },
           "commitmentEndsAt": {
             "type": "string",
             "format": "date-time",
@@ -27080,7 +27089,7 @@
       "patch": {
         "operationId": "updateMembership",
         "summary": "Update a membership",
-        "description": "Changes whether the membership renews, when it ends, and whether it is active, paused, or cancelled. Cancelling stamps the cancellation date, as cancelling in 1club does.\n\nChanging the plan is not supported: that is a priced change needing proration, invoicing and possibly a refund. Move the customer to another plan in 1club instead.\n",
+        "description": "Changes whether the membership renews, its commitment, what it covers and counts, and whether it is active, paused, or cancelled. Cancelling stamps the cancellation date, as cancelling in 1club does.\n\nCoverage and allowance edits change this membership's own snapshot of the plan, never the plan or anyone else's membership. A new coverage decides what is spent from here on; sessions already spent stay spent.\n\nChanging the plan is not supported: that is a priced change needing proration, invoicing and possibly a refund. Move the customer to another plan in 1club instead.\n",
         "tags": [
           "Memberships"
         ],
@@ -27148,6 +27157,93 @@
                     "nullable": true,
                     "description": "Sessions left, for setting a balance migrated in. Only together with maxUses"
                   },
+                  "validFor": {
+                    "type": "object",
+                    "description": "What it covers, replaced whole. `scopes` picks classes, areas and/or instructors; `classTypes`, `areaTypes` and `instructorTypes` narrow a scope to those type ids, and a scope with no list covers every type in it. No scopes means general coverage (direct entry), refused (400) unless the plan's own coverage is general. Refused (400) on a membership with several allowances.\n",
+                    "properties": {
+                      "scopes": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "classes",
+                            "areas",
+                            "instructors"
+                          ]
+                        }
+                      },
+                      "classTypes": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        }
+                      },
+                      "areaTypes": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        }
+                      },
+                      "instructorTypes": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "sessionUnit": {
+                    "type": "string",
+                    "enum": [
+                      "booking",
+                      "hour"
+                    ],
+                    "description": "Whether a use is a booking or an hour; a change recounts what is left in the new unit. Refused (400) on a membership with several allowances, and on general coverage, where a check-in always counts one use.\n"
+                  },
+                  "sessionLengthMinutes": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1440,
+                    "nullable": true,
+                    "description": "How long one visit lasts at the door, from its first entry; null until the end of the club's day. Refused (400) unless the membership counts sessions per booking.\n"
+                  },
+                  "shareWithAccount": {
+                    "type": "boolean",
+                    "description": "Whether the people on the holder's account can use it too"
+                  },
+                  "allowances": {
+                    "type": "array",
+                    "description": "On a membership with several allowances, in place of `validFor`, `maxUses`, `usesRemaining` and `sessionUnit`. Name only the allowances that change; what is left out stays as it is. No two may cover the same type. What is used stays used: a count raised by two leaves two more.\n",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "The `allowanceId` on the membership"
+                        },
+                        "validFor": {
+                          "type": "object",
+                          "description": "What this allowance covers, replaced whole, in the shape of `validFor` above",
+                          "additionalProperties": true
+                        },
+                        "maxUses": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "Sessions each period; null for unlimited"
+                        },
+                        "sessionUnit": {
+                          "type": "string",
+                          "enum": [
+                            "booking",
+                            "hour"
+                          ]
+                        }
+                      }
+                    }
+                  },
                   "commitmentMonths": {
                     "type": "integer",
                     "minimum": 1,
@@ -27173,6 +27269,112 @@
           },
           "400": {
             "description": "Invalid body, or no fields to change",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `memberships:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
+    "/v1/platform/memberships/{id}/session-adjustments": {
+      "post": {
+        "operationId": "createMembershipSessionAdjustment",
+        "summary": "Adjust a membership's sessions",
+        "description": "Gives a pass sessions or takes some back, with a reason, recorded on the membership as staff adjustments in 1club are. The adjustment lasts for the current allowance period; the next one starts from the allowance again.\n\nSupports the `Idempotency-Key` header.\n",
+        "tags": [
+          "Memberships"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Retry-safe key; a repeat of the same request replays the first response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "units",
+                  "reason"
+                ],
+                "properties": {
+                  "units": {
+                    "type": "number",
+                    "minimum": -1000,
+                    "maximum": 1000,
+                    "description": "Sessions given (positive) or taken back (negative); hours on an hourly pass. Not zero."
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "Why, recorded with the adjustment"
+                  },
+                  "allowanceId": {
+                    "type": "integer",
+                    "description": "Which allowance, on a membership with several; required there"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The adjusted membership",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformMembership"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body, or the sessions cannot be adjusted: an unlimited membership, one that has ended, more taken back than are left, or no `allowanceId` on a membership with several\n",
             "content": {
               "application/json": {
                 "schema": {

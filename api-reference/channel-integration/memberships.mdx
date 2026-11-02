@@ -1,8 +1,19 @@
 ---
 title: "Memberships"
-description: "Put a customer on a plan, then pause, resume, or cancel it."
+description: "Put a customer on a plan, then pause, resume, cancel, or change what their membership covers and counts."
 keywords:
-  [memberships, plans, pause, resume, cancel, usesRemaining, platform api]
+  [
+    memberships,
+    plans,
+    pause,
+    resume,
+    cancel,
+    usesRemaining,
+    validFor,
+    allowances,
+    session adjustments,
+    platform api,
+  ]
 ---
 
 A **membership** puts a customer on a [plan](/api-reference/channel-integration/plans).
@@ -155,7 +166,10 @@ is a `400`, not an empty list.
 ## Get a membership
 
 Requires the `memberships:read` scope. Returns one membership by its 1club id,
-including `usesRemaining` - the sessions the customer has left.
+including `usesRemaining` - the sessions the customer has left - and `allowances`,
+which lists what it covers (`validFor`), its session count, and what is left. A
+membership sold from a plan with several allowances, such as 5 Yoga + 4 Pilates, has
+one entry for each, each with the `allowanceId` you use to change it.
 
 ```bash
 curl "https://api.1club.ai/v1/platform/memberships/7412" \
@@ -184,8 +198,16 @@ configures it:
 | `paused`    | `resumeAt`      | Pauses the membership. `resumeAt` is optional; when sent it must be in the future, and the pause lifts by itself then.  |
 | `active`    | -               | Resumes a paused membership. Only valid from `paused`.                                                                  |
 
-**A detail change** - any of `autoRenew`, `maxUses`, `usesRemaining`. Use
-`usesRemaining` to correct a balance after a migration.
+**A detail change** - any of these:
+
+- `autoRenew` - whether it renews
+- `commitmentMonths` - a new minimum term in months, counted from the start date; `null` removes it. Only a renewing membership carries one.
+- `maxUses` - session allowance; `null` for unlimited
+- `usesRemaining` - sessions left, for setting a balance migrated in. Send it together with `maxUses`: what is left otherwise follows from the allowance and what was spent. To give or take back sessions, use [session adjustments](#adjust-sessions).
+- `validFor` - what it covers. See [Change what a membership covers](#change-what-a-membership-covers).
+- `sessionUnit` - `booking` or `hour`. A change recounts what is left in the new unit.
+- `sessionLengthMinutes` - how long one visit lasts at the door, from its first entry; `null` lasts until the end of the gym's day. It applies only to a membership that counts sessions per booking.
+- `shareWithAccount` - whether the people on the holder's account can use it too
 
 `cancelMode` only applies to a cancellation and `resumeAt` only to a pause; sending
 either with the wrong status is a `400` rather than being quietly ignored.
@@ -195,8 +217,99 @@ either with the wrong status is a `400` rather than being quietly ignored.
   cannot be set here. They follow from dates, usage, and payment.
 </Note>
 
+### Change what a membership covers
+
+`validFor` replaces what the membership covers, so send the whole coverage. It uses the
+same shape as a [plan's](/api-reference/channel-integration/plans): `scopes` picks
+`classes`, `areas`, and/or `instructors`, and `classTypes`, `areaTypes`, and
+`instructorTypes` narrow a scope to those type ids. A scope with no list covers every
+type in it.
+
+```bash
+curl -X PATCH "https://api.1club.ai/v1/platform/memberships/7412" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "validFor": { "scopes": ["classes"], "classTypes": [11, 12] } }'
+```
+
+This changes the membership's own copy of the plan, never the plan or anyone else's
+membership. The new coverage decides what is spent from here on. Sessions already spent
+stay spent.
+
+These requests return a `400` instead of being stored and not acted on:
+
+| Request                                                                   | Code                             |
+| ------------------------------------------------------------------------- | -------------------------------- |
+| No coverage, on a plan limited to what it covers                          | `MEMBERSHIP_COVERAGE_REQUIRED`   |
+| `sessionUnit` on general coverage, where a check-in counts one use        | `MEMBERSHIP_GENERAL_HAS_NO_UNIT` |
+| `sessionLengthMinutes` on an unlimited membership or one counted in hours | `MEMBERSHIP_NOT_SESSION_PASS`    |
+
+A type id from another organization is also a `400`.
+
+### Change one of several allowances
+
+A membership with several allowances takes `allowances` instead of `validFor`, `maxUses`,
+`usesRemaining`, and `sessionUnit`. Send only the allowances that change, with only the
+fields that change. The rest stay as they are.
+
+```bash
+curl -X PATCH "https://api.1club.ai/v1/platform/memberships/7412" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "allowances": [{ "id": 31, "validFor": { "scopes": ["classes"], "classTypes": [13] } }] }'
+```
+
+Each entry takes:
+
+- `id` (required) - the `allowanceId` from the membership
+- `validFor` (optional) - what this allowance covers, replaced whole
+- `maxUses` (optional) - sessions each period; `null` for unlimited
+- `sessionUnit` (optional) - `booking` or `hour`
+
+No two allowances may cover the same type (`PLAN_ALLOWANCES_OVERLAP`). What is used
+stays used: a count raised by two leaves two more.
+
+Sending the wrong shape for the membership is a `400`: `MEMBERSHIP_HAS_SEVERAL_ALLOWANCES`
+for the single-allowance fields on a membership with several, and
+`MEMBERSHIP_HAS_ONE_ALLOWANCE` for `allowances` on a membership with one.
+
+## Adjust sessions
+
+Requires the `memberships:write` scope. Gives a membership sessions or takes some back,
+with a reason, the same way staff do in 1club. Use it for a goodwill session or a
+correction. To change the allowance itself, [update the membership](#update-a-membership).
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/memberships/7412/session-adjustments" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: goodwill-ivan-2026-11" \
+  -d '{ "units": 2, "reason": "Goodwill for a cancelled class" }'
+```
+
+Body fields:
+
+- `units` (required) - sessions given (positive) or taken back (negative), up to 1000 either way, and not zero. These are hours on an hourly pass.
+- `reason` (required) - why, up to 500 characters. It is recorded with the adjustment.
+- `allowanceId` (optional) - which allowance. Required on a membership with several.
+
+Returns the updated membership. On a membership with a session allowance, the adjustment
+lasts for the current allowance period, and the next period starts from the allowance
+again.
+
+| Refused with a `400`                            | Code                                   |
+| ----------------------------------------------- | -------------------------------------- |
+| The membership has unlimited sessions           | `MEMBERSHIP_SESSIONS_UNLIMITED`        |
+| The membership has ended or is awaiting payment | `MEMBERSHIP_NOT_ADJUSTABLE`            |
+| More taken back than are left                   | `SESSION_ADJUSTMENT_EXCEEDS_REMAINING` |
+| No `allowanceId` on a membership with several   | `MEMBERSHIP_ALLOWANCE_REQUIRED`        |
+
+Adjusting sessions accepts an `Idempotency-Key`, so a retry cannot adjust them twice.
+
 ## What this API does not do
 
 - **No plan changes.** Moving a customer to a different plan is a priced change needing proration, invoicing, and possibly a refund. Do it in 1club.
+- **No price or billing changes.** Changing what a membership costs, or how often it bills, is also done in 1club.
+- **No end date changes.** How long a membership runs follows from the plan. Extending one is done in 1club.
 - **No refunds.** Cancelling releases the membership; it never returns money.
 - **No deletes.** Cancel it instead, so the history stays intact.

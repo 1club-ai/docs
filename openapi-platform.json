@@ -31705,6 +31705,65 @@
         }
       }
     },
+    "/v1/platform/contacts/{contactId}/progression": {
+      "get": {
+        "operationId": "getContactProgression",
+        "summary": "Get a contact's ranks",
+        "description": "The member's current rank on each track the organization uses - level, stripes, the date it was earned and how close they are to the next rank - and their timeline of every rank and stripe recorded, latest earned first. Requires `contacts:read`.\n",
+        "tags": [
+          "Contacts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contactId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The contact's ranks and timeline",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformContactProgression"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PlatformBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `contacts:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/PlatformRateLimited"
+          }
+        }
+      }
+    },
     "/v1/platform/promotions": {
       "get": {
         "operationId": "listPromotions",
@@ -31848,65 +31907,6 @@
           },
           "403": {
             "description": "API key is missing the required `promotions:read` scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/PlatformNotFound"
-          },
-          "429": {
-            "$ref": "#/components/responses/PlatformRateLimited"
-          }
-        }
-      }
-    },
-    "/v1/platform/contacts/{contactId}/progression": {
-      "get": {
-        "operationId": "getContactProgression",
-        "summary": "Get a contact's ranks",
-        "description": "The member's current rank on each track the organization uses - level, stripes, the date it was earned and how close they are to the next rank - and their timeline of every rank and stripe recorded, latest earned first. Requires `contacts:read`.\n",
-        "tags": [
-          "Contacts"
-        ],
-        "security": [
-          {
-            "customerApiAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "contactId",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The contact's ranks and timeline",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformContactProgression"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/PlatformBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/PlatformUnauthorized"
-          },
-          "403": {
-            "description": "API key is missing the required `contacts:read` scope",
             "content": {
               "application/json": {
                 "schema": {

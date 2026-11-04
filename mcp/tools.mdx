@@ -304,15 +304,30 @@ An assistant that authenticates with a [Platform API key](/settings/api-tokens) 
 
 Each admin tool is a thin wrapper over the documented Platform API, so the request limits, error shapes, and field meanings are the same as the [API reference](/api-reference/introduction).
 
-## Discovery server
+## 1club marketplace server
 
-`https://mcp.1club.me` - no token, no scopes. These search the public 1club.me marketplace across every listed gym and read only published information.
+`https://mcp.1club.me` - no scopes. The search tools need no token and read only published information from the public 1club.me marketplace, across every listed club and independent coach. The booking tools act as the person and ask them to sign in with their 1club.me account the first time one is called; the assistant then retries the call as them.
 
 | Tool                | What it does                                                                                         |
 | ------------------- | ---------------------------------------------------------------------------------------------------- |
 | `find_availability` | Free, priced court times across the marketplace in one call, each with a link that opens the booking |
 | `search_clubs`      | Finds gyms by name, sport, location, distance, price, rating, amenities, date, and the age group and level of their classes |
 | `get_club`          | One club's profile and the menu of what it sells - courts by the hour, its classes, its passes        |
+| `search_professionals` | Finds independent coaches listed on 1club.me by sport, place or name |
+| `get_professional`  | One coach's profile, their next classes and, given a date, their free, priced times |
+
+Signed in with 1club.me:
+
+| Tool | What it does |
+| ---- | ------------ |
+| `list_my_bookings` | The person's bookings at every club, upcoming or past |
+| `book_area` | Books a free court, pitch or room time from `find_availability` or `get_club` |
+| `book_class` | Books a place in a class |
+| `book_instructor` | Books a free time with a club's instructor or an independent coach |
+| `join_waitlist` / `leave_waitlist` | Joins or leaves a full class's waitlist |
+| `cancel_booking` | Cancels one of their bookings under the club's cancellation policy |
+
+A booking uses a membership of theirs that covers it, otherwise it is paid at the club, exactly as on 1club.me. Nothing is paid through the assistant.
 
 Reach for `find_availability` for any "when can I play" question. It searches, prices and dates in one step, so there is no need to find clubs first and then look their availability up separately. Give it a `date` when someone names a day - without one it walks forward from today and may never reach the day they meant.
 
@@ -330,9 +345,9 @@ Tools address clubs by their marketplace **slug**, which is what comes back from
 
 ### Optional inline interface
 
-The three discovery tools also carry a small inline interface - club cards, slot chips, a club profile - for a host that supports MCP Apps, such as ChatGPT. A client that does not render it is unaffected: every tool still answers in text, and the interface is only ever a view of the same answer.
+The three club tools also carry a small inline interface - club cards, slot chips, a club profile - for a host that supports MCP Apps, such as ChatGPT. A client that does not render it is unaffected: every tool still answers in text, and the interface is only ever a view of the same answer.
 
-Nothing on this server writes. A booking is completed on 1club.me, which is why every free slot comes with the `url` that opens it there.
+Every free slot also comes with the `url` that opens it on 1club.me, for someone who would rather book there.
 
 ## What is not exposed
 

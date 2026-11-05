@@ -14,10 +14,13 @@ keywords:
     connect account,
     billing entity,
     capabilities,
+    online,
+    terminal,
+    pricing,
   ]
 ---
 
-Stripe powers card and digital wallet payments across 1club: member checkout in the portal and kiosk, admin-initiated charges, payment links, and recurring billing. An owner or admin sets it up once, and members pay through it wherever they check out.
+Stripe powers card and digital wallet payments across 1club: member checkout in the portal, the member app, and the kiosk, admin-initiated charges, payment links, automatic membership renewals, and card readers at the front desk. An owner or admin sets it up once, and members pay through it wherever they check out.
 
 <Note>
   If your organization trades through more than one company, each company
@@ -34,7 +37,7 @@ Stripe lets you rehearse payments in a sandbox, then take real money through you
 
 Typical uses:
 
-- **Validating checkout before going live** - book a couple of courts in the portal with Stripe test cards, check the checkout, receipt, and booking confirmation, then turn on **Live mode** and complete onboarding.
+- **Validating checkout before going live** - book a couple of areas in the portal with Stripe test cards, check the checkout, receipt, and booking confirmation, then turn on **Live mode** and complete onboarding.
 - **Memberships and drop-ins** - members pay recurring dues at checkout and drop-in visitors pay per session, while you watch the **Payouts** capability to confirm money is landing in your bank account.
 - **Two companies, two payouts** - a group runs its gyms through two companies, and each company connects its own Stripe account so its sales pay out to its own bank account.
 
@@ -44,6 +47,8 @@ Typical uses:
 - Configuring Stripe requires the **settings.manage.organization** permission.
 - You don't need a Stripe account to try test mode. 1club ships a sandbox you can use immediately.
 - To go live you need a Stripe account (you can create one during onboarding) with the business details, bank account, and identity documents Stripe requires for your country.
+- 1club opens your Stripe account under your business details, so fill them in first: your organization's email, phone number, and website under **Settings** > **Organization** > **Details**, and the company's legal name and registered address under [Billing entities](/settings/billing-entities). Until they are complete, a warning names what is missing and **Live mode** stays greyed out.
+- Each company takes online card payments through one provider. If [myPOS](/settings/integrations/mypos) or [DatecsPay](/settings/integrations/datecspay) already takes them, Stripe can still run your card readers (see [Use Stripe for](#use-stripe-for)).
 
 ## Activate Stripe (test mode)
 
@@ -53,6 +58,8 @@ Activating Stripe puts you straight into test mode against the 1club sandbox. No
 2. Under **Payments**, click **Activate** next to Stripe. 1club opens the Stripe page.
 3. The **Stripe status** card shows **Active** and says test payments use the 1club sandbox. No real cards are charged.
 4. Run a checkout in the member portal or kiosk using Stripe's [test card numbers](https://stripe.com/docs/testing) to confirm the flow end to end.
+
+When you activate Stripe, **Online** is ticked unless another provider already takes the company's online card payments, and **Terminal** is unticked. Change either under [Use Stripe for](#use-stripe-for).
 
 **Activate** on the Integrations list sets up Stripe for your default company. To activate it for another company, open the Stripe page, pick the company under **Billing entity**, and click **Activate** in the **Stripe status** card.
 
@@ -74,6 +81,17 @@ If you close the onboarding tab early, click **Complete setup** in the **Stripe 
   which account exists. That is why you can activate Stripe and take test
   payments long before you create a Connect account.
 </Note>
+
+## Use Stripe for
+
+Once Stripe is active, two checkboxes under **Use Stripe for** decide what it does for the selected company. Each change saves straight away.
+
+- **Online - card payments for members on the web and in the app** - Stripe checkout in the member portal, the member app, and your website, saved cards, and automatic membership renewals.
+- **Terminal - in-person card readers at clubs** - [payment terminals](/settings/payment-terminals) at your front desks. With it ticked, a **Manage** button opens **Settings** > **Sales** > **Payment terminals**.
+
+Only one provider can take a company's online card payments, so members are never asked which payment company to use. While myPOS or DatecsPay takes them, **Online** is greyed out, and hovering it names the provider. Turn that provider's **Online** off (or deactivate DatecsPay) first. Terminals have no such limit: a gym can run a Stripe reader while myPOS takes its online payments.
+
+With **Online** off and no other online card provider, members can't pay by card online, and membership renewals are left owed for you to collect at the desk.
 
 ## Test mode vs. live mode
 
@@ -131,9 +149,17 @@ If Stripe still needs information before you can take payments, a **Setup progre
 
 Once the account can take payments but Stripe will still want more documents later, a separate **Pending verification** card appears instead. It says payments work but Stripe will ask for more documents, lists them, and has a **Complete verification** button that reopens onboarding.
 
+## Pricing
+
+A **Pricing** card beside the settings shows what Stripe card payments cost through 1club, for the online and in-person payments you use it for. In test mode it is titled **Live mode pricing**, showing what you will pay once you go live. Fees can change and vary by payment method and country.
+
 ## Payment terminals
 
-To take payments in person, set up card readers under **Settings** > **Sales** > **Payment terminals**. The Stripe page links there with a **Manage** button. Terminals from every provider you use are managed in one place.
+To take payments in person, tick **Terminal** under [Use Stripe for](#use-stripe-for), then set up card readers under **Settings** > **Sales** > **Payment terminals**. The Stripe page links there with a **Manage** button. Terminals from every provider you use are managed in one place.
+
+## Membership renewals
+
+When Stripe takes a company's online card payments, its auto-renewing memberships are charged to the member's saved card when each renewal falls due. A failed charge doesn't cancel the membership. When the member saves a new card, 1club tries their failed renewals again. See [Recurring memberships](/sales/overview#recurring-memberships).
 
 ## Deactivate
 
@@ -153,7 +179,7 @@ Deactivating stops 1club from creating new charges on that Stripe account. Your 
 
 ## Worked examples
 
-**Padel gym validating checkout before going live.** A racket-sports gym activates Stripe, leaves **Live mode** off, and books a couple of courts in the portal using Stripe test cards. Once the checkout, receipt, and booking confirmation all look right, it turns on **Live mode**, completes Stripe onboarding with its bank details, turns **Live mode** on again, and starts collecting real court fees.
+**Padel gym validating checkout before going live.** A racket-sports gym activates Stripe, leaves **Live mode** off, and books a couple of areas in the portal using Stripe test cards. Once the checkout, receipt, and booking confirmation all look right, it turns on **Live mode**, completes Stripe onboarding with its bank details, turns **Live mode** on again, and starts collecting real area fees.
 
 **Martial-arts gym selling memberships and drop-ins.** A jiu-jitsu gym runs live Stripe. Members pay recurring dues at checkout and drop-in visitors pay per session. The gym watches **Payouts** show **Active** to confirm money is landing in its bank account, and opens **View dashboard** to handle a disputed charge.
 
@@ -169,6 +195,8 @@ Deactivating stops 1club from creating new charges on that Stripe account. Your 
 ## Troubleshooting
 
 - **Activate is greyed out** - your organization is on the Free plan or the free trial. Upgrade to a paid plan to activate payments.
+- **Live mode is greyed out with a warning about business details** - Stripe opens your account under your organization's email, phone, and website and the company's legal name and registered address. Use the buttons on the warning to fill in what is missing, then come back.
+- **Online is greyed out under Use Stripe for** - another provider already takes this company's online card payments. Turn its **Online** off first, or keep Stripe for **Terminal** only.
 - **"Stripe needs more information before you can take payments"** - open the **Setup progress** card and submit everything under **Currently due** through **Complete setup**.
 - **Live mode doesn't turn on** - either your Stripe account is not ready (click **Complete setup** to finish onboarding) or your plan doesn't allow live payments (upgrade to a paid plan).
 - **Payments succeed in test mode but fail live** - confirm **Live mode** is on and that **Charges** shows **Active**.

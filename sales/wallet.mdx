@@ -1,120 +1,140 @@
 ---
 title: Wallet
-description: A per-member store-credit balance in your gym's currency that fills from vouchers, plan bonuses, refunds, and imports, and spends like cash or a card at checkout.
-keywords: ["wallet", "store credit", "credit balance", "voucher", "plan bonus", "refund to wallet", "wallet ledger", "wallet transactions", "pay with credit", "member wallet", "opening balance", "prepaid credit"]
+description: A member's wallet balance in your gym's currency - filled by top-ups, vouchers, plan bonuses, and refunds, spent at checkout, protected by deposit rules, and used to collect what cancelled or missed bookings cost.
+keywords:
+  [
+    "wallet",
+    "wallet balance",
+    "top up",
+    "voucher",
+    "plan bonus",
+    "refund to wallet",
+    "wallet movements",
+    "wallet ledger",
+    "deposit",
+    "wallet deposit",
+    "return deposit",
+    "cancellation charge",
+    "no-show charge",
+    "waive cancellation charge",
+    "opening balance",
+  ]
 ---
 
-The wallet is a per-member store-credit balance held in your gym's currency. Credit lands in the wallet from redeemed vouchers, plan bonuses, and refunds, and members spend it at checkout the same way they'd use cash or a card. It is money-value credit, not loyalty points. Members see and spend their balance in the portal and app, and front-desk staff can apply it as part of a payment at the point of sale.
+The wallet is a member's balance of money held with your gym, in your gym's currency. Money reaches it from top-ups, redeemed vouchers, plan bonuses, and refunds, and members spend it at checkout alongside a card or cash. Members see and spend their balance in the portal and app, front-desk staff top it up and apply it at the point of sale, and owners use it to hold deposits and collect cancellation charges.
 
 ## When to use it
 
-The wallet lets you give money back or add value without paying anything out: the credit stays with your gym until the member spends it. Every change is logged, and the wallet-funded portion of a sale is left out of revenue reporting. If you invoice through more than one company, the credit belongs to your default one and is spent on its sales; see [Billing entities](/settings/billing-entities).
+The wallet lets you give money back or add value without paying anything out: the money stays with your gym until the member spends it. Every movement is logged, and money spent from the wallet that came from a voucher or a refund is not counted as new revenue.
 
 Typical uses:
 
-- **Keeping a cancellation refund with the gym** - a climber cancels a booking that qualifies for a refund, the amount lands in their wallet, and it is applied automatically the next time they book in the portal.
-- **A "pay 100, get 120" plan** - a plan carries bonus credit that is granted when the membership activates, and again at each renewal on a recurring plan.
-- **A voucher promotion** - you share a voucher code, the member redeems it under **Account** > **Add voucher** in the portal, and the credit posts immediately.
-- **Carrying over existing credit** - when you import contacts from a spreadsheet, a wallet column seeds each member's opening balance.
+- **Keeping a cancellation refund with the gym** - a climber cancels a booking that qualifies for a refund, the amount goes to their wallet, and it is used automatically the next time they book in the portal.
+- **A "pay 100, get 120" plan** - a plan carries a wallet bonus that is added when the membership starts, and again at each renewal on a renewing plan.
+- **A voucher promotion** - you share a voucher code, the member redeems it under **Account** > **Add voucher** in the portal, and the money is added immediately.
+- **A deposit for area bookings** - a padel gym requires members to keep 50 in their wallet. A late cancellation is paid from it, so nobody has to chase the member.
+- **Carrying over existing balances** - when you import contacts from a spreadsheet, a wallet column sets each member's opening balance.
 
-## What the wallet is
+## How it works
 
-Every member (contact) can have one wallet per organization. The wallet holds a single balance in your organization's currency - the same currency you sell plans and bookings in. A member who belongs to more than one organization has a separate wallet in each.
+Every member (contact) has one wallet per organization, holding one balance in your organization's currency. A member who belongs to more than one organization has a separate wallet in each. The wallet appears the first time money is added to it; until then the balance is simply zero. There is nothing to turn on.
 
-The wallet is created automatically the first time a member earns credit; until then their balance is simply zero. There is nothing to enable.
+One unit in the wallet equals one unit of your currency. It is money, not loyalty points, and it can be spent on anything the member can pay for at checkout. It never goes below zero.
 
-<Note>
-  The wallet is a monetary store-credit balance, not a points or loyalty
-  program. One unit of wallet credit equals one unit of your currency, and it
-  can be spent on anything the member can pay for at checkout.
-</Note>
+If you invoice through more than one company, the wallet belongs to your default company and can only be spent on its sales. See [Billing entities](/settings/billing-entities#two-things-that-stay-whole).
 
-## How credit gets added
+### How money gets in
 
-Credit reaches a member's wallet in a few ways, including a staff [top-up](#topping-up-a-wallet). Each addition is recorded as a positive entry in the [wallet ledger](#the-wallet-ledger).
+Each addition is a positive entry in the [wallet history](#wallet-balances-and-movements).
 
-### Vouchers
+- **Top-ups** - the member pays money into their wallet, online or at the desk. See [Topping up a wallet](#topping-up-a-wallet). Members can top up their own wallet in the portal.
+- **Vouchers** - a voucher [promotion](/sales/promotions) adds money when its code is redeemed, by the member under **Account** > **Add voucher** in the portal, or by staff from the member's page.
+- **Plan bonuses** - a plan's **Wallet balance** is added when a membership on it starts, and again at each renewal of a renewing plan. It follows the start of the membership, not the payment: if the membership starts before its charge is paid and the charge later fails, the bonus is not taken back.
+- **Refunds** - a refund you send to the wallet, or the part of a cancelled booking's price that was paid beyond what the cancellation costs. See [Refunds](/sales/payments#refunds).
+- **Imported balances** - an opening balance from a contact import, always in your organization's currency.
 
-A **voucher** promotion adds credit to the member's wallet when a code is redeemed. The member enters the code in the portal under **Account** > **Add voucher**, or a staff member redeems it on their behalf from the contact's page. The credit posts immediately and is labelled with the promotion name. See [Promotions](/sales/promotions) for how to create and target vouchers.
+### Spending it
 
-### Plan-included credit
+The wallet pays alongside another payment method, or on its own when the balance covers everything.
 
-A plan can carry a bonus credit amount (for example, "pay 100, get 120 in the wallet"). When a membership on such a plan **activates**, the bonus is granted to the buyer's wallet once for that billing cycle. On a recurring plan the bonus is granted again at each renewal.
+- **Member portal and app** - the wallet balance is used automatically at checkout, up to the amount due, and the member pays only the rest by card or on arrival. The breakdown shows a **Wallet** line (for example `Wallet: -10.00`) above the total, and **Pay** shows what is left. When the wallet covers the whole order, the member pays nothing more.
+- **Admin point of sale** - when you take a payment with a card, cash, or another method, tick **Also apply wallet balance ({balance} available)** and set the **Amount from wallet**. The split reads "Wallet {amount} + {remainder} via primary method". When the wallet covers the full amount, the option is hidden and the order can be paid from the wallet alone.
 
-The credit follows activation, not payment. If a membership activates before its charge settles and the charge later fails, the bonus is not automatically clawed back - it is treated as an activation perk rather than part of a refundable payment.
+The amount taken from a wallet is always capped at the balance and at what is owed.
 
-### Refunds from cancellations
+### Wallet money and revenue
 
-When a member cancels a booking that qualifies for a refund, the refunded amount is credited to the member's wallet rather than returned to the original payment method. The refund goes to the contact who actually paid (which, for a booking made on behalf of another member, may differ from the attendee). The refund is capped at what was actually paid for the booking. Add-on products bought in the same order are refunded to the wallet in full on cancellation.
+Money paid into the wallet by top-up is real money; money added by a voucher, a goodwill correction, or a refund being spent again is not new money. When a sale is paid from a voucher or a refund in the wallet, that part is left out of revenue reporting, so a part-wallet, part-card payment counts the card part. Revenue figures then reflect money actually collected.
 
-### Imported opening balances
+## Deposits and cancellation charges
 
-When you import contacts from a spreadsheet, you can include a wallet column to seed each member's opening balance. Imported balances are always credited in your organization's currency.
+A deposit rule asks members to keep a minimum amount in their wallet, so that what a cancelled or missed booking costs can be taken from it. Deposits start turned off; you choose when to introduce them under **Settings** > **Billing** > **General** > **Deposit rules**. See [Deposit rules](/settings/billing-general#deposit-rules) for the setup.
 
-## Spending wallet credit
+### What a cancelled or missed booking costs
 
-Wallet credit is a payment method. It can cover part or all of what a member owes at checkout, and it never goes negative - a debit is capped at the available balance.
+The cancellation charge of a class, area, or instructor booking comes from the cancellation terms of its [booking policy](/settings/booking-policies), as they stood when the booking was made:
 
-### Member portal and app
+> cancellation charge = the booking's price x (100% - the refund % for when it was cancelled)
 
-In the member portal and mobile app, wallet credit is applied automatically at checkout. The order deducts the wallet balance up to the amount due, and the member pays only the remainder by card or on arrival. The breakdown shows a **Wallet** line (for example `Wallet: -10.00`) above the total, and the **Pay** button reflects the post-wallet amount. When the wallet covers the whole order, the member pays nothing further.
+- **A missed booking (no-show)** costs the full price.
+- **Payments count towards it.** Anything the member paid beyond the charge is refunded to their wallet. Anything still owed is taken from the wallet, deposit included, when the booking's gym has a deposit rule; whatever the wallet can't cover stays owed.
+- **Fully covered bookings cost nothing.** A booking paid entirely by a membership or pass has no cancellation charge.
+- It works the same whether the member paid upfront or planned to pay at the gym.
+- Event tickets keep their own cancellation terms. A no-show on an [external program](/settings/external-programs) booking is billed to the member at the full price instead of the program's per-visit fee.
 
-### Admin point of sale
+Members see the cancellation terms before they book, including "If you miss the booking, the full price is charged." Before cancelling they see exactly what it costs: the **Cancellation charge**, the **Refund**, what is **Taken from your wallet**, and anything **Still to pay**. A covered booking says "Your membership or pass fully covers this booking, so cancelling or missing it costs no money."
 
-When a staff member takes a payment in the dashboard using a primary method (card, cash, and so on), they can also apply wallet credit as a secondary payment through the **Also apply wallet credit ({balance} available)** checkbox and an **Amount from wallet** field. The split appears as "Wallet {amount} + {remainder} via primary method". If the wallet already covers the full amount, the toggle is hidden and the order can be paid entirely from the wallet.
+When **staff** cancel a booking that has been partly or fully paid, they choose what happens to the money: **Refund in full**, or **Apply the cancellation policy**.
 
-The amount drawn from a wallet is always capped at the member's balance and the outstanding amount. Where the balance is too small to cover an order, the wallet option is hidden as a standalone payment method.
+### Seeing and waiving a cancellation charge
 
-## The wallet ledger
+A cancelled or missed booking's panel shows a **Cancellation charge** (or **No-show charge**) box with the charge, what was **Taken from the wallet**, and what is **Still due**. To let the member off what is unpaid, enter a **Waiver reason** and click **Waive the unpaid charge**. What the wallet paid towards the charge goes back to it, and nothing more is owed; money the member paid upfront stays with the gym. The box then shows the waiver and its reason. Waiving needs the **billing.update.club** permission.
 
-Every change to the balance is written as a wallet transaction:
+### Top-ups settle cancellation charges first
 
-- **Credits** are positive amounts - a redeemed voucher, a plan bonus, or a refund.
-- **Debits** are negative amounts - credit spent on a booking, product, or membership charge.
+When a member who owes cancellation charges tops up, the top-up pays those charges first, oldest first, then refills the wallet. The top-up form shows the split, for example "Add 50.00 -> settle 10.00 in unpaid cancellation charges -> leave 40.00 in the wallet." Money above the deposit stays available for ordinary purchases.
 
-Each entry carries a description (for example, the promotion name or "Refund to wallet - booking cancellation") and, where applicable, a link to the related charge so the spend can be traced back to what it paid for. This ledger is the wallet's source of truth: the balance is the sum of its entries.
+## Wallet balances and movements
 
-Wallet activity also surfaces on the member's [charges](/sales/charges) - a voucher redemption appears there labelled with the promotion, and a wallet-funded charge shows the credit applied.
+Go to **Sales** > **Finance** > **Wallet** to see every member who holds a wallet, with their **Last movement** and **Balance**. Search by name to find one member.
 
-## Where the balance appears
+The **Wallet movements** tab beside it lists every entry across all wallets, newest first, with the **Date**, member **Name**, **Type**, **Description**, **Payment method**, the **Staff** member who recorded it, and the **Amount**. Tabs filter by type - **Correction**, **Voucher**, **Top up**, **Funding refund**, **Plan wallet grant**, **Refund**, **Reversal**, **Wallet addition**, and **Spend** - and only types that have entries appear. A cancellation charge paid from the wallet is a **Spend**.
 
-- **Members** see their wallet balance in the portal and mobile app, and see credit applied automatically during checkout.
-- **Staff** see a member's available balance in the booking and payment dialogs, where it gates and drives the wallet payment option described above.
-
-### Wallet balances and movements in the admin
-
-Go to **Sales** > **Finance** > **Wallet** to see every member who holds a wallet, with their **Balance** and **Last movement**. Search by name to find one member.
-
-The **Wallet movements** tab next to it lists every entry across all wallets, newest first, with the date, member, **Type**, description, **Payment method**, the **Staff** member who recorded it, and the amount. Tabs filter by type, such as **Top up**, **Correction**, **Voucher**, **Plan wallet grant**, **Refund**, or **Spend**, and only types that have entries appear.
-
-Click a row on either tab to open that member's wallet. It shows the **Current balance** and the member's full **Wallet history**, and, depending on your permissions, tabs to top up, refund, or correct the balance. The same wallet opens from the member's profile.
+Click a row on either tab to open that member's wallet, titled "Wallet - {name}". It shows the **Current balance** and the member's full history, and, depending on your permissions, tabs to top up, refund, or correct the balance. The same wallet opens from the member's profile, where a member who must hold a deposit shows **Deposit**.
 
 ### Topping up a wallet
 
 On the **Top up** tab, enter the amount and pick a **Payment method**:
 
-- **A manual method** (cash or a standalone card terminal) records money you already collected. It does not charge a card. Click **Record collected payment**. Recording a top-up collected at the desk needs the **billing.manage.organization** permission.
-- **An online method** creates a checkout. Click **Create checkout**, then **Copy checkout** and send the link to the member. The wallet updates once the payment is confirmed. This does not activate a card reader.
+- **A manual method** (cash or a standalone card terminal) records money you already collected. It does not charge a card. Click **Record collected payment**. Recording money collected at the desk also needs the **billing.manage.organization** permission.
+- **An online method** creates a checkout. Click **Create checkout**, then **Copy checkout** and send the link to the member. The wallet updates once the payment is confirmed. This does not use a card reader.
 
-If the member owes unpaid cancellation charges, the top-up settles those first, and the dialog shows the split, for example "Add 50.00 -> settle 10.00 in unpaid cancellation charges -> leave 40.00 in the wallet". Topping up needs the **billing.create.club** permission.
+Topping up needs the **billing.create.club** permission.
 
-### Refunding unspent funding
+### Refunding unspent money
 
-On the **Refund unspent funding** tab (**Return deposit** when the member holds a [wallet deposit](/settings/billing-general#deposit-rules)), you return money the member paid into the wallet. The refundable balance includes surplus funding but excludes vouchers and complimentary credit. Funds return through the original payment methods: Stripe refunds are processed automatically, and for cash or other manual refunds you confirm only after handing the money back. When part of the refund has to go back through a payment provider that 1club can't refund for you, the form asks for a **Provider refund reference**: refund through that provider first, then record its reference. A **Reason** is required. If the refund leaves a deposit shortfall, the dialog warns you.
+On the **Refund unspent funding** tab (**Return deposit** when the member holds a deposit), you give back money the member paid into the wallet. What can be refunded includes anything paid in beyond the deposit, but not vouchers or goodwill additions. The money goes back through the original payment methods: Stripe refunds happen automatically, and for cash or other manual methods you confirm only after handing the money back. When part of it has to go back through a provider 1club can't refund for you, the form asks for a **Provider refund reference**: refund through that provider first, then record its reference. A **Reason** is required. If the refund leaves the member short of their deposit, the form warns you ("This refund leaves a deposit shortfall of {amount}.").
 
 ### Correcting a balance
 
-On the **Adjust wallet balance** tab, enter an **Amount** (positive to increase the balance, negative to decrease it) and a **Reason**, then click **Apply correction**. The correction is saved to the ledger with your name as a **Correction** entry.
+On the **Adjust wallet balance** tab, enter an **Amount** (positive to add, negative to take away) and a **Reason**, then click **Apply correction**. It is saved to the history as a **Correction**, with your name.
 
 Refunding and correcting both need the **billing.manage.organization** permission.
 
-## Wallet credit and revenue
+## Troubleshooting
 
-Wallet credit is store value, not new cash. When a sale is funded by wallet credit - a redeemed voucher, a comp, or a refund the member is re-spending - that portion brought in no new money, so it is excluded from revenue reporting. A part-wallet, part-card payment counts only the card portion as revenue. This keeps revenue figures reflecting actual money collected rather than credit recirculating through the wallet.
+| What you see                                              | Why                                                                                                                                                | What to do                                                               |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| The wallet isn't offered at checkout                      | The sale is made by a company other than your default one, or the balance is zero.                                                                 | Take another payment method. The wallet belongs to your default company. |
+| A member's top-up didn't all reach their wallet           | They owed cancellation charges, which a top-up settles first.                                                                                      | Expected. The wallet history shows the split.                            |
+| A cancelled booking's charge wasn't taken from the wallet | The booking's gym had no deposit rule when the booking was made, the booking was fully covered, the charge was waived, or another company sold it. | Collect what is still due from [Charges](/sales/charges), or waive it.   |
+| **Refund unspent funding** offers less than the balance   | Vouchers and goodwill additions can't be refunded as money.                                                                                        | Expected. Only money the member paid in can go back.                     |
 
 ## Related
 
-- [Payments](/sales/payments) - How wallet credit is applied against what a member owes at checkout.
-- [Sales overview](/sales/overview) - How plans, invoices, payments, and credit fit together.
-- [Promotions](/sales/promotions) - Create vouchers that credit the wallet, and plan bonuses.
-- [Member profiles](/members/member-profiles) - Where a member's account details live.
+- [Payments](/sales/payments) - how the wallet is used alongside other payment methods, and refunds.
+- [Billing general settings](/settings/billing-general#deposit-rules) - deposit rules.
+- [Booking policies](/settings/booking-policies) - the cancellation terms that set what a cancellation costs.
+- [Promotions](/sales/promotions) - vouchers that add to the wallet.
+- [Plans](/sales/plans) - a plan's wallet bonus.
+- [Member profiles](/members/member-profiles) - where a member's wallet opens.

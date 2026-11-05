@@ -1,6 +1,6 @@
 ---
 title: API tokens
-description: Create, scope, edit, and revoke API tokens for programmatic integrations, from Settings > Organization > APIs & webhooks.
+description: Create, scope, edit, and revoke API tokens for programmatic integrations, and register webhook endpoints, from Settings > Integrations > APIs & webhooks.
 keywords: [api tokens, api keys, scopes, programmatic access, integrations, webhooks, revoke token]
 ---
 
@@ -31,7 +31,7 @@ In practice, only admins (and owners) hold organization settings management, so 
 
 ## Creating a token
 
-API tokens live on **Settings** > **Organization** > **APIs & webhooks**. The **API tokens** list shows each token's **Name**, **Key**, **Scopes**, **Expires**, **Last Used**, and **Created** date.
+API tokens live on **Settings** > **Integrations** > **APIs & webhooks**. The **API tokens** list shows each token's **Name**, **Key**, **Scopes**, **Expires**, **Last Used**, and **Created** date.
 
 1. Click **Create Token** in the **API tokens** section.
 2. Fill in the token details:
@@ -56,11 +56,12 @@ Scopes use the format `resource:action`. Each token is a set of these strings. T
 | **Content**               | Read, Write             |
 | **Website**               | Read, Write, Publish    |
 | **Media library**         | Read, Write, Delete     |
-| **Clubs**                 | Read                    |
-| **Transactions**          | Read, Write             |
+| **Clubs**                 | Read, Write             |
+| **Transactions**          | Read, Write, Delete     |
+| **Payments**              | Write                   |
 | **Invoices**              | Read                    |
 | **Areas**                 | Read, Write             |
-| **Bookings**              | Read, Write             |
+| **Bookings**              | Read, Write, Delete     |
 | **Contacts**              | Read, Write, Delete     |
 | **Instructors**           | Read, Write             |
 | **Plans**                 | Read, Write             |
@@ -72,12 +73,25 @@ Scopes use the format `resource:action`. Each token is a set of these strings. T
 | **Pricing rules**         | Read, Write             |
 | **Booking policies**      | Read, Write             |
 | **Document rules**        | Read, Write             |
+| **External programs**     | Read, Write             |
 | **Message templates**     | Read, Write             |
 | **Events**                | Read, Write             |
 | **Messages**              | Read, Write             |
 | **Analytics**             | Read                    |
+| **Payment methods**       | Write                   |
+| **Staff and roles**       | Read, Write             |
+| **Notification settings** | Read, Write             |
+| **Competitors**           | Read, Write             |
+| **Promotions**            | Read                    |
 
-The **Transactions** scope covers the records the admin calls [Charges](/sales/charges). **Transactions: Write** records revenue collected outside 1club, such as a marketplace payout, and refunds of it; it never charges anyone.
+A few resources are worth reading closely before you grant them:
+
+- **Transactions** covers the records the admin calls [Charges](/sales/charges). **Transactions: Write** records revenue collected outside 1club, such as a marketplace payout, and refunds of it; it never charges anyone. **Transactions: Delete** voids or deletes unpaid charges, so a member no longer owes them.
+- **Payments: Write** takes a member's money against a charge: it records a payment the desk already collected, and it can charge the member's saved card. A key can only do either for charges of bookings it created itself.
+- **Bookings: Delete** removes a booking outright, with its unpaid charges, leaving no record that it was made. Cancelling a booking only needs **Bookings: Write**.
+- **Clubs: Write** edits a gym's profile, such as its description, address, and opening hours. Renaming a gym's booking cards needs **Organization settings: Write**.
+- **Revenue accounts** and **Payment methods** are write-only, because reading them is already allowed by the plan, product, or transaction scopes that show them.
+- **Staff and roles: Write** is refused to every API key, whatever it holds: a role change is checked against the person making it, and a key is nobody. Use it only through an [AI assistant connected over OAuth](/mcp/connect).
 
 - **Read** allows fetching data (GET requests).
 - **Write** allows creating and updating data where that resource exposes those operations.
@@ -86,7 +100,7 @@ The **Transactions** scope covers the records the admin calls [Charges](/sales/c
 Each action has its own color in the interface (write, delete, and publish stand out from read) so you can spot powerful grants at a glance. Grant only the scopes an integration needs, and avoid write access unless the external system genuinely has to create or change data. The available resources and actions can grow over time; the dialog always reflects the current list.
 
 <Note>
-The **Full access** switch at the top of **Scopes** grants every current and future capability (the wildcard scope). The dialog warns that such a token can read and write everything in the organization. Treat it as an all-access key: use it only for a fully trusted, internally managed integration, and prefer explicit `resource:action` scopes everywhere else. The wildcard is an API-key feature only - an MCP client that asks for it over OAuth is rejected and must name the scopes it wants. See the [MCP tools reference](/mcp/tools#how-a-connection-gets-its-scopes).
+The **Full access** switch at the top of **Scopes** grants every current and future capability (the wildcard scope). The dialog warns that such a token can read and write everything in the organization, including capabilities added later. Treat it as an all-access key: use it only for a fully trusted, internally managed integration, and prefer explicit `resource:action` scopes everywhere else. Only an API key stores the wildcard: an MCP client that asks for it over OAuth gets it expanded into today's concrete scopes, each of which you approve separately. See the [MCP tools reference](/mcp/tools#how-a-connection-gets-its-scopes).
 </Note>
 
 ## Token expiry
@@ -116,7 +130,7 @@ Revoking is immediate and permanent. Any integration using that token stops work
 ## Webhooks and MCP
 
 - **Webhooks** remain on this page, in the **Webhooks** section. Click **Add endpoint** and enter an HTTPS **Endpoint URL**, an optional **Description**, and the **Events** to receive. 1club sends signed POST requests when availability changes. Copy the **Signing secret** when it is shown, because it is shown only once. The endpoint's edit dialog has an **Enabled** switch to pause delivery and **Rotate signing secret**, which stops the old secret at once. See the [Webhooks reference](/api-reference/channel-integration/webhooks).
-- **MCP** is separate from API tokens. Open **Settings** > **Artificial Intelligence** > **AI assistants (MCP)** to copy the endpoint, review connected assistants, and revoke OAuth grants. See [Connect an assistant](/mcp/connect).
+- **MCP** is separate from API tokens. Open **Settings** > **Integrations** > **AI assistants (MCP)** to copy the endpoint, review connected assistants, and revoke OAuth grants. See [Connect an assistant](/mcp/connect).
 
 ## Worked examples
 

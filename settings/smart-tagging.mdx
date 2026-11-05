@@ -1,305 +1,334 @@
 ---
 title: Smart tagging
-description: Rule-based tags that 1club applies to members automatically, segmenting them by payments, lifecycle, membership expiry, attendance, loyalty, age, saved payment methods, household role, language, and the sports they book.
-keywords: [smart tags, automatic tagging, member segmentation, attendance tags, financial tags, lifecycle tags, membership expiry, loyalty tags, interest tags, language tags, payment method tags, frozen, sync tags]
+description: Rule-based tags that 1club applies to contacts automatically - by visits, payments, lifecycle, membership dates, progression, messaging and personal details - plus the engagement score, under Settings > Members > Smart Tags.
+keywords:
+  [
+    smart tags,
+    automatic tagging,
+    member segmentation,
+    attendance tags,
+    declining,
+    at risk,
+    not started,
+    birthday,
+    top spender,
+    financial tags,
+    lifecycle tags,
+    membership expiry,
+    loyalty tags,
+    interest tags,
+    language tags,
+    payment method tags,
+    frozen,
+    engagement score,
+    sync tags,
+  ]
 ---
 
-Smart tagging applies tags to your contacts automatically based on rules you configure once. The engine looks at how a member pays, which payment methods they have saved, how long they've been with you, when their membership expires, how often they check in, how active they've been overall, their age, their household role, their preferred language, and which sports they book. From then on 1club keeps every contact's tags in sync, so staff can filter and target members without curating lists by hand. Smart tags sit next to manual tags everywhere they're used - member lists, [promotion segments](/sales/promotions), and messaging - but you can't add or remove a smart tag on an individual profile; you change the rule instead.
+Smart tagging applies tags to your contacts automatically, from rules you switch on once. 1club reads how often each person comes, what they pay and owe, where they are in their membership, how they progress and answer your messages, and simple facts such as their age and birthday, and keeps every contact's tags up to date. Owners and managers set the rules; everyone else uses the tags to filter the member list, target promotions and messages, and start automations. You can't add or remove a smart tag on one profile: you change the rule instead.
 
 ## When to use it
 
-Use smart tags when you want segments that maintain themselves - who is overdue, whose membership is about to expire, who plays padel - and then act on them with promotions, automations, and reports.
+Use smart tags when you want segments that maintain themselves - who is slipping away, whose membership is about to expire, who plays padel - and then act on them with promotions, automations and reports.
 
 Typical uses:
 
-- **Marketing by sport** - a padel and tennis gym tags members who book a sport regularly and targets a padel-night promotion at the padel tag only.
-- **Chasing renewals** - a gym pairs the **Expiring Soon** tag with a renewal discount.
+- **Catch members drifting away** - a gym turns on **At Risk** and starts the **At-risk member win-back** automation, and checks the [At-risk customers](/analytics/members#at-risk-customers) report each Monday for the members tagged **At Risk** or **Declining**.
+- **Members who paid and never came** - a studio messages everyone tagged **Not Started** a week after they bought their first plan.
+- **Marketing by sport** - a padel and tennis gym targets a padel-night promotion at the padel **Interest** tag only.
 - **Recovering payments** - a Pilates studio builds an automation that messages members tagged **Overdue**.
-- **Age and family messaging** - a martial-arts school tags kids and juniors automatically, and tags parents from household accounts so it can message them about their children.
-
-See [Worked examples](#worked-examples) for the categories and settings behind each of these.
+- **A birthday offer** - an academy sends a free guest pass to everyone tagged **Birthday**, a week before the day.
 
 ## How it differs from manual tags
 
-You can attach two kinds of tags to a contact:
+|                              | Manual tags                                                                | Smart tags                                       |
+| ---------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------ |
+| **Where they come from**     | You create them and apply them to specific contacts                        | 1club applies them from rules                    |
+| **Who decides who has them** | You, per contact                                                           | The rule, from the contact's current data        |
+| **Configured in**            | **Settings** > **Members** > **Manual Tags**, or any tag chip on a contact | **Settings** > **Members** > **Smart Tags**      |
+| **Editable per contact**     | Yes                                                                        | No - change the rule, not the tag on the contact |
+| **Examples**                 | "VIP", "Family of John", "Yoga teacher"                                    | "Regular", "Overdue", "Expiring Soon", "Adult"   |
 
-| | Manual tags | Smart tags |
-| --- | --- | --- |
-| **Where they come from** | You create them and apply them to specific contacts | 1club applies them automatically based on rules |
-| **Who controls membership** | You add or remove them per contact | The engine, based on the contact's current data |
-| **Configured in** | **Settings** > **Members** > **Manual Tags**, or any tag chip on a contact | **Settings** > **Members** > **Smart Tags** |
-| **Editable per contact** | Yes | No - change the rule, not the tag on the contact |
-| **Examples** | "VIP", "Family of John", "Yoga teacher" | "Regular", "Overdue", "Expiring soon", "Adult" |
-
-Both types behave identically when you filter or segment. A promotion that targets "Overdue" works the same whether that tag is manual or smart.
+Both kinds behave the same when you filter or segment. A promotion that targets "Overdue" works the same whether that tag is manual or smart.
 
 ## Who gets smart tags
 
-The engine treats contacts differently depending on what they are:
+- **Leads, members, drop-ins and lapsed members** are eligible for every category that is on.
+- **Plain contacts** (never booked, checked in or held a plan, and not in your [pipeline](/members/leads)) only receive the categories that don't depend on activity: **Contact stages**, the lead tags (**Source**, **Stale Lead**, **Engaged**, **Unresponsive**), **Payment method**, **Age**, **Birthday**, **Relationship** and **Language**.
+- **Staff** (instructors, managers, admins) never receive smart tags. Any smart tag they had before becoming staff is removed on the next evaluation; their manual tags are kept.
+- **Archived contacts** are frozen: their tags stay as a snapshot and are not recomputed.
 
-- **Members, drop-ins, lapsed members, and leads** (anyone who has booked, checked in, or held a plan, or who is in your [pipeline](/members/leads)) are eligible for every enabled category.
-- **Contacts with no activity** (never booked, checked in, or held a plan, and not in your pipeline) only receive **Age**, **Contact stages**, **Relationship**, **Language**, and **Payment method**. The activity-based categories (Attendance, Financial, Lifecycle, Loyalty, Membership, Sessions Left, Interest, Progression, Assessment) don't apply until the contact becomes a lead or a customer.
-- **Staff** (instructors, managers, admins) never receive smart tags. Any auto-tag they picked up before becoming staff is stripped on the next evaluation; their manual tags are kept.
-- **Archived contacts** are frozen - their tags stay as a snapshot and are not recomputed.
+## The Smart Tags page
+
+Go to **Settings** > **Members** > **Smart Tags**. Each smart tag category is a card, grouped by what it reads, in this order:
+
+| Group                | Categories                                                                                                                                                                         | On for a new organization             |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| **Leads**            | [Contact Stages](#contact-stages), [Source Tags](#lead-tags), [Stale Lead Tag](#lead-tags)                                                                                         | Contact Stages                        |
+| **Membership**       | [Lifecycle Tags](#lifecycle), [Membership Tags](#membership), [Sessions Left Tags](#sessions-left)                                                                                 | Lifecycle, Membership                 |
+| **Attendance**       | [Attendance Tags](#attendance), [Trend Tags](#declining), [At Risk Tag](#at-risk), [Loyalty Tags](#loyalty), [Interest Tags](#interest), [Engagement Scoring](#engagement-scoring) | Attendance, Trend, Engagement Scoring |
+| **Payments**         | [Financial Tags](#financial), [Spending Tags](#top-spender), [Payment Method Tags](#payment-method)                                                                                | Financial, Spending                   |
+| **Messaging**        | [Engaged Tag](#lead-tags), [Unresponsive Tag](#lead-tags)                                                                                                                          | None                                  |
+| **Progression**      | [Progression Tags](#progression), [Assessment Tags](#assessment)                                                                                                                   | None                                  |
+| **Personal details** | [Age Tags](#age), [Birthday Tags](#birthday), [Relationship Tags](#relationship), [Language Tags](#language)                                                                       | Age, Birthday, Relationship           |
+
+Four categories only appear once they could tag someone, so the page doesn't offer what your gym can't use yet: **Language** (your organization uses more than one language), **Interest** (your gyms offer more than one sport), **Progression** (a [progression track](/settings/progression) is enabled), and **Assessment** (you have an [assessment template](/members/assessments)). A category that is already on always shows.
+
+### Change a category
+
+1. Use the switch on a card to turn the category on or off. It saves at once.
+2. Click the card to open its panel. The table lists each **Tag** with its **Rule** and **Threshold**.
+3. Rename or recolor a tag, change its threshold, add a tag with **Add Tag** (where the category allows more than its fixed rows), or delete one.
+4. Click **Save**.
+
+Tag names must be unique within a category, and thresholds are validated (for example, minimum visits can't be negative). Changing smart tag settings needs the Members **Edit** permission.
+
+After you save, 1club updates the tags themselves right away: a renamed tag is renamed on every contact that has it, and a deleted one comes off every contact. Saving doesn't re-check who qualifies - that happens on the next sync. To apply a new threshold or a newly enabled category now, click **Sync tags** at the top of the page.
 
 ## Categories
 
-Each category has an **Enable this tag category** switch. Within a category, a contact gets at most one tag - the highest matching tier - except **Interest** (one tag per qualifying sport), **Relationship** (a contact can be both Parent and Child), **Payment method** (one tag per kind of saved method), **Membership** (Freeze Ending Soon and Member Anniversary apply alongside an expiry tier), and **Sessions Left**, **Progression** and **Assessment** (a member can carry more than one). Disable a category and every tag it produced is removed on the next sync.
+Within a category a contact gets at most one tag, the highest that matches, unless the category says otherwise below.
 
-The categories below are listed in the order they appear on the page. Five are enabled out of the box: **Financial**, **Lifecycle**, **Membership**, **Contact stages**, and **Payment method**.
+### What counts as a visit
 
-### Financial (enabled by default)
+The attendance categories, the engagement score and the progression counts all read **visits**: a check-in, or a completed booking. A gym whose members book an area and play without scanning in is read the same as one with a turnstile. Cancelled bookings and no-shows never count.
 
-Flags members with unpaid or overdue payments. Each tier defines the minimum number of days a payment can be overdue before the tag applies.
+### Contact stages
 
-Defaults:
+Tags contacts by how recently they were added, for spotting fresh leads. The field is **Max Days Since Created**. Default: **New** (within 14 days).
 
-- **Unpaid** - owes money, but nothing is past due yet (at least one pending, failed, or overdue charge dated today or later).
-- **Past Due** - a payment is 1+ day overdue.
-- **Overdue** - a payment is 7+ days overdue.
+### Lead tags
 
-The field is labelled **Min Days Overdue**. The **Unpaid** tier is fixed and can't be deleted; you can add, rename, recolour, or remove the past-due tiers.
+Four categories for segmenting and re-engaging leads, each with its own switch and each off until you turn it on.
 
-### Lifecycle (enabled by default)
-
-Tracks where each person is in their journey. A contact gets the first of these that applies:
-
-- **Pipeline stage** - a contact in your [pipeline](/members/leads) carries their stage as their Lifecycle tag (for example "New lead" or "Contacted"). The page lists one row per stage; rename or add stages under **Settings** > **Members** > **Pipeline** (**Edit in Pipeline settings**).
-- **Frozen** - every recurring membership or [season pass](/schedule/season-passes) the member holds is paused. A paused plan next to an active one isn't Frozen. This row is fixed: you can rename and recolour it, but not delete it.
-- **Tenure tags** - how long the member has been with you, counted from the start date of their first plan. Requires a plan that is active or pending, so a lapsed member drops out of the category. A day pass or a class pack starts the count as much as a recurring membership does. Someone who visited before buying their first plan doesn't get **Trial**, but gets the later tiers as usual.
-
-Tenure defaults: **Trial** (day 1+), **Probation** (day 15+), **Active** (day 46+). The field is labelled **Min Days Since First Membership**.
-
-### Lead tags (disabled by default)
-
-Four categories for segmenting and re-engaging leads, each with its own switch and each off until you turn it on: **Source Tags**, **Stale Lead Tag**, **Engaged Tag** and **Unresponsive Tag**. Because they are tags, everything that already reads tags can use them: automation triggers and conditions, contact audiences and segments.
-
-- **Source Tags** - tags each person with the [source](/members/leads#sources) they came from, one tag per source, named and coloured like the source. The category has no rows of its own: add, rename or recolour sources under **Settings** > **Members** > **Pipeline**. A contact keeps their source's tag after they convert, since they keep their source.
-- **Stale Lead** - tags a lead in an open pipeline stage with no booking, form, stage move or conversation for the set number of days. The field is **Days without activity** (default 7). Activity is counted as for the Lost stage's inactivity rule: a message only counts when it was exchanged with the person, so campaigns and automated messages don't keep a lead warm. A lead in **Lost**, or out of the pipeline, never carries it.
-- **Engaged** - tags people who recently clicked or replied to an email or WhatsApp message, or read one on WhatsApp. The field is **Days since they last responded** (default 30). An email open alone doesn't count, because some mail apps open every email they deliver.
-- **Unresponsive** - tags people who received several marketing emails or WhatsApp messages and clicked, replied to or read on WhatsApp none of them. The fields are **Marketing messages, at least** (default 3) and **Period (Days)** (default 60). A marketing message is a campaign or an automation's message. SMS reports no responses, so someone reached only by SMS is never Unresponsive.
+- **Source Tags** - tags each person with the [source](/members/leads#sources) they came from, one tag per source, named and colored like the source. The category has no rows of its own: add, rename or recolor sources under **Settings** > **Members** > **Pipeline**. A contact keeps their source's tag after they convert.
+- **Stale Lead Tag** - a lead in an open pipeline stage with no booking, form, stage move or conversation for **Days without activity** (default 7). A message only counts when it was exchanged with the person, so campaigns and automated messages don't keep a lead warm. A lead in **Lost**, or out of the pipeline, never carries it.
+- **Engaged Tag** - people who recently clicked or replied to an email or WhatsApp message, or read one on WhatsApp, within **Days since they last responded** (default 30). An email open alone doesn't count, because some mail apps open every email they deliver.
+- **Unresponsive Tag** - people who received at least **Marketing messages, at least** (default 3) marketing emails or WhatsApp messages within **Period (Days)** (default 60) and clicked, replied to or read none of them. SMS reports no responses, so someone reached only by SMS is never Unresponsive.
 
 Engaged and Unresponsive apply to anyone you message, not only leads. All four are re-checked overnight, when a message or form arrives from the person, when their stage changes, and when their source is set. The [Re-engage stale leads](/marketing/automations#suggested-blueprints) automation starts on the Stale Lead tag.
 
-### Membership (enabled by default)
+### Lifecycle
 
-Tags members around three dates of their membership: when it ends, when a pause ends, and its yearly anniversary. The table has a **Rule** column saying which date each row counts to, and a **Days** column.
+Where each person is in their journey. A contact gets the first of these that applies:
 
-| Tag | Rule | Days | Default |
-| --- | --- | --- | --- |
-| **Expiring** | Days Before Expiry | A **positive** value means days *before* expiry; a **negative** value means days *after* | 7 days before |
-| **Expiring Soon** | Days Before Expiry | As above | 3 days before |
-| **Expired** | Days Before Expiry | As above | 7 days after |
-| **Freeze Ending Soon** | Days before the pause ends | 0 to 60 | Empty: tags nobody |
-| **Member Anniversary** | Days before the anniversary | 0 to 60 | Empty: tags nobody |
+- **Pipeline stage** - a contact in your [pipeline](/members/leads) carries their stage as their Lifecycle tag (for example "New lead"). The panel lists one row per stage, with **Edit in Pipeline settings**.
+- **Frozen** - every membership or [season pass](/schedule/season-passes) the member holds is paused. A paused plan next to an active one isn't Frozen. This row can be renamed and recolored, not deleted.
+- **Tenure** - how long the member has been with you, counted from the start of their first plan, while they hold an active or pending plan. Any plan starts the count, a day pass or class pack included, and so does a plan shared with them on an account. Someone who visited before buying their first plan doesn't get **Trial**, but gets the later tiers.
 
-The expiry tiers:
+Tenure defaults: **Trial** (day 1+), **Probation** (day 15+), **Active** (day 46+). The field is **Min Days Since First Membership**.
 
-- **Before-expiry** tiers only match memberships that are active and **not auto-renewing**. An auto-renewing membership is never flagged as expiring, because it isn't going to lapse.
-- **After-expiry** tiers only apply when the member has **no** active membership at all.
-- A member gets at most one expiry tier, the highest that matches. You can add, rename, recolour, or remove expiry tiers.
+### Membership
 
-**Freeze Ending Soon** and **Member Anniversary** apply alongside the expiry tiers, so a member can be **Expiring** and **Freeze Ending Soon** at once. Each is carried from its number of days ahead of the date through the day itself, on your gym's clock. They ship with **Days** empty and tag nobody until you set it. Both rows are fixed: you can rename, recolour, and set their days, but not delete them.
+Tags members around three dates: when their membership ends, when a pause ends, and its yearly anniversary.
 
-- **Freeze Ending Soon** - a pause on one of the member's paused memberships, or on one shared with them, ends within the window. Pair it with [Frozen](#lifecycle-enabled-by-default) to welcome a member back before their first day.
-- **Member Anniversary** - the yearly return of the day the member's current stretch with you began, from the first year on, while they hold an active recurring membership or season pass. A member who left and came back counts from their return. A stretch begun on 29 February comes round on 28 February.
+| Tag                    | Rule                        | Days                                                             | Default            |
+| ---------------------- | --------------------------- | ---------------------------------------------------------------- | ------------------ |
+| **Expiring**           | Days Before Expiry          | Positive means days _before_ expiry, negative means days _after_ | 7 days before      |
+| **Expiring Soon**      | Days Before Expiry          | As above                                                         | 3 days before      |
+| **Expired**            | Days Before Expiry          | As above                                                         | 7 days after       |
+| **Freeze Ending Soon** | Days before the pause ends  | 0 to 60                                                          | Empty: tags nobody |
+| **Member Anniversary** | Days before the anniversary | 0 to 60                                                          | Empty: tags nobody |
 
-### Loyalty (disabled by default)
+- **Before-expiry** tags only match active memberships that are **not auto-renewing**, because an auto-renewing one isn't going to lapse.
+- **After-expiry** tags only apply when the member has **no** active membership.
+- **Freeze Ending Soon** and **Member Anniversary** apply alongside an expiry tag, from their number of days ahead through the day itself. They can't be deleted.
+- **Freeze Ending Soon** - a pause on one of the member's memberships, or one shared with them, ends within the window. Pair it with **Frozen** to welcome a member back.
+- **Member Anniversary** - the yearly return of the day the member's current stretch with you began, while they hold an active recurring membership or season pass. A member who left and came back counts from their return. A stretch begun on 29 February comes round on 28 February.
 
-Ranks members by total lifetime activity (bookings + check-ins). Use it for tenure-style recognition, in contrast to Attendance, which measures recent engagement.
+### Sessions Left
 
-Defaults: **Legend** (50+), **Champion** (25+), **Pro** (10+), **Rising Star** (5+), **Beginner** (fewer than 5). The field is labelled **Minimum Activity**.
+Tags members whose pass or membership is almost out of sessions, or ran out recently and hasn't been bought again. Off by default.
 
-### Attendance (disabled by default)
+| Tag                   | Applies when                                                                                                    | Field                      | Default |
+| --------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------- | ------- |
+| **Few Sessions Left** | An active plan has a limited allowance with at least 1 and at most this many sessions (or hours) left           | **Sessions left, at most** | 2       |
+| **No Sessions Left**  | A pass was used up within this many days, and the member has no active pass of the same plan with sessions left | **Days since it ran out**  | 30      |
 
-Groups members by how often they check in over a recent window. Each tier defines a **Minimum Visits** count and a **Period (Days)**.
+A member can carry both. Both rows are fixed. A pass past its end date doesn't count for either.
 
-Defaults: **All-Star** (16+ visits / 30 days), **Regular** (8+), **Casual** (4+), **Low Activity** (1+), **Inactive** (0 in the period). Thresholds and periods are fully editable.
+### Attendance
 
-### Sessions Left (disabled by default)
+Groups members by how often they visit over one period. Every tier counts over the category's **Period (Days)** (default 30), and each tier sets **Minimum Visits**.
 
-Tags members whose pass or class pack is almost used up, or ran out recently and hasn't been bought again. Use it to sell the next pack before the current one runs out. It reads every limited allowance on the member's own passes and memberships, so a plan with several allowances (for example 10 classes and 5 open-gym visits) is checked allowance by allowance.
+| Tag              | Rule                         | Default |
+| ---------------- | ---------------------------- | ------- |
+| **Not Started**  | Has a plan, never visited    | -       |
+| **All-Star**     | Minimum visits in the period | 16      |
+| **Regular**      | Minimum visits in the period | 8       |
+| **Casual**       | Minimum visits in the period | 4       |
+| **Low Activity** | Minimum visits in the period | 1       |
+| **Inactive**     | No visits in the period      | 0       |
 
-| Tag | Applies when | Field | Default |
-| --- | --- | --- | --- |
-| **Few Sessions Left** | An active pass or membership has a limited allowance with at least 1 and at most this many sessions (or hours) left. An unlimited plan never runs low. | **Sessions left, at most** | 2 |
-| **No Sessions Left** | A pass was used up within this many days, and the member has no active pass of the same plan with sessions left. Buying the next pack takes the tag off. | **Days since it ran out** | 30 |
+**Inactive** and **Not Started** are only for someone with an active plan: **Not Started** when they have never visited at all, **Inactive** otherwise. A plan that hasn't started yet doesn't count, since its holder couldn't have come. A contact with nothing active isn't inactive but lapsed.
 
-Both rows are fixed: you can rename, recolour, and set their threshold, but not add or remove rows. A pass past its end date doesn't count for either tag. The tags update when a member books or checks in, as well as in the nightly run.
+### Declining
 
-### Age (disabled by default)
+The **Trend Tags** card holds one tag, **Declining**: a member with an active plan who came at least **Min Visits Before** times (default 4) in the attendance period before this one, and at most **Now At Most** (default 50%) of that in this one. It reads a falling count, not a low one: someone who always comes twice a month is never Declining, someone who drops from twenty visits to nine is. It uses the attendance period, and can sit beside an attendance tag. On by default.
 
-Tags members by age group from their date of birth. Each tier has a **Min Age** and **Max Age**.
+### At Risk
 
-Defaults: **Infant** (0-4), **Kid** (5-12), **Junior** (13-17), **Adult** (18-64), **Senior** (65+). Edit the bounds to match how you market and price. These defaults are the same age bands a [class type's](/settings/class-types#age-group-and-difficulty) age group uses, so a Kids class and the Kid tag start out meaning the same ages. Editing a tag's bounds changes only the tag.
+The **At Risk Tag** card tags a paying member who has stopped coming. Off by default. A member carries **At Risk** while all of these hold:
 
-### Contact stages (enabled by default)
+- they hold a live membership or season pass that is not paused, so a Frozen member never is,
+- they have been with you for at least 14 days without a break,
+- they owe nothing,
+- they have had no visit in **Days without a visit** (default 10),
+- and nothing is booked for the next 3 days.
 
-Tags contacts by how recently they were added - useful for spotting fresh leads. The field is **Max Days Since Created**.
+Booking, visiting, pausing or a failed payment takes the tag off. It is re-checked on bookings, check-ins, memberships and payments, and overnight. The **At-risk member win-back** automation [blueprint](/marketing/automations#suggested-blueprints) starts on it, and is suggested only while the category is on.
 
-Default: **New** (within 14 days).
+The [At-risk customers](/analytics/members#at-risk-customers) report under **Analytics** > **Members** lists everyone tagged **At Risk** or **Declining** by the thresholds you set here, so it shows exactly whom the member card shows. Turn both on to fill it.
 
-### Payment method (enabled by default)
+### Loyalty
 
-Tags contacts by the kinds of payment method they have saved in Stripe and can still be charged to. An expired card doesn't count. There's one fixed row per kind: **Card**, **ACH Debit**, **SEPA Debit**, **Bacs Debit**, **Link**, and **Other Payment Method**. As with Relationship, you can only edit each row's display name and colour.
+Ranks members by their total visits, booked or checked in, over all time. Use it for long-term recognition, where Attendance measures recent habits. Off by default.
 
-A contact gets one tag per kind they have saved, and it applies to contacts with no activity too, since someone can save a card before they ever book. The tags update when a payment method is saved or removed, not in the nightly run. If you turn the category off and on again, 1club rebuilds the tags from Stripe in the background. A gym that doesn't use Stripe sees none of these tags.
+Defaults: **Legend** (50+), **Champion** (25+), **Pro** (10+), **Rising Star** (5+), **Beginner** (fewer than 5). The field is **Minimum Activity**.
 
-### Relationship (disabled by default)
+### Interest
 
-Tags members by their household role. Household owners and adults are tagged as parents; dependents are tagged as children.
+Sport-by-sport tags for members who booked the same sport at least **Minimum Bookings per Sport** times (default 3). One tag per sport that crosses the threshold, so a member can hold several. Off by default, and only offered when your gyms offer more than one sport.
 
-This category has two fixed tags - **Parent** and **Child**. You can only edit their display name and colour; there are no thresholds and you can't add or remove tiers. A contact can carry **both** if, for example, they're an adult in one household and a dependent in another. It applies to leads as well as members.
+### Engagement scoring
 
-### Language (disabled by default)
+Not a tag category: **Calculate engagement scores** gives each member holding an active plan a score from 0 to 100, read from their visits alone over the attendance period:
 
-Tags members by their preferred language, taken from their linked account profile. There's one fixed tag per supported locale: **English**, **Español**, **Français**, **Deutsch**, **Български**, **Čeština**. As with Relationship, you can only edit the display name and colour - not the locale mapping - and you can't add or remove rows.
+- half from how often they come compared with your other scored members,
+- a quarter from keeping up with the period before,
+- a quarter from how recently they came, fading to nothing a period after their last visit.
 
-A contact with no linked user account (a walk-in or lead who never registered) has no known language and receives no language tag.
+A member who pays every month but never comes scores low. Scores are recalculated nightly, and a member whose plan ends has their score removed. The levels are **Low**, **Medium**, **High** and **Rockstar**, at 25, 50 and 75. The score shows on the member's profile and on the [engagement dashboard](/analytics/engagement). On by default; turning it on calculates every score straight away.
 
-### Interest (disabled by default)
+### Financial
 
-Sport-by-sport tags applied to members who've booked the same sport at least N times. Tags are generated dynamically, one per sport that crosses the threshold, so a member can hold several interest tags at once. The field is **Minimum Bookings per Sport** (default 3). Use these to target audiences with offers relevant to what they already do - for example, a padel-only promotion for members tagged with the padel interest.
+Flags members with unpaid or overdue payments. Each past-due tier sets **Min Days Overdue**.
 
-### Progression (disabled by default)
+- **Unpaid** - owes money, but nothing is past due yet. This row is fixed.
+- **Past Due** - a payment is 1+ day overdue.
+- **Overdue** - a payment is 7+ days overdue.
 
-Tags members by their levels on your [progression tracks](/settings/progression). The four tags are fixed: you can edit each one's name, colour and threshold, but you can't add or remove rows. A member who holds several tracks gets a tag if any of their tracks qualifies, and can carry more than one.
+### Top Spender
 
-- **Eligible for Promotion** - has the sessions the next level requires (see [Sessions to the next level](/settings/progression#sessions-to-the-next-level)).
-- **Close to Promotion** - not eligible yet, but has reached a share of the sessions needed (default 80%).
-- **Stalled at Rank** - holds a level but hasn't attended a session in the last N days (default 30). The check runs per track, counting only the sessions that count toward that track, so a member training only in classes linked to another track is stalled on this one.
-- **Recently Promoted** - was promoted in the last N days (default 14). A member's first level, a stripe or a correction never counts as a promotion.
+The **Spending Tags** card holds one tag, **Top Spender**: a contact in the **Top Share** (default 10%) of your paying contacts by what they paid over **Period (Days)** (default 365). Paid charges count at their total, so a refund takes the spend back off. A share rather than an amount, so the same setting works in any currency. On by default.
 
-### Assessment (disabled by default)
+### Payment method
+
+Tags contacts by the kinds of payment method they have saved in Stripe and can still be charged to. An expired card doesn't count. There's one fixed row per kind: **Card**, **ACH Debit**, **SEPA Debit**, **Bacs Debit**, **Link**, and **Other Payment Method**, and you can only rename and recolor them. Off by default.
+
+A contact gets one tag per kind they have saved. The tags update when a payment method is saved or removed, not in the nightly run. Turning the category back on rebuilds the tags from Stripe in the background. A gym that doesn't use Stripe sees none of these tags.
+
+### Progression
+
+Tags members by their levels on your [progression tracks](/settings/progression). The four tags are fixed: you can edit each one's name, color and threshold. A member who holds several tracks gets a tag if any track qualifies, and can carry more than one.
+
+- **Eligible for Promotion** - meets every requirement the next level sets (see [Promotion requirements](/settings/progression#promotion-requirements)).
+- **Close to Promotion** - not eligible yet, but has reached **Sessions reached** (default 80%) of what is needed.
+- **Stalled at Rank** - holds a level but hasn't attended a session counting toward that track in **Days without a session** (default 30).
+- **Recently Promoted** - was promoted within **Days since the promotion** (default 14). A first level, a stripe or a correction never counts.
+
+Filter the member list by **Eligible for Promotion** and promote everyone at once (see [Promote a selection of members](/settings/progression#promote-a-selection-of-members)).
+
+### Assessment
 
 Tags members by their [assessments](/members/assessments). The three tags are fixed, like Progression.
 
-- **Not Assessed Recently** - attended at least one session in the last N days (default 30) but has no assessment in that time. Members who stopped coming aren't flagged.
-- **Top Performer** - the average of their last 3 assessments is at least a share of the scale (default 80%).
-- **Needs Attention** - the average of their last 3 assessments is at most a share of the scale (default 50%).
+- **Not Assessed Recently** - attended at least one session within **Days since assessed** (default 30) but has no assessment in that time. Members who stopped coming aren't flagged.
+- **Top Performer** - the average of their last 3 assessments is at least **Average score at least** (default 80%) of the scale.
+- **Needs Attention** - that average is at most **Average score at most** (default 50%).
 
-The average takes every score on those assessments as a share of its template's scale - the same measure as the average on the member's profile.
+### Age
 
-### Engagement scoring (disabled by default)
+Tags contacts by age group from their date of birth, each with a **Min Age** and **Max Age**. Defaults: **Baby** (0-2), **Preschooler** (3-5), **Kid** (6-9), **Preteen** (10-12), **Junior** (13-17), **Adult** (18-64) and **Senior** (65+), each named with its ages (for example "Kid 6-9"), the same bands a [class type's](/settings/class-types#age-group-and-difficulty) age group uses. Editing a tag's bounds changes only the tag.
 
-Sitting at the bottom of the same page, engagement scoring is a related feature rather than a tag category. When enabled, it computes a member engagement score from four weighted inputs - **Financial**, **Services**, **Physical**, and **Engagement** - whose weights must sum to 100%. The score surfaces on the [engagement dashboard](/analytics/engagement); it doesn't create tags.
+### Birthday
 
-## Configuring rules
+Tags contacts from **Days Before** their birthday (default 7) through the day itself, on your gym's clock. A 29 February birthday falls on 28 February in a common year. You can add more rows with their own window, such as "Birthday Today" with 0 days (0 to 31): they are not a ladder, so a contact carries every row whose window includes today. The default **Birthday** row can't be deleted. Leads carry it too.
 
-1. Go to **Settings** > **Members** > **Smart Tags**. (The **Manual Tags** tab next to it manages plain manual tags; see [Manual tags](#manual-tags).)
-2. For each category:
-   - Toggle **Enable this tag category** on or off.
-   - Edit a tier - adjust the threshold (visits, days, age range, and so on) and rename or recolour the tag.
-   - Add a tier with **Add Tag** (not available for Payment method, Relationship, Language, Interest, Progression, Assessment, or Sessions Left, whose rows are fixed or derived).
-   - Delete a tier you don't need (the fixed Unpaid, Frozen, Freeze Ending Soon, Member Anniversary, Sessions Left, payment method, Parent/Child, language, progression, and assessment rows can't be deleted). Lifecycle's pipeline stage rows are managed under **Settings** > **Members** > **Pipeline**.
-3. Save with the floating save alert at the bottom of the page.
+### Relationship
 
-Tag names must be unique within a category, and the dialog validates thresholds (for example, minimum visits can't be negative and overdue days must be at least 1).
+Tags contacts by their household role: owners and adults are tagged **Parent**, children **Child**. You can only rename and recolor the two rows. A contact can carry both, for example as an adult in one household and a child in another.
 
-After you save, 1club updates the tags themselves right away: a renamed tier is renamed on every contact that has it, and a deleted tier comes off every contact. Saving doesn't re-evaluate who qualifies for each tag - that happens on the next sync. To apply a threshold change or a newly enabled category now, use **Sync tags** (below).
+### Language
+
+Tags members by the preferred language on their account: **English**, **Español**, **Français**, **Deutsch**, **Български**, **Čeština**. You can only rename and recolor the rows. A contact with no account has no known language and gets no tag.
 
 ## How and when tags are kept in sync
 
 Smart tags are recomputed:
 
-- **Reactively**, on the events that could shift a tag - when a contact is created or moves to another pipeline stage, a membership is created, cancelled, paused, resumed, or expires, a payment succeeds or fails, a booking is created, cancelled, marked no-show, checked in, or completed, a payment method is saved or removed, a member is promoted or a level is corrected or removed, an assessment is added, edited or removed, or a member has a birthday. The affected contact is re-evaluated right away.
-- **Nightly**, as a backstop, for every contact in the organization (runs at 03:00 UTC). This is what catches purely time-based transitions - a membership crossing its expiry window, a contact ageing past "New", a household-role change.
-- **On demand**, via the **Sync tags** button on the Smart tagging page. It re-evaluates everyone and reports how many members were updated.
+- **On events** that could change a tag - a contact is created or changes pipeline stage, a membership is created, cancelled, paused, resumed or expires, a payment succeeds or fails, a booking is created, cancelled, marked no-show, checked in or completed, a payment method is saved or removed, a member is promoted or a level is corrected, an assessment is added, edited or removed. The affected contact is re-evaluated right away.
+- **Nightly**, for every contact, which catches time-based changes such as a membership entering its expiry window or a birthday coming up.
+- **On demand**, with **Sync tags**, which re-evaluates everyone and reports how many members were updated.
 
-Re-evaluation only touches tags the engine manages. Manual tags are never removed by a sync.
+A sync only touches smart tags. Manual tags are never removed by it.
 
 ## Where smart tags show up
 
-Smart tags behave exactly like manual tags wherever tags are consumed:
+- **Member list** - filter by tag. See [Member list](/members/member-list#search-and-filter).
+- **Member profile** - smart and manual tags appear together next to the member's name.
+- **[Promotions](/sales/promotions)** - restrict a voucher or discount to contacts with specific tags.
+- **[Automations](/marketing/automations)** - start on a tag being added, or use tags in entry conditions.
+- **Messages** - send to an audience of tags.
+- **Reports** - the [At-risk customers](/analytics/members#at-risk-customers) report reads the At Risk and Declining tags.
 
-- **Member lists** - filter the list by tag; a tag chip tells you whether it's manual or smart.
-- **Contact profile** - both kinds appear in the same Tags section.
-- **[Promotion segments](/sales/promotions)** - restrict a voucher or discount to contacts carrying specific tags.
-- **Automations** - use tags in entry conditions to control which contacts a workflow runs for.
-- **Reports and analytics** - break KPIs down by tag to compare cohorts (for example, revenue from "Regular" vs. "Overdue").
-
-Because smart-tag membership is recomputed continuously, these segments stay current without anyone curating lists.
-
-## Editing tags on a contact
-
-You **cannot** add or remove a smart tag on a single contact from their profile. A smart tag is the output of a rule, so the engine would just put it back (or take it off) on the next evaluation. To change who has a tag:
-
-- **Change the rule** under **Settings** > **Members** > **Smart Tags** (this affects every contact).
-- Or, to flag one person, use a **manual tag** instead - manual tags can be added and removed per contact at any time.
+Turning a category off removes its tags from everyone on the next sync, and promotion and automation filters that referenced them simply stop matching anyone.
 
 ## Manual tags
 
-Manual tags are the ones you apply by hand. Manage the list under **Settings** > **Members** > **Manual Tags**: click **Add Tag**, enter a **Tag Name**, and optionally pick a **Color**. Click a tag to edit it. Deleting a tag removes it from every member who has it.
+Manual tags are the ones you apply by hand. Manage them under **Settings** > **Members** > **Manual Tags**: click **Add Tag**, enter a **Tag Name**, and optionally pick a **Color**. Click a tag to edit it. Deleting a tag removes it from every member who has it. You add and remove manual tags on one contact with the tag button next to their name on their profile.
 
-You add and remove manual tags on a single contact from the tag chips on their profile.
-
-## Renaming or disabling categories
-
-- **Renaming a tier** updates the tag name across every contact that has it as soon as you save.
-- **Disabling a category** removes every tag in that category from every contact on the next sync.
-- **Re-enabling a category** re-applies its tags on the next sync.
-- **Deleting a tier** removes it from every contact that has it as soon as you save, and leaves the rest of the category intact.
-
-Promotion and automation filters that referenced a disabled or deleted tag simply stop matching anyone - they don't break.
+To flag one person in a way a rule can't, use a manual tag rather than trying to change their smart tags.
 
 ## Worked examples
 
-### Racket-sports gym: fill courts and chase renewals
+### Keep members from drifting away
 
-A padel and tennis gym wants to market by sport and keep courts busy.
+Turn on **At Risk** (leave **Days without a visit** at 10) and keep **Declining** on. Start the **At-risk member win-back** automation blueprint, which reaches out over three weeks and stops when the tag comes off. Each week, work through the [At-risk customers](/analytics/members#at-risk-customers) report, which also shows each member's monthly value.
 
-- Enable **Interest** (Minimum Bookings per Sport = 3) so regulars pick up padel and tennis interest tags. Target a padel-night promotion at the padel tag only.
-- Enable **Attendance** to separate court regulars ("Regular", "All-Star") from members who are slipping ("Low Activity", "Inactive").
-- Keep **Membership** on and pair the "Expiring Soon" tag with a renewal discount.
+### Racket-sports gym: fill areas and chase renewals
+
+- Turn on **Interest** so regulars pick up padel and tennis tags, and target a padel-night promotion at the padel tag.
+- Use **Attendance** to separate regulars (**Regular**, **All-Star**) from members who are slipping (**Low Activity**, **Inactive**).
+- Keep **Membership** on and pair **Expiring Soon** with a renewal discount.
 
 ### Martial-arts school with a kids' programme
 
-A jiu-jitsu and muay-thai academy runs junior classes and family memberships.
+- Keep **Age** and **Relationship** on to tag kids and their parents, so you can message parents about their children.
+- Turn on **Progression** to see who is **Eligible for Promotion** before a grading, and nudge members who are **Stalled at Rank**.
+- Turn on **Assessment** so coaches see who is **Not Assessed Recently**.
 
-- Enable **Age** so juniors (13-17) and kids (5-12) are tagged automatically for age-appropriate class messaging.
-- Enable **Relationship** to tag **Parent** and **Child** from household accounts, so you can message parents about their dependents' progress.
-- Enable **Progression** to see who is **Eligible for Promotion** before a grading, and to reach members who are **Close to Promotion** or **Stalled at Rank** with a nudge to keep training.
-- Enable **Assessment** so coaches see who is **Not Assessed Recently**, and so parents of a **Top Performer** can be congratulated automatically.
+### Studio: welcome new members who never came
 
-### Pilates/yoga studio: recover payments and reward loyalty
-
-- Leave **Financial** on and build an automation that messages the "Overdue" segment before it becomes "Overdue" at 7 days.
-- Enable **Loyalty** to recognise long-standing members ("Legend", "Champion") with perks.
-
-### Multi-language community gym
-
-Enable **Language** so members are tagged by their preferred locale (for example Español or Français), then send each promotion in the right language by segmenting on the language tag.
+Keep **Attendance** on and start an automation on the **Not Started** tag that invites the member to book their first class.
 
 ## Tips & best practices
 
-- **Start with the defaults.** Financial, Lifecycle, Membership, Contact stages, and Payment method are on out of the box because almost every gym needs them. Add Attendance, Loyalty, Interest, and the demographic categories as you're ready to act on them.
-- **Use Attendance for short-term campaigns and Loyalty for long-term recognition.** They answer different questions: "who's gone quiet recently?" vs. "who's been with us the longest?"
-- **Don't duplicate categories with manual tags.** If you find yourself hand-tagging members "Overdue", adjust the Financial thresholds instead.
-- **Remember auto-renewing memberships never show "Expiring".** If you rely on the Membership tags for renewals, they target non-auto-renewing plans.
-- **Re-check thresholds periodically.** What counted as "Regular" attendance a year ago may not match how your gym runs today.
+- **Read the visit-based tags together.** Attendance says how often someone comes now, Declining says they come less than before, At Risk says they stopped.
+- **Use Loyalty for recognition, Attendance for short-term campaigns.**
+- **Don't duplicate smart tags with manual ones.** If you are hand-tagging members "Overdue", adjust the Financial thresholds instead.
+- **Remember auto-renewing memberships never show "Expiring".**
+- **Click Sync tags after changing a threshold** to see the result straight away.
 
 ## Troubleshooting
 
-**Issue**: A member isn't getting an activity tag (Attendance, Financial, Loyalty, and so on).
-**Cause / fix**: The contact has no bookings, check-ins, or plans and isn't in your pipeline, so only the demographic and payment method categories apply - or the category is disabled. Confirm they have activity and the category is on.
-
-**Issue**: A member has no Language tag.
-**Cause / fix**: The tag comes from a linked account's preferred language. A contact with no linked user account (a walk-in or unregistered lead) can't be tagged. Also confirm the Language category is enabled.
-
-**Issue**: A member isn't tagged "Expiring" even though their membership ends soon.
-**Cause / fix**: Auto-renewing memberships are never flagged as expiring. The before-expiry tiers only match active, non-auto-renewing memberships whose end date falls inside the window.
-
-**Issue**: A staff member has no smart tags.
-**Cause / fix**: That's by design - staff are excluded from smart tagging entirely.
-
-**Issue**: I changed a threshold but tags didn't update.
-**Cause / fix**: Reactive re-evaluation fires on data changes, not rule changes. After a rule change, click **Sync tags** to apply it now, or wait for the nightly run at 03:00 UTC.
-
-**Issue**: A lead shows a pipeline stage as their Lifecycle tag instead of Trial.
-**Cause / fix**: That's by design - while a contact is in your pipeline, their stage is their Lifecycle tag. Once they leave the pipeline, the Frozen and tenure tags apply.
+| Symptom                                                                    | Cause                                                                                                          | Fix                                                     |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| A member isn't getting an activity tag (Attendance, Financial, Loyalty...) | They are a plain contact with no bookings, check-ins or plans and not in your pipeline, or the category is off | Confirm the contact has activity and the category is on |
+| A category is missing from the page                                        | It can't tag anyone yet: one language, one sport, no progression track enabled, or no assessment template      | Set up what it reads first                              |
+| A member who never comes isn't **Inactive**                                | They have no active plan (they are lapsed), or they never visited, which makes them **Not Started**            | Expected                                                |
+| The At-risk customers report is empty                                      | **At Risk** and **Trend** are off, or nobody meets their rules                                                 | Turn them on and click **Sync tags**                    |
+| A member isn't tagged "Expiring" though their membership ends soon         | The membership auto-renews                                                                                     | Expected                                                |
+| A member has no Language tag                                               | They have no account with a preferred language, or the category is off                                         | Expected for contacts without an account                |
+| Staff have no smart tags                                                   | Staff are excluded from smart tagging                                                                          | Expected                                                |
+| I changed a threshold but tags didn't update                               | Saving doesn't re-check who qualifies                                                                          | Click **Sync tags**, or wait for the nightly run        |
+| I can't switch a category                                                  | You lack the Members **Edit** permission                                                                       | Ask an admin                                            |
+| A lead shows a pipeline stage as their Lifecycle tag instead of Trial      | While a contact is in your pipeline, their stage is their Lifecycle tag                                        | Expected                                                |
 
 ## Related
 
 - [Members](/members/overview) - where tags are surfaced and used.
-- [Promotions](/sales/promotions) - restrict offers to specific tags via segment filters.
-- [Engagement analytics](/analytics/engagement) - view engagement scores across your members.
+- [Members analytics](/analytics/members#at-risk-customers) - the At-risk customers report.
+- [Engagement analytics](/analytics/engagement) - engagement scores across your members.
+- [Promotions](/sales/promotions) - restrict offers to specific tags.
+- [Automations](/marketing/automations) - start workflows on a tag.

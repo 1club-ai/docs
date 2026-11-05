@@ -34,16 +34,17 @@ Open **Analytics** in the main nav and select the **Marketing** category to reac
 - **Email Analytics Dashboard** - delivery and engagement status for sent emails, plus unsubscribed contacts.
 - **Promotions** - redemption volume, wallet funds added, discounts given, and per-promotion and per-member breakdowns.
 
-Both require the `analytics.read.club` permission. Each dashboard opens on a filter bar with a date range.
+Both require the `analytics.read.club` permission.
 
 ### Filtering
 
-The filter bar at the top of each dashboard controls what the metrics cover:
+Each dashboard opens on the shared filter bar (see [Analytics overview](/analytics/overview#the-filter-bar)):
 
-- **Date range** - one field showing the selected days, with previous and next period arrows. Open it to pick a preset (**Today**, **Yesterday**, **This week**, **Last week**, **This month**, **Last month**, **Last 3 days** through **Last 365 days**, **This year**, **Previous year**) or a custom range on the calendar.
-- **Club** - there is no club control on the dashboard. **Promotions** follows the club selected in the breadcrumb at the top of the admin; the **Email Analytics Dashboard** is always organization-wide.
+- **Period** - defaults to the last 30 days.
+- **Compare with** - compares the cards with the previous period or the same period last year.
+- **Club** - both dashboards, and **Web Traffic**, cover the whole organization, whichever club the breadcrumb shows.
 
-Your last-used range is remembered per dashboard and carried in the URL, so you can bookmark or share a filtered view.
+Your last-used period is remembered per dashboard and carried in the URL, so you can bookmark or share a filtered view.
 
 ## Email analytics dashboard
 
@@ -51,19 +52,26 @@ This dashboard reports on emails your gym has sent, drawn from your messages and
 
 ### Summary metrics
 
-- **Total Sent** - the count of email recipients in the range.
-- A card per status that has activity. The effective status prefers a recipient's engagement status (for example **Opened**, **Clicked**), then delivery status (**Delivered**, **Bounced**, **Dropped**), then the message status. Statuses you may see include **Delivered**, **Opened**, **Clicked**, **Deferred**, **Bounced**, **Dropped**, **Spam Report**, **Unsubscribed**, and **Failed**.
+- **Total Sent** - the count of email recipients in the period. This is the one card compared with another period.
+- A card per status that has activity, such as **Delivered**, **Opened**, **Clicked**, **Deferred**, **Bounced**, **Dropped**, **Spam reported**, **Unsubscribed**, and **Failed**. Only statuses with a non-zero count appear.
 
-Only statuses with a non-zero count appear, so the cards adapt to what actually happened in the range.
+The engagement cards include the steps after them, so you can divide them:
+
+- **Delivered** - emails that arrived, including every one later opened, clicked, unsubscribed from, or reported as spam.
+- **Opened** - emails opened at least once, the clicked ones included, so **Opened** over **Delivered** is your open rate.
+- **Clicked** - emails with a link clicked at least once; each is also counted as opened and delivered.
+- **Unsubscribed** - emails whose recipient unsubscribed through them; counted as delivered, apart from opened and clicked.
+
+The status cards count the period's emails by how far each has got today, so an older period has had longer to be opened. That is why they are not compared.
 
 ### Charts and tables
 
-- **Sent Emails by Status per Week** - a stacked bar chart with one bar per ISO week, each segment a delivery or engagement status.
+- **Sent Emails by Status per Week** - a stacked bar chart with one bar per week, labelled by its Monday. Unlike the cards, a bar counts each recipient once, under the furthest step reached, so its segments read **Delivered, not opened**, **Opened, not clicked**, **Clicked**, and so on.
 - **Unsubscribed Contacts** - a table of contacts who have opted out of marketing email, with their opt-out date. This reads from each contact's marketing email preference, so it also includes people who unsubscribed outside a specific send.
 
 ## Promotions
 
-This dashboard measures how your [promotions](/sales/promotions) (vouchers and discounts) get redeemed. The date range filters on when each redemption happened, not when the promotion was created. Redemptions tied to a voided or refunded charge are excluded, so the totals reflect settled activity only.
+This dashboard measures how your [promotions](/sales/promotions) (vouchers and discounts) get redeemed, across the whole organization. The period filters on when each redemption happened, not when the promotion was created. Redemptions tied to a voided or refunded charge are excluded, so the totals reflect settled activity only.
 
 ### Summary metrics
 
@@ -88,14 +96,14 @@ Both tables are capped at the top 200 rows, and the underlying aggregation reads
 
 ## Website and Apps
 
-The **Website and Apps** category has one report, **Web Traffic** (**Analytics** > **Website and Apps** > **Web Traffic**). It shows member and visitor activity across the member portal and your website. Events are recorded when people log in, sign up, book, cancel, or complete payments on the portal or website. It is organization-wide and not narrowed by club.
+The **Website and Apps** category has one report, **Web Traffic** (**Analytics** > **Website and Apps** > **Web Traffic**). It shows member and visitor activity across the member portal, your website, and the mobile app. Events are recorded when people log in, sign up, book, cancel, or complete payments. It is organization-wide and not narrowed by club. It offers **Group by** and **Compare with**.
 
-Next to the date range, filter by **Event type** and by **Source** (**Portal Events** or **Website Events**).
+Under **Filters**, narrow it by **Event type** and by **Source** (**Portal Events** or **Website Events**).
 
-- **Cards** - **Total Events** and **Unique visitors**, each followed by one card per source.
-- **Performance** - events over time, one area per event type.
-- **Unique Visitors** - visitors over time, one area per source.
-- **Events by Contact** - which contacts generated the events.
+- **Cards** - **Total Events** and **Unique visitors**, each followed by one card per source (**Member portal**, **Website**, **Mobile app**).
+- **Performance** - events over time, one series per event type.
+- **Unique Visitors** - visitors over time, one series per source.
+- **Events by Contact** - which contacts generated the events. Open a contact to see each of their events with its **Date**, **Event**, **Details**, and **Source**.
 
 ## Worked examples
 
@@ -117,8 +125,9 @@ Next to the date range, filter by **Event type** and by **Source** (**Portal Eve
 | --- | --- | --- |
 | **Wallet funds added** looks lower than expected while **Discounts Given** is high | Vouchers applied as money off a booking count as discounts, not wallet credit | This is expected; only wallet-crediting voucher redemptions count there. |
 | Promotion totals seem to miss older redemptions in a wide range | The aggregation reads the most recent 10,000 redemptions | Narrow the date range so the window fits under the cap. |
-| A dashboard stays empty | No records match the range, or you lack `analytics.read.club` | Widen the time range; confirm your role grants the analytics read permission. |
-| Email counts differ from your send tool | Statuses use the effective per-recipient status (engagement over delivery over message status) | Read the per-status cards together rather than any single number. |
+| A dashboard stays empty | No records match the period, or you lack `analytics.read.club` | Widen the period; confirm your role grants the analytics read permission. |
+| The chart's **Delivered** is smaller than the **Delivered** card | The card includes emails later opened or clicked; the chart counts each recipient once, at the furthest step | This is expected. Read the cards for rates and the chart for the funnel. |
+| Promotions ignores the club in the breadcrumb | The dashboard is organization-wide | This is expected. The **Per-Promotion Summary** shows each promotion on its own. |
 
 ## Related
 

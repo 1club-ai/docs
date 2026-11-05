@@ -3,18 +3,19 @@ title: "Calendar"
 description: "The unified day/week calendar that drives bookings, classes, instructor time off, and check-in."
 ---
 
-The calendar is the hub of the **Schedule** section. It pulls classes, bookings, and instructor time off for the visible date range and renders them as colored blocks across resource columns. The front desk runs the day from it, managers plan the week on it, and instructors see a streamlined view of their own teaching schedule.
+The calendar is the hub of the **Schedule** section. It pulls classes, bookings, instructor time off, and area blocks for the visible date range and renders them as colored blocks across resource columns. The front desk runs the day from it, managers plan the week on it, and instructors see a streamlined view of their own teaching schedule.
 
 ## When to use it
 
-Most reservations and check-ins start here. Click an empty slot and the right dialog opens pre-filled for that court, instructor, or class type, and right-click a block to check someone in, take a payment, or cancel without leaving the grid.
+Most reservations and check-ins start here. Click an empty slot and the right dialog opens pre-filled for that area, instructor, or class type, and right-click a block to check someone in, take a payment, or cancel without leaving the grid.
 
 Typical uses:
 
 - **Build tomorrow's class grid fast** - drop a class into each start time, then copy a popular class like your 18:00 vinyasa to the other days that run it.
-- **Reschedule a padel court booking** - a member asks to move their Tuesday court an hour later, and you drag the block to the new slot.
+- **Reschedule an area booking** - a member asks to move their Tuesday padel game an hour later, and you drag the block to the new slot.
 - **Front-desk check-in during class** - as members arrive for the 09:00 class, check them in straight from the class block.
-- **Declutter a multi-court venue** - a racket center with a dozen courts and several coaches shows only the courts the desk is working.
+- **Declutter a venue with many areas** - a racket center with a dozen areas and several coaches shows only the areas the desk is working.
+- **Find a free hour for one area** - open one area's week and step from area to area until one has the hour the member wants.
 
 See [Worked examples](#worked-examples) for the steps behind each of these.
 
@@ -32,6 +33,14 @@ The Schedule has no page header: one row above the grid carries the club, the da
 
 Use the arrows and **Today** to move between dates, or click the date to pick one from a calendar. The selected date is pushed to the URL as `?date=YYYY-MM-DD` so you can share a link to a specific day.
 
+In **3 days** and **Week**, click a day's heading to open that day in **Day** view. The browser's back button returns you to the week.
+
+### One area's or one instructor's week
+
+In **Day** or **Timeline**, click an area's or an instructor's name at the top of its lane (or choose **View week** from the lane's options menu) to open that resource's week: its days as columns, with only its own bookings, classes, and blocks. The bar above the week names the resource, with arrows to step to the previous or next area (or instructor) and a menu to jump to any other, so the desk can walk the areas looking for a free hour. **Back** returns to the view you came from.
+
+The address carries the focused week (`?resource=area-12`), so you can share it. **View week in schedule** in an area's row menu under **Settings** > **Clubs** > **Areas**, and the link on an instructor's page, open the same week. An instructor who can see only their own schedule lands on their own week.
+
 ## Resources and what shows up where
 
 The schedule reads three live data sources for the visible range:
@@ -41,13 +50,15 @@ The schedule reads three live data sources for the visible range:
 - **Instructor time off** - shown as grey blocks on the instructor's column, alongside shift breaks and rostered days off (see [Roster and time off](/staff/roster)).
 - **Area blocks** - shown as grey, dashed cards on the area's column (see [Area blocks](/schedule/area-blocks)).
 
-Staff who can only see their own schedule still see when a court is taken by someone else's booking: the slot shows as **Occupied**, without the booking's details.
+Staff who can only see their own schedule still see when an area is taken by someone else's booking: the slot shows as **Occupied**, without the booking's details.
 
 An hour that a [season pass](/schedule/season-passes) paid for carries a small season icon labelled with the season's name, so a contracted week reads as an hour of a prepaid contract rather than a casual booking. Makeup hours replayed on another date carry the same marker.
 
-Live [events](/events/events) also render on the calendar as read-only cards: single-day events at a gym appear in their areas' lanes (or under their instructors when no areas are assigned), while multi-day and organization-wide events appear as chips in a banner above the grid. Event cards link to the event detail page and don't reserve the area they're shown in.
+Live [events](/events/events) also render on the calendar as read-only cards: single-day events at a gym appear in their areas' lanes (or under their instructors when no areas are assigned), while multi-day and organization-wide events appear as chips in a banner above the grid. Event cards link to the event detail page. A live event takes one place in each area and with each instructor it's assigned to, like a booking, so an area that takes one booking at a time is full while the event runs. See [Events on the schedule](/events/events#events-on-the-schedule).
 
 Active areas (`status=active`) and bookable instructors (`isBookable=true`) are the only ones included. Inactive or non-bookable resources don't get a column.
+
+In **Day** view, an area or instructor lane with nothing on it that day folds to a narrow strip, so the busy lanes get the width. In the area and instructor lanes, each free hour shows that hour's price from the area's rate and your [pricing rules](/settings/pricing-rules). When you arrive from a member's profile with **+** > **Booking**, the prices are that member's. Hours outside a resource's operating hours are shaded.
 
 ## Filtering what you see
 
@@ -61,7 +72,7 @@ The organization-level defaults for what's hidden come from **Settings** > **Boo
 
 Two coloring modes can be toggled on the same **Settings** > **Bookings** > **Schedule Display** page:
 
-- **Staff coloring** - when on, a booking takes the color of the instructor assigned to it. When off, blocks use the resource's configured color (or a hash of the resource name as a fallback). The same section sets the color of **Any instructor** bookings - court bookings still waiting for a coach - so they stand out from ordinary court bookings. The card also says **Any instructor** in words, so it reads the same with staff coloring off.
+- **Staff coloring** - when on, a booking takes the color of the instructor assigned to it. When off, blocks use the resource's configured color (or a hash of the resource name as a fallback). The same section sets the color of **Any instructor** bookings - area bookings still waiting for a coach - so they stand out from ordinary area bookings. The card also says **Any instructor** in words, so it reads the same with staff coloring off.
 - **Source coloring** - when on, a second border color is added that encodes the booking **source** (admin, portal, website, kiosk, etc.). Source colors are configurable on the same settings page.
 
 ## Creating activities
@@ -82,7 +93,7 @@ The header has an **Add** button that opens a menu with **Booking**, **Class**, 
 
 ## Acting on existing blocks
 
-Click a block to open it: bookings, classes, and events open their detail pages, while time-off entries, shift breaks, and area blocks open their edit dialogs.
+Click a block to open it. A booking opens in the [booking panel](/schedule/bookings#the-booking-panel) beside the calendar, so the schedule stays in view. Classes and events open their detail pages, while time-off entries, shift breaks, and area blocks open their edit dialogs.
 
 Right-click a block (or use the mobile tap menu) for its actions. Each is shown only when you hold the permission for it:
 
@@ -102,7 +113,7 @@ To copy a class or a booking to another time without reopening its dialog, hold 
 While you drag with the key held, the calendar shows that you are copying rather than moving: the cursor becomes a copy cursor, the source block gets a green outline and a small copy badge, and the target slots highlight in green. Let go of the key mid-drag to fall back to a normal move.
 
 - **A copied class** is a single one-off class at the drop time. It keeps the original's name, description, instructors, area, capacity, price, visibility, color, and class type, but never its recurrence, and it starts with no bookings or check-ins. A **Class duplicated** banner offers **Undo**, which removes it again.
-- **A copied booking** is the same member on the same court or with the same coach, for the same duration, at the drop time. It's priced for the new slot, set to be paid at the desk rather than drawn from a membership, never repeats, and doesn't send a confirmation email. A **Booking duplicated** banner offers **Undo**, which cancels the copy.
+- **A copied booking** is the same member on the same area or with the same coach, for the same duration, at the drop time. It's priced for the new slot, set to be paid at the desk rather than drawn from a membership, never repeats, and doesn't send a confirmation email. A **Booking duplicated** banner offers **Undo**, which cancels the copy.
 
 The gesture works with a mouse and keyboard. Time-off blocks keep their normal drag-to-reschedule behavior. A dismissible hint in the calendar header ("Hint: Option + drag to duplicate") points it out until you close it.
 
@@ -112,7 +123,7 @@ While the calendar shows today or a future date, it checks for changes every 30 
 
 ## Bookings created with a member pre-selected
 
-If you arrive at the schedule from a member profile with **Book a slot**, the URL carries `?contactId=X`. A toast prompts you to pick a slot, and every booking dialog you open from a slot click is pre-filled with that contact.
+If you arrive at the schedule from a member profile with **+** > **Booking**, the URL carries `?contactId=X`. A toast prompts you to pick a slot, and every booking dialog you open from a slot click is pre-filled with that contact.
 
 ## Instructors on the calendar
 
@@ -124,17 +135,21 @@ Instructors use the same **Schedule** page. An instructor who can only see their
 
 Open Day view on tomorrow, click the class-type column at each start time to drop in a class, then **Option/Alt-drag** a popular class (say your 18:00 vinyasa) to the other days that run it. Each drop is a fresh one-off class with the same name, instructor, area, and capacity but no bookings yet.
 
-### Reschedule a padel court booking
+### Reschedule an area booking
 
-A member asks to move their Tuesday court an hour later. Find the block on the court's column, drag it to the new slot, and confirm the old and new time in the prompt. The resource and duration stay the same; only the time shifts.
+A member asks to move their Tuesday padel game an hour later. Find the block on the area's column, drag it to the new slot, and confirm the old and new time in the prompt. The resource and duration stay the same; only the time shifts.
 
 ### Front-desk check-in during class
 
 As members arrive for the 09:00 class, right-click the class block and choose **Check In**. No need to open the class detail page.
 
-### Declutter a multi-court venue
+### Declutter a venue with many areas
 
-A racket center with a dozen courts and several coaches can be noisy in Day view. Use **Show on schedule** to show only the courts you're working, saved per view so the desk keeps its layout.
+A racket center with a dozen areas and several coaches can be noisy in Day view. Use **Show on schedule** to show only the areas you're working, saved per view so the desk keeps its layout.
+
+### Find a free hour for one area
+
+A member wants padel area 4 on any evening this week. In **Day** view, click **Padel 4** at the top of its lane to open its week, and look for a free evening hour. If none is free, use the arrows beside its name to step to the next area.
 
 ## Tips & best practices
 
@@ -145,9 +160,9 @@ A racket center with a dozen courts and several coaches can be noisy in Day view
 
 ## Troubleshooting
 
-**Issue**: A court or coach is missing from the calendar.
+**Issue**: An area or coach is missing from the calendar.
 
-**Solution**: Only **active** areas and **bookable** instructors get a column. Check the area status and the instructor's **Bookable** toggle. Also confirm the resource's type isn't hidden under **Settings** > **Bookings** > **Schedule Display**, or re-enable it under **Show on schedule**. If the **Staff** filter is set, only the selected instructors are shown.
+**Solution**: Only **active** areas and **bookable** instructors get a column. Check the area status and the instructor's **Bookable** toggle. Also confirm the resource's type isn't hidden under **Settings** > **Bookings** > **Schedule Display**, or re-enable it under **Show on schedule**.
 
 **Issue**: A class booking doesn't appear in the Week or 3 days view.
 
@@ -163,9 +178,9 @@ A racket center with a dozen courts and several coaches can be noisy in Day view
 
 ## Related
 
-- [Bookings](/schedule/bookings) - The list view and detail page for reservations.
+- [Bookings](/schedule/bookings) - The list view and the booking panel for reservations.
 - [Classes](/schedule/classes) - Class creation, capacity, and attendance.
 - [Events](/events/events) - One-off ticketed events that render as read-only cards.
-- [Season passes](/schedule/season-passes) - Sell a whole season of a weekly court hour from a slot.
+- [Season passes](/schedule/season-passes) - Sell a whole season of a weekly hour from a slot.
 - [Booking policies](/settings/booking-policies) - Rules that govern payment timing and cancellation.
 - [Check-in models](/reference/check-in-models) - Entrance flow your front desk should follow.

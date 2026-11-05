@@ -1,10 +1,10 @@
 ---
 title: Physical access control
-description: How 1club turns bookings and check-ins into door access - areas, credentials, access grants, the access buffer, and the door access integrations that open real doors.
-keywords: [physical access control, door access, door, area access, credential, RFID, NFC, QR code, PIN, access grant, manual access grant, revoke access, access buffer, access event, WebLock, Impro, Salto KS, door hardware]
+description: How 1club turns bookings, check-ins and plans into door access - areas, walk-in areas, credentials, access grants, the access buffer, session passes at the door, and the door access integrations that open real doors.
+keywords: [physical access control, door access, door, area access, walk-in area, default area, plan door access, session length, check-in locks, credential, RFID, NFC, QR code, PIN, access grant, manual access grant, revoke access, access buffer, access event, WebLock, Impro, Salto KS, door hardware]
 ---
 
-Physical access control is how 1club opens real doors. It gives a member a time-bound **access grant** to one **area** of a gym, derived from their booking or check-in, and a door access integration ([Impro](/settings/integrations/access-bridge), [WebLock](/settings/integrations/weblock), or [Salto KS](/settings/integrations/salto)) keeps that gym's door system in step with those grants. Owners and admins set up the integration once per gym, staff can add or withdraw access by hand, and members get in with their [credential](/members/member-cards): an access card, QR code, PIN, or a digital key on their phone.
+Physical access control is how 1club opens real doors. It gives a member a time-bound **access grant** to one **area** of a gym, derived from their booking, their check-in, or the plan they hold, and a door access integration ([Impro](/settings/integrations/access-bridge), [WebLock](/settings/integrations/weblock), or [Salto KS](/settings/integrations/salto)) keeps that gym's door system in step with those grants. Owners and admins set up the integration once per gym, staff can add or withdraw access by hand, and members get in with their [credential](/members/member-cards): an access card, QR code, PIN, or a digital key on their phone.
 
 <Note>
 This page is different from [Access control](/settings/access-control), which covers **check-in modes** (walk-ins, anonymous check-ins, payment enforcement) and how members **identify themselves** at the front desk. This page is about door hardware and the grants that drive it.
@@ -12,31 +12,88 @@ This page is different from [Access control](/settings/access-control), which co
 
 ## When to use it
 
-Use physical access control when your doors should open based on what a member has booked or checked in for, without staff programming the door system by hand. Grants are created and withdrawn as bookings and check-ins change, and you can see every grant in one list.
+Use physical access control when your doors should open based on what a member has booked, checked in for, or holds, without staff programming the door system by hand. Grants are created and withdrawn as bookings, check-ins and memberships change, and you can see every grant in one list.
 
 Typical uses:
 
-- **Court doors that open only for the booking** - a padel gym gives each court its own area, and a player's card opens that court a few minutes before their slot and for a few minutes after it.
-- **A walk-in member at a 24/7 gym** - a member with an active membership checks in on arrival and picks the gym floor. Their access lasts until midnight at the gym.
+- **Area doors that open only for the booking** - a padel gym gives each playing space its own area, and a player's card opens that area a few minutes before their slot and for a few minutes after it.
+- **A gym floor members walk into on their plan** - a strength gym with no front desk sets its gym floor to walk-in. A member on an unlimited plan opens the door with their card during the plan's hours, with no booking and no check-in.
+- **An off-peak plan that only opens the door off-peak** - a plan with hours from 09:00 to 15:00 opens the gym floor only in those hours. A member who also holds an evening plan gets both windows.
+- **A 10-visit pass used at the door** - at a climbing gym on Salto KS, each entry through the bouldering hall's own door uses one session, and coming back in after lunch within the pass's session length uses nothing more.
 - **Access for someone with no booking** - the front desk adds an access grant so a coach can get into the studio on Saturday morning, and revokes it if plans change.
 
 ## How it works
 
-- **Areas are the unit of access.** A grant opens one area of one gym, such as a court, a studio, or the gym floor. Each door access integration maps the gym's areas to its doors. A gym needs at least one active area.
+- **Areas are the unit of access.** A grant opens one area of one gym, such as a padel area, a studio, or the gym floor. Each door access integration maps the gym's areas to its doors. A gym needs at least one active area.
+- **Each area is booked or walked into.** An area's **How members use it** is either **Booked by the hour** (a padel area, a treatment room) or **Walk-in, no booking** (the gym floor, the pool, the sauna). A plan only ever opens walk-in areas. An area booked by the hour opens for its booking and nothing else.
 - **Bookings and check-ins create grants.** A confirmed booking with an area gets a grant for its time window. A check-in linked to a booking or class gets one too. Cancelling the booking or removing the check-in revokes the grant.
-- **A membership alone opens nothing.** A member with a membership but no booking gets door access by checking in. When staff, the kiosk, the check-in app, or the member themselves record a check-in on a membership, they choose the area to enter. With one active area it is picked automatically; with several, someone chooses, and **No door access** is also an option. That access runs from the check-in until the next midnight in the gym's time zone. A gym with no active areas still records the attendance, without door access.
-- **The access buffer widens the window.** Each integration has an access buffer (15 minutes by default) that lets a member in a little before a booking starts and keeps access a little after it ends. A check-in opens access straight away and keeps only the trailing buffer. Manual grants and membership check-ins use their exact times.
-- **Grants reach the doors quickly.** Changes are pushed to the door system within moments, and a complete sync repairs anything that was missed every few minutes.
+- **Plans create grants for walk-in areas.** A member with an active membership gets a grant for each walk-in area their plan reaches, open during the plan's hours, from the day the membership is active until it ends. See [Door access from plans](#door-access-from-plans).
+- **A check-in on a membership opens an area for the day.** When staff, the kiosk, the check-in app, or the member themselves record a check-in on a membership, it opens one area. With one active area it is used automatically. With several, a general plan lands in the gym's **Default Area**, and otherwise someone chooses. **No door access** is also an option. That access runs from the check-in until the end of the gym's day, or for the session length on a pass that has one. A gym with no active areas still records the attendance, without door access.
+- **The access buffer widens a booking's window.** Each integration has an access buffer (15 minutes by default) that lets a member in a little before a booking starts and keeps access a little after it ends. A check-in opens access straight away and keeps only the trailing buffer. Manual grants use their exact times.
+- **An unsigned entry document holds access back.** A member who owes a document marked [**Required for entry**](/settings/waivers#required-for-entry) gets no door access from a booking or a plan until they sign it, or until staff let them in that day. Access from a check-in always applies.
+- **Grants reach the doors quickly.** Changes are pushed to the door system within moments, and a complete sync repairs anything that was missed every five minutes.
 
 Only one door access integration can be on for a gym at a time.
 
 ## Set it up for a gym
 
-1. Go to **Settings** > **Access Control** > **Settings** and turn on **Access Control** for the gym, so members can register credentials. Choose the **Enabled Identification Methods** you accept. See [Access control](/settings/access-control#member-identification-methods-per-club).
-2. Make sure the gym has at least one active area. See [Areas](/settings/areas).
-3. Set up the gym's door system under **Settings** > **Integrations**: [Impro](/settings/integrations/access-bridge), [WebLock](/settings/integrations/weblock), or [Salto KS](/settings/integrations/salto). Each integration page explains how to connect the gym's areas to its doors and set the access buffer.
+1. Go to **Settings** > **Check-in & Access** > **Door access** and turn on **Access Control** for the gym, so members can register credentials. Choose the **Enabled Identification Methods** you accept. See [Access control](/settings/access-control#member-identification-methods-per-club).
+2. Make sure the gym has at least one active area, under **Settings** > **Clubs** > **Areas**. See [Areas](/settings/areas).
+3. On each area, set **How members use it**: **Walk-in, no booking** for the areas members should enter on their plan, **Booked by the hour** for the rest. On the area list, use **Make default** on the open floor, so a general plan and a bare check-in know where to land. See [Walk-in areas and the Default Area](#walk-in-areas-and-the-default-area).
+4. Set up the gym's door system under **Settings** > **Integrations**: [Impro](/settings/integrations/access-bridge), [WebLock](/settings/integrations/weblock), or [Salto KS](/settings/integrations/salto). Each integration page explains how to connect the gym's areas to its doors and set the access buffer.
 
 Until a door access integration is enabled for a gym, no grants are created there, and **Add access grant** is refused.
+
+## Door access from plans
+
+A member on a plan walks in during the plan's hours, with no booking and no check-in first. 1club works out which areas each of a member's plans opens and keeps a grant for each one, and the door system lets them in whenever any of those grants is open.
+
+### Walk-in areas and the Default Area
+
+**How members use it** is set on each area (**Settings** > **Clubs** > **Areas**) and on each area type (**Settings** > **Clubs** > **Area Types**). A new area starts with its type's choice, and changing it on the area type applies it to every area of that type. An area with no area type is set on the area alone. New areas are **Booked by the hour** until you change them.
+
+Which areas a plan opens depends on what the plan covers:
+
+| The plan | Opens |
+| --- | --- |
+| A general plan, covering no specific classes, areas or instructors | The gym's **Default Area**, or its only area when it has just one and that area is walk-in |
+| A plan that covers areas | Every active walk-in area it covers: of every area type, or only of the area types the plan names |
+| A plan that covers classes or instructors only | Nothing. Members enter through a booking or a check-in |
+
+An area booked by the hour is never opened by a plan, so those areas stay booking-only. The **Default Area** is the one exception: a general plan opens it whatever it is set to. A gym has at most one Default Area, shown with a **Default** chip on the area list.
+
+### When the door is open
+
+- **Plan hours.** The door opens during the plan's operating hours, as they were when the membership was sold. A plan with no hours of its own follows the area's opening hours, then the gym's. An area or gym saved as closed every day opens nothing.
+- **Two plans add up.** Each membership is its own grant. A member holding a plan for 09:00 to 15:00 and another for 10:00 to 19:00 gets in from 09:00 to 19:00.
+- **From the day it is active.** Only an active membership in effect that day qualifies, from the moment it is active, whether or not its charge has been paid. Collecting the money stays with the front desk.
+- **At its own gym.** A membership for one gym opens nothing at another.
+- **Shared plans.** A plan shared with a household or company account opens the door for everyone it is shared with.
+
+### Passes with sessions
+
+A pass that counts sessions per booking opens the door too, while it has a session left, at a gym that runs [Impro](/settings/integrations/access-bridge) or [Salto KS](/settings/integrations/salto). These door systems report each entry back to 1club, and every visit through an area's own door uses one session.
+
+- **Session length.** A visit lasts the plan's **Session length** from the first entry, so coming back in within it uses nothing more. Leave it empty and a visit lasts the rest of the gym's day. A session never runs past the end of that day. Session length is set on the plan, and you can change it on one member's membership. The field only appears on a plan with a session limit that is not counted in hours, once door access is on at one of your gyms.
+- **Which doors count.** An entry counts when it comes through a check-in lock: a lock that opens exactly one area. A lock shared by several areas, such as the front entrance to the gym, sauna and pool, only opens. Set this per lock under **Check-in locks** on the integration page.
+- **The last session.** The door stays open until the visit's window closes, even when that visit used the last session.
+
+At a gym on WebLock, and for a pass counted in hours, the member still enters through a check-in, because the door cannot count the visit.
+
+### Seeing which doors a member's plans open
+
+On the member's [profile](/members/member-profiles), click their name to open **Contact Information**: **Door access from plans** sits below **Cards**, and shows each plan, the area it opens and its weekly hours. When one of the member's plans opens nothing, it says why:
+
+| Reason | What it means |
+| --- | --- |
+| **Not active today** | The membership has not started, has ended, or is paused |
+| **Counts sessions, so enters through a check-in** | A pass at a gym whose door system cannot count visits, or a pass counted in hours |
+| **No sessions left** | The pass has used all its sessions |
+| **Covers no walk-in area** | The plan covers no area that is walk-in, or covers classes or instructors only |
+| **For another club** | The plan belongs to another gym |
+| **Has no opening hours** | The hours that apply are closed every day: the plan's own, or the area's or gym's when the plan has none |
+
+When no plan opens anything, it reads **No plan opens a door here**. The panel only appears in an organization with door access, and needs operations view access. An organization with several **Clubs** sees one list per gym.
 
 ## Credentials
 
@@ -46,26 +103,26 @@ A credential is what a member presents at a door:
 - **Access Card** - a physical RFID or NFC card or fob.
 - **PIN Code** - a numeric PIN typed at a keypad.
 
-You manage credentials on **Members** > **Access cards** (`/members/access-cards`), where you can enroll, assign, revoke, and delete them. See [Access cards](/members/member-cards). A few facts that matter for door access:
+You manage access cards and PINs on the **Cards** page, from the three-dot menu on **Members** (`/members/access-cards`), where you issue a card, remove it from a member, or delete club stock. See [Access cards](/members/member-cards). A few facts that matter for door access:
 
 - **Identifiers are protected.** The raw card number or PIN is encrypted at rest and stored alongside a one-way hash.
-- **A credential is assigned to a contact**, and a contact's **primary** credential is the one door access uses.
-- **Credential lifecycle.** A credential is `active`, `suspended`, `revoked`, or `expired`. Only an `active` credential opens a door. Revoking a credential keeps it as an audit record; deleting is only allowed once it has no active assignments.
+- **A card has one holder at most**, and door access follows the holder. The door systems receive every card and PIN the member holds. One of them is their **main card**.
+- **Removing a card deletes it.** There is no suspended or revoked state: a card taken off a member stops working at once, and scanning the same card again later issues it fresh.
 
 <Note>
-When access control is on for a gym and **PIN Code** is an enabled method, a member who needs door access but has no credential is given a primary random 6-digit PIN automatically. QR codes are not provisioned this way, because the member's app QR already identifies them.
+When access control is on for a gym and **PIN Code** is an enabled method, a member who needs door access but has no card is given a random 6-digit PIN as their main card automatically. QR codes are not provisioned this way, because the member's app QR already identifies them.
 </Note>
 
 ## Access grants
 
 An access grant records a **contact**, a **gym**, an **area**, and a **valid from** and **valid until** time, plus the booking or check-in it came from, if any.
 
-Review them under **Settings** > **Access Control** > **Access grants** (`/settings/access/grants`). The list shows, for each grant:
+Review them under **Settings** > **Check-in & Access** > **Access grants** (`/settings/access/grants`). The list shows, for each grant:
 
 - **ID** and **Sync** - the grant and whether the door system has been updated.
 - **Area**, **Club**, and **Contact**.
-- **Source** - **Booking**, **Check-in**, **Manual**, or **Legacy** for grants left from the previous door access model.
-- **Valid from** and **Valid until** - the effective window, including the access buffer. A class ending at 14:30 with a 15-minute buffer shows **Valid until** 14:45.
+- **Source** - **Booking**, **Check-in**, **Manual**, **Plan**, or **Legacy** for grants left from the previous door access model. A plan grant also shows the plan's name and its weekly hours.
+- **Valid from** and **Valid until** - the effective window, including the access buffer. A class ending at 14:30 with a 15-minute buffer shows **Valid until** 14:45. A plan grant runs until the membership's last day, and shows **-** when the membership has no end date.
 - **Status** - **Active**, **Expired**, or **Revoked**. A grant turns **Expired** at the end of its effective window, and the list refreshes at that moment.
 
 ### Add access by hand
@@ -79,7 +136,7 @@ Review them under **Settings** > **Access Control** > **Access grants** (`/setti
 
 Click **Revoke** on an active grant to withdraw the access straight away. A revocation you make by hand sticks, even if the booking or check-in behind the grant changes later. Click **Restore** to undo your own revocation, as long as the grant's period hasn't ended.
 
-Grants that 1club revoked itself, for example because the booking was cancelled or the contact was archived, can't be restored.
+Grants that 1club revoked itself, for example because the booking was cancelled, the membership ended or the contact was archived, can't be restored.
 
 If the door system still lets the person in through a group set up directly in that system, 1club warns you after revoking. Remove the person from that group in the door system.
 
@@ -89,20 +146,35 @@ Adding, revoking, and restoring grants needs permission to manage operations at 
 
 Door systems can report each tap, scan, or PIN entry back to 1club as an access event, with the credential, a result (`granted` or `denied`), a timestamp, and, when the system knows it, the area. Events are matched against grants by area and time, and an event that doesn't match is flagged as a discrepancy, for example a credential 1club has never seen or access granted with no matching grant. Events without an identifiable area can't confirm that a particular door was authorized.
 
+At a gym on Impro or Salto KS, entries through a check-in lock are also what count a session pass's visits: an entry that uses a session records a check-in, which shows in [Attendance](/schedule/attendance) like any other.
+
 Access events are available through the access-control API. There is no admin screen for browsing the raw event log; front-desk attendance is reviewed on [Attendance](/schedule/attendance).
 
 ## Worked examples
 
-### Padel courts that open for the booking
+### Padel areas that open for the booking
 
-- Give each court its own area, and connect each area to its door in the gym's door system.
+- Create one area per playing space, and connect each area to its door in the gym's door system.
 - Set the access buffer on the integration to 15 minutes.
-- When a player's 18:00-19:00 booking is confirmed, they get a grant valid from 17:45 to 19:15 for that court. If they cancel, the grant is revoked.
+- When a player's 18:00-19:00 booking is confirmed, they get a grant valid from 17:45 to 19:15 for that area. If they cancel, the grant is revoked.
 
 ### A 24/7 gym with walk-in members
 
-- Give the gym floor its own area. With only one active area, it is picked automatically.
-- A member with an active membership checks in when they arrive, from the kiosk, the check-in app, or their own phone, and the gym floor opens for them until midnight.
+- Give the gym floor its own area, set **How members use it** to **Walk-in, no booking**, and make it the **Default Area**.
+- Sell a general plan with no operating hours, so it follows the gym's hours. If the gym is open around the clock, leave the gym's hours open too.
+- A member with an active membership taps their card and walks in, with no booking and no check-in. On the member's profile, **Door access from plans** shows the gym floor and its hours.
+
+### Gym floor, sauna and padel areas in one club
+
+- Set the gym floor and the sauna to **Walk-in, no booking**, and leave the padel areas **Booked by the hour**.
+- A general plan opens the gym floor, as the Default Area. A "Gym and sauna" plan scoped to both area types opens both.
+- Padel areas open only for a booking, whatever plan the player holds.
+
+### A 10-visit pass at a Salto KS gym
+
+- On the pass's plan, set **Session length** to 180 minutes.
+- On the Salto KS page, check that the bouldering hall's own lock counts under **Check-in locks**, and that the shared front entrance only opens.
+- A member enters at 10:00, which uses one session. Leaving for lunch and coming back at 12:30 uses nothing more. Coming back at 18:00 uses a second session.
 
 ### Letting in a coach with no booking
 
@@ -112,14 +184,21 @@ Access events are available through the access-control API. There is no admin sc
 ## Tips & best practices
 
 - **Set up areas before you enable a door system.** No area, no door access. A new or renamed area opens no doors until the integration has synced it.
-- **Give every member a primary credential.** Door access follows the primary credential.
+- **Decide walk-in or booked per area type.** Setting it once on the area type keeps every area of that type consistent, and a new area starts right.
+- **Give plans their real hours.** An off-peak plan with no hours of its own opens the door whenever the area is open.
 - **Use the access buffer, not manual grants, for early arrival.** The buffer applies to every booking automatically.
-- **Revoke, do not delete, a lost card.** Revoking keeps the audit trail intact and stops the card working.
+- **Remove a lost card from the member at once.** It stops working straight away, and the replacement can be issued in the same visit.
 
 ## Troubleshooting
 
 **Issue**: A member with an active membership can't open the door.
-**Cause / fix**: A membership alone opens nothing. The member needs a booking with an area, or a check-in on their membership with an area chosen. Check the **Access grants** list for an active grant for them.
+**Cause / fix**: Open their profile and read **Door access from plans** in **Contact Information** (click their name): it names the reason a plan opens nothing. Common causes are an area set to **Booked by the hour**, no **Default Area** for a general plan, a plan scoped to classes, or a time outside the plan's hours. A member who owes a document required for entry is held back until they sign it. Otherwise the member needs a booking with an area, or a check-in on their membership.
+
+**Issue**: A member on a pass with sessions can't get in at the door.
+**Cause / fix**: A pass opens the door only at a gym on Impro or Salto KS, and only while it has a session left. At a gym on WebLock, or for a pass counted in hours, the member checks in first.
+
+**Issue**: A pass used a session when the member walked through the front entrance.
+**Cause / fix**: That lock counts visits for an area. Under **Check-in locks** on the integration page, set it to **Only opens**.
 
 **Issue**: A booking was confirmed but no grant appeared.
 **Cause / fix**: The gym has no door access integration enabled, the booking has no area, or the booking has no contact. Grants are only created for gyms with an enabled door access integration.
@@ -142,5 +221,6 @@ Access events are available through the access-control API. There is no admin sc
 - [Access cards](/members/member-cards) - enroll, assign, revoke, and delete credentials.
 - [Impro](/settings/integrations/access-bridge), [WebLock](/settings/integrations/weblock), and [Salto KS](/settings/integrations/salto) - the door access integrations.
 - [Areas](/settings/areas) - the areas grants open.
+- [Plans](/sales/plans) - plan hours and session length.
 - [Bookings](/schedule/bookings) - the bookings that create grants.
 - [Check-in models](/reference/check-in-models) - how members get into your gym.

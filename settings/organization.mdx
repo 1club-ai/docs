@@ -1,10 +1,10 @@
 ---
 title: Organization
-description: Configure organization-wide identity, address, time zone, locales, clubs, branding, and custom domains in 1club Settings.
-keywords: [organization, settings, slug, timezone, clubs, branding, domains, locales, subscription]
+description: Configure organization-wide identity, address, time zone, locales, clubs, your Brand Book, and custom domains in 1club Settings.
+keywords: [organization, settings, slug, timezone, clubs, branding, brand book, tone of voice, domains, locales, subscription]
 ---
 
-Your organization settings hold the identity that applies to your whole 1club account, not to any one gym: name, slug, headquarters address, time zone, contact info, and supported languages. Owners and admins manage them. This page is the anchor for the wider Organization category, which also covers your clubs, branding, custom domains, users, and your 1club platform subscription.
+Your organization settings hold the identity that applies to your whole 1club account, not to any one gym: name, slug, headquarters address, time zone, contact info, and supported languages. Owners and admins manage them. This page also covers the settings closest to it: your clubs, your Brand Book, custom domains, and your 1club platform subscription.
 
 Per-gym things like opening hours, address, and check-in mode live on each club under **Settings** > **Clubs**, not here. The two scopes exist for different jobs: the organization owns brand and identity, and each gym owns its own physical setup. See [Organization and clubs](/reference/organization-clubs).
 
@@ -89,19 +89,21 @@ Kiosk and check-in app options are set per gym under **Settings** > **Member App
 
 To delete a club, open it and choose **Delete** from the actions menu. Deleting is blocked while the club still has associated data (bookings, areas, and so on); remove or reassign that first, or set the club to **Closed** instead.
 
-## Branding
+## Brand Book
 
-Logo, favicon, colors, and fonts are configured under **Settings** > **Member Apps** > **Branding**, not on the Details page. Branding covers:
+Logo, favicon, colors, fonts, and the way your gym writes are configured under **Settings** > **Member Apps** > **Brand Book**, not on the Details page. The Brand Book covers:
 
-- **Logos and images** - Light logo, dark logo, logo alt text, and favicon.
-- **Color scheme** - Primary color, header color, and their dark-mode variants.
-- **Typography** - Body font and heading font.
+- **Logos & Images** - **Upload Logo**, **Upload Dark Logo**, **Upload Favicon**, and **Logo Alt Text**.
+- **Color Scheme** - **Primary Color**, **Header Color**, **Accent Color**, **Background Color**, **Text Color**, and their dark-mode variants (**Dark Primary Color**, **Page background (dark)**, **Body text (dark)**, **Dark Header Color**). A warning appears when a primary color is hard to see against your background. Leave the background and text colors empty to use the default palette.
+- **Always keep my brand colors** - When on, applying a website look never replaces your brand colors. You can still change a color by hand or ask the assistant for one.
+- **Typography** - **Body Font** and **Heading Font**.
+- **Voice** - **Tone of voice** (**Professional**, **Friendly**, **Casual**, or **Formal**) and **Brand guidelines**, free text of up to 4,000 characters on how your gym writes: how you address members, words to use or avoid, and anything else. The AI assistant, the website builder, and connected AI assistants read the tone and guidelines whenever they write for your gym. The guidelines shape how they write, never what they do. Members never see this page, but the member-facing assistant also follows the guidelines, so keep anything private out of them.
 
-Branding customization is not available on the **Free** plan. On Free, the page loads with a banner saying branding is not available in your plan, and saving is blocked.
+The Brand Book is not available on the **Free** plan. On Free, the page loads with a banner saying it is not available in your plan, and its fields are read-only.
 
 ## Domains
 
-Custom domains are managed under **Settings** > **Organization** > **Domains**. Each domain is attached for one **purpose**:
+Custom domains are managed under **Settings** > **Member Apps** > **Domains**. Each domain is attached for one **purpose**:
 
 - **Email (SendGrid)** - Send member email from your own domain. See [Email sending](/settings/email-sending) for the full setup, including which address members see.
 - **Website (CMS)** - Serve your CMS website on your own domain.
@@ -111,8 +113,12 @@ Custom domains are managed under **Settings** > **Organization** > **Domains**. 
 
 1. Click **Add Domain**, enter the fully-qualified domain, and choose the purpose.
 2. 1club shows the **DNS records to add** (type, name, value). Add them at your DNS provider.
-3. For website and portal domains, delete any leftover A, AAAA, or CNAME records for the same host first, or verification will fail.
+3. For website and portal domains, delete any leftover A, AAAA, or CNAME records for the same host first, or verification will fail. When 1club can tell where your DNS is hosted, the dialog names the provider to add the records at.
 4. Wait for DNS to propagate, then click **Verify**.
+
+<Warning>
+If your email runs through the same domain you point at your website, the dialog warns you before you change anything. Add the mail (MX) and SPF records it shows first, replacing your existing mail record and SPF record, or your email stops working. A domain can have only one SPF record.
+</Warning>
 
 The domains list shows each domain's **Purpose** and **Status**. A **Website (CMS)** domain also shows which of your websites it opens; when you have more than one website, or the domain is **Not assigned**, use **Change website** in the row's actions to point it at another site. **View DNS** reopens the records to add.
 
@@ -135,7 +141,7 @@ Every Settings page needs the Settings module at **View** (organization scope), 
 
 ### Racket club rebrands and moves online-first
 
-A padel and tennis club changes its name and wants a cleaner portal address. On **Details** they update **Name**, then edit **Slug** to `citypadel` so members reach `citypadel.portal.1club.ai`. Old links using the previous slug stop working, so they announce the new address. Under **Member Apps** > **Branding** they upload a new logo and set the primary color; because they are on the Run plan, the save succeeds.
+A padel and tennis club changes its name and wants a cleaner portal address. On **Details** they update **Name**, then edit **Slug** to `citypadel` so members reach `citypadel.portal.1club.ai`. Old links using the previous slug stop working, so they announce the new address. Under **Member Apps** > **Brand Book** they upload a new logo and set the primary color; because they are on the Run plan, the save succeeds.
 
 ### Martial arts gym opens a second location
 
@@ -147,7 +153,7 @@ A yoga and pilates studio serves English and Bulgarian members. Under **Localiza
 
 ### Serving the portal on a custom domain
 
-A climbing gym wants members to visit `members.gripcity.com` instead of the default subdomain. Under **Organization** > **Domains** they add the domain with purpose **Portal subdomain**, add the CNAME record shown, remove an old parking-page record, and click **Verify**. The domain sits in **Issuing SSL certificate** for a few minutes, then flips to **Verified** and goes live.
+A climbing gym wants members to visit `members.gripcity.com` instead of the default subdomain. Under **Member Apps** > **Domains** they add the domain with purpose **Portal subdomain**, add the CNAME record shown, remove an old parking-page record, and click **Verify**. The domain sits in **Issuing SSL certificate** for a few minutes, then flips to **Verified** and goes live.
 
 ## Tips and best practices
 
@@ -164,7 +170,7 @@ A climbing gym wants members to visit `members.gripcity.com` instead of the defa
 | Save fails with "slug is already in use" | Another organization already claimed that slug | Pick a different slug; it must be globally unique |
 | Save fails saying the slug is too long | The slug exceeds 40 characters (it is your portal subdomain) | Shorten it to 40 characters or fewer |
 | Time zone did not change after editing the address | The org time zone resolves only once, when first set | Set the **Time zone** field manually |
-| Branding page blocks saving | You are on the Free plan | Upgrade to a paid plan under **Organization** > **Subscription** |
+| Brand Book fields are read-only | You are on the Free plan | Upgrade to a paid plan under **Organization** > **Subscription** |
 | Custom domain stuck on "Issuing SSL certificate" | DNS is confirmed but the certificate is still being issued | Wait a few minutes and click **Verify** again |
 | Custom domain will not verify | Conflicting A, AAAA, or CNAME records for the same host | Delete the old records at your DNS provider, then verify |
 | Cannot delete a club | It still has bookings, areas, or other associated data | Remove or reassign that data first, or set the club to **Closed** |

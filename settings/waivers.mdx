@@ -1,8 +1,8 @@
 ---
 title: Documents and waivers
 sidebarTitle: Waivers
-description: Define signable documents (liability waivers, terms, policies) under Settings > Bookings > Waivers, and use document rules to require the right members to accept them, with audience targeting and mandatory gating.
-keywords: [waiver, liability waiver, document rule, required document, typed-name acceptance, consent, onboarding, compliance, minor waiver, guardian]
+description: Define signable documents (liability waivers, terms, policies) under Settings > Members > Waivers, and use document rules to require the right members to accept them, with audience targeting, mandatory gating, and waivers required for entry.
+keywords: [waiver, liability waiver, document rule, required document, required for entry, check-in tablet, sign waiver at check-in, typed-name acceptance, consent, onboarding, compliance, minor waiver, guardian]
 ---
 
 Documents and waivers are the signable agreements your members accept - liability waivers, terms of service, codes of conduct, and policies. Each document is paired with one or more **document rules** that decide who must accept it and how strictly acceptance is enforced, so the right people are asked to sign the right agreements at the right moment. Owners and admins set up documents and rules, and members accept them during signup, in the portal, or in the app.
@@ -15,7 +15,8 @@ Typical uses:
 
 - **A waiver for one plan only** - a climbing gym requires a lead-climbing liability waiver, with a typed name, only from members on its **Lead Climbing** plan.
 - **A minor's waiver signed by the parent** - a jiu-jitsu academy targets its youth waiver at dependents, so the parent accepts it for each child during signup.
-- **A release for every drop-in** - a padel gym asks every drop-in visitor who pays per court to sign a court-use release.
+- **A release for every drop-in** - a padel gym asks every drop-in visitor who pays per area to sign an area-use release.
+- **No waiver, no entry** - an unattended climbing gym marks its liability waiver **Required for entry**, so nobody checks themselves in or opens the door before signing, and members who haven't signed sign it on the check-in tablet.
 
 See [Worked examples](#worked-examples) for the exact rule settings.
 
@@ -27,11 +28,11 @@ A signature counts as accepted regardless of the stored document version, so cos
 
 ## Authoring a document
 
-Manage documents and their rules from **Settings** > **Bookings** > **Waivers** (route `/settings/operations/waivers`). The page has two sections: **Documents** (the agreements themselves) and **Document Rules** (the targeting and enforcement layer on top of them).
+Manage documents and their rules from **Settings** > **Members** > **Waivers** (route `/settings/operations/waivers`). The page has two sections: **Documents** (the agreements themselves) and **Document Rules** (the targeting and enforcement layer on top of them).
 
 A document is a CMS content item with its type set to `document`, so it is written in the same block editor as your other [content](/marketing/content) (posts, FAQs, reusable blocks), with the same title, slug, body, and language-variant support.
 
-1. On **Settings** > **Bookings** > **Waivers**, click **Add document**. This opens the content editor with the type pre-set to `document`.
+1. On **Settings** > **Members** > **Waivers**, click **Add document**. This opens the content editor with the type pre-set to `document`.
 2. Give it a **Title** (for example, `Liability waiver`) and write the body in the block editor.
 3. Set the **status** to **Published**. Only published documents are enforced - a draft or archived document is skipped by every rule, so members are never asked to sign it.
 4. Save. The document now appears as a card in the **Documents** section and becomes selectable when you create a rule.
@@ -95,7 +96,39 @@ The field is only available while the rule is **Optional**. If the rule has no *
 
 ## Required for entry
 
-Turn on **Required for entry** to make a mandatory document a condition of self check-in. Members the rule covers can't check themselves in until they have signed, and the check-in tablet asks them to sign. The toggle is greyed out on an optional rule, and making a rule optional turns it off.
+Turn on **Required for entry** to make a mandatory document a condition of entry. Members the rule covers can't let themselves in until they have signed. The toggle is greyed out on an optional rule, and making a rule optional turns it off.
+
+Scope the rule like any other: with **Plans** it applies to the members on those memberships and passes, and with no filters it applies to everyone.
+
+### What it blocks
+
+Until the member signs, or until a staff member lets them in that day at that gym:
+
+- **Self check-in** - checking in on the [check-in tablet](/settings/kiosk#check-in-app), with their member QR code, or from the member portal is refused with "Please sign the waiver to check in."
+- **Door access from a booking or a plan** - a booking, or a plan that opens a walk-in area, no longer opens the door for them. See [Physical access control](/settings/access-control-settings#how-it-works).
+
+Staff stay in charge. A check-in recorded by the front desk is never refused, and once staff have let a member in, their door access for the rest of that day applies as usual.
+
+### Signing on the check-in tablet
+
+A member the tablet refuses can sign there and carry straight on. The tablet shows **Sign the waiver**, one document after another; the member reads each to the end, types their full name when the rule asks for it, and taps **Accept and check in**.
+
+- **Who can sign there.** Only a member who identified with their full PIN or by scanning their QR code. Someone who found their name in a search, or used the four-digit PIN shortcut, is asked to scan their QR code or enter their full PIN first.
+- **Children.** A dependent or a member under 18 is told that a parent or guardian has to sign for them, and to ask at the front desk.
+- **The typed name** has to match the name your gym holds for the member.
+
+The signature is recorded on the member's own record like any other, with the device it was signed on.
+
+### At the front desk
+
+Staff see who still owes an entry document before they serve them:
+
+- **The member profile** - an alert names the unsigned document. See [Member profile](/members/member-profiles#notices-above-the-info-strip).
+- **The point of sale** - scanning the member's card at the [point of sale](/pos/point-of-sale) shows **Needs attention** with the documents they haven't signed. You decide whether to let them in.
+
+### New visitors
+
+For people who are not on file yet, leave a form open as a [Tablet station](/marketing/forms#tablet-station): visitors fill it in one after another and sign the documents that apply to them, and nobody stays signed in. A form can also **Show the documents first** and **Confirm the signer's email or phone**. A signature that could not be confirmed waits on the member's profile for staff to approve, and does not count toward entry until they do. See [Signatures awaiting approval](/members/document-signatures#signatures-awaiting-approval).
 
 ## Typed-name acceptance
 
@@ -130,11 +163,11 @@ A jiu-jitsu academy enrolls children through a household account, and the parent
 
 ### Racket sports - one-time release for drop-in visitors
 
-A padel gym lets non-members pay per court but wants a signed release from every drop-in.
+A padel gym lets non-members pay per area but wants a signed release from every drop-in.
 
-1. Author a published document `Drop-in court-use release`.
-2. Create a rule named `Drop-ins - court release`:
-   - **Document**: `Drop-in court-use release`
+1. Author a published document `Drop-in area-use release`.
+2. Create a rule named `Drop-ins - area release`:
+   - **Document**: `Drop-in area-use release`
    - **Contact Type**: `Drop In`
    - **Optional**: off (mandatory)
 
@@ -156,6 +189,9 @@ To require every contact to accept a code of conduct, create a rule with **no co
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
 | A member can't check themselves in | A mandatory rule marked **Required for entry** covers them and they haven't signed | Have them sign on the check-in tablet, or turn off **Required for entry** |
+| A member with a booking or a plan can't open the door | They owe a document marked **Required for entry** | Have them sign it, or check them in at the desk to let them in for the day |
+| The tablet won't let a member sign | They identified by name search or the four-digit PIN shortcut, or they are a child | Ask them to scan their QR code or enter their full PIN. A child's waiver is signed by a parent or guardian |
+| A member signed but still can't get in | Their signature is **Awaiting approval** | Approve it on the **Documents** tab of their profile |
 | A member is never asked to sign a document | The document is not **Published**, or the rule is inactive | Publish the document; toggle the rule **Active** on |
 | A rule does not fire at signup even though the audience seems right | The rule relies on a **tag** filter, which is skipped during public signup | Re-target by contact type, plan, or household role |
 | The **Require review and typed name** or **Required for entry** toggle is greyed out | The rule is **Optional** - both are only allowed on mandatory rules | Turn **Optional** off to make the rule mandatory |
@@ -167,6 +203,8 @@ To require every contact to accept a code of conduct, create a rule with **no co
 
 - [Document signatures](/members/document-signatures) - The ledger of who signed what, when, and how, including guardian signing for dependents.
 - [Content](/marketing/content) - The block editor and content types used to author document bodies and language variants.
-- [Accounts](/members/accounts) - Household accounts and the owner/adult/dependent roles that household-role targeting uses.
+- [Accounts](/members/accounts) - Household accounts and the Owner, Adult, and Child roles that household-role targeting uses.
+- [Forms](/marketing/forms) - Signup forms, tablet stations, and signer verification.
+- [Physical access control](/settings/access-control-settings) - How an unsigned entry document holds back door access.
 - [Plans](/sales/plans) - The plans that plan-based targeting matches against.
 - [Settings overview](/settings/overview) - Where Waivers lives among the other settings.

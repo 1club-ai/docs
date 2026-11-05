@@ -1,244 +1,338 @@
 ---
 title: Plans
-description: Membership and pass templates in 1club - price, billing frequency, usage limits, what they grant access to, signup fees, wallet credit, visibility, and revenue account.
-keywords: ["plan", "membership plan", "pass", "class pack", "billing frequency", "recurring membership", "signup fee", "unlimited plan", "10-class pack", "auto renewal", "valid for", "generic plan"]
+description: Membership and pass templates in 1club - price, billing frequency, minimum term, session limits, what each plan covers, sharing with an account, signup fees, wallet balance, visibility, and revenue account.
+keywords:
+  [
+    "plan",
+    "membership plan",
+    "pass",
+    "class pack",
+    "billing frequency",
+    "recurring membership",
+    "signup fee",
+    "unlimited plan",
+    "10-class pack",
+    "auto renewal",
+    "session limit",
+    "separate session counts",
+    "any visit",
+    "shared with account",
+    "family plan",
+    "corporate plan",
+    "most popular",
+    "intro offer",
+    "session length",
+  ]
 ---
 
-A plan is the template you sell to members. It defines the price, the billing cadence, the usage allowance, what the plan grants access to, and a few visibility and accounting fields. When someone is enrolled in a plan they get a [membership](/sales/memberships) record; the plan itself just describes the offer. Owners and admins set plans up, the front desk sells them, and members buy them online.
+A plan is the template you sell to members. It defines the price, the billing cadence, the sessions it allows and what they cover, and a few visibility and accounting fields. When someone buys a plan they get a [membership](/sales/memberships); the plan itself only describes the offer. Owners and admins set plans up, the front desk sells them, and members buy them online.
 
 ## When to use it
 
-Create a plan for every membership or pass you sell. One plan can be recurring or a one-time pass, cap how often it can be used, limit which classes, courts, or instructors it covers, add a signup fee or starter wallet balance, and be shown publicly, to members only, or kept private for staff-assisted signups. Trials and intro prices attach to a plan as [promotions](/sales/promotions).
+Create a plan for every membership or pass you sell. A plan can renew or be paid once, allow unlimited visits or a set number, count those visits on one counter or on several, be shared with a whole household or company, and be shown publicly, to members only, or kept for staff. Trials and intro prices attach to a plan as [promotions](/sales/promotions).
 
 Typical uses:
 
-- **An unlimited monthly membership** - a yoga studio sells an all-access monthly pass that auto-renews, with an optional off-peak version that only works before 4pm.
+- **An unlimited monthly membership** - a yoga studio sells an all-access monthly plan that renews automatically, with an off-peak version that only works before 4pm.
 - **A class pack that expires** - a Pilates studio sells 10 reformer classes valid for 60 days after purchase.
-- **Court hours per month** - a padel gym sells a monthly membership with eight court hours, counted per hour rather than per booking.
+- **Two kinds of class in one plan** - a studio sells "5 Yoga + 4 Pilates a month", and a Pilates class never uses up a Yoga session.
+- **Gym floor plus coaching** - a strength gym sells unlimited gym entry with 4 coaching sessions a month as one membership.
+- **A family plan** - one parent buys a monthly plan, and everyone on the household account books with it.
 - **A drop-in day pass** - a one-day pass for visitors who check in at the front desk rather than booking.
 
 See [Worked examples](#worked-examples) for the settings behind each of these.
 
-## How plans turn into charges
+## How it works
 
-When a contact buys a plan you get a membership and, immediately, a charge:
+### Memberships, passes, and drop-ins
 
-- **One-time plans**: one charge at the plan's price, plus a separate `membership_signup_fee` charge when the signup fee is set.
-- **Recurring plans**: a `membership_creation` charge for the current period, with the next period scheduled. An hourly job creates a fresh `membership_recurrence` charge when each period rolls over.
+1club treats a plan as one of three kinds, worked out from its settings rather than chosen:
 
-For plans that have a stored Stripe payment method on file and **Require payment upfront** on, the recurrence job also attempts to charge immediately. If the card payment fails or no default method is on file, the charge is left `pending` and you collect through the [Invoices](/sales/invoices) or [Charges](/sales/charges) flow. See the [Sales overview](/sales/overview) for the full charge lifecycle.
+| Kind           | What it is                                   | Example                            |
+| -------------- | -------------------------------------------- | ---------------------------------- |
+| **Membership** | Renews and is charged again each period.     | Unlimited monthly                  |
+| **Pass**       | Bought once, and admits more than one visit. | 10-class pack, day pass for a week |
+| **Drop-In**    | Bought once, for a single visit.             | One open-mat session               |
+
+The kind shows under the plan name on the [Memberships](/sales/memberships) page.
+
+### How a sale turns into charges
+
+When a contact buys a plan they get a membership and, straight away, a charge:
+
+- **A plan paid once** - one charge at the plan's price, plus a separate charge for the signup fee when there is one.
+- **A renewing plan** - a charge for the first period. If you have set a [billing day](/sales/membership-billing#billing-day), the first period runs only to that day and costs less. After that, the renewal engine raises and collects each renewal on its own. See [Membership billing](/sales/membership-billing).
+
+### What a session is
+
+A plan counts **visits** or **hours**. A visit is a booking, or a check-in with no booking behind it. Counting in hours means each booking takes its length, so a 90-minute area booking takes 1.5 hours. Leave the number empty and the count is unlimited.
 
 ## The plans list
 
-Plans live under **Sales** > **Plans** in the admin (`/billing/plans`). **Plans** is the first tab of **Sales**, so the section opens here. The page opens on the **Active** tab; switch to **Inactive** to see archived offers.
+Go to **Sales** > **Plans** (`/billing/plans`). **Plans** is the first page of **Sales**, so the section opens here. The list opens on the **Active** tab; switch to **Inactive** for plans you no longer sell. A **Frequency** filter at the end of the tabs narrows the list to **Recurring**, **One-time**, **Weekly**, **Monthly**, **Quarterly**, **Annually**, or **Custom**.
 
-**Sales** > **Plans** shows plans as a sortable list. Each row displays:
+Each row shows:
 
 - A **color dot** (the plan's color).
 - **Name**.
-- **Price**, with the billing frequency beneath it (for `custom` plans it reads "N days/weeks/months") and the **signup fee** when one is set.
-- A **category** chip (when the plan has a category).
-- A **sessions** chip when the plan caps its uses, and a **Shared with account** chip when the plan is shared with the holder's account.
-- A **visibility** chip (Public, Admin & Member, or Admin only).
+- **Price**, with the billing frequency beneath it (a custom plan reads "N days/weeks/months"), and the signup fee when one is set.
+- A **category** chip, when the plan has a category.
+- A chip per session limit, for example "Yoga, Pilates: 5 Visits". An unlimited plan has none.
+- A **Minimum term** chip, for example "Minimum 12 months".
+- A **Shared with account** chip, when the plan is shared with the holder's account.
+- A **visibility** chip: **Public**, **Admin & Member**, or **Admin only**.
 
-Drag any row by its handle to set the global plan order (see [Plan order](#plan-order)). Clicking a plan's name opens it for editing. The row menu has **Edit**, **Delete**, and **View Details**.
+Click a row to open the plan. The row's more-actions menu has **Edit** and **Delete**. Drag a row by its handle to set the [plan order](#plan-order).
 
-A **frequency filter** at the top narrows the list to a specific billing cadence, and the **Active** / **Inactive** tabs carry a count badge each.
-
-The page header also has **Categories** (manage plan categories) and **Add Plan**.
+In the page header, **Categories** manages [plan categories](#plan-categories) and the **+** button (**Add Plan**) creates a plan.
 
 <Note>
-  Adding, editing, deleting, and reordering plans, and managing categories, need the **billing.manage.organization** permission. Without it, the list is read-only and clicking a plan's name opens its details page.
+  Creating, editing, deleting, and reordering plans, and managing categories,
+  need the **billing.manage.organization** permission. Without it, the header
+  buttons, the row menu, and dragging are hidden.
 </Note>
 
 ## Creating or editing a plan
 
-Click **Add Plan**, or open a row's menu and choose **Edit**. The plan dialog is organized into five sections.
+Click **+** (**Add Plan**), or click a plan in the list. Each plan opens in a dialog, and its address (`/billing/plans?plan=<id>`) links straight to it. The dialog has up to six sections.
 
 ### General
 
-- **Plan Name** - public-facing. Required.
-- **Gym** - which gym the plan belongs to. Only shown when your organization has more than one gym; choose **All** to make it organization-wide.
-- **Category** - an optional grouping (see [Plan categories](#plan-categories)). Pick an existing one or type a new name to create it inline.
+- **Plan Name** - shown to members. Required.
+- **Club** - which gym sells the plan. Only shown when your organization has more than one gym. Choose **All clubs** to sell it everywhere.
+- **Category** - an optional grouping (see [Plan categories](#plan-categories)). Pick one, or type a new name to create it.
 - **Barcode** - an optional code printed on a shelf card. Scan the card into this field to fill it in. When the code is scanned at the [Point of Sale](/pos/point-of-sale), the register adds this plan to the basket.
-- **Visibility** - **Public**, **Admin & Member**, or **Admin only**. Controls which sales surfaces the plan appears on.
-- **Description** - public-facing free text.
-- **Active** - whether the plan can be sold. Toggling a plan inactive does not affect existing memberships on it; they keep running until they expire or are cancelled.
+- **Visibility** - **Public**, **Admin & Member**, or **Admin only**. Decides which sales surfaces show the plan.
+- **Description** - shown to members.
+- **Active** - whether the plan can be sold. Turning it off doesn't affect memberships already sold; they run until they end or are cancelled.
 
-You can translate **Name** and **Description** into your other locales with the translate button on the section header.
+Use the translate button on the section header to translate **Plan Name** and **Description** into your other languages.
 
 ### Pricing
 
-- **Price** (labeled **Price per Period** for recurring plans) - the amount charged each billing period, or the one-off price for a one-time plan.
-- **Type** - the billing frequency: **One-time**, **Weekly**, **Monthly**, **Quarterly**, **Annually**, or **Custom**. Choosing **Custom** reveals a **Period** number and a **Unit** of `Days`, `Weeks`, or `Months` (for example, `10 weeks`).
-- **Minimum term** (recurring plans only) - how long members commit for from their start date, for example 12 months and then month to month. Pick **None**, one of the offered terms, or **Custom** to enter a number of months. The term must be longer than one billing period, so only terms that commit the member to more than the first payment are offered (a yearly plan, for example, offers 24 and 36 months). Every membership sold on the plan starts with this term, and staff can change it for one member. Members see it before they buy. Plans with a minimum term always renew, so **Default Auto Renewal** stays on. What leaving before the term costs is set in [Membership policies](/settings/membership-policies).
-- **Signup Fee** - a one-time fee charged when joining. Added to the first charge. Optional.
-- **Wallet balance** - value added to the member's wallet when the membership is activated. Use it for "get X credit when you join" offers. Optional. If the plan sells through a billing entity other than the default one, a warning explains that the member can only spend this balance on the default billing entity's sales.
-- **Revenue Account** - the accounting code that charges for this plan are tagged with. Leave as **None (uses default)** to fall back to the organization default.
-- **Default Auto Renewal** (recurring plans only) - whether new memberships on this plan start with auto-renew on. Members can flip this on their own membership later. When on, a **Renewal Lead Time (Days)** field appears: how many days before the renewal date 1club attempts the auto-renewal charge. This is also the cancellation cut-off. Defaults to 3, maximum 60.
-- **Require payment upfront** - the membership only starts once it has been paid. When on (the default), 1club also attempts to charge the member's stored default payment method as each period becomes due. When off, the charge is not attempted automatically and you collect through invoices or charges instead.
+- **Price** (**Price per Period** for a renewing plan) - the amount charged each period, or the one-off price.
+- **Type** - the billing frequency: **One-time**, **Weekly**, **Monthly**, **Quarterly**, **Annually**, or **Custom**. **Custom** adds a **Period** number and a **Unit** of **Days**, **Weeks**, or **Months** (for example 10 weeks).
+- **Minimum term** (renewing plans only) - how long members commit for from their start date, for example 12 months and then month to month. Pick **None**, one of the offered terms, or **Custom** to enter a number of months. The term must be longer than one billing period, so a yearly plan, for example, offers 24 and 36 months. Every membership sold on the plan starts with this term, staff can change it for one member, and members see it before they buy. What leaving before the term costs is set in [Membership policies](/settings/membership-policies).
+- **Signup Fee** - a one-off fee charged when joining, as its own charge. Optional.
+- **Wallet balance** - an amount added to the member's [wallet](/sales/wallet) when the membership starts, and again at each renewal on a renewing plan. Use it for "pay 100, get 120" offers. Optional. If the plan sells through a billing entity other than your default one, a warning explains that the member can only spend this balance on the default billing entity's sales.
+- **Revenue Account** - the account the plan's charges post to. Leave it on **None (uses default)** to use your default revenue account.
+- **Default Auto Renewal** (renewing plans only) - whether new memberships on the plan renew automatically. A plan with a minimum term always renews, so members can complete their term.
+- **Renewal Lead Time (Days)** - how many days before the renewal date 1club charges the renewal. Shown when auto renewal is on or the plan has a minimum term. Defaults to 3, at most 60. A membership sold on a [billing day](/sales/membership-billing#billing-day) is charged on that day instead.
+- **Require payment upfront** - the membership only starts once it has been paid. A member buying online pays at checkout. Staff can still sell on credit: the membership is saved and the amount stays owed.
 
 ### Validity
 
-- **Shared with account** - everyone on the holder's household or company account can use the membership, all drawing on the same allowance. This applies to memberships sold from now on. To switch an existing membership over, change it on the membership itself.
-- **Coverage** - what the plan grants access to:
-  - **General plan** - check-ins and dynamic pricing only, with no booking access.
-  - **Restricted plan** - covers only what the **Classes**, **Areas**, and **Instructors** dropdowns allow. Each dropdown offers **No ...**, **All ...** (for example **All classes**), or specific class types, area types, or instructor types. Pick at least one of the three.
-- **Sessions** - the usage cap (the plan's max uses). For recurring plans this is uses per billing period (for example, `10/month`); for one-time plans it is the total uses for the pass. Leave blank for unlimited. General plans keep the cap, because check-ins spend the same counter.
-- **Session limit is per** - whether each use counts as one **Booking** or as the booking's duration in **Hours**. Only shown on a restricted plan with a **Sessions** cap.
-- **Validity (Days)** (one-time plans only) - how long the pass remains valid after it is issued.
-
-<Warning>
-  A **General plan** cannot be used to access bookings. It only works for direct check-ins and still affects dynamic booking pricing. If you want a membership that members book classes or courts with, choose **Restricted plan** and set at least one of **Classes**, **Areas**, or **Instructors**.
-</Warning>
+- **Shared with account** - everyone on the holder's household or company account can use the membership, all drawing on the same sessions. Applies to memberships sold from now on. See [Sharing with an account](#sharing-with-an-account).
+- **Session limits** - a table with one row per session count. See [Session limits](#session-limits).
+- **Session length** - how long one visit lasts after the first door entry, in minutes. Entering again within it uses no other session. Leave it empty (**Whole day**) for a visit that lasts until the end of the day. Only shown when your gym has [door access](/settings/access-control) and the first session limit is a number of visits.
+- **Validity (Days)** (one-time plans only) - how long the pass stays valid after it is issued.
 
 ### Presentation
 
-- **Features** - a free-text bullet list shown on the plan detail card. Add each feature and press Enter.
-- **Sports** - tags the plan with one or more sports so it surfaces under sport-specific filtering.
-- **Plan Images** - a drag-to-reorder gallery (up to 5) shown on the member-facing sales pages.
-- **Color** - the accent color used for the plan's dot in the list and on member-facing surfaces.
+- **Features** - a bullet list shown on the plan card. Type each feature and press Enter.
+- **Sports** - tags the plan with sports, so it shows under sport filters.
+- **Color** - the plan's accent color, in the list and on member-facing pages.
+- **Plan Images** - up to 5 images, shown on member-facing sales pages.
+- **Most popular** - highlights this plan in every list of plans.
+- **Intro offer** - counts the plan's buyers in the [First visits](/analytics/members#first-visits) report.
 
-### Operating hours
+### Operating Hours
 
-Set per-day open and close times, or fall back to the default. A plan's operating hours define the time windows during which its membership can be used, which is how you model off-peak or time-limited memberships. Leave this empty for a membership that works whenever the gym is open.
+Turn on **Customize operating hours** to set opening and closing times per day. Leave it off and the plan **Uses club operating hours**. A plan's hours are the times its membership can be used, which is how you build an off-peak plan. At the door, a plan without hours of its own follows the area's opening hours.
 
-## Plan details
+### Promotions
 
-Choose **View Details** from a plan's row menu to open its details page. It shows the same fields plus two stat cards at the top: **Active Memberships** (a count of memberships on the plan currently in `active` status) and **Total Revenue** (the sum of the prices of those active memberships).
+Shown once the plan is saved, to staff who can see promotions. It lists the promotions for this plan and those for every plan, each with edit and delete. **Add promotion** opens the promotion editor already set to this plan. See [Trials, free days, and intro offers](#trials-free-days-and-intro-offers).
 
-If the plan has images, a sortable gallery sits at the top; drag to reorder and the change saves as you drop. The right column shows the assigned **Revenue Account**, or a "None (uses default)" hint when none is set. The details page also lists the [promotions](#trials-free-days-and-intro-offers) targeting the plan.
+## Session limits
+
+The **Validity** section holds a table of session limits. Most plans have one row. Add more with **Add session limit** to sell several counts in one plan, for example "5 Yoga + 4 Pilates a month" or "unlimited gym + 4 coaching sessions". Each row has:
+
+- **Covers** - what this count is for. Pick **Any visit**, or any mix of:
+  - **Classes** - **All classes**, all classes in a program, or single class types.
+  - **Areas** - **All areas**, or area types.
+  - **Instructors** - **All instructors**, or instructor types (for coaching).
+- **Visits** - how many sessions per billing period, or in total on a plan paid once. Leave it empty for unlimited.
+- **Counted per** - **Visits** or **Hours**. A row that covers **Any visit** always counts visits.
+
+A new row starts at 1 visit and covers something no other row covers yet. A plan holds up to 20 rows.
+
+### How a session is taken from a count
+
+- **A booking** uses the count that covers it. Two counts can never cover the same thing, so there is never a choice to make. A booking with more than one resource, such as an area booked with a coach, needs one count that covers all of them.
+- **A check-in with no booking** uses the count for the class type, else the area type, else the **Any visit** count. If none applies, the check-in is refused.
+- **A door entry** follows the same rules as a check-in.
+
+All counts share one period, one renewal, one pause, one cancellation, and one price, so the plan is sold, renewed, paused, and cancelled as one membership. The membership only runs out once every count is spent; if any count is unlimited, it never runs out. Members see each count by name on their membership and on the plan card, and staff can give or take sessions on one count at a time with [Adjust sessions](/sales/memberships#adjust-sessions).
+
+**Any visit** works for check-ins and door entries without a booking, and still counts towards dynamic booking pricing. It gives no booking access. For a membership members book classes or areas with, pick what it covers under **Classes**, **Areas**, or **Instructors**.
+
+Two rules are checked when you save:
+
+- "Two session limits cover the same thing. Each kind of booking can count against one limit only."
+- "Only one session limit can be for check-ins without a booking." - only one row may cover **Any visit**.
+
+## Sharing with an account
+
+Turn on **Shared with account** to sell a family or company plan. Everyone on the holder's household or company account can then book with the membership, all drawing on the same sessions. There are no seats to manage: the person it is shared with picks it as their way in and books.
+
+The setting applies to memberships sold from then on. Change it on one membership, from the membership's own **Shared with account** switch, when one family needs something different from the next. Members see that a plan is shared on the plan card, on the plan details page, in the signup form, and on the membership in their account. An employer can buy one plan and have their team book on it the same way.
 
 ## Trials, free days, and intro offers
 
-Plans don't have a built-in "trial days" field. Instead, trials and intro pricing are modelled as [promotions](/sales/promotions) attached to the plan. This keeps the same offer machinery (eligibility, caps, audience, analytics) behind every kind of incentive.
+Plans have no "trial days" field. Trials and intro prices are [promotions](/sales/promotions) attached to the plan, so every kind of incentive uses the same eligibility, caps, audience, and analytics.
 
-The plan-details page has a **Promotions** section listing everything currently targeting this plan. **Add promotion** opens the editor pre-scoped to this plan; from there you pick the shape:
+Open the plan and use **Add promotion** in its **Promotions** section. The editor opens already set to this plan, and you pick the shape:
 
-- **Free trial** - a discount with **Auto-apply** on and **Value** of 100%. New customers buying this plan get it free the first time, no code. The first-time-buyer rule prevents repeat redemptions.
-- **First-month intro** - same idea with a partial discount (e.g. 50% or a fixed amount off the first period). For recurring plans this rides through every renewal once applied, so prefer a one-shot code if you only want it on the creation charge.
-- **Coded promotion** - leave **Auto-apply** off and give the discount a code to share via email or partners. Members or staff enter the code at checkout.
+- **Free trial** - a discount with **Auto-apply** on and a **Value** of 100%. New customers buying the plan get it free the first time, with no code. The first-time-buyer rule stops repeat redemptions.
+- **First-month intro** - the same with a partial discount (for example 50%, or a fixed amount off the first period). On a renewing plan a discount carries through every renewal once applied, so prefer a one-off code if you only want it on the first charge.
+- **Coded promotion** - leave **Auto-apply** off and give the discount a code to share by email or through partners. Members or staff enter the code at checkout.
 
-See the [Promotions](/sales/promotions) page for the full set of controls (schedule, redemption caps, audience targeting, analytics).
+Turn on **Intro offer** on the plan as well to count its buyers in the [First visits](/analytics/members#first-visits) report. See [Promotions](/sales/promotions) for schedules, redemption caps, audiences, and analytics.
 
 ## Plan order
 
-Plans have a single global sort order that controls how they appear everywhere - the public plans listing, the booking-confirmation upsell suggestions, and the admin Plans list. On **Sales** > **Plans**, drag rows to reorder them; the order is saved and applied across all of those surfaces. If another admin reorders at the same time, the later save is rejected and the list reloads to the latest order.
+Plans have one global order that applies everywhere - the public plans list, the plans offered after a booking, and the admin Plans list. On **Sales** > **Plans**, drag rows to reorder them. If the save fails (for example because another admin reordered at the same moment), you see "Failed to reorder plans. The list will refresh." and the list reloads.
 
 <Note>
-  Booking policies no longer keep their own upsell order. When a policy upsells plans, they display in the global plan order set here. See [Booking policies](/settings/booking-policies).
+  Booking policies don't keep their own upsell order. When a policy upsells
+  plans, they display in the global plan order set here. See [Booking
+  policies](/settings/booking-policies).
 </Note>
 
 ## Plan categories
 
-You can group plans into categories (for example, "Adults", "Juniors", "Day passes"). Categories are optional - uncategorized plans simply appear ungrouped.
+Group plans into categories (for example "Adults", "Juniors", "Day passes"). Categories are optional - a plan without one simply appears ungrouped.
 
-- **Manage categories** - On **Sales** > **Plans**, click **Categories** to add, rename, reorder, or delete categories. Deleting a category clears it from any plans that used it (the plans are not deleted).
-- **Assign a category** - Set a plan's **Category** in the plan dialog. You can pick an existing category or type a new name to create one inline.
-- **On your website** - Categories show as a small tag on plan cards and on the plan details page. When a Plans section has more than one category, members get a pill filter (with an **All** option) to narrow the list, and you can scope which categories a section shows from the website editor's **Categories** field.
+- **Manage categories** - On **Sales** > **Plans**, click **Categories** to add, rename, reorder, or delete categories. Deleting a category clears it from its plans; the plans stay.
+- **Assign a category** - Set a plan's **Category** in the plan dialog. Pick one, or type a new name to create it.
+- **On your website** - Categories show as a tag on plan cards and on the plan details page. When a Plans section has more than one category, members get a pill filter (with an **All** option), and the website editor's **Categories** field limits which categories a section shows.
+- **In membership policies** - A [membership policy](/settings/membership-policies) can cover every plan in a category.
 
 ## Deleting a plan
 
-Delete is permanent and clears the plan record. If active memberships still reference it you'll need to migrate or cancel them first. Inactive plans you've stopped selling but want to keep for historical reporting should stay on the **Inactive** tab rather than being deleted.
+Delete is permanent, so 1club refuses it while anything still depends on the plan:
+
+- any membership sold on it, active or not,
+- a [package](/sales/packages) that includes it,
+- a checkout for it that is still in progress.
+
+In each case you see "Failed to delete plan". Set the plan to inactive (turn off **Active**) instead: it stops selling, its memberships keep running, and its history stays in your reports. Deleting a plan also takes it off any signup form that offered it.
 
 ## Worked examples
 
-### Unlimited yoga membership (recurring, all classes)
+### Unlimited yoga membership
 
-You run a yoga studio and want an all-access monthly pass.
+You run a yoga studio and want an all-access monthly plan.
 
-- **Type**: Monthly. **Price per Period**: your monthly rate.
-- **Sessions**: leave blank (unlimited).
-- **Coverage**: **Restricted plan**, with **Classes** set to **All classes**.
-- **Sports**: yoga. **Default Auto Renewal**: on, so members roll over each month.
-- Optionally set **Operating hours** to model an off-peak version that only works before 4pm.
+- **Type**: Monthly. **Price per Period**: your monthly rate. **Default Auto Renewal**: on.
+- **Session limits**: one row, **Covers** set to **All classes**, **Visits** empty (unlimited).
+- **Sports**: yoga.
+- For an off-peak version, turn on **Customize operating hours** and set the plan to end at 4pm.
 
-### 10-class pack (one-time pass)
+### 10-class pack
 
 A punch card that expires.
 
 - **Type**: One-time. **Price**: the pack price.
-- **Sessions**: 10, with **Session limit is per** set to **Bookings**.
+- **Session limits**: one row, **Covers** set to your reformer or mat class types, **Visits** 10, **Counted per** **Visits**.
 - **Validity (Days)**: 60, so the pack expires two months after purchase.
-- **Coverage**: **Restricted plan**, with **Classes** set to your reformer or mat class types.
 
-### Racket monthly membership (court access, per-hour usage)
+### 5 Yoga + 4 Pilates a month
 
-A padel or tennis membership that includes a set number of court hours.
+One membership with two counts.
 
-- **Type**: Monthly. **Sessions**: 8, with **Session limit is per** set to **Hours** (eight court hours per month).
-- **Coverage**: **Restricted plan**, with **Areas** set to the _Padel court_ area type (see [Areas](/settings/areas)).
-- **Signup Fee**: a one-off joining fee. **Wallet balance**: optional starter credit for extra bookings.
+- **Type**: Monthly, **Default Auto Renewal** on.
+- **Session limits**: a row covering the yoga class types with 5 visits, then **Add session limit** for a row covering the Pilates class types with 4 visits.
+- A Pilates class takes from the Pilates count only. The membership is used up only when both counts are spent, and both refill at the renewal.
 
-### Family membership (shared with the account)
+### Unlimited gym and 4 coaching sessions
 
-One membership that covers a household.
+- **Type**: Monthly.
+- **Session limits**: a row covering **Any visit** with **Visits** empty (unlimited gym entry), and a row covering your coaching instructor types with 4 visits.
+- Because one count is unlimited, the membership never shows as **Used**.
 
-- **Type**: Monthly or Annually. **Shared with account**: on, so everyone on the holder's household account books against the same allowance.
-- **Coverage**: **Restricted plan**, with the class and court types the family should reach.
-- **Category**: "Family" so it groups on your website.
+### Area hours
 
-### Martial arts unlimited with intro offer
+A padel or tennis membership with a set number of hours on the areas.
 
-An unlimited jiu-jitsu or muay-thai membership with a trial.
+- **Type**: Monthly.
+- **Session limits**: one row, **Covers** set to the padel area type (see [Areas](/settings/areas)), **Visits** 8, **Counted per** **Hours** (eight hours a month).
+- **Signup Fee**: a one-off joining fee. **Wallet balance**: optional, for extra bookings.
 
-- **Type**: Monthly, **Sessions** blank, **Coverage** restricted to the martial-arts class types.
-- On the plan details page, **Add promotion** and create a **Free trial** (auto-apply, 100%) so new members get their first month free, or a **First-month intro** at 50% off.
+### Family membership
 
-### Day pass (generic check-in plan)
+One membership for a household.
 
-A single-visit pass for drop-ins who check in at the front desk rather than booking.
+- **Type**: Monthly or Annually. **Shared with account**: on.
+- **Session limits**: cover the class and area types the family should reach.
+- **Category**: "Family", so it groups on your website.
+
+### Martial arts unlimited with a free first month
+
+- **Type**: Monthly, one session limit covering the martial arts class types, unlimited.
+- Save the plan, then in its **Promotions** section click **Add promotion** and create a **Free trial** (auto-apply, 100%). Turn on **Intro offer** to see its buyers in the First visits report.
+
+### Day pass
+
+A single-day pass for visitors who check in at the front desk rather than booking.
 
 - **Type**: One-time, **Validity (Days)**: 1.
-- Set **Coverage** to **General plan** - it won't grant booking access but works for direct check-ins and still feeds dynamic booking pricing.
+- **Session limits**: one row covering **Any visit**. It works for check-ins and door entries but grants no booking access.
 
 ## Tips & best practices
 
-- **Pick a restricted plan unless you truly want generic.** A **General plan** can't book anything. For a bookable membership, choose **Restricted plan** and set at least one scope.
-- **Choose the session unit deliberately.** Class packs usually count per **Booking**; court memberships that sell "hours per month" count per **Hour**.
-- **Model trials as promotions, not prices.** Keep the plan price at its true value and attach a free-trial or intro promotion so analytics and eligibility stay consistent.
-- **Prefer Inactive over Delete.** Deactivating stops new sales while existing memberships keep running; deleting is permanent and blocked while memberships reference the plan.
-- **Set the global order once.** Drag rows on the Plans list to control how plans appear on your website, in upsells, and in the admin all at once.
-- **Use categories for large catalogs.** Grouping into "Adults", "Juniors", "Day passes" gives members a pill filter on the website.
+- **Cover what members book.** A plan whose only count is **Any visit** can't book anything. For a bookable membership, pick class, area, or instructor types under **Covers**.
+- **Use one plan, not a package, for two kinds of session.** Several session limits on one plan renew, pause, and cancel together; a package of two plans renews, pauses, and cancels them separately.
+- **Choose the unit deliberately.** Class packs usually count **Visits**; area memberships sold as "hours per month" count **Hours**.
+- **Model trials as promotions, not prices.** Keep the plan at its real price and attach a free-trial or intro promotion, so analytics and eligibility stay consistent.
+- **Prefer inactive over delete.** Turning **Active** off stops new sales while existing memberships keep running.
+- **Set the global order once.** Dragging rows on the Plans list sets the order on your website, in upsells, and in the admin.
 
 ## Troubleshooting
 
 **Issue**: Members can't book anything with a membership on this plan.
 
-**Cause**: The plan's **Coverage** is **General plan**.
+**Cause**: Its only session limit covers **Any visit**, which is for check-ins without a booking.
 
-**Fix**: Edit the plan, set **Coverage** to **Restricted plan**, and set at least one of **Classes**, **Areas**, or **Instructors**.
+**Fix**: Open the plan and set **Covers** to the class, area, or instructor types members should book.
 
-**Issue**: The **Session limit is per** field isn't showing.
+**Issue**: Saving the plan fails with "Two session limits cover the same thing."
 
-**Cause**: It only appears on a restricted plan with a **Sessions** cap. General plans always count one unit per use.
+**Cause**: Two rows cover the same class, area, or instructor type, so a booking could count against either.
 
-**Fix**: Set **Coverage** to **Restricted plan** and enter a **Sessions** number, then choose **Bookings** or **Hours**.
+**Fix**: Narrow the rows so each type sits in one row only.
 
-**Issue**: A recurring plan's renewal charge never runs.
+**Issue**: The **Session length** field isn't showing.
 
-**Cause**: **Require payment upfront** is off, or the member has no default Stripe payment method on file.
+**Cause**: It needs door access at your gym, and a first session limit with a number of visits (not unlimited, not counted in hours).
 
-**Fix**: Turn on **Require payment upfront** for automatic charging, and make sure the member has a saved default method. Otherwise the recurrence stays `pending` and you collect it from [Charges](/sales/charges) or [Invoices](/sales/invoices).
+**Fix**: Set a number of visits on the first row, counted per **Visits**.
 
-**Issue**: You can't delete a plan.
+**Issue**: A renewing plan's renewals are never charged automatically.
 
-**Cause**: Active memberships still reference it.
+**Cause**: **Default Auto Renewal** is off for those memberships, the member has no saved card, or the company selling the plan takes no online payments.
 
-**Fix**: Migrate or cancel those memberships first, or set the plan to **Inactive** to stop selling it while keeping the history.
+**Fix**: Check the plan's **Default Auto Renewal** and the membership's own auto-renew setting, then look at [Membership billing](/sales/membership-billing), which flags each renewal that won't be charged and says why.
+
+**Issue**: Deleting a plan fails with "Failed to delete plan".
+
+**Cause**: Memberships were sold on it, a package includes it, or a checkout for it is still in progress.
+
+**Fix**: Turn off **Active** instead to stop selling it while keeping its history.
 
 **Issue**: A custom-period plan won't save.
 
-**Cause**: **Custom** billing requires both a **Period** number and a **Unit**.
+**Cause**: **Custom** needs both a **Period** number and a **Unit**.
 
-**Fix**: Fill in both fields (for example, `10` and `Weeks`).
+**Fix**: Fill in both (for example `10` and **Weeks**).
 
 ## Related
 
 - [Sales overview](/sales/overview) - how plans, charges, invoices, and payments fit together.
-- [Memberships](/sales/memberships) - the per-contact record produced when someone buys a plan.
+- [Memberships](/sales/memberships) - the record created when someone buys a plan.
+- [Membership billing](/sales/membership-billing) - the billing day and how renewals are charged.
 - [Membership policies](/settings/membership-policies) - what members can cancel and pause themselves, and what leaving before a minimum term costs.
-- [Charges](/sales/charges) - the records created when someone is billed for a plan.
-- [Invoices](/sales/invoices) - documents that group outstanding charges.
-- [Promotions](/sales/promotions) - vouchers, discount codes, and auto-apply trials that attach to a plan.
-- [Areas](/settings/areas) - the area types a court or space plan can be scoped to.
+- [Promotions](/sales/promotions) - discount codes and auto-apply trials that attach to a plan.
+- [Packages](/sales/packages) - bundles that include plans.
+- [Areas](/settings/areas) - the area types a plan can cover.

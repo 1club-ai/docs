@@ -12,7 +12,7 @@ A card identifies a member at the door or desk, so nobody has to find their name
 
 Typical uses:
 
-- **An unattended front door** - a 24/7 strength gym issues every member an access card and removes it when they cancel, so it stops working at the door immediately.
+- **An unattended front door** - a 24/7 strength gym issues every member an access card. With door access on, the card opens the gym floor during their plan's hours, and removing the card when they cancel stops it at the door immediately.
 - **No hardware at all** - a reformer Pilates studio uses the QR member code each member already has in the member portal and app.
 - **A keypad entrance** - a bouldering gym gives each member a PIN, and replaces it when someone forgets or shares theirs.
 - **Pre-encoded stock** - a padel gym loads a box of new cards as club stock, then hands one over at the desk by scanning it on the member.
@@ -29,23 +29,35 @@ There are three types, matching the identification methods configured under [Acc
 
 A member's QR code is their member code, which every member with a portal account already has. It needs no issuing, so you only issue access cards and PINs. Card codes are encrypted at rest and only decrypted for display in the admin.
 
-Which types you can issue depends on the identification methods enabled for the gym, under **Enabled Identification Methods** in access control settings. Only enabled types are offered when you issue a card.
+Which types you can issue depends on the identification methods enabled for the gym, under **Enabled Identification Methods** in **Settings** > **Check-in & Access** > **Door access**. Only enabled types are offered when you issue a card.
 
 ## How cards interact with check-in
 
-How strict the door is, and what happens when a card is presented, depends on your check-in mode. See [Check-in models](/reference/check-in-models) for the full matrix. Quick summary:
+A scanned card is matched to the member who holds it, and the rest of the check-in flow proceeds as if you had selected that member manually. Whether that member may be checked in without a booking, and whether payment is needed first, is set by your [check-in model](/reference/check-in-models) on the booking policy, not by the card.
 
-- **Strict** mode requires the member to have an active booking or membership.
-- **Flexible** mode allows walk-ins and anonymous check-ins.
-- A scanned card is matched to the member who holds it, and the rest of the check-in flow proceeds as if you had selected that member manually.
+A member checking themselves in with their card or QR code is also refused while they owe a document [required for entry](/settings/waivers#required-for-entry). On the check-in tablet, they can sign it there and carry on.
 
 Each successful scan updates the card's **Last used** date, so a card that never shows a scan is a useful signal that it is faulty or was never handed out.
+
+### Cards at the door
+
+With a door access integration on, the door system receives every access card and PIN a member holds, and lets them in wherever they have an access grant: for a booking, a check-in, or a plan that opens a walk-in area. See [Physical access control](/settings/access-control-settings).
+
+### Scanning a card at the point of sale
+
+Scanning a member's card at the [point of sale](/pos/point-of-sale) opens a **Member card** check. It tells you whose card it is and whether they may use the gym right now:
+
+- **Valid** - they hold a membership the front desk can admit them on, or they are booked in for today.
+- **Needs attention** - a current member, but nothing they hold can be used unaided (a plan for specific classes or areas, sessions used up, or money owed), or they haven't signed a document required for entry. You decide.
+- **Not valid** - an archived member, a card nobody holds, an unknown code, or no active membership.
+
+The check only answers the question. It records no check-in and uses no session: admitting the member stays a separate step. A code that matches nothing opens **Code not recognised**, with **Issue to a member** when it is a blank card.
 
 ## Opening the page
 
 Go to **Members**, open the three-dot overflow menu next to **Add member**, and pick **Cards** (URL `/members/access-cards`). The entry is shown to staff who can read operations. The page lists every card on file in the org, newest first.
 
-The **Settings** button in the top right jumps to [Access control settings](/settings/access-control), where the check-in mode and identification methods are configured.
+The **Settings** button in the top right jumps to **Settings** > **Check-in & Access** > **Door access**, where the identification methods are configured for each gym. See [Access control](/settings/access-control#member-identification-methods-per-club).
 
 ## Grid columns
 
@@ -99,9 +111,10 @@ See [Roles and permissions](/reference/roles-permissions).
 
 A 24/7 strength-and-conditioning gym wants a fob for every member so the front door works unattended.
 
-1. In [Access control](/settings/access-control), enable access cards as an identification method and set the check-in mode to **Strict** so only members with an active membership get in.
-2. For each new member, open their profile, click **Issue card**, and tap the fob on the reader.
-3. Hand over the fob. When a member cancels, use **Remove from member** so it stops working at the door immediately.
+1. In [Access control](/settings/access-control), enable **Access Card** as an identification method.
+2. With a door access integration on, set the gym floor area to **Walk-in, no booking** and make it the Default Area, so members on a plan get in during its hours. See [Door access from plans](/settings/access-control-settings#door-access-from-plans).
+3. For each new member, open their profile, click **Issue card**, and tap the fob on the reader.
+4. Hand over the fob. When a member cancels, use **Remove from member** so it stops working at the door immediately.
 
 ### QR check-in for a Pilates or yoga studio
 
@@ -109,7 +122,7 @@ A reformer Pilates studio runs class-based check-in and does not want to distrib
 
 1. Enable QR code as the identification method.
 2. There is nothing to issue: each member shows their QR member code from the member portal or app.
-3. At the desk or kiosk, scan the member's QR at the start of class. In Strict mode the scan is accepted only if they have a spot in that class.
+3. At the desk or kiosk, scan the member's QR at the start of class. With a **Book and pay** [check-in model](/reference/check-in-models), the scan is accepted only if they have a spot in that class.
 
 ### PIN keypad for a climbing gym
 
@@ -140,13 +153,16 @@ A padel gym buys a batch of pre-encoded cards.
 | A card type is missing when issuing a card | That identification method is not enabled for the gym | Enable it under **Enabled Identification Methods** in [access control settings](/settings/access-control) |
 | Issuing fails because the card is already issued to someone | The code is held by another member | Remove it from that member first, or use a different card |
 | Issuing fails because the code is already used by a product, pass, or plan | A catalog item uses the same barcode | Use a different card, or change the item's barcode |
-| A member is rejected at the reader | The card was removed, or check-in mode is Strict and they have no matching booking or membership | Check the grid and their profile; issue a card again, and confirm their booking or membership - see [Check-in models](/reference/check-in-models) |
+| A member is rejected at the reader | The card was removed, they have no booking, check-in or plan that opens that area right now, or they owe a document required for entry | Check the grid and their profile; issue a card again. On the profile, **Door access from plans** says why a plan opens nothing - see [Physical access control](/settings/access-control-settings) |
 | A member has a PIN nobody issued | It was created automatically when they gained an access grant | Expected. Remove it and issue a different PIN if you need to |
-| Kiosk tap does not enroll a card | Credential enrollment is off for that gym | Enable enrollment in access control settings, then have the member tap again after scanning their QR |
+| Kiosk tap does not enroll a card | Credential enrollment is off for that gym | Turn on **Access Control** for the gym under **Settings** > **Check-in & Access** > **Door access**, then have the member tap again after scanning their QR |
+| The **Member card** check at the point of sale says **Needs attention** | The member's plan can't be used unaided, or they owe money or an entry document | Read the reason shown, then decide at the desk |
 
 ## Related
 
-- [Access control](/settings/access-control) - check-in mode, identification methods, organization-level card settings
+- [Access control](/settings/access-control) - identification methods and enrollment per gym
+- [Physical access control](/settings/access-control-settings) - how cards open doors through access grants
+- [Point of sale](/pos/point-of-sale) - the **Member card** check when a card is scanned
 - [Check-in models](/reference/check-in-models) - how cards are honored at the reader
 - [Member profile](/members/member-profiles) - the per-member **Cards** block
 - [Attendance](/schedule/attendance) - the check-in log

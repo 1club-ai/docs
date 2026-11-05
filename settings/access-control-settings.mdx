@@ -16,7 +16,7 @@ Use physical access control when your doors should open based on what a member h
 
 Typical uses:
 
-- **Court doors that open only for the booking** - a padel gym gives each court its own area, and a player's card opens that court a few minutes before their slot and for a few minutes after it.
+- **Area doors that open only for the booking** - a padel gym gives each playing space its own area, and a player's card opens that area a few minutes before their slot and for a few minutes after it.
 - **A gym floor members walk into on their plan** - a strength gym with no front desk sets its gym floor to walk-in. A member on an unlimited plan opens the door with their card during the plan's hours, with no booking and no check-in.
 - **An off-peak plan that only opens the door off-peak** - a plan with hours from 09:00 to 15:00 opens the gym floor only in those hours. A member who also holds an evening plan gets both windows.
 - **A 10-visit pass used at the door** - at a climbing gym on Salto KS, each entry through the bouldering hall's own door uses one session, and coming back in after lunch within the pass's session length uses nothing more.
@@ -24,8 +24,8 @@ Typical uses:
 
 ## How it works
 
-- **Areas are the unit of access.** A grant opens one area of one gym, such as a court, a studio, or the gym floor. Each door access integration maps the gym's areas to its doors. A gym needs at least one active area.
-- **Each area is booked or walked into.** An area's **How members use it** is either **Booked by the hour** (a court, a treatment room) or **Walk-in, no booking** (the gym floor, the pool, the sauna). A plan only ever opens walk-in areas. An area booked by the hour opens for its booking and nothing else.
+- **Areas are the unit of access.** A grant opens one area of one gym, such as a padel area, a studio, or the gym floor. Each door access integration maps the gym's areas to its doors. A gym needs at least one active area.
+- **Each area is booked or walked into.** An area's **How members use it** is either **Booked by the hour** (a padel area, a treatment room) or **Walk-in, no booking** (the gym floor, the pool, the sauna). A plan only ever opens walk-in areas. An area booked by the hour opens for its booking and nothing else.
 - **Bookings and check-ins create grants.** A confirmed booking with an area gets a grant for its time window. A check-in linked to a booking or class gets one too. Cancelling the booking or removing the check-in revokes the grant.
 - **Plans create grants for walk-in areas.** A member with an active membership gets a grant for each walk-in area their plan reaches, open during the plan's hours, from the day the membership is active until it ends. See [Door access from plans](#door-access-from-plans).
 - **A check-in on a membership opens an area for the day.** When staff, the kiosk, the check-in app, or the member themselves record a check-in on a membership, it opens one area. With one active area it is used automatically. With several, a general plan lands in the gym's **Default Area**, and otherwise someone chooses. **No door access** is also an option. That access runs from the check-in until the end of the gym's day, or for the session length on a pass that has one. A gym with no active areas still records the attendance, without door access.
@@ -60,7 +60,7 @@ Which areas a plan opens depends on what the plan covers:
 | A plan that covers areas | Every active walk-in area it covers: of every area type, or only of the area types the plan names |
 | A plan that covers classes or instructors only | Nothing. Members enter through a booking or a check-in |
 
-An area booked by the hour is never opened by a plan, so courts stay booking-only. The **Default Area** is the one exception: a general plan opens it whatever it is set to. A gym has at most one Default Area, shown with a **Default** chip on the area list.
+An area booked by the hour is never opened by a plan, so those areas stay booking-only. The **Default Area** is the one exception: a general plan opens it whatever it is set to. A gym has at most one Default Area, shown with a **Default** chip on the area list.
 
 ### When the door is open
 
@@ -152,11 +152,11 @@ Access events are available through the access-control API. There is no admin sc
 
 ## Worked examples
 
-### Padel courts that open for the booking
+### Padel areas that open for the booking
 
-- Give each court its own area, and connect each area to its door in the gym's door system.
+- Create one area per playing space, and connect each area to its door in the gym's door system.
 - Set the access buffer on the integration to 15 minutes.
-- When a player's 18:00-19:00 booking is confirmed, they get a grant valid from 17:45 to 19:15 for that court. If they cancel, the grant is revoked.
+- When a player's 18:00-19:00 booking is confirmed, they get a grant valid from 17:45 to 19:15 for that area. If they cancel, the grant is revoked.
 
 ### A 24/7 gym with walk-in members
 
@@ -164,11 +164,11 @@ Access events are available through the access-control API. There is no admin sc
 - Sell a general plan with no operating hours, so it follows the gym's hours. If the gym is open around the clock, leave the gym's hours open too.
 - A member with an active membership taps their card and walks in, with no booking and no check-in. On the member's profile, **Door access from plans** shows the gym floor and its hours.
 
-### Gym floor, sauna and courts in one club
+### Gym floor, sauna and padel areas in one club
 
-- Set the gym floor and the sauna to **Walk-in, no booking**, and leave the courts **Booked by the hour**.
+- Set the gym floor and the sauna to **Walk-in, no booking**, and leave the padel areas **Booked by the hour**.
 - A general plan opens the gym floor, as the Default Area. A "Gym and sauna" plan scoped to both area types opens both.
-- Courts open only for a booking, whatever plan the player holds.
+- Padel areas open only for a booking, whatever plan the player holds.
 
 ### A 10-visit pass at a Salto KS gym
 

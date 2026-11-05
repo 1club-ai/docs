@@ -24,7 +24,7 @@ https://mcp.1club.ai
 
 An assistant you connected at the earlier address, `https://mcp.1club.ai/admin`, keeps working; you do not need to reconnect it.
 
-The public discovery server is `https://mcp.1club.me`. It searches published marketplace data without an account, and asks a person to sign in with their 1club.me account only when they book.
+The public discovery server is `https://mcp.1club.me`. It searches what gyms publish on the 1club network without an account, and asks a person to sign in with their 1club.me account only when they book.
 
 ## Connect the admin server
 
@@ -88,7 +88,7 @@ Claude Code speaks OAuth over HTTP MCP, so one command is enough and no header i
 claude mcp add --transport http 1club-admin https://mcp.1club.ai
 ```
 
-The sign-in and authorization pages open when you first use the server. Run `claude mcp list` to confirm it is connected. For the anonymous marketplace server, use the same command with `https://mcp.1club.me`.
+The sign-in and authorization pages open when you first use the server. Run `claude mcp list` to confirm it is connected. For the anonymous discovery server, use the same command with `https://mcp.1club.me`.
 
 ## ChatGPT
 
@@ -112,7 +112,7 @@ It sees only what your role allows, and changes nothing unless you tick **Make c
 
 ## The discovery server
 
-Anyone can add `https://mcp.1club.me` as a custom connector, with no 1club admin account and nothing to approve. It searches the 1club.me marketplace for gyms, independent professionals, and free times straight away. The first time someone asks it to book, list, or cancel their own bookings, the client opens a sign-in with their 1club.me account, and from then on the assistant books as them. See [Discovery server](/mcp/tools#discovery-server) for its tools.
+Anyone can add `https://mcp.1club.me` as a custom connector, with no 1club admin account and nothing to approve. It searches the 1club network for gyms, independent professionals, and free times straight away. The first time someone asks it to book, list, or cancel their own bookings, the client opens a sign-in with their 1club.me account, and from then on the assistant books as them. See [Discovery server](/mcp/tools#discovery-server) for its tools.
 
 ## Other remote MCP clients
 
@@ -170,7 +170,7 @@ To move an existing connection to OAuth:
 
 A developer can also run the MCP servers locally over stdio, which is what an editor or a script on your own machine talks to. This path has no OAuth and is meant for local development.
 
-The servers are not published to a package registry, so build one from the product repository and start it with `npm start`: `admin-mcp` for your organization's data, or `public-mcp` for anonymous marketplace search. Install the shared package first (`npm install --prefix ../mcp-shared`), then `npm install` and `npm run build` in the server's own folder. They read these environment variables:
+The servers are not published to a package registry, so build one from the product repository and start it with `npm start`: `admin-mcp` for your organization's data, or `public-mcp` for anonymous search of the 1club network. Install the shared package first (`npm install --prefix ../mcp-shared`), then `npm install` and `npm run build` in the server's own folder. They read these environment variables:
 
 | Variable          | Purpose                                                                                                 |
 | ----------------- | ------------------------------------------------------------------------------------------------------- |

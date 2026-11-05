@@ -34,7 +34,7 @@ Each row on the automations list shows how many times the automation has run, ho
 
 Use **Marketing** > **Automations** to view, edit, and create automations. The list is split into two sections:
 
-- **Built-in automations** - Seeded by 1club into every gym, on every plan: **Booking reminder**, **Membership lifecycle**, **Review request** and **Marketplace review request**. They carry a **Built-in** badge. You can adjust their timing, channels and message, but the step structure is fixed. See [Built-in automations](#built-in-automations).
+- **Built-in automations** - Seeded by 1club into every gym, on every plan: **Booking reminder**, **Membership lifecycle**, **Review request** and **Network review request**. They carry a **Built-in** badge. You can adjust their timing, channels and message, but the step structure is fixed. See [Built-in automations](#built-in-automations).
 - **Your automations** - Custom workflows you build from scratch, plus any suggested blueprints you have accepted. Available on the Grow plan.
 
 Each row shows the trigger, step count, total runs, failed runs (when there are any), and the last time it fired, plus an **Active** or **Paused** status. Click a row to open it in the builder. To delete a custom automation, open the row's actions menu and choose **Delete**. Deleting cancels any runs still in progress. Built-in automations can't be deleted.
@@ -138,7 +138,7 @@ Filters narrow which triggers start the automation by what the trigger is about:
 | **Clubs (any of)** | Bookings, visits, memberships, failed check-ins | The gym the visit takes place in: its class's gym, else its area's, else its event's. For a membership, the gym it was sold for. A membership sold for your whole organization counts in every gym. Shown only when you have more than one gym. |
 | **Class types (any of)** | Bookings and visits | The class type of the booked class or the class checked in to. A booking for an area has no class type, so it doesn't match. |
 | **Area types (any of)** | Bookings and visits | The area type of the booked area, or of the area the class runs in. |
-| **Booked on (any of)** | Bookings and visits | Where the booking was made: **Admin**, **Member portal**, **1club App**, **Branded App**, **1club marketplace**, **Website**, **Kiosk**, **Integration**, or **API**. |
+| **Booked on (any of)** | Bookings and visits | Where the booking was made: **Admin**, **Member portal**, **1club App**, **Branded App**, **1club network**, **Website**, **Kiosk**, **Integration**, or **API**. |
 | **Plans (any of)** | Memberships | The plan the membership is on. |
 | **Payment method (any of)** | Membership renewal upcoming | Whether the member has a payment method the renewal can be charged to: **Saved**, **None saved**, or **Expired**. |
 | **Kind (any of)** | Promotion or stripe | **Promotion** or **Stripe**. |
@@ -300,15 +300,15 @@ Four automations are seeded into every gym, on every plan. They appear under **B
 | **Booking reminder** | Booking upcoming, 24 hours before | Reminds the member of their booking. | Email, App | On |
 | **Membership lifecycle** | Membership expiring, 7 days before | A reminder a week before a membership ends, a last reminder the day before, and a note the day after it has expired. | Email, App | On |
 | **Review request** | Visit completed | The morning after a visit, asks the member to rate it, then invites them to review you on Google. | Email | On for new gyms |
-| **Marketplace review request** | Booking completed | The morning after a visit booked on the 1club Marketplace or in the 1club App, asks the member to rate it. | Email | On, run by 1club |
+| **Network review request** | Booking completed | The morning after a visit booked on the 1club network or in the 1club App, asks the member to rate it. | Email | On, run by 1club |
 
 Every message goes out in the member's own language, from the matching [system template](/settings/templates#system-template-catalog): **Booking Reminder**, **Membership Expiration Reminder**, **Membership Expired** and **Review Request**. To reword one, customize that template under **Settings** > **Communication** > **Templates**. If you edit the text inside the step instead, the step sends your text as you wrote it.
 
 **Membership lifecycle** only speaks to members who have to act. It covers memberships that don't renew on their own (never passes or drop-ins, and never one on auto-renew). A member who renews, buys their next membership of the same plan, cancels, or switches on auto-renewal hears nothing more. A membership that is already a day from its end gets the last reminder only, not two in a row. It replaces the older **Membership expiration** reminder.
 
-**Review request** asks about every visit your gym sold itself: a completed booking or a walk-in check-in, whether or not you check members in. It waits 10 hours from the end of your gym's day, so the email arrives mid-morning. As shipped it asks after the first visit, then every 10th, and at most once in 30 days, by email, with the Google invitation on for everyone who rates. It never asks about a marketplace booking, which the marketplace request owns. It is switched on for gyms created since it shipped; gyms that existed before find it switched off. Turn it on from the **Marketing** card on [Home](/home/overview) (**Turn on**), from the intro on **Reviews** (**Ask members for reviews**), or here.
+**Review request** asks about every visit your gym sold itself: a completed booking or a walk-in check-in, whether or not you check members in. It waits 10 hours from the end of your gym's day, so the email arrives mid-morning. As shipped it asks after the first visit, then every 10th, and at most once in 30 days, by email, with the Google invitation on for everyone who rates. It never asks about a network booking, which the network request owns. It is switched on for gyms created since it shipped; gyms that existed before find it switched off. Turn it on from the **Marketing** card on [Home](/home/overview) (**Turn on**), from the intro on **Reviews** (**Ask members for reviews**), or here.
 
-**Marketplace review request** is run by 1club for every gym listed on the [Marketplace](/marketing/marketplace), so it cannot be switched off or edited ("1club runs this automation for your club, so it cannot be changed"). It asks once per marketplace booking, at most once a month per member counting your own review requests too, and never sends the Google invitation.
+**Network review request** is run by 1club for every gym listed on the [1club network](/marketing/marketplace), so it cannot be switched off or edited ("1club runs this automation for your club, so it cannot be changed"). It asks once per network booking, at most once a month per member counting your own review requests too, and never sends the Google invitation.
 
 For a built-in automation you can change:
 
@@ -513,8 +513,8 @@ You want to sell the next class pack before the current one runs out.
 | Messages arrive a minute late | The step worker polls every minute | Expected - build in a small buffer rather than relying on second-level timing. |
 | A built-in automation won't let you add steps | Built-in (auto-provisioned) automations have a fixed structure | Edit the timing, channels, and content in place; build a separate custom automation for extra steps. |
 | A member got two messages from one event | Two automations share the trigger | Add non-overlapping entry conditions (contact type or tag) so only one applies. |
-| The review request is on but a member wasn't asked | They were asked within the last 30 days, it isn't their first or 10th visit since the last ask, or the visit was a marketplace booking | Expected - adjust **Sessions between requests** and the frequency limit on the step if you want to ask more often. |
-| A built-in automation says it cannot be changed | It is the **Marketplace review request**, which 1club runs for every listed gym | Expected - your own **Review request** covers every other visit. |
+| The review request is on but a member wasn't asked | They were asked within the last 30 days, it isn't their first or 10th visit since the last ask, or the visit was a network booking | Expected - adjust **Sessions between requests** and the frequency limit on the step if you want to ask more often. |
+| A built-in automation says it cannot be changed | It is the **Network review request**, which 1club runs for every listed gym | Expected - your own **Review request** covers every other visit. |
 | An AI message step never reaches anyone | Its **Mode** is **Save as draft**, which generates the message without sending it | Switch the step to **Auto-send**. |
 | A trigger with a class type filter never fires for some bookings | The bookings are for areas, which have no class type | Use **Area types (any of)** for area bookings, or add a second automation. |
 | **Only the contact's first booking** skips a new member | They booked before, for example as a lead | Expected - the filter means the first booking ever, at any gym. Use **Contact type changed** to Member for a new-member welcome. |

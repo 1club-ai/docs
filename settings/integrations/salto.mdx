@@ -1,10 +1,10 @@
 ---
 title: Salto KS
 description: Open Salto KS locks from 1club bookings and check-ins, with each area as a Salto access group and a phone digital key members activate with their 1club account.
-keywords: [salto, salto ks, access control, door access, digital key, bluetooth, access group, locks, site, system user, salto account, access buffer, opening hours, subscription seats]
+keywords: [salto, salto ks, access control, door access, digital key, bluetooth, access group, locks, site, system user, salto account, access buffer, opening hours, subscription seats, plan door access, session pass, check-in locks, suspend members]
 ---
 
-The Salto KS integration connects 1club to Salto KS, Salto's cloud access control system. Each area in a gym becomes a Salto access group holding the locks you choose, and a booking or check-in puts the member in that group for its time window. Members open the lock with their phone, using a digital key they activate by signing in with their 1club account. An owner or admin adds the Salto account 1club signs in as, then sets up each gym.
+The Salto KS integration connects 1club to Salto KS, Salto's cloud access control system. Each area in a gym becomes a Salto access group holding the locks you choose, and a booking or check-in puts the member in that group for its time window. A plan that opens walk-in areas puts the member in a group of its own, with the plan's hours on the locks. Members open the lock with their phone, using a digital key they activate by signing in with their 1club account. An owner or admin adds the Salto account 1club signs in as, then sets up each gym.
 
 ## When to use it
 
@@ -15,12 +15,14 @@ Typical uses:
 - **Studio doors that open only for class time** - a yoga studio's room opens for each booked member shortly before class and closes again after, from the member's phone.
 - **Courts with no front desk** - a padel gym's court gates open for the players who booked the slot, and the gym's opening hours stay enforced even if the internet goes down.
 - **A large membership on a small Salto subscription** - only the members inside their booking window take a Salto seat, so thousands of members can share a subscription sized for the people actually in the building.
+- **A gym floor members walk into on their plan** - members on an unlimited plan open the gym's door from their phone during the plan's hours, and a 10-visit pass uses one session for each visit through the gym's own lock.
 
 ## How it works
 
 - **1club signs in as your Salto account.** You add a Salto KS account, a system user that administers your sites, and 1club manages access with it. 1club's own connection to Salto is already set up, so the account is all you enter.
 - **Areas become access groups.** **Sync areas** creates a Salto access group for each area, holding the locks you choose.
 - **Access follows the schedule.** A booking or a check-in puts the member in the area's group for its own window plus the access buffer.
+- **Plans get their own groups.** A plan that opens walk-in areas has an access group holding those areas' locks, with the plan's hours as Salto time schedules. Members on that plan stay in the group for as long as the membership lasts, and Salto's locks enforce the hours. See [Door access from plans](/settings/access-control-settings#door-access-from-plans).
 - **Doors open from the phone.** Members activate a digital key in the 1club mobile app by signing in with their 1club account, then open the lock over Bluetooth.
 - **Seats follow who is inside.** A member takes a Salto subscription seat only while their access is open.
 
@@ -38,7 +40,17 @@ With **Limit access to opening hours** on, 1club sends the gym's opening hours t
 
 Salto counts everyone who has access right now against your subscription. Members outside their booking window don't take a seat, so a seat comes free as soon as a member's window closes.
 
+A member with door access from a plan is never outside their window in that sense: they hold a seat for as long as the plan lasts, even outside its hours. Size your Salto subscription for every member with plan access, plus the people with bookings at any one time.
+
+**Suspend members when their access ends** decides what happens when a member's access ends. On (the default), 1club suspends them in Salto, which frees their paid seat. Off, they stay subscribed and only lose this gym's doors. Turn it off when another provider also manages the same Salto site. Members another provider added are never suspended.
+
 1club only manages the Salto users it created itself. Other integrators' users on the same Salto site are left alone.
+
+### Session passes and check-in locks
+
+A pass that counts sessions opens Salto locks too, while it has a session left. Every entry through a **check-in lock** uses one session, and coming back in within the plan's **Session length** uses nothing more. 1club reads the entries from Salto every minute.
+
+By default, a lock that opens exactly one area counts visits for that area, and a lock shared by several areas only opens. Under **Check-in locks**, choose an area for a shared lock to make it count, or **Only opens** for a single-area lock that shouldn't. A lock shows here once an area uses it.
 
 ## Before you start
 
@@ -80,7 +92,7 @@ Pick the gym under **Clubs**. Until it is live, a **Before you turn it on** chec
 
 1. Under **Connection**, choose the **Site**: the Salto site whose locks are this gym's doors. Sites are listed under the account that administers them, so choosing a site also chooses the account.
 2. Set the **Access buffer (minutes)** (15-120).
-3. Leave **Limit access to opening hours** on unless you have a reason to turn it off.
+3. Leave **Limit access to opening hours** and **Suspend members when their access ends** on unless you have a reason to turn them off.
 4. Click **Save**. The **Locks** lists load once the site is saved.
 5. Under **Areas**, choose the **Locks** each area opens, and save.
 6. Click **Sync areas**.
@@ -88,7 +100,7 @@ Pick the gym under **Clubs**. Until it is live, a **Before you turn it on** chec
 
 Each area shows **Access group ready** once it has been synced, or **Not synced** until then. An area opens no doors until you sync areas.
 
-Lock choices reach Salto only when you sync areas. Click **Sync areas** again whenever you change an area's locks, add or rename an area, or change the gym's opening hours.
+Lock choices reach Salto only when you sync areas. Click **Sync areas** again whenever you change an area's locks, add or rename an area, or change the gym's opening hours. Syncing areas also moves each plan's access group onto its areas' current locks, and fails if a plan group can't be updated, so sync again until it succeeds.
 
 Use **Test connection** to check the gym's connection. **Test connection** and **Sync areas** are available once the gym is saved, and only while there are no unsaved changes.
 
@@ -154,6 +166,9 @@ Other problems:
 - **The switch can't be turned on** - the gym already uses another door system, or the checklist isn't finished. Turn the other provider off for this gym, or finish the steps.
 - **Door access stopped after a password change** - edit the account and enter the new password.
 - **A member can't be given access** - make sure the member has a login email on their 1club account.
+- **A member on a plan can't get in** - open their profile and read **Door access from plans**, which says why a plan opens nothing. Check that the area is set to **Walk-in, no booking**, or is the gym's Default Area for a general plan.
+- **A pass used a session at the front entrance** - set that lock to **Only opens** under **Check-in locks**.
+- **Salto refuses members for lack of seats after you started selling plans** - members with plan access hold a seat for as long as their plan lasts. Ask your installer to enlarge the subscription.
 
 ## Related
 

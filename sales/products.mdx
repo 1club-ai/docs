@@ -1,10 +1,10 @@
 ---
 title: Products
 description: Build your catalog of sellable items - retail, add-ons, and rentals - with categories, brands, price, revenue account, visibility, and optional stock tracking.
-keywords: ["product", "retail", "pro shop", "add-on", "rental", "product category", "brand", "barcode", "revenue account", "inventory", "stock", "point of sale", "POS"]
+keywords: ["product", "retail", "pro shop", "shop", "cart", "online shop", "import products", "add-on", "rental", "product category", "brand", "barcode", "revenue account", "inventory", "stock", "point of sale", "POS"]
 ---
 
-Products are the sellable items in your catalog that aren't memberships: pro-shop retail, consumable add-ons, and gear rentals. Memberships and passes live in [Plans](/sales/plans) instead. Each product has a name, a price, a revenue account for accounting, a visibility level, and can be grouped by category and brand. You maintain the catalog in the admin, the front desk rings products up at the point of sale, and members can add them to their order on signup forms.
+Products are the sellable items in your catalog that aren't memberships: pro-shop retail, consumable add-ons, and gear rentals. Memberships and passes live in [Plans](/sales/plans) instead. Each product has a name, a price, a revenue account for accounting, a visibility level, and can be grouped by category and brand. You maintain the catalog in the admin, the front desk rings products up at the point of sale, and members buy them in the member portal shop or add them to their order on signup forms.
 
 ## When to use it
 
@@ -50,7 +50,7 @@ The dialog asks for:
 - **Club** - which club the product belongs to. For single-club organizations the lone club is selected automatically; multi-club organizations pick one, or leave it unset to make the product available across clubs.
 - **Category** - the product category, used to group products on the POS. Type to search existing categories, or type a new name to create one inline.
 - **Brand** - an optional brand. Type to search, or type a new name to create one inline.
-- **Barcode** - an optional code (up to 64 characters) for scan-to-sell at the point of sale. Scan the item into this field to fill it in.
+- **Barcode** - an optional code (up to 64 characters) for scan-to-sell at the point of sale. Scan the item into this field to fill it in. A code already used by another product, a package, a plan, or a member card is refused, so a scan at the till always finds one thing.
 - **SKU / Product code** - an optional internal product code.
 - **Color** - a display color for the product.
 - **Active** - inactive products are hidden from the POS and can't be added to packages or order forms, but existing sales are preserved.
@@ -85,9 +85,24 @@ Products are the first tab on the **point of sale**. They're grouped into sectio
 
 Products can be bundled with plans into a fixed-price [package](/sales/packages). When a package sells, its fixed price is split proportionally across the component plans and products, so each product still records revenue against its own revenue account.
 
+### Member portal shop
+
+Members can buy products themselves in the [member portal](/settings/member-portal). Add the **Products** page under **Settings** > **Member Apps** > **Member Portal** > **Portal Pages** to open the shop.
+
+- Members browse your products by category, add them to a **Cart**, change quantities, and pay for everything in one order. The cart stays at the bottom of the screen while they browse.
+- Checkout goes through your gym's online card provider: [Stripe](/settings/integrations/stripe), [myPOS](/settings/integrations/mypos), or [DatecsPay](/settings/integrations/datecspay). If no online card provider is set up, the shop tells members it doesn't take orders online yet.
+- Every purchase arrives as an ordinary [order](/sales/orders) with the source set to the portal, and it takes products off stock exactly as a sale at the desk does.
+- Products sold by different [billing entities](/settings/billing-entities) can't be paid together. The member is asked to check out some of them first, then come back for the rest.
+- When **Accept unpaid orders from the online shop** is on under **Settings** > **Sales** > **Point of Sale**, members can choose **Pay on site** and **Place order** without paying. The order opens as a tab marked **Placed online** at the [point of sale](/pos/point-of-sale#open-tabs), where you take the payment when they collect it.
+
 ### Signup order forms
 
-On a [form](/marketing/forms), you can attach products as **add-on products** - optional items a member can add to their order during signup. Attaching packages turns the signup form into an order form; add-on products then appear alongside as optional extras.
+On a [form](/marketing/forms), you can attach products as **add-on products** - optional items a member can add to their order during signup. Attaching packages turns the signup form into an order form; add-on products then appear alongside as optional extras. The buyer pays at the end of the form the same way as anywhere else, and receives an itemized order confirmation email once the order is paid. A zero-priced order completes straight away.
+
+## Importing and managing products in bulk
+
+- **Import from a spreadsheet** - bring in a catalog from your previous till under **Settings** > **Data Tools** > **Import**, with prices, tax rates, barcodes, categories, cost prices, and opening stock for one location. See [Product import](/settings/import#product-import).
+- **Over the API and MCP** - the platform API and the admin MCP server can search, create, reprice, and retire products, manage categories, and report how many of each product are left to sell per gym. Receiving stock and correcting counts stay in the admin. See [MCP tools](/mcp/tools#admin-server).
 
 ## Inventory and stock
 
@@ -162,6 +177,10 @@ You rent shoes and harnesses to drop-in climbers.
 **Issue**: Revenue for a product is landing in the wrong account.
 
 **Solution**: Edit the product and set its **Revenue Account** explicitly instead of **None (uses default)**. Existing sales aren't re-booked; the change applies to future sales.
+
+**Issue**: A member can't check out the cart in the portal shop.
+
+**Solution**: Check that an online card provider is connected for the company that sells these products. If the cart mixes products sold by two billing entities, the member has to pay for them in separate orders.
 
 **Issue**: Some products weren't deleted in a bulk delete.
 

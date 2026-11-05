@@ -12,7 +12,7 @@ Connect your assistant directly to 1club with OAuth. You do not need to create, 
 You need:
 
 - A 1club account with access to the organization you want to connect.
-- The **settings.manage.organization** permission, which is what lets you authorize a connection. Owners and admins hold it.
+- The **AI assistants (MCP)** permission, which is what lets you connect an assistant. Owners always have it and administrators hold it by default; an organization can grant it to other roles in **Settings** > **Organization** > **Permissions**.
 - A paid 1club plan. MCP and API access are locked on free plans and during a trial.
 - A client that supports remote MCP servers over HTTP, with OAuth.
 
@@ -24,7 +24,7 @@ https://mcp.1club.ai
 
 An assistant you connected at the earlier address, `https://mcp.1club.ai/admin`, keeps working; you do not need to reconnect it.
 
-The public discovery server is `https://mcp.1club.me`. It searches published marketplace data and does not require sign-in.
+The public discovery server is `https://mcp.1club.me`. It searches published marketplace data without an account, and asks a person to sign in with their 1club.me account only when they book.
 
 ## Connect the admin server
 
@@ -38,27 +38,29 @@ The public discovery server is `https://mcp.1club.me`. It searches published mar
   </Step>
 
   <Step title="Sign in to 1club">
-    Sign in on the 1club authorization page. The page lists every organization you are staff of: the connection works in each of them, with what your role allows there. When you manage more than one, name the business in your question and the assistant acts in that one.
+    Sign in on the 1club authorization page, titled **Connect** followed by the assistant's name. Under **Organizations** it lists every organization you are staff of: the connection works in each of them, and in any you join as staff later, with what your role allows there. When you manage more than one, name the business in your question and the assistant acts in that one.
   </Step>
 
   <Step title="Review and authorize access">
-    The page lists the read access the client asked for under **This assistant will be able to**. Everything that changes data appears below it, under **Also allow it to make changes?**, as its own checkbox that starts unticked.
+    Under **What** followed by the assistant's name and **can do**, the read access the client asked for is listed as **Always included**. Everything that changes data appears below it, under **Make changes**, as its own checkbox that starts unticked. **Allow all changes** ticks every one at once.
 
-    Leave every box unticked and the assistant gets read-only access, even if the client asked for everything. Tick only the capabilities you want it to have, then select **Allow access to** your organization.
+    Leave every box unticked and the assistant gets view-only access, even if the client asked for everything. Tick only the capabilities you want it to have, then select **Allow access**.
   </Step>
 
   <Step title="Test the connection">
-    Ask: "Which 1club organization are you connected to?" The assistant should call `get_account` and return the selected organization and granted scopes.
+    Ask: "Which 1club organizations are you connected to?" The assistant should call `get_account` and return the organizations it can act in and the granted scopes.
   </Step>
 </Steps>
 
 <Note>
-  **Allow** stays disabled until at least one capability is granted. That only
-  bites when a client requests no read access at all: it has nothing to list
-  under **This assistant will be able to**, so you have to tick one of its write
-  boxes to connect it. Every client that asks for any read scope can be approved
-  with nothing ticked.
+  **Allow access** stays disabled until at least one capability is granted. That
+  only bites when a client requests no read access at all: it has nothing under
+  **Always included**, so you have to tick one of its **Make changes** boxes to
+  connect it. Every client that asks for any read scope can be approved with
+  nothing ticked.
 </Note>
+
+What the assistant can do in each organization is what you approved, narrowed to what your role allows there. A manager who ticks **Make changes** for bookings still cannot delete a booking if their role cannot, and in a gym where they only teach, the assistant reaches only what an instructor sees.
 
 <Warning>
   Only connect assistants you trust. Review tool confirmations carefully before
@@ -90,7 +92,7 @@ The sign-in and authorization pages open when you first use the server. Run `cla
 
 ## ChatGPT
 
-1club Admin is listed in ChatGPT's plugins, so you can run your business from ChatGPT without setting anything up by hand.
+1club Admin is listed in ChatGPT's plugins, so you can run your business from ChatGPT without entering an address or setting anything up by hand. ChatGPT then answers from your live data: how full this week's classes are, who is booked, how many sessions a member has left, how sales are going.
 
 1. Open [1club Admin in ChatGPT](https://chatgpt.com/plugins/plugin_asdk_app_6acf0ea6ff448191aed2db046c98e0a5), or search for "1club" under **Plugins** in ChatGPT.
 2. Select **Install plugin**, then **Connect 1club Admin**.
@@ -99,7 +101,7 @@ The sign-in and authorization pages open when you first use the server. Run `cla
 
 Try asking "Which classes are on this week, and how full are they?" or "Find Alex's upcoming bookings and sessions left on their membership."
 
-To disconnect, open the plugin in ChatGPT and select **Manage**, or revoke the connection in 1club under **Settings** > **AI assistants (MCP)**.
+It sees only what your role allows, and changes nothing unless you tick **Make changes** boxes when you connect. To disconnect, open the plugin in ChatGPT and select **Manage**, or revoke the connection in 1club under **Settings** > **Integrations** > **AI assistants (MCP)**.
 
 <Note>
   A ChatGPT workspace admin may need to allow third-party plugins before members
@@ -107,6 +109,10 @@ To disconnect, open the plugin in ChatGPT and select **Manage**, or revoke the c
   `https://mcp.1club.ai` as a custom app in developer mode instead; see
   [OpenAI's developer mode and MCP apps guide](https://help.openai.com/en/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt-beta).
 </Note>
+
+## The discovery server
+
+Anyone can add `https://mcp.1club.me` as a custom connector, with no 1club admin account and nothing to approve. It searches the 1club.me marketplace for gyms, independent professionals, and free times straight away. The first time someone asks it to book, list, or cancel their own bookings, the client opens a sign-in with their 1club.me account, and from then on the assistant books as them. See [Discovery server](/mcp/tools#discovery-server) for its tools.
 
 ## Other remote MCP clients
 
@@ -142,7 +148,7 @@ The remote configuration is the same endpoint with a request header:
 Authorization: Bearer 1club_sk_live_your_token_here
 ```
 
-The key's own scopes decide what the assistant can do, exactly as they do for a direct API call, and revoking the key under **Settings** > **Organization** > **APIs & webhooks** cuts the assistant off.
+The key's own scopes decide what the assistant can do, exactly as they do for a direct API call, and revoking the key under **Settings** > **Integrations** > **APIs & webhooks** cuts the assistant off. A key acts for one organization and is not limited to particular gyms, and it is refused the tools that change staff roles and permissions.
 
 To move an existing connection to OAuth:
 
@@ -179,27 +185,27 @@ Point your client's stdio command at the built entry point. There is no global b
 
 Confirm these checks after connecting:
 
-1. Ask the assistant to call `get_account`. Confirm the organization is correct, and read the reach from `effectiveScopes` rather than `scopes`.
+1. Ask the assistant to call `get_account`. Confirm the organizations are correct, and read the reach from `effectiveScopes` rather than `scopes`.
 2. Ask for next week's classes. This confirms `classes:read` access.
 3. Ask the assistant to list recent check-ins. This confirms `checkins:read` access.
 4. Before testing a write, use a disposable record and review the tool confirmation.
 
 ## Review connected assistants
 
-Go to **Settings** > **Artificial Intelligence** > **AI assistants (MCP)**. The page shows the endpoint to hand to a client, and lists every assistant connected to this organization with who authorized it, the scopes it holds, and when it was last used.
+Go to **Settings** > **Integrations** > **AI assistants (MCP)**. The page shows the **MCP endpoint** to hand to a client, and lists under **Connected assistants** every assistant that can act in this organization, with the **Assistant**, who it was **Authorized by**, the **Scopes** it holds here, and when it was **Last Used**.
 
-Connections appear here no matter who created them, because an assistant is authorized by whoever connects it rather than created on this page. Seeing what has access, and cutting it off, is what the page is for. Viewing it needs **settings.read.organization**; revoking needs **settings.manage.organization**.
+Connections appear here no matter who created them, because an assistant is authorized by whoever connects it rather than created on this page. A connection made by someone who is staff of several organizations shows in each of them, with the scopes it holds in that one. Seeing what has access, and cutting it off, is what the page is for. Viewing it needs **settings.read.organization**; revoking needs **settings.manage.organization**.
 
 ## Disconnect or revoke
 
 - Disconnecting in the MCP client removes the connection from that client.
-- Revoking it in 1club ends access immediately. The client must complete OAuth again to reconnect.
+- Revoking it in 1club with **Revoke connection** ends its access to this organization immediately. A connection that also works in other organizations keeps working there. The client must complete OAuth again to reconnect here.
 - There is nothing to rotate on an OAuth connection. The access and refresh credentials are managed by the client and 1club, and never handled by you. An access token lasts an hour, and the client refreshes it silently. Each refresh issues a fresh pair, so an assistant in regular use stays connected indefinitely and 30 days is the idle limit, not a deadline.
 - **An approved scope set cannot be edited afterwards.** To give an assistant a capability you did not tick, or to take one back, revoke the connection and authorize it again with the boxes you want.
 
 Two things also revoke a connection without anyone pressing a button:
 
-- **The authorizing person losing access.** A connection carries the permission of whoever approved it. If that person loses **settings.manage.organization**, or leaves the organization, the connection is revoked the next time the assistant calls a tool.
+- **The authorizing person losing access.** A connection carries the access of whoever approved it. If that person leaves an organization, or their role there loses the **AI assistants (MCP)** permission, the connection stops working in that organization the next time the assistant calls a tool.
 - **Long disuse.** A client that has not been used for 90 days is deleted along with its tokens, so it has to register and authorize again.
 
 If setup fails, see [MCP troubleshooting](/mcp/troubleshooting).

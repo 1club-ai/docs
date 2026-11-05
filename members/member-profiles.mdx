@@ -1,21 +1,22 @@
 ---
 title: Member profile
-description: The per-contact page that pulls together a member's identity, balances, pipeline stage, memberships, bookings, check-ins, charges, documents, notes, cards, and account links.
-keywords: [member profile, contact, notes, PIN, wallet balance, account balance, due now, upcoming charges, amount due, household, custom fields, activity timeline, portal invitation, credentials]
+description: The per-contact page that pulls together a member's identity, balances, progress, pipeline stage, memberships, bookings, check-ins, charges, documents, notes, cards, and account links, with actions such as a statement or an invite link to the app.
+keywords: [member profile, contact, notes, PIN, wallet balance, account balance, due now, upcoming charges, amount due, household, custom fields, activity timeline, portal invitation, credentials, contact information, statement, send invite link, 1club App, engagement score, promote]
 ---
 
 The member profile is the page for one contact: it pulls together their identity, balances, memberships, history, and integration links into one view. A **contact** is your organization's own copy of a person's record - name, email, phone, plus their memberships, invoices, and signatures. Front desk staff open it when a member is at the desk, and managers use it to fix records, set up access, and follow up on money owed.
 
 ## When to use it
 
-The profile answers the questions staff ask most at the desk - does this person owe anything, have they checked in today, how active are they - without opening a tab. From the same page you add a booking, membership, check-in, or voucher redemption, keep internal notes, and manage the member's portal account, pipeline stage, cards, and household or company links.
+The profile answers the questions staff ask most at the desk - does this person owe anything, have they checked in today, how active are they - without opening a tab. From the same page you add a booking, membership, check-in, or voucher redemption, keep internal notes, promote the member on their progression track, and manage their portal account, pipeline stage, cards, and household or company links.
 
 Typical uses:
 
 - **A padel member who owes money checks in** - the **Due now** tile shows last week's unpaid court fee, so you record the visit and take payment in one place.
-- **Getting a new jiu-jitsu member onto the portal** - confirm their email and send the invitation from the **User Account** block.
-- **A door PIN for a climber** - add a PIN from the **Cards** block when access control is on.
-- **Belt progression for a martial-arts student** - assign their current belt from the **Progression Levels** tile so it stays visible to the front desk.
+- **Getting a new jiu-jitsu member onto the portal** - confirm their email and send the invitation from **User Account** in **Contact Information**.
+- **Bringing a member to the app** - send them your gym's booking link with **Send invite link**, so they open your gym in the 1club App.
+- **A door PIN for a climber** - add a PIN from the **Cards** tile when access control is on.
+- **Belt progression for a martial-arts student** - see how close they are to their next belt on the **Progression Levels** tile, and promote them from it.
 
 See [Worked examples](#worked-examples) for the steps.
 
@@ -23,20 +24,26 @@ See [Worked examples](#worked-examples) for the steps.
 
 You land on the member profile after clicking a row in the [Member list](/members/member-list). The URL is `/members/list/{contactId}`.
 
-The page has two columns:
+From top to bottom:
 
-- **Header** - the contact's name, avatar (click it to upload a photo), type chip, and email and phone, with a WhatsApp badge when the number is WhatsApp-verified and a **No SMS** chip when text messages are stopped.
-- **Left sidebar** - in order: **Accounts**, **Contact Information** (date of birth with age, gender, address, **Tags**, and any custom fields that have a value), the **Pipeline** block, **User Account**, **Cards** (when access control is on), **Reviews** (when the member has left reviews and you can read marketing), **Integrations** (Stripe, WebLock), **Payment Methods**, and **Notes**.
-- **Main column** - an info strip across the top, then the underlined tabs underneath.
+- **Header** - the member's avatar (click it to upload a photo), name, type chip, and account status chip. Below the name: their email and phone (with a WhatsApp badge when the number is WhatsApp-verified, and a **No SMS** chip when text messages are stopped) and their age (hover it for the date of birth). Their tags sit beside the name, with a button to add a manual tag. When they belong to a household or company, the [account](#accounts) shows on the right with its members' avatars.
+- **Notices** - anything to resolve before serving the member. See [Notices above the info strip](#notices-above-the-info-strip).
+- **Info strip** - tiles summarizing what the member owes, pays, holds and does.
+- **Tabs** - the member's history, opening on **Overview**.
+
+Click the member's **name**, or their account status chip, to open **Contact Information**: everything the header doesn't show, in one panel. Click the **type chip** to see the type-change history.
 
 ## Info strip
 
-Tiles at the top of the main column summarize the contact's current state. Three tiles always show, and a fourth appears when progression tracking or assessments are enabled:
+The tiles at the top summarize the member's current state. Which ones show depends on what your gym uses:
 
-- **Due now** - what this member owes that has already fallen due, plus any shortfall on a required wallet deposit. It turns red when anything is due. Underneath, **Upcoming** shows unpaid charges that are not due yet, such as a pay-on-arrival court booked for tomorrow or a membership that starts next month. Upcoming charges are never added to **Due now** - see [What counts as due now](#what-counts-as-due-now). A **Wallet** sub-line shows any wallet credit. When a deposit is required it reads **Deposit** (held against required) with the **Available** balance instead. Staff who can read billing can click it to open **Wallet history**, where they can top up, refund, or adjust the balance. What is due and the credit are shown separately and never netted against each other: a member who owes 100 and holds 100 in credit still shows 100 due now. Use the redeem icon in this tile to redeem a voucher against the account.
-- **Total paid** - lifetime amount paid, with an "of X billed" sub-line so you can see paid versus billed at a glance.
-- **Attendance** - a sparkline of recent check-ins. The dot lights up when the member has already checked in today. Use the overflow icon to change the window: **4 weeks**, **12 weeks** (the default), **6 months**, **12 months**, or **Since first visit**. Your choice is remembered for the next profile you open.
-- **Progression Levels** / **Assessments** / **Progress** - current progression level, shown when progression tracks are enabled, and the member's overall assessment average (for example "Tennis juniors: 3.5/5") once your organization has an assessment template and you may view assessments club-wide. The tile is titled **Progression Levels** with only levels, **Assessments** with only assessments, and **Progress** when both are on. When the next level sets a number of sessions, the tile also shows the member's count toward it (for example "13 / 20 sessions to Blue belt") or **Eligible for promotion** to that level - see [Sessions to the next level](/settings/progression#sessions-to-the-next-level). The plus icon offers **Assign Level** and **Add assessment** (adding an assessment needs `assessments.create.club`); clicking the average opens the member's full [assessment history](/members/assessments#reviewing-a-members-assessments). When ratings are enabled, the tile also shows the member's ratings by sport.
+- **Due now** - what this member owes that has already fallen due, plus any shortfall on a required wallet deposit. It turns red when anything is due. Underneath, **Upcoming** shows unpaid charges that are not due yet, such as an area booked for tomorrow or a membership that starts next month. Upcoming charges are never added to **Due now** - see [What counts as due now](#what-counts-as-due-now). A **Wallet** line shows any wallet credit; when a deposit is required it reads **Deposit** (held against required) with the **Available** balance instead. Staff who can read billing can click it to open **Wallet history**, where they top up, refund, or adjust the balance. What is due and the credit are never netted: a member who owes 100 and holds 100 in credit still shows 100 due now. Use the redeem icon on this tile to redeem a voucher.
+- **Total paid** - lifetime amount paid, with an "of X billed" line.
+- **Payment method** - the saved card charged first, with its expiry, or **None**. Shown when your gym takes card payments through Stripe or the member has a card saved. Click it to see and add saved [payment methods](#payment-methods).
+- **Cards** - the member's main access card or PIN, when access control is on. Click it to see all their [cards](#cards-and-pin); the plus icon adds one.
+- **Attendance** - a sparkline of recent visits. The dot lights up when the member has already checked in today. Use the overflow icon to change the window: **4 weeks**, **12 weeks** (the default), **6 months**, **12 months**, or **Since first visit**. Your choice is remembered for the next profile you open.
+- **Engagement Scores** - the member's [engagement score](/settings/smart-tagging#engagement-scoring) and level, when your gym calculates scores and the member has one.
+- **Progression Levels** / **Assessments** / **Progress** - the member's current levels when progression tracks are enabled, and their overall assessment average (for example "Tennis juniors: 3.5/5") once your organization has an assessment template and you may view assessments club-wide. The tile is titled **Progress** when both are on. Under each level it shows the member's progress toward the next one - sessions, days at the level and skills learned - or **Eligible for promotion** once every requirement is met (see [Promotion requirements](/settings/progression#promotion-requirements)). Click a level to open the member's progression, with **Promote**, the history, and the curriculum to tick off. The plus icon offers **Assign Level** and **Add assessment**; clicking the average opens the member's [assessment history](/members/assessments#reviewing-a-members-assessments). When ratings are enabled, the tile also shows the member's ratings by sport.
 
 ### What counts as due now
 
@@ -56,7 +63,9 @@ Two kinds of notice can appear between the header and the info strip:
 
 ## Header actions
 
-For an active contact the header has an **Add** menu, an **Edit** action, and a three-dot overflow menu holding **Suspend** (or **Reinstate**), **Stop SMS** (or **Allow SMS again**) when the contact has a phone number, and **Archive**. **Suspend**, **Reinstate**, and the SMS actions need `members.update.organization`, and **Suspend** or **Reinstate** only appears when the contact has an active or suspended portal account. The **Add** menu creates, depending on your permissions and the features you use:
+For an active contact the header has an **Add** (+) menu and a more-actions menu (**...**).
+
+The **Add** menu creates, depending on your permissions and the features you use:
 
 - **Booking** - opens the schedule pre-filtered to this contact.
 - **Membership** - opens the membership dialog with the contact pre-selected.
@@ -64,19 +73,35 @@ For an active contact the header has an **Add** menu, an **Edit** action, and a 
 - **Wallet** (or **Deposit** when a deposit is required) - tops up the member's wallet.
 - **Voucher** - redeems a voucher against this contact's account.
 - **Payment** - takes a payment toward what the member owes, upcoming charges included, so a member can pay ahead. Disabled while the member owes nothing.
-- **Card** - issues an access card, when access control is on. See [Access cards](/members/member-cards).
+- **Card** - adds an access card when access control is on, or a card for an external program such as MultiSport. See [Access cards](/members/member-cards).
 - **Payment card** - saves a payment card to charge, when your gym takes card payments through Stripe.
 - **Assessment** - adds an assessment card, when assessments are set up.
 - **Rental** - lends gear, when Rentals is on.
+- **Account** - creates a household or company account with this member as its owner. Needs Members **Create**.
 - **Message** - opens a new message pre-addressed to the contact in the [Inbox](/inbox/overview).
 
-**Edit** opens the contact form. **Suspend** pauses the member without changing anything, and **Archive** removes them from active use. See [Suspend and archive](/members/suspend-and-archive) for which to reach for.
+The more-actions menu holds, depending on the contact and your permissions:
 
-If the contact is archived, the header collapses to a single **Unarchive** action (visible to staff with the `members.update.organization` permission). An **archived member** is retained for financial and legal history but is hidden from listings, has its memberships and future bookings cancelled, and cannot log in until an admin unarchives it.
+- **Edit** - opens the contact form. See [Editing the contact](#editing-the-contact).
+- **Statement** - what the member was charged and paid over a period, as a PDF or by email. Needs Billing **View**. See [A member's statement](/sales/statements#a-members-statement).
+- **Suspend** (or **Reinstate**) - pauses the member's access without changing anything. Only shown when the contact has an active or suspended portal account.
+- **Stop SMS** (or **Allow SMS again**) - when the contact has a phone number.
+- **Send invite link** - opens a new message to the member with a link to book at your gym in the 1club App or on the web. See [Invite a member to the app](#invite-a-member-to-the-app).
+- **Archive** - removes the member from active use.
 
-A **suspended member** keeps everything - record, plan, bookings, staff role - but cannot sign in to your gym, so cannot book for themselves, until someone reinstates them. Staff can still book and check them in. The profile shows an **Access suspended** banner with a **Reinstate** button while they are suspended.
+**Suspend**, **Reinstate**, and the SMS actions need Members **Edit**. See [Suspend and archive](/members/suspend-and-archive) for which of Suspend and Archive to reach for.
+
+If the contact is archived, the header collapses to a single **Unarchive** action (Members **Edit**). An **archived member** is retained for financial and legal history but is hidden from listings, has its memberships and future bookings cancelled, and cannot sign in until you unarchive them.
+
+A **suspended member** keeps everything - record, plan, bookings, staff role - but cannot sign in to your gym, so cannot book for themselves, until someone reinstates them. Staff can still book and check them in. The profile shows an **Access suspended** notice with a **Reinstate** button while they are suspended.
 
 Both are scoped to your gym: the same person can stay an active member elsewhere.
+
+### Invite a member to the app
+
+**Send invite link** opens a new message addressed to the member, already filled in with a subject ("Book at" and your gym's name), a short note, and a **Book now** button. The button opens your gym's own link - the one its QR code holds - so the member lands on your gym in the [1club App](/settings/mobile-app), or on the web without installing anything. The message is in your organization's language, and you choose the channel and can edit it before sending, like any message.
+
+It is offered when the member has an email address or a phone number, to staff who can send messages. It is a booking link, not a login invitation: to give a member a portal login, use **Invite** in [User account](#user-account).
 
 ## Tabs
 
@@ -84,84 +109,95 @@ Tabs load their own data on demand, so opening the profile stays fast even for c
 
 | Tab | What it shows |
 |------|---------------|
-| **Activity** | Engagement gauge and activity timeline |
+| **Overview** | The member's **Activity** (their bookings and memberships, each with its money), their **Notes**, and the automations that have run for them |
 | **Bookings** | All bookings, including cancelled. Click through to the booking detail |
 | **Memberships** | Every membership ever assigned. Edit, pause, resume, renew, or cancel from here. Shown to staff who can read memberships |
-| **Check-ins** | Visit history |
 | **Charges** | What this contact owes, with the payments and invoices against it |
-| **Documents** | Signed documents (waivers, contracts), signatures awaiting approval, and required documents the member has not signed yet, with **Send for signature**. See [Document signatures](/members/document-signatures#signatures-awaiting-approval) |
-| **Notifications** | Which notifications the member receives, with any overrides of your defaults |
-| **Matches** | Match history, shown only when ratings are enabled |
+| **Check-ins** | Visit history |
 | **Rentals** | Gear the member has out, shown only when Rentals is on. The badge turns red while anything is overdue |
+| **Documents** | Signed documents (waivers, contracts), form responses, signatures awaiting approval, and required documents the member has not signed yet, with **Send for signature**. See [Document signatures](/members/document-signatures#signatures-awaiting-approval) |
+| **Matches** | Match history, shown only when ratings are enabled |
+| **Notifications** | Which notifications the member receives, with any overrides of your defaults |
 
-**Bookings**, **Memberships**, **Check-ins**, **Charges**, **Documents**, and **Rentals** show a count badge when they have something to count. The **Bookings** badge leaves out cancelled bookings, and the **Memberships** badge counts live memberships. The **Bookings** tab has **Active**, **Cancelled**, and **All** pills, the **Memberships** tab has **Active**, **Inactive**, and **All** pills, and both open on **Active**.
+**Bookings**, **Memberships**, **Charges**, **Check-ins**, **Documents**, and **Rentals** show a count badge when they have something to count. The **Bookings** badge leaves out cancelled bookings, the **Memberships** badge counts live memberships, and the **Documents** badge includes required documents still unsigned. The **Bookings** tab has **Active**, **Cancelled**, and **All** pills, the **Memberships** tab has **Active**, **Inactive**, and **All** pills, and both open on **Active**.
 
-### Activity tab
+### Notes
 
-The **Activity** tab stacks two elements:
+The **Notes** panel on the **Overview** tab is a free-form running log. Click **Add**, type the note, and save it. Each note is timestamped; editing a note updates its timestamp. Use the pencil and trash icons on a note to edit or delete it. Adding, editing, and deleting notes needs Members **Edit**; without it the panel is read-only. Notes are internal - members never see them.
 
-- **Engagement gauge** - the member's engagement score and level. See [Engagement analytics](/analytics/engagement) for how the score is computed.
-- **Activity timeline** - a chronological feed of the member's bookings, check-ins, memberships, emails, messages, and saved payment cards. Use the chips (**All**, **Bookings**, **Check-ins**, **Memberships**, **Emails**, **Messages**, **Payment cards**) to narrow it, and **Show more** to load older entries.
+The automations panel beside it, for staff who can view marketing, lists the [automations](/marketing/automations) that have run for this member.
 
 ## Editing the contact
 
-Click **Edit** in the header. The form covers name, contact details, date of birth, profile image, address, and any custom fields configured under **Settings** > **Members** > **Contacts**. The email can't be changed for a member with a linked user account. If you save an email address another contact already uses, the form offers to open or merge with that contact - see [Duplicates and merging](/members/merge-duplicates). A contact has no **Club** of their own: they belong to your whole organization, and each membership or booking records its own.
+Choose **Edit** in the more-actions menu, or in **Contact Information**. The form covers name, contact details, date of birth, profile image, address, and any custom fields configured under **Settings** > **Members** > **Contacts**. The email can't be changed for a member with a linked user account. If you save an email address another contact already uses, the form offers to open or merge with that contact - see [Duplicates and merging](/members/merge-duplicates).
 
-The contact's **type** (member, lead, drop-in, lapsed, contact, staff) is not edited here. It follows what the contact holds and does, and every change is logged. Click the type chip in the page header to open its type-change history.
+The contact's **type** (member, lead, drop-in, lapsed, contact, staff) is not edited here. It follows what the contact holds and does, and every change is logged. Click the type chip in the header to open its type-change history.
 
-## Pipeline
+## Contact Information
 
-The **Pipeline** block on the contact card shows the contact's stage, source, and assigned staff member, each changed in place. For a contact who is not a customer and not yet in the pipeline, it offers **Add to pipeline**, and for one in the pipeline, **Remove from pipeline**. Changing the pipeline needs `members.update.organization`. See [Leads and pipeline](/members/leads).
+Click the member's name, or their account status chip, to open **Contact Information**. From top to bottom it shows:
 
-## Notes
+- **Accounts** - see [Accounts](#accounts).
+- The contact's details: source, date of birth with age, gender, address, tags, custom fields that have a value, and the **Chosen program** the member picked at signup (see [Programs](/settings/progression#programs)).
+- **Pipeline** - see [Pipeline](#pipeline).
+- **User Account** - see [User account](#user-account).
+- **Cards** and **Door access from plans** - see [Cards and PIN](#cards-and-pin).
+- **Reviews**, **Integrations**, and **Payment Methods** - see below.
+- **Edit**, to open the contact form.
 
-The notes panel at the bottom of the sidebar is a free-form running log. Type a note and press the add button (or Ctrl+Enter) to save it. Each note is timestamped; editing a note updates its timestamp. Use the pencil and trash icons on a note to edit or delete it. Deleting has no confirmation. Adding, editing, and deleting notes needs `members.update.organization`; without it the panel is read-only. Notes are internal - members never see them.
+### Accounts
 
-## User account
+The **Account** block lists every household and company the contact belongs to, with the account type on each. Click an account name to open the [account page](/members/accounts).
 
-The **User Account** block in the sidebar shows whether the contact has a member-portal login. Possible states:
+- When the contact belongs to **no account**, the block shows **Add**, which creates a new household or company account with this contact as its owner.
+- When the contact **is on an account**, each account shows up to four of the other members with their roles. The account's **Add** button attaches a new person, and the trash icon detaches a member, after you confirm, without deleting their contact record.
 
-- **Unregistered** - no portal account exists. When the contact has an email address or a phone number, an **Invite** button appears for staff with `members.update.organization`. It asks how the invitation should travel - see [Choosing how an invitation reaches a member](/members/member-list#choosing-how-an-invitation-reaches-a-member).
-- The account exists (statuses such as **Active**, **Invited**, **Incomplete**, **Suspended**, **Expired**, or **Deleted**). The block shows the status chip, the member's sign-in methods, and the invitation expiry date while an invitation is outstanding. An **Incomplete** account lists what the member has not completed yet, and a **Deleted** one says the person deleted their account (you can invite them again).
+The header shows the same account beside the member's name (a household first, when they have several), with its members' avatars. Hover an avatar to see that person's first name and role, and click it to open their profile.
 
-The overflow menu on this block offers, depending on state:
+### Pipeline
 
-- **Reset password** - sends a password reset email. Available for an active account that is not your own, to staff with `settings.manage.organization` or `staff.manage.organization`.
+The **Pipeline** block shows the contact's stage, source, and assigned staff member, each changed in place. For a contact who is not a customer and not yet in the pipeline, it offers **Add to pipeline**; for one in the pipeline, **Remove from pipeline** and, in an open stage, **Mark as lost**. A lost lead shows why ("Lost: Price"). Changing the pipeline needs Members **Edit**. See [Leads and pipeline](/members/leads).
+
+### User account
+
+The **User Account** block shows whether the contact has a member-portal login. Possible states:
+
+- **Unregistered** - no portal account exists. When the contact has an email address or a phone number, an **Invite** button appears for staff with Members **Edit**. It asks how the invitation should travel - see [Choosing how an invitation reaches a member](/members/member-list#choosing-how-an-invitation-reaches-a-member).
+- The account exists (statuses such as **Active**, **Invited**, **Incomplete**, **Suspended**, **Expired**, or **Deleted**). The block shows the status chip, when they joined, the member's **Sign-in methods**, and the invitation expiry date while an invitation is outstanding. An **Incomplete** account lists what the member has not completed yet, and a **Deleted** one says the person deleted their account (you can invite them again).
+
+The block's menu offers, depending on state:
+
+- **Reset password** - sends a password reset email. Available for an active account that is not your own, to staff who manage organization settings or staff.
 - **Send Invitation** / **Resend invitation** - sends or re-sends a portal invitation while one is pending or has expired.
 - **Delete** - deletes an outstanding invitation, or removes the portal login link, for anyone but yourself.
 
-## Cards and PIN
+### Cards and PIN
 
-When [access control](/settings/access-control) is enabled, the **Cards** block lists every access card, PIN, or QR code this contact holds, with a star on their main card. From here you can:
+When [access control](/settings/access-control) is enabled, the **Cards** block lists every access card, PIN, or QR code this contact holds, with a star on their main card. The **Cards** tile in the info strip opens the same list. From here you can:
 
 - **Issue card** - scan a card on the reader (or type its code, or enter a PIN) to give it to this member. A card already on file as club stock is issued the same way.
-- **Remove from member** - takes a card off the member. It stops working right away, and scanning it again later issues it fresh.
+- **Remove from member** - takes a card off the member. It stops working right away.
 
 A **PIN** is a number the member types at a kiosk or door. See [Access cards](/members/member-cards) for card types and how issuing works.
 
-## Accounts panel
+Below it, **Door access from plans** lists which doors the member's plans open and when, or why a plan opens none. It needs Operations **View**. See [Door access from plans](/settings/access-control-settings#seeing-which-doors-a-members-plans-open).
 
-The Accounts block in the sidebar shows every household and company the contact belongs to, with the account type (**Household** or **Company**) on each. Click an account name to open the [account detail page](/members/accounts).
-
-- When the contact belongs to **no account**, the block shows an **Add** button that creates a new account (household or company) with this contact locked in as the owner.
-- When the contact **is on an account**, each account row shows up to four of the other members with their roles. The row's **Add** button attaches a new person to that account, and the trash icon detaches a member, after you confirm, without deleting their contact record.
-
-## Reviews
+### Reviews
 
 When the member has left reviews and you can view marketing, a **Reviews** block shows how many, with **View all** to open them in [Reviews](/marketing/reviews).
 
-## Integrations
+### Integrations
 
-The **Integrations** block in the sidebar shows:
+The **Integrations** block shows:
 
 - **Stripe Customer** - when the contact has a Stripe customer: the customer ID, email, and creation date. **Sync** pushes the contact's details to Stripe.
 - **WebLock** - when the WebLock integration is active: the WebLock user ID, or a prompt to sync. **Sync** re-pushes every active access grant for this contact to WebLock and reports how many grants were pushed.
 
-**Sync** needs `members.update.organization`.
+**Sync** needs Members **Edit**.
 
-## Payment methods
+### Payment methods
 
-Saved cards and bank accounts on file appear in the **Payment Methods** block. Use **+** (**Add card**) to save a new card. They are the same payment methods available when adding payments to invoices or membership charges.
+Saved cards and bank accounts on file appear in **Payment Methods**, also opened from the **Payment method** tile. Use **+** (**Add card**) to save a new card. They are the same payment methods available when adding payments to invoices or membership charges.
 
 ## Worked examples
 
@@ -175,20 +211,20 @@ Saved cards and bank accounts on file appear in the **Payment Methods** block. U
 ### Onboard a new jiu-jitsu member to the portal
 
 1. Create or open the contact and click **Edit** to confirm the email is correct.
-2. In the **User Account** block, click **Invite**. The block switches to show the invitation and its expiry.
-3. If the member does not accept in time, use the overflow menu to **Resend invitation**.
+2. Click the member's name to open **Contact Information**, and under **User Account** click **Invite**. The block switches to show the invitation and its expiry.
+3. If the member does not accept in time, use the block's menu to **Resend invitation**.
 
 ### Give a climbing member a door PIN
 
 1. Make sure access control is enabled for your org, with PIN as an identification method.
-2. In the **Cards** block, click **Issue card**, choose **PIN code** as the card type, and enter the number. Leading zeros count.
+2. Use the plus icon on the **Cards** tile (or **Add** > **Card**), choose **PIN code** as the card type, and enter the number. Leading zeros count.
 3. Turn on **Make this their main card** if the PIN should be the member's main card, and save.
 
 ### Track belt progression for a martial arts student
 
-1. Enable progression tracks so the **Progression Levels** tile appears in the info strip.
-2. Use the plus icon on the tile to assign the student's current belt.
-3. The **Activity** tab's timeline and the info strip keep the level visible for front-desk staff.
+1. Enable a progression track so the **Progression Levels** tile appears in the info strip.
+2. Use the plus icon on the tile and **Assign Level** to record the student's current belt. Their first level sends no notice.
+3. The tile then shows their sessions, days and skills toward the next belt. When it reads **Eligible for promotion**, click the belt and use **Promote**: the student gets a promotion notice.
 
 ## Tips & best practices
 
@@ -202,15 +238,17 @@ Saved cards and bank accounts on file appear in the **Payment Methods** block. U
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| No **Invite** button in the User Account block | The contact has neither an email address nor a phone number, or you lack `members.update.organization` | Click **Edit** and add an email or phone number, or ask an admin for the permission |
+| No **Invite** button under **User Account** | The contact has neither an email address nor a phone number, or you lack Members **Edit** | Click **Edit** and add an email or phone number, or ask an admin for the permission |
 | **Due now** shows nothing, but the member has an unpaid booking | The booking has not started yet, so its charge is upcoming | Check **Upcoming** under **Due now**. To collect it ahead of time, use **Add** > **Payment** |
 | No "No phone number" notice for a contact without a phone | Your gym does not require a phone number | Make the phone field required under **Settings** > **Members** > **Contacts** |
-| **Reset password** missing from the overflow menu | The account is not active, you lack `settings.manage.organization` and `staff.manage.organization`, or it is your own account | Have someone with staff-management access send the reset |
-| **Cards** block not visible | Access control is not enabled for the org | Enable it under [access control settings](/settings/access-control) |
+| **Reset password** missing from the **User Account** menu | The account is not active, you can manage neither organization settings nor staff, or it is your own account | Have someone with staff-management access send the reset |
+| No **Cards** tile | Access control is not enabled for the org | Enable it under [access control settings](/settings/access-control) |
 | **PIN code** missing from the card types | PIN is not an identification method enabled for the club | Enable it under [access control settings](/settings/access-control) |
 | Stripe block missing | The contact has no Stripe customer yet | Expected. The block appears once the contact has a Stripe customer |
 | WebLock block missing | The WebLock integration is not active | Connect the integration under **Settings** > **Integrations** |
-| Only an **Unarchive** button in the header | The contact is archived | Unarchive to restore active use (requires `members.update.organization`) |
+| Only an **Unarchive** button in the header | The contact is archived | Unarchive to restore active use (needs Members **Edit**) |
+| No **Send invite link** in the more-actions menu | The contact has neither an email address nor a phone number, or you can't send messages | Add an email or phone number |
+| No **Engagement Scores** tile | Your gym doesn't calculate engagement scores, or the member has no active plan | Turn on **Engagement Scoring** under [Smart tagging](/settings/smart-tagging#engagement-scoring) |
 
 ## Related
 
@@ -220,4 +258,6 @@ Saved cards and bank accounts on file appear in the **Payment Methods** block. U
 - [Attendance](/schedule/attendance) - check-in workflows
 - [Access cards](/members/member-cards) - cards and PIN management
 - [Leads and pipeline](/members/leads) - the Pipeline block and the Leads tab
-- [Engagement analytics](/analytics/engagement) - how the gauge is computed
+- [Engagement analytics](/analytics/engagement) - engagement scores across your members
+- [Progression tracks](/settings/progression) - levels, requirements and promotion
+- [Statements](/sales/statements#a-members-statement) - a member's statement

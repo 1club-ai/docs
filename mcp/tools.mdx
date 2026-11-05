@@ -1,7 +1,7 @@
 ---
 title: "1club MCP tools reference"
 sidebarTitle: "Tools reference"
-description: "Every tool the 1club admin and discovery MCP servers expose, what it returns, and the OAuth scope each one requires."
+description: "Every tool the 1club admin and discovery MCP servers expose, what it does, and the OAuth scope each one requires."
 keywords:
   [
     mcp tools,
@@ -9,16 +9,21 @@ keywords:
     get_account,
     list_classes,
     create_booking,
+    record_payment,
     search_clubs,
+    search_professionals,
+    book_area,
     list_class_types,
     list_progression_tracks,
     find_availability,
     get_club,
     list_clubs,
+    update_club,
     update_club_booking_labels,
     void_transaction,
     delete_booking,
     list_external_programs,
+    list_instructor_shifts,
     booking labels,
     availability,
     platform api,
@@ -29,35 +34,349 @@ This is the complete tool list for both 1club MCP servers. An assistant sees onl
 
 ## Admin server
 
-`https://mcp.1club.ai` - authenticated, normally with 1club OAuth. Every tool is scoped to one organization and needs the listed scope. A call whose scope is missing fails with a permission error, not with empty data.
+`https://mcp.1club.ai` - authenticated, normally with 1club OAuth. Every call acts in one organization and needs the listed scope. A call whose scope is missing fails with a permission error, not with empty data.
+
+Over OAuth, the scope is only half of it: the assistant acts as the person who connected it, so a call also needs the permission their role holds in that gym, exactly as the same action would in the admin. A front desk login with `bookings:delete` still cannot delete a booking their role cannot delete.
+
+### Account
 
 | Tool | What it does | Scope required |
 | --- | --- | --- |
-| `get_account` | Names the authorized organization and lists its granted scopes | None |
+| `get_account` | Lists the organizations the connection can act in, what it may do in each, and its granted scopes | None |
 | `get_report_theme` | Returns the 1club report template - brand palette, chart colours, and wordmark - for reports and dashboards built from your data | None |
+| `get_setup_checklist` | Reads your setup checklist: the steps to go live, and which are done, skipped, or still to do | `clubs:read` |
+| `update_setup_step` | Marks a setup checklist step done or skipped by hand, or clears the mark | `organization:write` |
+| `get_brand_book` | Reads your Brand Book: colours, logos, fonts, tone of voice, and writing guidelines | `clubs:read` or `website:read` |
+| `update_brand_book` | Changes your Brand Book, for the whole organization at once | `organization:write` |
+
+### Gyms
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_clubs` | Lists your gyms with their slug, status, and booking labels | `clubs:read` |
+| `get_club` | Opens one of your gyms by slug, with amenities, rating, and booking labels | `clubs:read` |
+| `update_club` | Edits a gym's profile: name, description, contact details, address, opening hours, amenities, and sports, or hides it from members | `clubs:write` |
+| `update_club_booking_labels` | Renames a gym's private training, group activities, and areas booking cards, and translates them | `organization:write` |
+
+### Classes, programs, and progression
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
 | `list_classes` | Lists your classes | `classes:read` |
 | `get_class` | Opens one class by id | `classes:read` |
+| `create_class` | Creates a class, or a whole repeating series in one call, linked so it can be rescheduled or cancelled together | `classes:write` |
+| `update_class` | Updates one class occurrence | `classes:write` |
+| `delete_class` | Deletes one class, or this and the future occurrences of a series | `classes:write` |
 | `list_class_bookings` | Lists a class roster, with each attendee's status and what they paid | `bookings:read` |
 | `book_class` | Enrols a customer in a class occurrence, through the same capacity, booking-policy, and waitlist checks staff use | `bookings:write` |
 | `list_class_types` | Lists your class types, with sport, age group, level, and the track each counts toward | `classes:read` |
-| `list_progression_tracks` | Lists your progression tracks and the class types counting toward each | `classes:read` |
 | `get_class_type` | Opens one class type by id | `classes:read` |
 | `create_class_type` | Adds a class type | `classes:write` |
 | `update_class_type` | Changes a class type, including its age group, level, and track | `classes:write` |
-| `create_class` | Creates one class occurrence | `classes:write` |
-| `update_class` | Updates one class occurrence | `classes:write` |
-| `delete_class` | Deletes one class or this and future recurring occurrences | `classes:write` |
-| `list_content` | Lists CMS content - posts, FAQs, documents, and reusable blocks | `content:read` |
-| `get_content` | Opens one published content item by slug | `content:read` |
-| `create_content` | Creates a content item | `content:write` |
-| `update_content` | Updates a content item, including taking it back to draft | `content:write` |
-| `delete_content` | Permanently deletes a content item | `content:write` |
+| `reorder_class_types` | Puts your class types in a new display order | `classes:write` |
+| `list_programs` | Lists your programs, such as "Kids BJJ (7-12)", which group class types | `classes:read` |
+| `get_program` | Opens one program | `classes:read` |
+| `create_program` | Adds a program | `classes:write` |
+| `update_program` | Changes a program, including the progression track its class types count toward | `classes:write` |
+| `list_progression_tracks` | Lists your progression tracks and the class types counting toward each | `classes:read` |
+| `get_progression_track` | Opens one progression track with its ladder of ranks and what each requires | `classes:read` |
+| `save_progression_track` | Creates or changes a progression track and its ranks, or copies a template track | `classes:write` |
+| `list_track_members` | Lists everyone ranked on a track, with their progress to the next rank and who is eligible | `contacts:read` |
+| `get_contact_progression` | Reads one member's ranks and the timeline of every rank and stripe they earned | `contacts:read` |
+| `set_progression_rank` | Gives up to 100 members a rank or their next rank, as on a grading day | `contacts:write` |
+
+### Areas and availability
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_areas` | Lists your bookable areas | `areas:read` |
+| `get_area` | Opens one area by id, whatever its state | `areas:read` |
+| `create_area` | Adds a bookable area - a court, a studio, a lane - to one of your gyms | `areas:write` |
+| `update_area` | Renames, reprices, or changes the hours or capacity of an area, or takes it out of service | `areas:write` |
+| `list_area_types` | Lists your area types | `areas:read` |
+| `get_area_type` | Opens one area type by id | `areas:read` |
+| `create_area_type` | Adds an area type | `areas:write` |
+| `update_area_type` | Changes an area type, and with it every area of that type | `areas:write` |
+| `reorder_area_types` | Puts your area types in a new display order | `areas:write` |
+| `get_platform_area_availability` | Checks when an area is free, for a date or a date range | `areas:read` |
+| `get_club_availability` | Returns the open slots of every bookable area at a gym in one call | `areas:read` |
+| `list_availability_changes` | Lists what changed in court availability since a cursor | `areas:read` |
+| `list_area_blocks` | Lists area blocks overlapping a date range | `areas:read` |
+| `create_area_block` | Closes one court, or a whole gym, for a time range | `areas:write` |
+| `delete_area_block` | Deletes a block, reopening the courts it covered | `areas:write` |
+
+### Bookings and check-ins
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_bookings` | Lists bookings in a date window, across every channel | `bookings:read` |
+| `get_booking` | Opens one booking by id | `bookings:read` |
+| `create_booking` | Creates a booking, optionally with a coach | `bookings:write` |
+| `update_booking` | Reschedules a booking, moves its area, changes its coach, contact, notes, or price | `bookings:write` |
+| `cancel_booking` | Cancels a booking | `bookings:write` |
+| `delete_booking` | Permanently deletes a booking entered by mistake, with its unpaid charges; for staff, needs the Extended level of booking delete, which only admins hold by default | `bookings:delete` |
+| `waive_cancellation_charge` | Waives what a cancelled or no-show booking owes under its cancellation terms | `bookings:write` |
+| `list_booking_participants` | Lists the extra players on a booking | `bookings:read` |
+| `add_booking_participant` | Adds a player to a booking | `bookings:write` |
+| `remove_booking_participant` | Removes a player from a booking | `bookings:write` |
+| `quote_booking_price` | Prices a booking without making it, listing every rule that applied | `pricing-rules:read` |
+| `list_checkins` | Lists attendance records with filters | `checkins:read` |
+| `get_checkin` | Opens one attendance record | `checkins:read` |
+| `create_checkin` | Records attendance: checks in an existing booking, or checks a member in on their membership with no booking | `checkins:write` |
+
+### Events
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_events` | Lists your events, earliest first | `events:read` |
+| `get_event` | Opens one event with its tickets, coaches, and areas | `events:read` |
+| `create_event` | Creates an event | `events:write` |
+| `update_event` | Edits an event | `events:write` |
+| `publish_event` | Publishes a draft event and puts its tickets on sale | `events:write` |
+| `unpublish_event` | Takes a live event back to draft | `events:write` |
+| `cancel_event` | Cancels an event | `events:write` |
+| `duplicate_event` | Copies an event into a new draft | `events:write` |
+| `delete_event` | Permanently deletes an event nobody has booked | `events:write` |
+| `list_event_bookings` | Lists an event's attendees, one row per seat, with ticket, status, and payment | `bookings:read` |
+| `book_event` | Registers a customer for a live event, with any guests they bring | `bookings:write` |
+
+### Contacts, tags, and accounts
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `search_contacts` | Finds customers by name, email, or phone | `contacts:read` |
+| `get_contact` | Opens one customer by id | `contacts:read` |
+| `create_contact` | Creates a customer | `contacts:write` |
+| `update_contact` | Corrects a contact's name, email, or phone, or moves them in the sales pipeline | `contacts:write` |
+| `archive_contact` | Archives a contact who has left the gym | `contacts:delete` |
+| `list_pipeline` | Lists your sales pipeline stages, with how many contacts each holds, and the sources contacts come from | `contacts:read` |
+| `list_tags` | Lists your tags - manual, smart, and interest - with how many contacts carry each | `contacts:read` |
+| `create_tag` | Creates a manual tag | `contacts:write` |
+| `update_tag` | Renames or recolours a manual tag | `contacts:write` |
+| `delete_tag` | Deletes a manual tag and takes it off every contact | `contacts:delete` |
+| `add_contact_tags` | Puts manual tags on contacts, creating a tag that does not exist yet | `contacts:write` |
+| `remove_contact_tags` | Takes manual tags off contacts | `contacts:write` |
+| `get_smart_tag_settings` | Reads the smart tag rules: which categories are on, and each tag's name, colour, and threshold | `contacts:read` |
+| `update_smart_tag_settings` | Switches smart tag categories on or off, or renames, recolours, or re-thresholds their tags | `contacts:write` |
+| `list_custom_fields` | Lists your contact custom fields, with their type, options, and who sees them | `contacts:read` |
+| `get_custom_field` | Opens one contact custom field | `contacts:read` |
+| `create_custom_field` | Adds a custom field to your contacts | `contacts:write` |
+| `update_custom_field` | Changes a custom field's label, options, visibility, or sign-up requirement, or switches it off | `contacts:write` |
+| `delete_custom_field` | Deletes a custom field and every value recorded in it | `contacts:delete` |
+| `get_contact_custom_field_values` | Reads the custom field values on one contact | `contacts:read` |
+| `set_contact_custom_field_values` | Sets custom field values on one contact | `contacts:write` |
+| `list_member_accounts` | Lists your household and company accounts | `contacts:read` |
+| `get_member_account` | Opens one household or company account with its members and billing details | `contacts:read` |
+| `create_member_account` | Creates a household or company account with its first member | `contacts:write` |
+| `update_member_account` | Renames an account, or changes its primary contact or billing details | `contacts:write` |
+| `delete_member_account` | Deletes a household or company account; its members stay as contacts | `contacts:delete` |
+| `add_member_account_member` | Adds a contact to a household or company account | `contacts:write` |
+| `update_member_account_member` | Changes a member's role in an account | `contacts:write` |
+| `remove_member_account_member` | Takes a contact out of an account | `contacts:write` |
+
+### Instructors, pay, and the staff roster
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `search_instructors` | Finds coaches by name, gym, or sport | `instructors:read` |
+| `get_instructor` | Opens one coach by id, with hourly rate and bookability | `instructors:read` |
+| `create_instructor` | Adds a coach | `instructors:write` |
+| `update_instructor` | Edits a coach's bookable profile: sports, rate, availability, and who may book them | `instructors:write` |
+| `list_instructor_types` | Lists your instructor types | `instructors:read` |
+| `get_instructor_type` | Opens one instructor type by id | `instructors:read` |
+| `create_instructor_type` | Adds an instructor type | `instructors:write` |
+| `update_instructor_type` | Changes an instructor type | `instructors:write` |
+| `reorder_instructor_types` | Puts your instructor types in a new display order | `instructors:write` |
+| `list_pay_rate_policies` | Lists the rules for what the gym pays its coaches | `instructors:read`, plus `staff:read` for a member of staff |
+| `get_pay_rate_policy` | Opens one pay rate policy with its rates and what it covers | `instructors:read`, plus `staff:read` for a member of staff |
+| `create_pay_rate_policy` | Creates a pay rate policy | `instructors:write` |
+| `update_pay_rate_policy` | Edits a pay rate policy's name, rates, or coverage | `instructors:write` |
+| `assign_pay_rate_policy_instructors` | Adds coaches to a pay rate policy | `instructors:write` |
+| `remove_pay_rate_policy_instructor` | Takes one coach off a pay rate policy | `instructors:write` |
+| `list_pay_ledger` | Lists what coaches earned in a period, with totals per coach, for payroll | `transactions:read` and `staff:read` |
+| `list_shift_templates` | Lists your shift templates: named shifts with their times and breaks | `instructors:read` |
+| `get_shift_template` | Opens one shift template | `instructors:read` |
+| `create_shift_template` | Creates a shift template | `instructors:write` |
+| `update_shift_template` | Edits a shift template | `instructors:write` |
+| `delete_shift_template` | Deletes a shift template, or deactivates one a rotation still uses | `instructors:write` |
+| `list_shift_rotations` | Lists your shift rotations: weekly patterns of shift templates, 1 to 12 weeks long | `instructors:read` |
+| `get_shift_rotation` | Opens one shift rotation with its pattern | `instructors:read` |
+| `create_shift_rotation` | Creates a shift rotation | `instructors:write` |
+| `update_shift_rotation` | Edits a shift rotation and regenerates the roster of every coach on it | `instructors:write` |
+| `delete_shift_rotation` | Deletes a shift rotation nobody is assigned to | `instructors:write` |
+| `list_shift_rotation_assignments` | Lists which coach is on which rotation, and over which dates | `instructors:read` |
+| `create_shift_rotation_assignment` | Puts a coach on a rotation from a date, generating their shifts | `instructors:write` |
+| `update_shift_rotation_assignment` | Moves a coach to another rotation, or changes the dates or starting week | `instructors:write` |
+| `delete_shift_rotation_assignment` | Takes a coach off a rotation and removes the shifts it generated | `instructors:write` |
+| `list_instructor_shifts` | Lists the staff roster: the shifts coaches work between two days | `instructors:read` |
+| `get_instructor_shift` | Opens one shift | `instructors:read` |
+| `create_instructor_shift` | Adds one extra shift for a coach, outside any rotation | `instructors:write` |
+| `update_instructor_shift` | Changes one shift's times, breaks, or note | `instructors:write` |
+| `cancel_instructor_shift` | Takes a coach off one shift, keeping it on the roster as cancelled | `instructors:write` |
+| `delete_instructor_shift` | Deletes a shift added by hand | `instructors:write` |
+| `list_instructor_time_off` | Lists coaches' time off overlapping a range of days | `instructors:read` |
+| `create_instructor_time_off` | Books a coach off for a time range, returning the bookings and classes it conflicts with | `instructors:write` |
+| `update_instructor_time_off` | Shortens, extends, or edits a coach's time off | `instructors:write` |
+| `delete_instructor_time_off` | Removes a coach's time off | `instructors:write` |
+
+### Staff, roles, and notifications
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_staff` | Lists everyone with access to your admin, with their role and whether they accepted their invitation | `staff:read` |
+| `update_staff_role` | Gives a member of staff another role, with the same limits as the **Users** page | `staff:write` |
+| `get_role_permissions` | Reads what each staff role may do, and the catalogue of permissions a role can be given | `staff:read` |
+| `update_role_permissions` | Grants or revokes permissions on the manager, front desk, or instructor role | `staff:write` |
+| `reset_role_permissions` | Puts a staff role back to 1club's default permissions | `staff:write` |
+| `get_notification_settings` | Reads which notifications each role gets by default, on which channels, and which are locked | `notifications:read` |
+| `update_notification_setting` | Changes one notification's default for one role: on or off, channels, or locked | `notifications:write` |
+| `apply_notification_settings` | Writes a role's saved notification settings onto everyone in it, replacing their own choices | `notifications:write` |
+
+### Plans and memberships
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `search_plans` | Finds membership plans the gym sells, with price and joining fee | `plans:read` |
+| `get_plan` | Opens one plan by id | `plans:read` |
+| `create_plan` | Creates a membership plan | `plans:write` |
+| `update_plan` | Updates or retires a membership plan | `plans:write` |
+| `delete_plan` | Deletes an unused membership plan | `plans:write` |
+| `list_plan_categories` | Lists your membership plan categories, in display order | `plans:read` |
+| `get_plan_category` | Opens one plan category by id | `plans:read` |
+| `create_plan_category` | Adds a plan category | `plans:write` |
+| `update_plan_category` | Renames a plan category or moves it in the display order | `plans:write` |
+| `list_memberships` | Lists memberships, with sessions remaining | `memberships:read` |
+| `get_membership` | Opens one membership by id | `memberships:read` |
+| `create_membership` | Puts a customer on a plan | `memberships:write` |
+| `update_membership` | Pauses, resumes, or cancels a membership, or changes what it covers and counts, such as its class types, session allowance, and session unit | `memberships:write` |
+| `adjust_membership_sessions` | Gives a membership sessions or takes some back, with a reason | `memberships:write` |
+
+### Products
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `search_products` | Finds products by name, description, SKU, or barcode | `products:read` |
+| `get_product` | Opens one product by id | `products:read` |
+| `create_product` | Adds a product to the catalogue | `products:write` |
+| `update_product` | Reprices, recategorises, or retires a product | `products:write` |
+| `get_product_availability` | Reports how many of a product are left to sell, per gym | `products:read` |
+| `list_product_categories` | Lists the product categories, in display order | `products:read` |
+| `get_product_category` | Opens one product category by id | `products:read` |
+| `create_product_category` | Adds a product category | `products:write` |
+| `update_product_category` | Renames a category or moves it in the display order | `products:write` |
+
+### Charges, payments, and invoices
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_transactions` | Lists billing transactions, newest first | `transactions:read` |
+| `get_transaction` | Opens one transaction by id | `transactions:read` |
+| `create_transaction` | Records a settlement: revenue collected outside 1club, as one sum for a gym | `transactions:write` |
+| `refund_transaction` | Records money given back out of a settlement | `transactions:write` |
+| `void_transaction` | Voids an unpaid charge, so it is no longer owed | `transactions:delete` |
+| `delete_transaction` | Deletes an unpaid charge raised by mistake that nothing refers to | `transactions:delete` |
+| `record_payment` | Records that a member paid what a charge owes with one of your own payment methods, such as cash at the desk; nothing is charged to a card | `payments:write` |
+| `list_payment_methods` | Lists your own payment methods, such as Cash and POS Terminal, and who may choose each | `transactions:read` or `payment-methods:write` |
+| `get_payment_method` | Opens one payment method | `transactions:read` or `payment-methods:write` |
+| `create_payment_method` | Adds a payment method staff can record payments with, such as "Bank transfer" | `payment-methods:write` |
+| `update_payment_method` | Renames a payment method, or changes its code or who may choose it | `payment-methods:write` |
+| `delete_payment_method` | Deletes a payment method nobody has paid with yet | `payment-methods:write` |
+| `get_invoice_summary` | Totals what was invoiced over a range of days, today by default | `invoices:read` |
+| `list_invoices` | Lists the invoices issued over a range of days, newest first | `invoices:read` |
+| `get_invoice` | Opens one invoice with its line items and payments | `invoices:read` |
+| `list_revenue_accounts` | Lists your revenue accounts | Any plans, products, classes, areas, or instructors scope, `transactions:read`, or `revenue-accounts:write` |
+| `get_revenue_account` | Opens one revenue account by id | Same as `list_revenue_accounts` |
+| `create_revenue_account` | Adds a revenue account | `revenue-accounts:write` |
+| `update_revenue_account` | Renames, recodes, or retires a revenue account, or makes it the default | `revenue-accounts:write` |
+
+### Reports
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `get_revenue_report` | Reports revenue for a period: how much, from what, where, and on which revenue account | `transactions:read` or `analytics:read` |
+| `get_activity_report` | Reports how busy a period was: bookings, check-ins, and attendance | `analytics:read` |
+| `get_memberships_report` | Reports how memberships, passes, and drop-ins moved over a period | `analytics:read` |
+| `get_members_report` | Reports your customers over a period: how many, new, and active | `analytics:read` |
+| `get_tax_report` | Reports the tax a period's sales carried, by revenue account, tax rate, or gym | `analytics:read` |
+| `list_tax_charges` | Lists every sale behind the tax report, one line each | `transactions:read` |
+| `explain_metric` | Explains what a figure on your analytics reports counts and what it leaves out | `analytics:read` |
+
+### Rules and policies
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_pricing_rules` | Lists your pricing rules in the order they win | `pricing-rules:read` |
+| `get_pricing_rule` | Opens one pricing rule with its scopes and conditions | `pricing-rules:read` |
+| `create_pricing_rule` | Adds a pricing rule | `pricing-rules:write` |
+| `update_pricing_rule` | Edits a pricing rule | `pricing-rules:write` |
+| `delete_pricing_rule` | Permanently deletes a pricing rule | `pricing-rules:write` |
+| `list_booking_policies` | Lists your booking policies, newest first | `booking-policies:read` |
+| `get_booking_policy` | Opens one booking policy with its gyms, scope, and rules | `booking-policies:read` |
+| `create_booking_policy` | Creates a booking policy | `booking-policies:write` |
+| `update_booking_policy` | Edits a booking policy | `booking-policies:write` |
+| `duplicate_booking_policy` | Copies a booking policy as "`<name> (copy)`" | `booking-policies:write` |
+| `delete_booking_policy` | Permanently deletes a booking policy | `booking-policies:write` |
+| `get_effective_booking_policy` | Finds the one booking policy that governs a booking | `booking-policies:read` |
+| `list_document_rules` | Lists your document rules: who must accept which waivers and terms | `document-rules:read` |
+| `get_document_rule` | Opens one document rule | `document-rules:read` |
+| `create_document_rule` | Asks matching members to read and accept one or more documents | `document-rules:write` |
+| `update_document_rule` | Edits a document rule | `document-rules:write` |
+| `delete_document_rule` | Deletes a document rule | `document-rules:write` |
+| `list_external_programs` | Lists your external programs, such as MultiSport, and what each pays per visit | `external-programs:read` |
+| `get_external_program` | Opens one external program | `external-programs:read` |
+| `create_external_program` | Adds an external program members can use to pay for visits | `external-programs:write` |
+| `update_external_program` | Edits an external program, including what it pays and what it can be used for | `external-programs:write` |
+| `delete_external_program` | Deletes an unused external program, or deactivates one that has visits, bookings or cards | `external-programs:write` |
+
+### Promotions
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_promotions` | Lists your discounts and vouchers, with their codes, dates, status, and redemptions | `promotions:read` |
+| `get_promotion` | Opens one promotion | `promotions:read` |
+
+### Forms
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_forms` | Lists your forms, newest first | `forms:read` |
+| `get_form` | Opens one form with its questions | `forms:read` |
+| `create_form` | Creates a form, live as soon as it is created | `forms:write` |
+| `update_form` | Edits a form | `forms:write` |
+| `set_form_questions` | Sets the questions a fill-in form asks, in order | `forms:write` |
+
+### Messages and templates
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_messages` | Lists your email, SMS, and WhatsApp messages, newest first | `messages:read` |
+| `get_message` | Opens one message with its recipients and delivery status | `messages:read` |
+| `create_message_draft` | Writes a draft email, SMS, or WhatsApp message for you to send | `messages:write` |
+| `update_message_draft` | Edits a draft message | `messages:write` |
+| `delete_message_draft` | Permanently deletes a draft message | `messages:write` |
+| `list_templates` | Lists your message templates with their content | `templates:read` |
+| `get_template` | Opens one message template | `templates:read` |
+| `create_template` | Creates a message template | `templates:write` |
+| `update_template` | Edits a message template | `templates:write` |
+| `delete_template` | Deletes a message template; messages already sent from it keep their record | `templates:write` |
+| `list_template_variables` | Lists the variables a template may use | `templates:read` |
+| `list_system_templates` | Lists the automatic emails you can replace with your own copy | `templates:read` |
+| `copy_system_template` | Creates your own editable copy of a system email | `templates:write` |
+
+### Website
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
 | `get_website` | Opens the website: pages, layout, theme, and its public and preview URLs | `website:read` |
 | `list_websites` | Lists every website the organization owns, its default one first | `website:read` |
+| `list_website_templates` | Lists the Website Templates: ready-made looks and page structures for each kind of gym | `website:read` |
+| `create_website` | Creates a new, offline website from a Website Template, with its sample copy rewritten for your gym | `website:write` |
+| `get_website_readiness` | Lists what the website still needs: stock photos, sample copy, hidden sections, and broken links | `website:read` |
+| `personalize_website_copy` | Rewrites the website's copy from your own data, in the draft | `website:write` |
 | `get_website_section_types` | Lists every section type a page can use, and the fields each takes | `website:read` |
 | `list_website_pages` | Lists every page with its slug, title, section types, and SEO fields | `website:read` |
 | `get_website_page` | Opens one page with all of its sections and settings | `website:read` |
-| `update_website` | Updates site-level settings: name, theme support, SEO defaults, and the languages the organization offers | `website:write`, plus `organization:write` for the language fields |
+| `update_website` | Updates site-level settings: name, the gym it represents, light and dark switching, SEO defaults, and the languages the organization offers | `website:write`, plus `organization:write` for the language fields |
 | `create_website_page` | Adds a page to the website | `website:write` |
 | `update_website_page` | Updates a page's title, SEO fields, or entire content | `website:write` |
 | `delete_website_page` | Deletes a page | `website:write` |
@@ -68,155 +387,32 @@ This is the complete tool list for both 1club MCP servers. An assistant sees onl
 | `get_website_theme_tokens` | Lists every design token and the theme presets to start from | `website:read` |
 | `get_website_theme` | Reads the website's current design tokens and where each value comes from | `website:read` |
 | `set_website_theme` | Changes how the website looks: colours, fonts, radius, shadows, spacing, and motion | `website:write` |
+| `apply_website_template_look` | Gives the website a template's fonts, palette, shape, and motion, in the draft | `website:write` |
 | `get_website_css` | Reads the website's custom stylesheet | `website:read` |
 | `set_website_css` | Replaces the website's custom stylesheet | `website:write` |
-| `publish_website` | Publishes the draft, making every pending edit public | `website:publish` |
+| `publish_website` | Publishes the draft, making every pending edit public | `website:publish`, and the Website Plan Addon |
 | `list_website_releases` | Lists the publish history, newest first | `website:read` |
-| `rollback_website` | Restores an earlier published version and puts it live | `website:publish` |
+| `rollback_website` | Restores an earlier published version and puts it live | `website:publish`, and the Website Plan Addon |
+
+### Content and media
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_content` | Lists CMS content - posts, FAQs, documents, and reusable blocks | `content:read` |
+| `get_content` | Opens one published content item by slug | `content:read` |
+| `create_content` | Creates a content item | `content:write` |
+| `update_content` | Updates a content item, including taking it back to draft | `content:write` |
+| `delete_content` | Permanently deletes a content item | `content:write` |
 | `list_media` | Browses or searches the media library | `media:read` |
 | `get_media` | Opens one media item by id | `media:read` |
 | `create_media` | Registers an already-hosted image or video in the library | `media:write` |
 | `update_media` | Updates a media item's name, alt text, or caption | `media:write` |
 | `delete_media` | Permanently deletes a file from the library | `media:delete` |
-| `list_clubs` | Lists your gyms with their slug, status, and booking labels | `clubs:read` |
-| `get_club` | Opens one of your gyms by slug, with amenities, rating, and booking labels | `clubs:read` |
-| `update_club_booking_labels` | Renames a gym's private training, group activities, and areas booking cards, and translates them | `organization:write` |
-| `list_transactions` | Lists billing transactions, newest first | `transactions:read` |
-| `get_transaction` | Opens one transaction by id | `transactions:read` |
-| `create_transaction` | Records a settlement: revenue collected outside 1club, as one sum for a gym | `transactions:write` |
-| `refund_transaction` | Records money given back out of a settlement | `transactions:write` |
-| `void_transaction` | Voids an unpaid charge, so it is no longer owed | `transactions:delete` |
-| `delete_transaction` | Deletes an unpaid charge raised by mistake that nothing refers to | `transactions:delete` |
-| `get_invoice_summary` | Totals what was invoiced over a range of days, today by default | `invoices:read` |
-| `list_invoices` | Lists the invoices issued over a range of days, newest first | `invoices:read` |
-| `get_invoice` | Opens one invoice with its line items and payments | `invoices:read` |
-| `get_revenue_report` | Reports revenue for a period: how much, from what, where, and on which revenue account | `analytics:read` |
-| `get_activity_report` | Reports how busy a period was: bookings, check-ins, and attendance | `analytics:read` |
-| `get_memberships_report` | Reports how memberships, passes, and drop-ins moved over a period | `analytics:read` |
-| `get_members_report` | Reports your customers over a period: how many, new, and active | `analytics:read` |
-| `list_areas` | Lists your bookable areas | `areas:read` |
-| `get_area` | Opens one area by id, whatever its state | `areas:read` |
-| `list_area_types` | Lists your area types | `areas:read` |
-| `get_area_type` | Opens one area type by id | `areas:read` |
-| `create_area_type` | Adds an area type | `areas:write` |
-| `update_area_type` | Changes an area type, and with it every area of that type | `areas:write` |
-| `create_area` | Adds a bookable area - a court, a studio, a lane - to one of your gyms | `areas:write` |
-| `update_area` | Renames, reprices, or changes the hours or capacity of an area, or takes it out of service | `areas:write` |
-| `get_platform_area_availability` | Checks when an area is free, for a date or a date range | `areas:read` |
-| `get_club_availability` | Returns the open slots of every bookable area at a gym in one call | `areas:read` |
-| `list_availability_changes` | Lists what changed in court availability since a cursor | `areas:read` |
-| `list_area_blocks` | Lists area blocks overlapping a date range | `areas:read` |
-| `create_area_block` | Closes one court, or a whole gym, for a time range | `areas:write` |
-| `delete_area_block` | Deletes a block, reopening the courts it covered | `areas:write` |
-| `search_contacts` | Finds customers by name, email, or phone | `contacts:read` |
-| `get_contact` | Opens one customer by id | `contacts:read` |
-| `create_contact` | Creates a customer | `contacts:write` |
-| `update_contact` | Corrects a contact's name, email, or phone, or moves them in the sales pipeline | `contacts:write` |
-| `archive_contact` | Archives a contact who has left the gym | `contacts:delete` |
-| `list_pipeline` | Lists your sales pipeline stages, with how many contacts each holds, and the sources contacts come from | `contacts:read` |
-| `search_instructors` | Finds coaches by name, gym, or sport | `instructors:read` |
-| `get_instructor` | Opens one coach by id, with hourly rate and bookability | `instructors:read` |
-| `create_instructor` | Adds a coach | `instructors:write` |
-| `update_instructor` | Edits a coach's bookable profile: sports, rate, availability, and who may book them | `instructors:write` |
-| `list_instructor_types` | Lists your instructor types | `instructors:read` |
-| `get_instructor_type` | Opens one instructor type by id | `instructors:read` |
-| `create_instructor_type` | Adds an instructor type | `instructors:write` |
-| `update_instructor_type` | Changes an instructor type | `instructors:write` |
-| `list_pay_rate_policies` | Lists the rules for what the gym pays its coaches | `instructors:read` |
-| `get_pay_rate_policy` | Opens one pay rate policy with its rates and what it covers | `instructors:read` |
-| `create_pay_rate_policy` | Creates a pay rate policy | `instructors:write` |
-| `update_pay_rate_policy` | Edits a pay rate policy's name, rates, or coverage | `instructors:write` |
-| `assign_pay_rate_policy_instructors` | Adds coaches to a pay rate policy | `instructors:write` |
-| `remove_pay_rate_policy_instructor` | Takes one coach off a pay rate policy | `instructors:write` |
-| `search_plans` | Finds membership plans the gym sells, with price and joining fee | `plans:read` |
-| `get_plan` | Opens one plan by id | `plans:read` |
-| `create_plan` | Creates a membership plan | `plans:write` |
-| `update_plan` | Updates or retires a membership plan | `plans:write` |
-| `delete_plan` | Deletes an unused membership plan | `plans:write` |
-| `list_plan_categories` | Lists your membership plan categories, in display order | `plans:read` |
-| `get_plan_category` | Opens one plan category by id | `plans:read` |
-| `create_plan_category` | Adds a plan category | `plans:write` |
-| `update_plan_category` | Renames a plan category or moves it in the display order | `plans:write` |
-| `list_revenue_accounts` | Lists your revenue accounts | Any plans, products, classes, areas, or instructors scope, `transactions:read`, or `revenue-accounts:write` |
-| `get_revenue_account` | Opens one revenue account by id | Same as `list_revenue_accounts` |
-| `create_revenue_account` | Adds a revenue account | `revenue-accounts:write` |
-| `update_revenue_account` | Renames, recodes, or retires a revenue account, or makes it the default | `revenue-accounts:write` |
-| `list_memberships` | Lists memberships, with sessions remaining | `memberships:read` |
-| `get_membership` | Opens one membership by id | `memberships:read` |
-| `create_membership` | Puts a customer on a plan | `memberships:write` |
-| `update_membership` | Pauses, resumes, or cancels a membership, or changes what it covers and counts, such as its class types, session allowance, and session unit | `memberships:write` |
-| `adjust_membership_sessions` | Gives a membership sessions or takes some back, with a reason | `memberships:write` |
-| `search_products` | Finds products by name, description, SKU, or barcode | `products:read` |
-| `get_product` | Opens one product by id | `products:read` |
-| `create_product` | Adds a product to the catalogue | `products:write` |
-| `update_product` | Reprices, recategorises, or retires a product | `products:write` |
-| `get_product_availability` | Reports how many of a product are left to sell, per gym | `products:read` |
-| `list_product_categories` | Lists the product categories, in display order | `products:read` |
-| `get_product_category` | Opens one product category by id | `products:read` |
-| `create_product_category` | Adds a product category | `products:write` |
-| `update_product_category` | Renames a category or moves it in the display order | `products:write` |
-| `list_forms` | Lists your forms, newest first | `forms:read` |
-| `get_form` | Opens one form with its questions | `forms:read` |
-| `create_form` | Creates a form, live as soon as it is created | `forms:write` |
-| `update_form` | Edits a form | `forms:write` |
-| `set_form_questions` | Sets the questions a fill-in form asks, in order | `forms:write` |
-| `list_checkins` | Lists attendance records with filters | `checkins:read` |
-| `get_checkin` | Opens one attendance record | `checkins:read` |
-| `create_checkin` | Checks in an existing booking | `checkins:write` |
-| `create_booking` | Creates a booking, optionally with a coach | `bookings:write` |
-| `update_booking` | Reschedules a booking, moves its area, changes its coach, contact, notes, or price | `bookings:write` |
-| `list_bookings` | Lists bookings in a date window, across every channel | `bookings:read` |
-| `cancel_booking` | Cancels a booking | `bookings:write` |
-| `delete_booking` | Permanently deletes a booking entered by mistake, with its unpaid charges; admins only | `bookings:delete` |
-| `get_booking` | Opens one booking by id | `bookings:read` |
-| `list_booking_participants` | Lists the extra players on a booking | `bookings:read` |
-| `add_booking_participant` | Adds a player to a booking | `bookings:write` |
-| `remove_booking_participant` | Removes a player from a booking | `bookings:write` |
-| `list_pricing_rules` | Lists your pricing rules in the order they win | `rules:read` |
-| `get_pricing_rule` | Opens one pricing rule with its scopes and conditions | `rules:read` |
-| `create_pricing_rule` | Adds a pricing rule | `rules:write` |
-| `update_pricing_rule` | Edits a pricing rule | `rules:write` |
-| `delete_pricing_rule` | Permanently deletes a pricing rule | `rules:write` |
-| `quote_booking_price` | Prices a booking without making it, listing every rule that applied | `rules:read` |
-| `list_booking_policies` | Lists your booking policies, newest first | `policies:read` |
-| `get_booking_policy` | Opens one booking policy with its gyms, scope, and rules | `policies:read` |
-| `create_booking_policy` | Creates a booking policy | `policies:write` |
-| `update_booking_policy` | Edits a booking policy | `policies:write` |
-| `duplicate_booking_policy` | Copies a booking policy as "`<name> (copy)`" | `policies:write` |
-| `delete_booking_policy` | Permanently deletes a booking policy | `policies:write` |
-| `get_effective_booking_policy` | Finds the one booking policy that governs a booking | `policies:read` |
-| `list_document_rules` | Lists your document rules: who must accept which waivers and terms | `rules:read` |
-| `get_document_rule` | Opens one document rule | `rules:read` |
-| `create_document_rule` | Asks matching members to read and accept one or more documents | `rules:write` |
-| `update_document_rule` | Edits a document rule | `rules:write` |
-| `delete_document_rule` | Deletes a document rule | `rules:write` |
-| `list_external_programs` | Lists your external programs, such as MultiSport, and what each pays per visit | `external-programs:read` |
-| `get_external_program` | Opens one external program | `external-programs:read` |
-| `create_external_program` | Adds an external program members can use to pay for visits | `external-programs:write` |
-| `update_external_program` | Edits an external program, including what it pays and what it can be used for | `external-programs:write` |
-| `delete_external_program` | Deletes an unused external program, or deactivates one that has visits, bookings or cards | `external-programs:write` |
-| `list_templates` | Lists your message templates with their content | `templates:read` |
-| `get_template` | Opens one message template | `templates:read` |
-| `create_template` | Creates a message template | `templates:write` |
-| `update_template` | Edits a message template | `templates:write` |
-| `delete_template` | Deletes a message template; messages already sent from it keep their record | `templates:write` |
-| `list_template_variables` | Lists the variables a template may use | `templates:read` |
-| `list_system_templates` | Lists the automatic emails you can replace with your own copy | `templates:read` |
-| `copy_system_template` | Creates your own editable copy of a system email | `templates:write` |
-| `list_events` | Lists your events, earliest first | `events:read` |
-| `get_event` | Opens one event with its tickets, coaches, and areas | `events:read` |
-| `create_event` | Creates an event | `events:write` |
-| `update_event` | Edits an event | `events:write` |
-| `publish_event` | Publishes a draft event and puts its tickets on sale | `events:write` |
-| `unpublish_event` | Takes a live event back to draft | `events:write` |
-| `cancel_event` | Cancels an event | `events:write` |
-| `duplicate_event` | Copies an event into a new draft | `events:write` |
-| `delete_event` | Permanently deletes an event nobody has booked | `events:write` |
-| `list_messages` | Lists your email, SMS, and WhatsApp messages, newest first | `messages:read` |
-| `get_message` | Opens one message with its recipients and delivery status | `messages:read` |
-| `create_message_draft` | Writes a draft email, SMS, or WhatsApp message for you to send | `messages:write` |
-| `update_message_draft` | Edits a draft message | `messages:write` |
-| `delete_message_draft` | Permanently deletes a draft message | `messages:write` |
+
+### Competitors
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
 | `list_competitors` | Lists the competitors you follow, with their websites, Google ratings, and what changed on their websites | `competitors:read` |
 | `get_competitor` | Opens one competitor with its latest website readings: prices, offers, services, and changes | `competitors:read` |
 | `get_competitor_market` | Compares your prices with your competitors', each against the market median | `competitors:read` |
@@ -237,22 +433,30 @@ This is the complete tool list for both 1club MCP servers. An assistant sees onl
   `get_account` needs no resource scope, so it works with any valid connection.
   That makes it the right first call when an assistant is behaving as if it has
   no access: if `get_account` succeeds, authentication worked and the problem is
-  usually the granted scopes.
+  usually the granted scopes. It also lists every organization the connection
+  can act in. When there is more than one, the assistant passes the
+  organization on every call, and should ask you which one you mean rather than
+  guess.
 </Note>
 
 <Note>
   **The website tools edit a draft.** Every change is invisible to the public
   until `publish_website` runs, which is why publishing is its own scope. An
   assistant that holds `website:write` but not `website:publish` can build a page
-  and hand you the preview URL, and cannot put it live. Read
-  `get_website_section_types` before composing a page, and take image URLs from
-  `list_media` rather than guessing them.
+  and hand you the preview URL, and cannot put it live. Publishing and rolling
+  back also need the Website Plan Addon. Read `get_website_section_types` before
+  composing a page, and take image URLs from `list_media` rather than guessing them.
 
-  `supportedLocales` and `defaultLocale` on `update_website` are the exception.
-  They are organization-wide rather than website content, so they need
+  `update_website` is the exception. The site's name and the gym it represents
+  apply immediately, and `supportedLocales` and `defaultLocale` are
+  organization-wide rather than website content, so they need
   `organization:write` as well and apply immediately instead of waiting for a
   publish - the same languages drive the member portal, the mobile app, and
   outbound email.
+
+  `create_website` builds a new website offline from a Website Template, with
+  the template's sample copy rewritten from your own data. Taking it online and
+  connecting a domain stay in the admin.
 </Note>
 
 <Note>
@@ -274,17 +478,27 @@ This is the complete tool list for both 1club MCP servers. An assistant sees onl
   languages you offer. See [Booking labels](/reference/organization-clubs#booking-labels).
 </Note>
 
+<Note>
+  **Some writes are refused to an API key.** `update_staff_role`,
+  `update_role_permissions`, and `reset_role_permissions` change who can do
+  what, which is checked against the person making the change, so they only
+  work for someone connected over OAuth. An API key can cancel or delete a
+  booking, void or delete its charges, record a payment for it, or waive its
+  cancellation charge only when the key created that booking itself.
+</Note>
+
 ### Reading the scope table
 
-Scopes follow the `resource:action` format used across the [Platform API](/api-reference/introduction). A connection carrying `bookings:write` does not automatically carry `bookings:read`; authorize both if the assistant should look a booking up as well as create one.
+Scopes follow the `resource:action` format used across the [Platform API](/api-reference/introduction). A connection carrying `bookings:write` does not automatically carry `bookings:read`; authorize both if the assistant should look a booking up as well as create one. Where the table lists two scopes joined by "or", either one is enough.
 
 ### How a connection gets its scopes
 
 The MCP client asks for a scope set, and you decide how much of that request to grant:
 
-- **A client that requests nothing gets a read-only connection.** Every read scope in the table above, and nothing that changes data.
-- **Requested read scopes are granted when you approve.** They are listed under "This assistant will be able to" on the authorization page.
-- **Everything that is not a read is opt-in, one at a time.** Each appears under "Also allow it to make changes?" as a checkbox that starts unchecked - the writes, and also `media:delete` and `website:publish`, which delete a file for good and make draft edits public. Approving the page without ticking any of them produces a read-only connection, even if the client asked for everything.
+- **A client that requests nothing gets a read-only connection.** Every read scope in the tables above, and nothing that changes data.
+- **Requested read scopes are granted when you approve.** The authorization page lists them under **What `<assistant>` can do**, in the **Always included** group.
+- **Everything that is not a read is opt-in, one at a time.** Each appears under **Make changes** as a checkbox that starts unticked - the writes, and also the deletes and `website:publish`, which remove things for good or make draft edits public. **Allow all changes** ticks them all at once. Approving the page without ticking any of them produces a read-only connection, even if the client asked for everything.
+- **Your role narrows it in each organization.** A connection acts as you, so in each organization it holds only the scopes your role's permissions stand for there. An owner holds every scope.
 - **The set is fixed once approved.** To add or remove a scope, revoke the connection and authorize it again - see [Disconnect or revoke](/mcp/connect#disconnect-or-revoke).
 
 An assistant that authenticates with a [Platform API key](/settings/api-tokens) instead of OAuth uses that key's scopes, which you edit on the token itself.
@@ -306,46 +520,71 @@ Each admin tool is a thin wrapper over the documented Platform API, so the reque
 
 ## Discovery server
 
-`https://mcp.1club.me` - no token, no scopes. These search the public 1club.me marketplace across every listed gym and read only published information.
+`https://mcp.1club.me` - the public 1club.me marketplace, across every listed gym and independent professional. Anyone can search it without an account. Listing, booking, and cancelling the person's own bookings asks them to sign in with their 1club.me account the first time, and from then on the assistant acts as them. These tools never reach a single organization's private data, and they have no scopes.
 
-| Tool                | What it does                                                                                         |
-| ------------------- | ---------------------------------------------------------------------------------------------------- |
-| `find_availability` | Free, priced court times across the marketplace in one call, each with a link that opens the booking |
-| `search_clubs`      | Finds gyms by name, sport, location, distance, price, rating, amenities, date, and the age group and level of their classes |
-| `get_club`          | One club's profile and the menu of what it sells - courts by the hour, its classes, its passes        |
+### Search
 
-Reach for `find_availability` for any "when can I play" question. It searches, prices and dates in one step, so there is no need to find clubs first and then look their availability up separately. Give it a `date` when someone names a day - without one it walks forward from today and may never reach the day they meant.
+| Tool                   | What it does                                                                                         |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| `find_availability`    | Free, priced court times across the marketplace in one call, each with a link that opens the booking |
+| `search_clubs`         | Finds gyms by name, sport, location, distance, price, rating, amenities, date, the age group and level of their classes, and what verified reviewers say |
+| `get_club`             | One gym's profile and what it sells - areas by the hour, classes, instructors, passes - and, given a date, that day's bookable classes and free times |
+| `search_professionals` | Finds independent professionals - personal trainers, coaches, and teachers who work for themselves - by sport, place, or name |
+| `get_professional`     | One professional's profile, places, rate, and next classes, and, given a date, their free times |
 
-Everything these tools return is the club's own: times are on the venue's clock (`localDay`, `localTime`, `localEndTime`, `localEndDay`, with its `timezone`), and prices come with their currency. Report them as given rather than converting them.
+### Book (signed in)
 
-Tools address clubs by their marketplace **slug**, which is what comes back from a search - not the ids an assistant sees on the admin server. Do not mix ids between the two servers.
+| Tool                | What it does                                                                           |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| `list_my_bookings`  | The signed-in person's own bookings at every gym on 1club, upcoming by default          |
+| `book_area`         | Books an area at one of its free times                                                 |
+| `book_class`        | Books a place in a class                                                               |
+| `book_instructor`   | Books a private session with an instructor or an independent professional, with an area when the session needs one |
+| `join_waitlist`     | Puts the person on the waitlist of a full class                                        |
+| `leave_waitlist`    | Takes the person off a class waitlist                                                  |
+| `cancel_booking`    | Cancels one of the person's own bookings under the gym's cancellation policy          |
+
+Each booking is made exactly as on 1club.me: a membership of theirs that covers it is used, and otherwise it is paid at the gym. A gym that requires paying online when booking cannot be booked this way, and the assistant hands the person the 1club.me link instead. The assistant should book only after the person agrees to what, when, and the price.
+
+Reach for `find_availability` for any "when can I play" question. It searches, prices and dates in one step, so there is no need to find gyms first and then look their availability up separately. Give it a `date` when someone names a day - without one it walks forward from today and may never reach the day they meant.
+
+Everything these tools return is the gym's own: times are on the venue's clock (`localDay`, `localTime`, `localEndTime`, `localEndDay`, with its `timezone`), and prices come with their currency. Report them as given rather than converting them.
+
+Tools address gyms and professionals by their marketplace **slug**, which is what comes back from a search, and areas, classes, and instructors by the ids `get_club` and `get_professional` return - never the ids an assistant sees on the admin server. Do not mix ids between the two servers.
+
+<Note>
+  `https://mcp.1club.me/me` is the same server for clients connected before the
+  root address offered sign-in: every tool there needs the sign-in up front,
+  the search tools included.
+</Note>
 
 <Warning>
   **Removed in September 2026:** `get_class_availability`, `get_area_availability` and
   `get_instructor_availability`. They addressed classes, areas and instructors by database
   id, which nobody holds in a conversation, and they overlapped with `find_availability`.
-  Move any client that called them to the three tools above - `find_availability` answers
-  the same questions from a place or a club slug instead of an id.
+  Move any client that called them to `find_availability` and `get_club`, which answer
+  the same questions from a place or a gym slug instead of an id.
 </Warning>
 
 ### Optional inline interface
 
-The three discovery tools also carry a small inline interface - club cards, slot chips, a club profile - for a host that supports MCP Apps, such as ChatGPT. A client that does not render it is unaffected: every tool still answers in text, and the interface is only ever a view of the same answer.
-
-Nothing on this server writes. A booking is completed on 1club.me, which is why every free slot comes with the `url` that opens it there.
+The discovery tools also carry a small inline interface - club cards, slot chips, a club profile - for a host that supports MCP Apps, such as ChatGPT. A client that does not render it is unaffected: every tool still answers in text, and the interface is only ever a view of the same answer.
 
 ## What is not exposed
 
-The admin server is built strictly on the documented Platform API, so anything that API does not cover is unreachable through MCP today. That currently includes automations and promotions, payments, and access control.
+The admin server is built strictly on the documented Platform API, so anything that API does not cover is unreachable through MCP today. That currently includes automations, access control, and taking card payments.
 
 Some areas are covered only in part:
 
+- **Payments** can be recorded but never taken: `record_payment` records money the desk already collected with one of your own payment methods, such as cash or a bank transfer, and the member gets a receipt. Charging a saved card and card payments stay in 1club.
+- **Promotions** are read-only. Creating and editing discounts and vouchers stays in 1club.
 - **Messages** can be drafted, edited, and read, but not sent. A draft created with `create_message_draft` is sent from the 1club inbox.
 - **Invoices** are read-only. Issuing, sending, charging, and voiding invoices stay in the 1club dashboard.
-- **Reports** are summaries for a period (`get_revenue_report`, `get_activity_report`, `get_memberships_report`, `get_members_report`), not the full analytics screens.
+- **Reports** are summaries for a period (`get_revenue_report`, `get_activity_report`, `get_memberships_report`, `get_members_report`, `get_tax_report`), not the full analytics screens.
 - **Contacts** can be created, edited, and archived, but not deleted. **Memberships** are readable, creatable, and editable, but not deletable.
 - **Forms** go live as soon as they are created or edited, and can't be deleted here, because deleting a form deletes every submission made through it.
-- **Classes**: individual occurrences can be managed through their write tools; recurring-series creation remains in the 1club dashboard.
+- **Staff**: an assistant can list your staff, change someone's role, and edit what a role may do, but inviting someone and giving a coach a login stay in 1club. `create_instructor` makes a bookable coach with no login.
+- **Gyms**: `update_club` edits a gym's profile, but closing a gym for good, its slug, billing, and kiosk settings stay in 1club. Changes to a gym listed on 1club.me are held for review before they reach the listing.
 
 Media can be registered but not uploaded: `create_media` records a file that is already hosted, so putting a new image online still happens in 1club or through your own hosting.
 

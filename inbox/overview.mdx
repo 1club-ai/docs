@@ -14,7 +14,7 @@ A **message** is human-authored correspondence between a gym and a member, addre
 - Read outbound and inbound messages as threaded conversations in one list.
 - Compose to a single contact, a hand-picked group, or everyone matching a segment (contact type, tags, membership, pipeline stage, or source).
 - Send over three channels: **email**, **SMS**, and **WhatsApp**.
-- Reply inside a thread.
+- Reply inside a thread, by hand or from an AI draft.
 - Save drafts, attach files to emails, and reuse custom message templates.
 - Scope access by role: organization-wide for admins and managers, limited to their own conversations for instructors.
 
@@ -34,7 +34,7 @@ App notifications, which cover the notification center and alerts on a member's 
 
 Sending creates one **message** record per outbound action and one recipient record per recipient. The Inbox lists only top-level messages: replies (anything with a `replyToMessageId`) roll up into the thread of their original.
 
-A message's content is **canonical and channel-neutral**: it is stored as structured blocks (paragraph, heading, button, image), not as rendered HTML. Each channel renders its own projection of that content. The Inbox renders the blocks natively; email renders them through the transactional layout. So the delivered email is a projection of the message, not the message itself.
+A message's content is channel-neutral: it is stored as structured blocks (paragraph, heading, button, image), not as rendered HTML, and each channel renders its own version. Email renders the blocks in your branded email layout, with your logo; SMS and WhatsApp get plain text.
 
 Inbound messages, including replies to your outbound sends, arrive as new top-level messages tagged `direction: inbound`. Selecting a draft opens the compose pane; selecting any other conversation opens the thread view with an inline reply box.
 
@@ -48,7 +48,7 @@ The raw record only shows the staff `senderId` and the resolved recipient contac
 
 ## AI-assisted replies
 
-Inside a thread, the reply composer shows a **Generate with AI** button. AI-drafted replies are not enabled for organizations at the moment, so the button returns "Failed to generate AI response" instead of a draft. Write the reply yourself, or ask the [AI assistant](/reference/ai-assistants) for help with the wording.
+Inside a thread, the reply box shows a **Generate with AI** button. It drafts a reply to the message from your organization's and gym's details, the conversation so far, and what 1club knows about the member (their recent bookings, memberships and tags), in the tone of voice set in your [Brand Book](/settings/organization#brand-book). The draft replaces what is in the reply box, and on email it also fills the subject. Read and edit it before you click **Send Reply**: nothing is sent until you do. It is only offered on replies, not on new messages.
 
 ## Permissions and access
 
@@ -92,7 +92,7 @@ Each channel is gated differently at send time:
 | Email send hits a limit dialog | The plan's email quota (daily or monthly) is exhausted | Wait for the quota to reset or upgrade the plan |
 | "All recipients are unsubscribed or suppressed" | Every selected contact has opted out or is on the suppression list | Adjust the recipient list and resend |
 | Instructor cannot see a conversation | Instructor inboxes show only the conversations they took part in | Have an admin or manager handle org-wide conversations |
-| **Generate with AI** shows "Failed to generate AI response" | AI-drafted replies are not enabled for organizations | Write the reply yourself |
+| **Generate with AI** shows "Failed to generate AI response" | The AI service couldn't produce a draft just then | Try again in a moment, or write the reply yourself |
 | A member's reply appears on the wrong side of the thread | Reply arrived without sender org-membership context | Reload the thread; the Inbox realigns member vs. staff senders on refetch |
 
 ## Related

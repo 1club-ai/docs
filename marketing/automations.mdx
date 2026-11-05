@@ -1,7 +1,7 @@
 ---
 title: Automations
 description: Build event-driven workflows that message members, manage tags, and notify staff automatically - with trigger filters, goals, built-in reminders, and one-click blueprints.
-keywords: [automations, workflows, triggers, trigger filters, goals, stop when, conversion, blueprints, win-back, review request, birthday, booking reminder, drip campaign, notify staff]
+keywords: [automations, workflows, built-in automations, membership lifecycle, membership end date, triggers, trigger filters, goals, stop when, conversion, blueprints, win-back, review request, birthday, booking reminder, drip campaign, notify staff]
 ---
 
 Automations are event-driven workflows that run in the background. A trigger fires (a booking is created, a membership expires, a payment fails), the contact is checked against the automation's entry conditions, and a sequence of steps then runs for that contact: send a message, wait, branch on a condition, add a tag, notify staff. Owners and managers build them, members receive the messages, and staff get notified when a person needs to follow up. Give an automation a **goal** (books again, buys a membership, pays) and it stops messaging a member who reaches it, and the **Performance** tab counts how many did.
@@ -12,12 +12,12 @@ Automations take over the follow-ups you would otherwise have to remember by han
 
 Typical uses:
 
-- **Remind members before they train** - turn on the built-in booking reminder so every booking gets an email and app notification 24 hours before it starts.
+- **Remind members before they train** - the built-in booking reminder sends every booking an email and app notification 24 hours before it starts, from the day your gym is created.
 - **Win back a member who cancels** - a jiu-jitsu gym tags the member **At risk** when they cancel, waits three days, then sends a reason to come back.
-- **Collect reviews without nagging regulars** - a padel gym asks players for a review two hours after they check in for a match, paced by sessions played, and invites everyone who leaves one to post it on Google too.
+- **Collect reviews without nagging regulars** - a padel gym turns on the built-in review request, which asks players the morning after a visit, after their first visit and then every tenth, and invites everyone who rates it to post a review on Google too.
 - **Chase a failed payment** - notify your admins and managers, then ask the member to update their payment details.
 
-See [Worked examples](#worked-examples) for step-by-step versions of these, and [Blueprints](#blueprints-prebuilt-automations) for the ready-made workflows behind them.
+See [Worked examples](#worked-examples) for step-by-step versions of these, and [Blueprints](#blueprints-prebuilt-automations) for the built-in and ready-made workflows behind them.
 
 ## How an automation runs
 
@@ -34,7 +34,7 @@ Each row on the automations list shows how many times the automation has run, ho
 
 Use **Marketing** > **Automations** to view, edit, and create automations. The list is split into two sections:
 
-- **Built-in automations** - Seeded by 1club into every gym (the booking reminder, the membership-expiration reminder, and the marketplace review request). They carry a **Built-in** badge. You can adjust timing, channels, and entry conditions, but the step structure is fixed.
+- **Built-in automations** - Seeded by 1club into every gym, on every plan: **Booking reminder**, **Membership lifecycle**, **Review request** and **Marketplace review request**. They carry a **Built-in** badge. You can adjust their timing, channels and message, but the step structure is fixed. See [Built-in automations](#built-in-automations).
 - **Your automations** - Custom workflows you build from scratch, plus any suggested blueprints you have accepted. Available on the Grow plan.
 
 Each row shows the trigger, step count, total runs, failed runs (when there are any), and the last time it fired, plus an **Active** or **Paused** status. Click a row to open it in the builder. To delete a custom automation, open the row's actions menu and choose **Delete**. Deleting cancels any runs still in progress. Built-in automations can't be deleted.
@@ -227,8 +227,8 @@ Send a post-booking review request with a single-use link.
 - **Channels** - **Email** or **WhatsApp**. SMS is marked coming soon.
 - **Instructor message style** - Optionally show a personal chat bubble from the instructor above the review form: **No instructor message**, **Casual & Friendly**, **Professional**, or **Motivational**. Turn on **Send from the instructor's email when possible** to send the email from the instructor's address.
 - **Sessions between requests** - Ask again only after the member attends this many sessions, counted across every club in your organization since their last request. Set it to 1 to ask after every session. **Also ask after the member's first session** lets a brand new member hear from you right away instead of waiting out a full interval.
-- **Frequency limit** - Cap how many requests a single contact can receive (**Max requests per member**, from 1 to 10) **Per period** (**Week** or **Month**). This is a ceiling on top of the session interval, and a request goes out only when both allow it.
-- **Enable Google review conversion** - After a member submits their review, invite them to share it on Google. Everyone who leaves a review is invited, whatever their rating. Only shown for gyms connected to a Google Business Profile.
+- **Frequency limit** - **Per period** is **No limit**, **Week** or **Month**; with a period, **Max requests per member** (1 to 10) caps how many requests one contact gets in it. This is a ceiling on top of the session interval, and a request goes out only when both allow it.
+- **Enable Google review conversion** - After a member rates their visit, invite them to review you on Google too. **Minimum rating to prompt** is **1 star (show to all)** by default. You can limit it to 3, 4 or 5 stars, but inviting only higher ratings goes against Google's review policy and carries a small risk for your Google profile. A gym with no Google profile connected shows no invitation.
 
 The two throttles cover opposite cases. The session interval paces the ask by how much a member actually trains, which is what protects infrequent visitors: someone who comes once a month never fills a 7-day window, so a time cap alone would ask them after every single visit. The frequency limit caps the member who trains daily and clears the session interval faster than you want to be asking.
 
@@ -247,7 +247,8 @@ If the form is deleted or later switched to sign people up, the step skips sendi
 Pause the run for a fixed duration.
 
 - **Duration** - Minutes, hours, or days.
-- **Measured from** - **Trigger event**, **Booking start time**, or **Booking end time**. The booking options appear only for booking triggers.
+- **Measured from** - **Trigger event**, **Booking start time**, **Booking end time**, or **Membership end date**. The booking options appear only for booking triggers (or after a **Has a booking** condition), and the membership option only for membership triggers.
+- **Before or after** and **At time** - with **Membership end date**, wait until a set time before or after the membership's last day, at the hour you choose on your gym's clock. For example, 1 day **Before** at 09:00 sends on the morning of the day before it ends.
 
 ### Wait until
 
@@ -266,6 +267,9 @@ Supported checks:
 - **Has active membership**
 - **Engagement above** / **Engagement below** - Compare the contact's engagement score (0 to 100, built from their recent payments, active memberships and services, visits, and activity trends) to a **Threshold** (50 by default).
 - **Booking in period** - Did the contact book in the last N days, hours, or minutes?
+- **Membership ends within** - Does the membership that started the run end within this many days? Only offered on membership triggers. Use it to branch a sequence when a membership is already close to its end.
+- **Has a booking** - Does the contact have a booking that still holds its seat: the run's own booking if it wasn't cancelled, otherwise their next upcoming one? On **Yes**, that booking becomes the run's booking, so later **Wait** steps can measure from its start or end, and **Booking was attended** can check it.
+- **Booking was attended** - Was the run's booking attended (completed, not missed or cancelled)? Offered on booking triggers and after a **Has a booking** step.
 
 ### Modify contact
 
@@ -285,31 +289,37 @@ Send an App, email, or SMS notification to staff.
 
 ## Blueprints: prebuilt automations
 
-A **blueprint** is a prebuilt definition of a complete automation (a trigger plus a full step graph) authored by 1club. A blueprint is never executed on its own - it becomes a real automation only when it is turned into an org-owned row. There are two ways a blueprint reaches your gym: it is either **auto-provisioned** (seeded and locked) or **suggested** (offered to you, and built only when you accept it).
+A **blueprint** is a prebuilt definition of a complete automation (a trigger plus a full step graph) authored by 1club. It becomes a real automation in your gym in one of two ways: it is **built in** (seeded into every gym, with a fixed structure) or **suggested** (offered to you, and built only when you accept it).
 
-### Auto-provisioned (built-in) automations
+### Built-in automations
 
-Three blueprints are seeded into every gym. They appear under **Built-in automations** and are locked: you cannot rename them, change their trigger or step structure, or delete them. Opening one shows the banner "This is a built-in automation. You can adjust its timing, channels and message."
+Four automations are seeded into every gym, on every plan. They appear under **Built-in automations** with a **Built-in** badge. Opening one shows "This is a built-in automation. You can adjust its timing, channels and message."
 
-| Automation | Trigger | Default timing | Channels | State |
+| Automation | Trigger | What it does | Channels | Starts |
 | --- | --- | --- | --- | --- |
-| **Booking reminder** | Booking upcoming | 24 hours before start | Email, App | Paused |
-| **Membership expiration** | Membership expiring | 3 days before expiry | Email, App | Paused |
-| **Marketplace review request** | Booking completed | 10 hours after the booking completes | Email | Active |
+| **Booking reminder** | Booking upcoming, 24 hours before | Reminds the member of their booking. | Email, App | On |
+| **Membership lifecycle** | Membership expiring, 7 days before | A reminder a week before a membership ends, a last reminder the day before, and a note the day after it has expired. | Email, App | On |
+| **Review request** | Visit completed | The morning after a visit, asks the member to rate it, then invites them to review you on Google. | Email | On for new gyms |
+| **Marketplace review request** | Booking completed | The morning after a visit booked on the 1club Marketplace or in the 1club App, asks the member to rate it. | Email | On, run by 1club |
 
-The two reminders ship **paused**. Sending unconfigured reminders the moment a gym is created would be surprising, so they stay off until you turn them on.
+Every message goes out in the member's own language, from the matching [system template](/settings/templates#system-template-catalog): **Booking Reminder**, **Membership Expiration Reminder**, **Membership Expired** and **Review Request**. To reword one, customize that template under **Settings** > **Communication** > **Templates**. If you edit the text inside the step instead, the step sends your text as you wrote it.
 
-The **Marketplace review request** ships active. It applies only to bookings made through the 1club [marketplace](/marketing/marketplace), asks the member to rate the visit, and never runs for a booking your own review request automation already covers. It has no session interval or frequency limit, since each marketplace booking gets one ask.
+**Membership lifecycle** only speaks to members who have to act. It covers memberships that don't renew on their own (never passes or drop-ins, and never one on auto-renew). A member who renews, buys their next membership of the same plan, cancels, or switches on auto-renewal hears nothing more. A membership that is already a day from its end gets the last reminder only, not two in a row. It replaces the older **Membership expiration** reminder.
+
+**Review request** asks about every visit your gym sold itself: a completed booking or a walk-in check-in, whether or not you check members in. It waits 10 hours from the end of your gym's day, so the email arrives mid-morning. As shipped it asks after the first visit, then every 10th, and at most once in 30 days, by email, with the Google invitation on for everyone who rates. It never asks about a marketplace booking, which the marketplace request owns. It is switched on for gyms created since it shipped; gyms that existed before find it switched off. Turn it on from the **Marketing** card on [Home](/home/overview) (**Turn on**), from the intro on **Reviews** (**Ask members for reviews**), or here.
+
+**Marketplace review request** is run by 1club for every gym listed on the [Marketplace](/marketing/marketplace), so it cannot be switched off or edited ("1club runs this automation for your club, so it cannot be changed"). It asks once per marketplace booking, at most once a month per member counting your own review requests too, and never sends the Google invitation.
 
 For a built-in automation you can change:
 
-- The advance window (how long before the event it fires).
-- The channels used by the message step.
-- The message subject and content (edit the step directly).
-- The entry conditions (tags, contact types, pipeline stages, sources) and **Stop when the contact no longer matches**.
+- The timing (how long before or after the event it fires).
+- The channels used by its message steps.
+- The message subject and content.
+- The settings of its **Review request** step (session interval, frequency limit, Google invitation).
+- The entry conditions and **Stop when the contact no longer matches**.
 - The on/off state.
 
-The step structure itself is fixed. Editing the message content or timing on a built-in automation, and turning it on or off, is allowed on any plan - that is the point of shipping them. To add steps or branches, build a custom automation alongside.
+The step structure itself is fixed. To add steps or branches, build a custom automation alongside.
 
 ### Suggested blueprints
 
@@ -326,7 +336,6 @@ The catalog of suggested blueprints:
 | Blueprint | Trigger | What it does | Goal | Prerequisites |
 | --- | --- | --- | --- | --- |
 | **New-member onboarding drip** | Contact type changed (to Member) | A three-touch welcome series over the first week (welcome, wait 2 days, tips, wait 3 days, "book your first session"), then tags the member as onboarded. | - | Onboarded tag (created for you) |
-| **Review request** | Booking checked in | Waits 2 hours after the check-in, then sends a review request by email (after the first session and every 10 sessions after that, and never more than one a week). | - | Gym runs bookings |
 | **No-show win-back** | Booking no-show | Branches on whether the member still has an active membership, then sends a tailored nudge to each path. | Books again, within 7 days | Gym runs bookings |
 | **Membership win-back** | Membership cancelled | Tags the member as at-risk, waits 3 days, then sends a win-back message. | Buys a membership, within 14 days | Membership plans exist, At risk tag (created for you) |
 | **Birthday celebration** | Contact birthday | Generates a warm, personalized birthday message with AI. The step is set to **Save as draft**, so nothing is sent until you switch it to **Auto-send**. | - | None |
@@ -335,8 +344,6 @@ The catalog of suggested blueprints:
 | **Trial conversion** | Pipeline stage changed (to your trial stage) | Welcomes the lead, reminds them before their trial, and follows up the morning after depending on whether they came. | Becomes a member, within 14 days | A trial stage in your pipeline, gym runs bookings |
 | **Re-engage stale leads** | Tag added (Stale Lead) | When a lead has gone quiet in your pipeline, reaches out over a week to restart the conversation: an email in the morning, a text 3 days later, and a last email on day 7. Stops as soon as they reply, book or move stage, since any of those takes the Stale Lead tag off. A lead can enter again 30 days later. | Replies or books, within 7 days | Stale Lead smart tag on |
 | **Win back lost leads** | Pipeline stage changed (to Lost, for the reasons **Price** or **Not the right time**) | A month after a lead is lost over price or timing, checks in again by email with your plans, then sends a text a week later. Stops once they join, or if staff move them out of Lost. | Becomes a member, within 30 days | Membership plans exist |
-
-The **Review request** blueprint can also be turned on from the **Marketing** card on [Home](/home/overview): its **Turn on** button creates the automation, activates it straight away, and opens it in the builder. Because it fires on check-in, gyms that don't check members in by hand need **Auto check-in at booking start** in a [booking policy](/settings/booking-policies) for any request to go out.
 
 After you accept a blueprint it lands paused in **Your automations**. Open it in the builder, review and tweak the copy, timing, and channels, then turn it on. Because it is a normal custom automation, you can freely add, remove, or rewire steps.
 
@@ -418,7 +425,7 @@ Below the cards, **Enrollments over time** charts entries per day, and **Message
 - Steps are executed by a background worker that polls every minute. Expect up to a minute of delay between when a step is scheduled and when it runs.
 - A step that errors is tried up to three times, with a growing delay between attempts. If the last attempt fails, the step and its run are marked failed and no further steps run.
 - Messaging steps are skipped when the trigger was recorded without notifying the customer (for example a booking made by a partner platform). Tagging, staff notifications, and conditions still run.
-- For the **Membership expiring** trigger, a **Send message** or **AI message** step is skipped if the membership was renewed, cancelled, or switched to auto-renew between the trigger and the send.
+- **Membership expiring** fires only for memberships that don't renew on their own: never for passes, drop-ins or memberships on auto-renew. A **Send message** or **AI message** step is skipped if the membership was renewed, cancelled, switched to auto-renew, or followed by a new membership of the same plan between the trigger and the send.
 - Completed and cancelled runs are archived after about 90 days; processed trigger events after about 30 days. Failed runs are kept indefinitely so you can investigate.
 - A contact is in an automation at most once at a time. Two triggers for the same contact that arrive together, such as two bookings made a second apart, start one run, not two.
 
@@ -434,15 +441,16 @@ A member cancels their unlimited plan. You want a considered follow-up, not an i
 4. Step 3 sends an email and App notification with a reason to return (a free open-mat week, say).
 5. Optionally add a **Condition** on **Tag exists** before the message so members who already resubscribed drop out.
 
-### Post-session review request for a padel gym
+### Review requests for a padel gym
 
-You want reviews from players who actually showed up, without nagging regulars.
+You want reviews from players who actually played, without nagging regulars.
 
-1. Accept the **Review request** blueprint. It fires on **Booking checked in**.
-2. The first step is a **Wait** of 2 hours measured from the **Trigger event** (the check-in), so the ask arrives once they've left the court.
-3. The **Review request** step is set to ask every 10 sessions, with **Also ask after the member's first session** left on. A regular who plays four times a week hears from you about once a month; a player who books once a month is asked once after their first match and then not again for the better part of a year.
-4. The step also carries a frequency limit of one request per contact every 7 days, which caps the handful of players who train daily and would otherwise clear the 10-session interval every fortnight.
-5. Turn on **Enable Google review conversion** so everyone who leaves a review is invited to post it on Google. The invitation goes to every reviewer, whatever their rating, because asking only happy members breaks Google's review policy.
+1. Open the built-in **Review request** automation and turn it on. It fires on **Visit completed**, so it covers booked matches and walk-ins alike, whether or not you check players in.
+2. Its **Wait** of 10 hours from the end of the gym's day puts the email in players' inboxes mid-morning.
+3. The **Review request** step asks after the first visit and then every 10th. A regular who plays four times a week hears from you about once a month; a player who books once a month is asked after their first match and then not again for the better part of a year.
+4. The frequency limit of one request a month caps the handful of players who play daily.
+5. **Enable Google review conversion** is on with **1 star (show to all)**, so everyone who rates the visit is invited to post a review on Google. Asking only happy members breaks Google's review policy.
+6. To also ask over WhatsApp, add the **WhatsApp** channel to the step. Messages on it are billed to your own WhatsApp account.
 
 ### Birthday message for a yoga studio
 
@@ -505,7 +513,8 @@ You want to sell the next class pack before the current one runs out.
 | Messages arrive a minute late | The step worker polls every minute | Expected - build in a small buffer rather than relying on second-level timing. |
 | A built-in automation won't let you add steps | Built-in (auto-provisioned) automations have a fixed structure | Edit the timing, channels, and content in place; build a separate custom automation for extra steps. |
 | A member got two messages from one event | Two automations share the trigger | Add non-overlapping entry conditions (contact type or tag) so only one applies. |
-| The review request is on but no requests go out | It fires on check-in, and nobody is checked in | Check members in, or turn on **Auto check-in at booking start** in a [booking policy](/settings/booking-policies). |
+| The review request is on but a member wasn't asked | They were asked within the last 30 days, it isn't their first or 10th visit since the last ask, or the visit was a marketplace booking | Expected - adjust **Sessions between requests** and the frequency limit on the step if you want to ask more often. |
+| A built-in automation says it cannot be changed | It is the **Marketplace review request**, which 1club runs for every listed gym | Expected - your own **Review request** covers every other visit. |
 | An AI message step never reaches anyone | Its **Mode** is **Save as draft**, which generates the message without sending it | Switch the step to **Auto-send**. |
 | A trigger with a class type filter never fires for some bookings | The bookings are for areas, which have no class type | Use **Area types (any of)** for area bookings, or add a second automation. |
 | **Only the contact's first booking** skips a new member | They booked before, for example as a lead | Expected - the filter means the first booking ever, at any gym. Use **Contact type changed** to Member for a new-member welcome. |

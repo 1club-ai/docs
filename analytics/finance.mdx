@@ -1,0 +1,158 @@
+---
+title: Finance analytics
+sidebarTitle: Finance
+description: The Finance analytics category - every charge in a period on Activity, who owes you and for how long on Amount Due, and the figures for your sales tax or VAT return on Tax.
+keywords:
+  [
+    finance analytics,
+    activity,
+    charges,
+    amount due,
+    aging,
+    debtors,
+    collections,
+    wallet,
+    tax report,
+    VAT return,
+    sales tax,
+    taxable,
+    non-taxable,
+    tax rate,
+  ]
+---
+
+The **Finance** category in **Analytics** answers the day-to-day money questions: what was charged and paid over a short period, who owes you money and for how long, and what to put on your tax return. Front-desk managers use **Activity** to close the day, owners use **Amount Due** to chase debt, and bookkeepers use **Tax** at the end of each month or quarter.
+
+## When to use it
+
+- **Close the day** - a climbing gym's manager opens **Activity** at closing time and checks that **Total Billed**, **Collected**, and **Due now** match the till.
+- **Chase old debt** - a martial arts school opens **Amount Due**, sets **Owed for** to **3 months**, and exports the PDF as a call list for the month.
+- **File a VAT return** - a padel gym opens **Tax** for last quarter, grouped by **Tax rate**, and copies the totals into its return.
+- **Separate two companies** - a gym that sells through two [billing entities](/settings/billing-entities) narrows **Tax** to one of them to file each company's return.
+
+## Reports in this category
+
+| Report                        | What it shows                                                                       | Period                                |
+| ----------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------- |
+| [**Activity**](#activity)     | Every charge with what it was for, its price, and what is still due                 | Up to 31 days, opens on **Today**     |
+| [**Amount Due**](#amount-due) | Who owes the gym and for how long, with their Wallet beside it                      | As of today                           |
+| [**Tax**](#tax)               | Sales, the taxable part, and the tax charged, by revenue account, tax rate, or club | Up to a year, opens on **Last month** |
+
+All three follow the club selected in the breadcrumb. **Amount Due** also needs permission to read billing. For how the money figures are counted, see [Analytics definitions](/analytics/definitions#money).
+
+## Activity
+
+**Analytics** > **Finance** > **Activity** lists the charges of a period, newest first, each joined to what it was for. It is the same feed as a member's **Activity** tab, for the whole gym. It always opens on **Today** and offers only short periods (today, yesterday, this or last week, this or last month, the last 7 or 30 days); a custom range can be up to 31 days.
+
+Three figures head the list, for staff who can read billing:
+
+- **Total Billed** - what the period's charges billed.
+- **Collected** - payments received in the period, whatever they paid for.
+- **Due now** - what is owed now. The part not due yet, such as a booking still ahead, is shown under it as **upcoming**.
+
+Each row shows what the charge was for, with an icon for its kind (a missed or cancelled visit reads apart from one that happened), its amount, how it was paid, and its state: **Paid**, **Unpaid**, the amount still owed, the day it falls due, **Void**, or **Refunded**. A row names the member, linking to their profile. Click **Show more** at the bottom for older rows.
+
+## Amount Due
+
+**Analytics** > **Finance** > **Amount Due** shows who owes your gym money and for how long, as of today. Use it as a collections list. It has no period; the date it was read is shown above the table.
+
+### Rows
+
+Switch **Rows** on the filter bar:
+
+- **By household** (the default) - one row per [account](/members/accounts) that receives a [statement](/sales/statements), with every member's charges added together, as the household's statement bills them.
+- **By person** - one row per person.
+
+A person's **Due now** is the same figure as on their profile.
+
+### Filters
+
+- **Owed for** (under **Filters**) - only the rows owing for at least **1 month**, **2 months**, **3 months**, or **4+ months**. The totals and the export follow it.
+- **Billing entity** - only one company's money, when your organization has two or more [billing entities](/settings/billing-entities).
+
+### Summary and table
+
+Above the table: **Due now** (the total owed), **3+ months** (the part owed for three months or more), **Owing** (how many rows owe something), and **Wallet** (the Wallet funds held).
+
+| Column                                                              | What it shows                                           |
+| ------------------------------------------------------------------- | ------------------------------------------------------- |
+| **Name**                                                            | The household or person, linking to the profile.        |
+| **Due now**                                                         | Everything they owe now.                                |
+| **Current**, **1 month**, **2 months**, **3 months**, **4+ months** | **Due now** split by how long ago each charge fell due. |
+| **Wallet**                                                          | The [Wallet](/sales/wallet) balance they hold.          |
+
+The Wallet sits beside the debt and is never subtracted from it: someone who owes 100 and holds 100 in their Wallet still shows as owing 100. With **All clubs** selected, people who only hold Wallet funds are listed too, after everyone who owes. The **Wallet** column is hidden when you narrow the report to a billing entity other than the default one, because the Wallet belongs to the default company.
+
+Expand a row to see its charges, each under the column of its age and linking to what it was for. Sort by any column; the report opens with the largest debt first.
+
+**Export** downloads the list as Excel, CSV, or PDF. The PDF is laid out to hand to your accountant.
+
+## Tax
+
+**Analytics** > **Finance** > **Tax** adds up a period's sales the way a sales tax or VAT return asks for them. It opens on **Last month**; a custom range can be up to a year.
+
+### Layout
+
+Two controls above the table set its layout:
+
+- **Sections** - group the sales by **Revenue account** (the default), **Tax rate**, or **Club**.
+- **Rows** - one row per **Day** (the default) or per **Month** within each section.
+
+Each section ends in a **Subtotal**, the table ends in a **Total**, and a **By tax rate** table below splits the total by rate. Sales with no tax rate are listed under **No tax rate**, with no account under **No account**, and with no club under **No club**.
+
+### Columns
+
+| Column                | What it counts                               |
+| --------------------- | -------------------------------------------- |
+| **Sales (excl. tax)** | The period's sales, excluding tax.           |
+| **Non-taxable**       | The part of those sales that carried no tax. |
+| **Taxable**           | The part that carried tax.                   |
+| **Tax**               | The tax charged.                             |
+| **Total (incl. tax)** | Sales plus tax.                              |
+
+A sale counts on the day it was made, at what it is worth now: a cancelled, refunded, or re-priced sale is counted at its current value. So the report agrees with the other money reports for the same days.
+
+### Filters and export
+
+Narrow the report with the club in the breadcrumb, and with **Billing entity** and **Revenue account** under **Filters** when your organization has more than one of either. **Export** offers two downloads, each as Excel or CSV: the **Summary** (the table as shown) or the **Charges** (every sale behind it).
+
+## Worked examples
+
+### Closing the day at a climbing gym
+
+At 22:00 the duty manager opens **Activity** on **Today**. **Collected** shows 1,240, and the card terminal and cash drawer add up to the same. Two rows read **Unpaid**: day passes sold at the desk that were never paid. The manager opens each member's profile from the row and takes the payment before leaving.
+
+### Collections at a martial arts school
+
+On the first of the month, the owner opens **Amount Due** **By household** and sets **Owed for** to **2 months**. Eight families owe 2,300 between them. Expanding one row shows three unpaid monthly charges and a Wallet of 50 the family forgot about. The owner exports the PDF for the office manager to call through.
+
+### A quarterly VAT return for a padel gym
+
+The bookkeeper opens **Tax** with the period on **Last quarter**, **Sections** on **Tax rate**, and **Rows** on **Month**. The standard-rate section's subtotal and the reduced-rate subtotal go straight into the return, and the **Charges** export is kept as the working papers.
+
+## Tips and best practices
+
+- **Set tax rates on everything you sell.** A sale with no rate lands under **No tax rate** and in **Non-taxable**; see [Tax rates](/settings/billing-general#tax-rates).
+- **Read Amount Due by household for families.** Parents get one statement for their children, so call them about one total.
+- **Use Owed for, not sorting, for a call list.** It narrows the export too.
+- **Re-run Tax after late changes.** A sale refunded after you filed changes the period it was made in, because it counts at what it is worth now.
+
+## Troubleshooting
+
+| Symptom                                                     | Likely cause                                                 | Fix                                                               |
+| ----------------------------------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------- |
+| "Please select a range of 31 days or fewer" on **Activity** | The feed lists every row, so its period is limited           | Pick a shorter period.                                            |
+| The **Activity** figures are missing                        | Your role cannot read billing                                | Ask an admin for billing read access.                             |
+| **Amount Due** is missing from the menu                     | It needs permission to read billing as well as analytics     | Ask an admin to grant both.                                       |
+| Someone with Wallet funds still shows as owing              | The Wallet is shown beside the debt, never netted            | Apply their Wallet to the charges if you want to clear them.      |
+| The **Wallet** column disappeared                           | You narrowed to a billing entity that is not the default one | Clear the **Billing entity** filter.                              |
+| **Tax** says to pick a range of 366 days or fewer           | A custom range longer than a year                            | Pick a shorter range.                                             |
+| A **No tax rate** section appears                           | Some sales carry no tax rate                                 | Set a tax rate on the items that sold without one. See [Tax rates](/settings/billing-general#tax-rates). |
+
+## Related
+
+- [Analytics overview](/analytics/overview) - Filters, comparisons, and exports.
+- [Revenue analytics](/analytics/billing) - Revenue, payments, and invoices over time.
+- [Sales > Finance > Charges](/sales/charges) - The charges behind these reports.
+- [Wallet](/sales/wallet) - Wallet funds and how members spend them.
+- [Billing entities](/settings/billing-entities) - Selling through more than one company.

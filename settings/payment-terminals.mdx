@@ -1,7 +1,7 @@
 ---
 title: Payment terminals
 description: Register the card readers at your front desks, check whether each one is online, and retire readers you no longer use.
-keywords: ["payment terminal", "card reader", "card terminal", "Stripe Terminal", "myPOS terminal", "in-person payment", "tap to pay", "pairing code", "serial number", "retire terminal", "terminal offline"]
+keywords: ["payment terminal", "card reader", "charge card", "card declined", "write off", "simulate tap", "card terminal", "Stripe Terminal", "myPOS terminal", "in-person payment", "tap to pay", "pairing code", "serial number", "retire terminal", "terminal offline"]
 ---
 
 A payment terminal is a card reader at one of your gyms that staff can send a sale to. The customer taps, inserts, or swipes their card on the reader, and 1club records the payment automatically. Owners and admins register the readers here; front-desk staff then pick a reader when they take a card payment.
@@ -20,12 +20,14 @@ Typical uses:
 
 Readers come from your payment providers. 1club supports **Stripe Terminal** and **myPOS terminal** readers, and you can mix them across your gyms. Before you can add a reader, the provider has to be connected for the company that bills for that gym:
 
-- **Stripe** - connect it under [Stripe](/settings/integrations/stripe). Stripe sells readers only in some countries, and in some of them only for one currency.
+- **Stripe** - connect it under [Stripe](/settings/integrations/stripe) and tick **Terminal** under **Use Stripe for**. Stripe sells readers only in some countries, and in some of them only for one currency.
 - **myPOS** - connect it under [myPOS](/settings/integrations/mypos) and turn on its **Terminal** capability.
 
 Each reader belongs to one gym, and it charges through the payment account of the company that bills for that gym. If you trade through more than one company, see [Billing entities](/settings/billing-entities#connect-each-companys-payment-accounts).
 
 Card payments taken on a registered reader are recorded against that provider's terminal payment method, which appears in your [payment methods](/settings/payment-methods) list once you have an active reader for it.
+
+Readers are separate from online card payments. Each company takes online card payments through one provider, but it can run readers from both Stripe and myPOS, whichever provider handles its online payments.
 
 ## Open the list
 
@@ -63,9 +65,22 @@ Open the row's menu, choose **Delete**, and confirm with **Retire**. The reader 
 
 Retire every reader at a gym before you point that gym at a different company. A reader belongs to one payment account, so 1club refuses to move a gym to another company while it still has readers registered. Register them again afterwards.
 
+## Take a payment on a reader
+
+Staff send a sale to a reader wherever they take a payment at the desk: the [point of sale](/pos/point-of-sale#payment-methods), **Complete order** on an [order](/sales/orders), and **Add Payment** on a charge, booking, check-in, or membership.
+
+1. Choose the provider's terminal method, **Stripe Terminal** or **myPOS terminal**, as the payment method. It is offered only at a gym that has an active reader for that provider.
+2. Pick the reader on your counter, then click **Charge card**. The amount appears on its screen.
+3. Ask the customer to tap, insert, or swipe their card. The dialog follows the payment and stays open until the reader answers. Click **Cancel** to stop a charge the customer hasn't paid yet.
+4. When the payment is approved, it is recorded against what it paid for: the booking is confirmed, the membership starts, or the order completes.
+
+If the card is declined, the dialog shows the provider's reason and the sale stays open, so the customer can **Try again** with another card or pay another way. Nothing is lost if you close the tab, lose the connection, or lock the tablet after the customer taps: 1club keeps checking with the provider and records the payment against the right sale a few minutes later.
+
+On a Stripe test reader, a **Simulate tap** button lets you rehearse the whole flow without a card.
+
 ## Permissions
 
-Adding, refreshing, and retiring readers needs permission to manage organization settings. Staff who can read settings, billing, or the point of sale can see the list, which is how the till offers a reader to send a sale to. See [Roles and permissions](/reference/roles-permissions).
+Adding, refreshing, and retiring readers needs permission to manage organization settings. Taking a payment on a reader needs the same access as any other payment at the desk. Writing off a terminal payment that can't be resolved needs full billing access, which only admins and owners hold by default. Staff who can read settings, billing, or the point of sale can see the list, which is how the till offers a reader to send a sale to. See [Roles and permissions](/reference/roles-permissions).
 
 ## Troubleshooting
 
@@ -76,6 +91,9 @@ Adding, refreshing, and retiring readers needs permission to manage organization
 | A reader shows **Offline** | The provider can't reach it, usually power or network. | Check the reader's power and connection, then click **Refresh status**. |
 | A reader shows **Unknown** | Its status hasn't been refreshed, or the provider reported a state 1club doesn't recognize. | Click **Refresh status**. |
 | You can't change which company a gym bills through | The gym still has readers registered. | Retire its readers, change the company, then register them again. |
+| Stripe isn't offered as a provider | **Terminal** isn't ticked under **Use Stripe for** on the [Stripe](/settings/integrations/stripe) page. | Tick **Terminal** for the company that bills for the gym. |
+| A payment says it couldn't confirm the charge reached the terminal | The connection to the provider broke at the moment the amount was sent. | Look at the reader's screen. It may already have taken the card. Don't take a second payment for the sale until this one resolves. |
+| A terminal payment stays **Pending** for more than a day | Neither the provider nor 1club can tell any more whether the card was charged. | Check the provider's statement. Then an admin can open the payment's actions, choose **Write off this payment**, and record what was checked. This cannot be undone. |
 
 ## Related
 

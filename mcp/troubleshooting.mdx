@@ -21,29 +21,32 @@ Remove and re-add the connection after changing its authentication settings. MCP
 
 ## Sign-in succeeds but authorization is denied
 
-Authorizing an MCP connection requires organization settings management permission.
+Connecting an assistant requires the **AI assistants (MCP)** permission in the organization. Owners always have it, and administrators hold it by default.
 
-- Confirm you selected an organization where you are an admin or owner.
-- Ask an owner to grant the required permission if you can use the dashboard but cannot authorize MCP.
+- If the authorization page says **You are not staff of any organization**, or leaves out the organization you expected, your role there does not hold the permission, or you have no gym assigned. Ask an owner or administrator to grant **AI assistants (MCP)** to your role in **Settings** > **Organization** > **Permissions**.
 - If the organization is on a free plan or trial, upgrade before connecting the admin MCP server.
 
-The discovery server at `https://mcp.1club.me` remains public and does not require authorization.
+The discovery server at `https://mcp.1club.me` needs no 1club admin account. It only asks for a 1club.me sign-in when someone books.
 
 ## A tool fails with a permission error
 
 Ask the assistant to call `get_account`. It returns the authorized organization and the scopes on the connection. Read `effectiveScopes`, not `scopes`: a full-access API key reports `scopes` as `["*"]`, and only `effectiveScopes` spells out what that expands to. Compare that list with the [tools reference](/mcp/tools).
 
-An OAuth grant's scopes are fixed once you approve them - there is no way to widen or narrow a live connection. To change them, revoke the connection under **Settings** > **Artificial Intelligence** > **AI assistants (MCP)**, disconnect it in the client, and authorize it again, ticking the write permissions you need this time.
+If the scope is there and the call is still refused, your role is the limit. An OAuth connection acts as you, so in each organization and gym it can do only what your role can do in the admin. Ask an administrator to change your role's permissions, or have someone whose role allows the action do it.
 
-If the assistant authenticates with a [Platform API key](/settings/api-tokens) rather than OAuth - which the admin MCP server also accepts, for developer-managed clients - then it is that key's scopes that apply, and you edit them under **Settings** > **Organization** > **APIs & webhooks**.
+An OAuth grant's scopes are fixed once you approve them - there is no way to widen or narrow a live connection. To change them, revoke the connection under **Settings** > **Integrations** > **AI assistants (MCP)**, disconnect it in the client, and authorize it again, ticking the **Make changes** boxes you need this time.
 
-## The assistant is connected to the wrong organization
+If the assistant authenticates with a [Platform API key](/settings/api-tokens) rather than OAuth - which the admin MCP server also accepts, for developer-managed clients - then it is that key's scopes that apply, and you edit them under **Settings** > **Integrations** > **APIs & webhooks**. A key is always refused the tools that change staff roles and permissions.
 
-1. Revoke the connection under **Settings** > **Artificial Intelligence** > **AI assistants (MCP)**.
-2. Disconnect it in the MCP client.
-3. Connect again and choose the correct organization on the 1club authorization page.
+## The assistant works in the wrong organization
 
-Every MCP connection is bound to one organization. It cannot switch organizations during a conversation.
+An OAuth connection works in every organization you are staff of. When there is more than one, the assistant has to pick one for every call.
+
+1. Name the business in your question, for example "at the Downtown studio".
+2. Ask the assistant to call `get_account`. It lists every organization the connection can act in, so you can check the name you used.
+3. To stop the assistant acting in one organization at all, revoke it there under **Settings** > **Integrations** > **AI assistants (MCP)**. It keeps working in your other organizations.
+
+A connection made before connections covered every organization, or one using a Platform API key, works in a single organization only. To move it, revoke it and connect again.
 
 ## I see a mix of marketplace and organization tools
 
@@ -51,8 +54,8 @@ The client is using an old or incorrect endpoint. Remove the connection and add 
 
 | Purpose | Endpoint |
 | --- | --- |
-| Manage one organization | `https://mcp.1club.ai` |
-| Search public marketplace data | `https://mcp.1club.me` |
+| Manage your organizations | `https://mcp.1club.ai` |
+| Search the marketplace, and book as a member | `https://mcp.1club.me` |
 
 A connection to `https://mcp.1club.ai/discovery` stops working: the discovery server moved to `https://mcp.1club.me`. Remove it and add the new address.
 
@@ -62,20 +65,20 @@ The admin and discovery servers never expose each other's tools.
 
 Compare the client's list with the [tools reference](/mcp/tools). Re-scan tools or remove and re-add the connection. Many clients cache the tool catalog.
 
-The admin server covers classes, areas and blocks, bookings, check-ins, contacts and instructors, plans, memberships, products, content, media, the website, gyms, and transactions. A missing OAuth scope causes a permission error when a tool runs. It does not normally remove the tool from the list.
+The admin server covers classes and progression, areas and blocks, bookings, check-ins, events, contacts and tags, instructors and the staff roster, staff roles, plans, memberships, products, charges and payments, invoices and reports, rules and policies, forms, messages and templates, the website, content, media, gyms, and competitors. A missing OAuth scope causes a permission error when a tool runs. It does not normally remove the tool from the list.
 
 ## Everything worked, then stopped
 
 Check these items:
 
 - **The connection was revoked.** Review connected assistants in 1club.
-- **The person who authorized it lost access.** A connection carries the permission of whoever approved it. If they left the organization or no longer hold **settings.manage.organization**, the connection is revoked on its next tool call. Someone who still holds the permission has to connect the assistant again. Check this first when an assistant stops working around a staff change.
+- **The person who authorized it lost access.** A connection carries the access of whoever approved it. If they left the organization, or their role there lost the **AI assistants (MCP)** permission, the connection stops working there on its next tool call. Someone who still holds the permission has to connect the assistant again. Check this first when an assistant stops working around a staff change.
 - **The organization downgraded.** API and MCP access stop when the paid feature is no longer available.
 - **It sat unused for 90 days.** The client registration and its tokens are deleted, so the client has to register and authorize again.
 - **The client lost its refresh credentials.** Disconnect and complete OAuth again. Replaying a refresh token that has already been rotated revokes the whole connection, so a client that restores an old copy of its credentials has to reconnect. Parallel refreshes are not affected: tool calls that all refresh at once are treated as one rotation.
 - **The rate limit was reached.** MCP shares the Platform API limit of 100 requests per minute per organization. Wait a minute and retry.
 
-The **Last used** column on the MCP page shows whether recent requests reached 1club.
+The **Last Used** column on the **AI assistants (MCP)** page shows whether recent requests reached 1club.
 
 ## A write fails even though reading works
 
@@ -88,6 +91,8 @@ The operation can also fail a business rule after authorization:
 - A plan cannot be deleted while memberships reference it. Retire it by setting `isActive` to `false`.
 - A class cannot be deleted while affected future occurrences have active bookings or waitlist entries.
 - A booking cannot be checked in outside its configured window, when required payment is outstanding, or after it was already checked in. Only a `confirmed` or `pending` booking can be checked in - a cancelled or no-show booking is rejected.
+- A booking that was paid or invoiced cannot be deleted. Cancel and refund it instead.
+- `publish_website` and `rollback_website` need the Website Plan Addon.
 
 Read the error returned by the tool before retrying. Do not repeatedly retry a validation or conflict error with a new idempotency key.
 

@@ -1,7 +1,7 @@
 ---
 title: Impro
 description: Open the doors of each gym's own Impro access control installation from 1club bookings and check-ins, with areas, people, and credentials kept in sync automatically.
-keywords: [impro, access bridge, access control, door access, physical access, areas, access buffer, credential technologies, facility code, card, pin, qr code, door sync]
+keywords: [impro, access bridge, access control, door access, physical access, areas, access buffer, credential technologies, facility code, card, pin, qr code, door sync, plan door access, session pass, check-in locks]
 ---
 
 The Impro integration connects 1club to the Impro access control system each of your gyms already runs. 1club keeps the gym's own Impro installation up to date with who may enter which area and when, so a booking or check-in opens the right doors without staff programming cards by hand. An owner or admin sets up each gym once, and an installer connects the areas to their doors in Impro.
@@ -15,11 +15,13 @@ Typical uses:
 - **Court doors that open only for the booking** - a padel gym syncs each court as an area, and players get in a little before their slot and out a little after, with no front desk.
 - **A climbing gym with zoned access** - the bouldering hall and the gym floor are separate areas, so a member booked into one doesn't get into the other.
 - **Several gyms, each with its own installation** - each gym uses its own Impro installation with its own key, and access at one never leaks into another.
+- **Members on a plan, no front desk** - members on an unlimited plan badge into the gym floor during their plan's hours, and a 10-visit pass uses one session per visit through the gym floor's door.
 
 ## How it works
 
 - **Areas become doors.** You sync the gym's areas to Impro. An installer then connects each area to its doors in Impro.
 - **Access follows the schedule.** A booking or a check-in opens the area for its own time window plus the access buffer.
+- **Plans open walk-in areas.** A plan that opens a walk-in area gives the member access during the plan's hours, with no booking or check-in. See [Door access from plans](/settings/access-control-settings#door-access-from-plans).
 - **People stay in step.** A booking, check-in, or cancellation reaches Impro within moments. A complete sync of the people who currently qualify for access, their credentials, and their areas also runs every five minutes, and you can run it by hand.
 - **It runs on your network.** 1club's server reaches your Impro installation directly. The browser never calls Impro, and the API key is stored encrypted.
 
@@ -35,17 +37,21 @@ A check-in grants access immediately, without waiting for the buffer before the 
 - Configuring Impro requires the **settings.manage.organization** permission. Viewing its settings requires **settings.read.organization**.
 - Each gym needs its own Impro installation, its **Installation URL**, and an **API key** issued for that installation.
 - Each gym needs at least one active area. Area names must be distinct within the gym, because each area becomes a named area in Impro. See [Areas](/settings/areas).
-- A gym can use only one door system at a time. If a gym already uses another provider, such as [WebLock](/settings/integrations/weblock) or [Salto KS](/settings/integrations/salto), turn that one off for the gym first. Until you do, the Impro page says which provider the gym uses and **Enable Impro for this club** can't be turned on.
+- A gym can use only one door system at a time. If a gym already uses another provider, such as [WebLock](/settings/integrations/weblock) or [Salto KS](/settings/integrations/salto), turn that one off for the gym first. Until you do, the Impro page says which provider the gym uses, with a link to it, and **Door access through Impro** can't be turned on.
 
 ## Activate and set up a gym
 
 1. Go to **Settings** > **Integrations** and click **Activate** next to Impro, under **Access control**. 1club activates Impro and opens its page. Once it is active, you reach the page from **Configure** under **Active Integrations**.
-2. On the Impro page, choose the gym under **Club**.
-3. Enter the gym's **Installation URL**.
+2. Pick the gym in the **Clubs** list. The list shows how many gyms are live and where each one stands.
+3. Under **Connection**, enter the gym's **Installation URL**.
 4. Enter the **API key**. Use the key issued for this installation. Once a key is saved, leave the field blank to keep it.
 5. Set the **Access buffer (minutes)** (15-120).
 6. Click **Test connection**. The test uses the URL and key on screen, so you can try them before you save. It reports whether the connection works, or that it connected but some checks need attention.
-7. Turn on **Enable Impro for this club** and click **Save**. **Save** stays greyed out until the URL and key are filled in and the buffer is a whole number from 15 to 120.
+7. Save. Saving is refused until the URL and key are filled in and the buffer is a whole number from 15 to 120.
+8. [Sync areas](#sync-areas), and have your installer connect them to their doors.
+9. Turn on **Door access through Impro** and confirm with **Turn on**. Members with a booking or check-in get door access within a few minutes.
+
+Until the gym is live, a **Before you turn it on** checklist shows what is left: saving the installation URL and API key, and syncing areas to Impro. The switch stays greyed out until both are done. Next to the switch, the page shows **Members with access**, **Pending updates** and **Last door update**.
 
 Repeat for every gym that has its own Impro installation.
 
@@ -60,9 +66,15 @@ Sync again whenever you add or rename an area. A new or renamed area opens no do
 
 ## Sync people
 
-Under **People**, 1club shows **Pending access updates** while some changes still have to reach Impro. The people who currently qualify for access, their credentials, and their areas sync every five minutes on their own. Click **Sync people** to run the same sync for this gym straight away. It is available while Impro is on for the gym and there are no unsaved changes. While it runs, the page shows how many people have been processed.
+**Pending updates**, next to the switch, counts the changes that still have to reach Impro. The people who currently qualify for access, their credentials, and their areas sync every five minutes on their own. Click **Sync people** to run the same sync for this gym straight away. It is available while Impro is on for the gym and there are no unsaved changes. While it runs, the page shows how many people have been processed.
 
-If some updates fail, 1club retries them automatically. A warning asks you to check the installation's connection and configuration in the meantime.
+If some updates fail, the **People** section lists the members who couldn't be updated, with the reason, and 1club retries them automatically.
+
+## Check-in locks
+
+Once Impro is on for the gym, **Check-in locks** lists the installation's doors. They decide which entries count a visit for a pass with sessions: each entry through a counting door uses one session, and coming back in within the plan's **Session length** uses nothing more. See [Passes with sessions](/settings/access-control-settings#passes-with-sessions).
+
+Impro doesn't report which areas a door opens, so every door starts as **Only opens**. For each door that is an area's own door, such as the bouldering hall's, choose that area. Leave shared doors, such as the front entrance, on **Only opens**.
 
 ## Credential technologies
 
@@ -80,13 +92,14 @@ The credentials themselves are the members' access cards, PIN codes, and QR code
 
 ## Turn Impro off for a gym or change its installation
 
-Turning off **Enable Impro for this club** and saving withdraws access rather than just editing a setting. 1club switches Impro off for the gym and starts access cleanup at the installation that still holds the access.
+Turning off **Door access through Impro** and confirming with **Turn off** withdraws access rather than just editing a setting. 1club switches Impro off for the gym and starts access cleanup at the installation that still holds the access. Your settings stay saved, so you can turn it back on later.
 
-To move a gym to a different installation URL or key:
+To move a gym to a different installation:
 
-1. Turn off **Enable Impro for this club**, enter the new **Installation URL** or **API key**, and click **Save**. The page confirms that Impro is off for the gym while access is cleared, and the new values stay on screen while cleanup runs.
-2. Watch **Pending access updates** under **People**.
-3. Once no updates are pending, click **Save** again to apply the new connection.
+1. Turn off **Door access through Impro** and confirm.
+2. Wait until **Pending updates** reaches zero, so the old installation no longer holds anyone's access.
+3. Enter the new **Installation URL** or **API key** and save. A new URL is refused while the old installation still holds access.
+4. Sync areas for the new installation, then turn door access back on.
 
 You can't change the URL or key while a people sync is running. Wait for it to finish first.
 
@@ -104,7 +117,10 @@ If an installation can't be reached, or a people sync is still running or has fa
 ## Troubleshooting
 
 - **The page asks you to create an area first** - the gym has no active area. Use **Manage areas** to add one.
-- **The page says the gym uses another provider** - only one door system can run per gym. Turn the other provider off for this gym, then turn on **Enable Impro for this club**.
+- **The page says the gym uses another provider** - only one door system can run per gym. Use the link to open the other provider, turn it off for this gym, then turn on **Door access through Impro**.
+- **The switch is greyed out** - the **Before you turn it on** checklist isn't finished. Save the connection and sync areas.
+- **A member on a plan can't get in** - read **Door access from plans** on the member's profile, which says why a plan opens nothing.
+- **A pass used a session at the front entrance** - set that door to **Only opens** under **Check-in locks**.
 - **An area opens no doors** - check that it shows **Synced**. If it shows **Needs sync**, click **Sync areas**, then make sure your installer has connected it to its doors in Impro.
 - **A member's card doesn't open the door** - check **Credential technologies** against the reader configuration in Impro, including the facility code. A warning appears when some credentials could not be written to the installation.
 - **Updates keep failing** - check that 1club's server can still reach the **Installation URL** and that the **API key** is current. Use **Test connection** to confirm.

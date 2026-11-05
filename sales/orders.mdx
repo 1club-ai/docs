@@ -51,7 +51,7 @@ An order is the top of the money trail:
 - **Charges -> invoices** - Charges can be grouped onto an invoice for the member. The invoice is the document; the order is the basket that produced the underlying charges. See [Invoices](/sales/invoices).
 - **Charges -> payments** - A payment is recorded against one or more charges to settle them. Completing an order records a payment against the order's charges with the method you selected. See [Payments](/sales/payments).
 
-The order detail page surfaces these links directly. Each line's **Linked to** column deep-links to the **booking**, **membership**, and **charge** it produced, and when an order has been synced to an external system (for example a POS for fiscalisation) an **Integrations** card shows the linked system and sync time.
+The order detail page surfaces these links directly. Each line's **Linked To** column deep-links to the **booking**, **membership**, and **charge** it produced, and a **For** column names the member a line is for when it isn't the customer who paid (for example a parent buying memberships for two children). A bookable [package](/sales/packages#bookable-packages) line also shows the date and time the buyer booked. An **Invoices** card lists the invoice and pro-forma issued for the order, and when an order has been synced to an external system (for example [Hype](/settings/integrations/hype) for fiscal receipts) an **Integrations** card shows the linked system and sync time.
 
 ## The order list
 
@@ -71,7 +71,7 @@ Open **Sales** > **Orders**. The list shows every order with these columns:
 Tabs across the top filter by status: **All**, **Draft**, **Open**, **Completed**, and **Cancelled**, each with a live count. Sort defaults to newest first. The row action menu offers **View** and, unless the order is already cancelled, **Cancel**. The **Point of Sale** button in the top right jumps to the POS to start a new sale.
 
 <Note>
-  Orders are created from the point of sale, from member checkout in the portal, or from a booking flow - not from an "Add order" button on this tab. The Orders tab is where you review and resolve those orders after they exist.
+  Orders are created from the point of sale, from member checkout in the portal or app (including the [portal shop](/sales/products#member-portal-shop)), from an order form, or from a booking flow - not from an "Add order" button on this tab. The Orders tab is where you review and resolve those orders after they exist.
 </Note>
 
 ## Order status and the lifecycle
@@ -125,9 +125,12 @@ Open the order and click **Close order**. Any line not yet fulfilled is fulfille
 
 ## Issuing an invoice or pro-forma for an order
 
-From an order that has a member, you can issue a numbered document for the sale. Use **Issue invoice** or **Issue pro-forma** in the order's header. Each takes the next number in its series.
+From an order that has a member, you can issue a numbered document for the sale. Use **Issue invoice** or **Issue pro-forma** in the order's header. Each takes the next number in its series. The document is built from the order's own lines, so it always matches what was sold.
 
-- A sale can carry one document of each type.
+- It works on an unpaid **Draft** too. Build the booking, issue a pro-forma, and send it to a company for approval before anything is charged.
+- A package appears as the package the customer bought, with its items under it, rather than one line per component.
+- Tax is calculated on every line of the document.
+- A sale can carry one document of each type. Issued documents are listed in the order's **Invoices** card.
 - **Issue pro-forma** is not offered once the order is paid, because a pro-forma asks to be paid up front.
 - While an unpaid pro-forma is outstanding, **Issue invoice** is not offered. Once the pro-forma is paid, use **Convert pro-forma to invoice** to issue the invoice from it. The pro-forma is kept as sent.
 
@@ -135,17 +138,17 @@ Issuing documents needs the **billing.create.organization** permission. See [Inv
 
 ## Cancelling an order
 
-1. Open the order and click **Cancel**, or use the **Cancel** row action in the list.
+1. Open the order and click **Cancel**. The **Cancel** row action in the list works too for an order with nothing paid on it, but cancel a paid order from its page, where the dialog asks where the refund goes.
 2. Confirm in the **Cancel order** dialog ("Are you sure you want to cancel this order? This action cannot be undone.").
 3. If the order has been paid, pick where the refund goes under **Refund to**: **Original payment method** or **Wallet balance**. The dialog shows the **Refund amount**, and the button reads **Cancel and refund**. If only one destination is possible, it is picked for you.
 
 What cancelling does depends on the order's state:
 
 - **Draft** - The status flips to **Cancelled**. Nothing else happens because nothing was created.
-- **Completed** - Each booking line is cancelled through the standard booking-cancellation flow, each membership line is cancelled immediately, and every related charge is voided. Then the order status becomes **Cancelled**. This reversal is idempotent, so an already-cancelled booking or already-voided charge is skipped rather than erroring.
+- **Completed** or **Open** - Each booking line is cancelled through the standard booking-cancellation flow, each membership line is cancelled immediately, and every related charge is voided. A bookable package's date and time go back on sale. Then the order status becomes **Cancelled**. This reversal is idempotent, so an already-cancelled booking or already-voided charge is skipped rather than erroring.
 
 <Note>
-  A paid order can't be cancelled without refunding it, so the money never stays with your gym after the sale is erased. When a card payment can't be reversed through the card provider, the refund can only go to the wallet, and the dialog says so. When no automatic refund is available at all, the dialog tells you to refund it from the charge first and then cancel. See [Payments](/sales/payments).
+  A paid order can't be cancelled without refunding it, so the money never stays with your gym after the sale is erased. Card payments taken through Stripe can go back to the card. A myPOS or DatecsPay card payment can't be reversed through the provider from 1club, so its refund can only go to the wallet, and the dialog says so. When no automatic refund is available at all, the dialog tells you to refund it from the charge first and then cancel. See [Payments](/sales/payments).
 </Note>
 
 ## Editing a draft
@@ -222,6 +225,14 @@ A yoga studio sells a 10-class pass.
 **Issue**: I can't cancel a paid order - the dialog says no automatic refund is available.
 
 **Solution**: None of the order's payments can be returned automatically. Refund it from the charge first, then cancel the order. See [Charges](/sales/charges).
+
+**Issue**: Cancelling a paid order from the list fails.
+
+**Solution**: Open the order and click **Cancel** there. The order page asks where the refund goes, which a paid order needs before it can be cancelled.
+
+**Issue**: Cancelling a fulfilled order says it requires billing permissions.
+
+**Solution**: Staff who hold only point-of-sale access can discard a draft, but cancelling an open tab or a completed order reverses a real sale and needs billing access. See [Who can use the POS](/pos/point-of-sale#who-can-use-the-pos).
 
 **Issue**: The payment-status chip is missing on a draft.
 

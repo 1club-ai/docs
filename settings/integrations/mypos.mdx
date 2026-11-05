@@ -14,10 +14,13 @@ keywords:
     ipn,
     terminal,
     billing entity,
+    saved cards,
+    renewals,
+    member app,
   ]
 ---
 
-myPOS is a card payment provider you can use alongside or instead of Stripe. Online, customers are redirected to myPOS's hosted checkout page to enter their card details, then return to 1club once the payment completes. In person, myPOS card terminals take payments at your front desk. An owner or admin sets it up, and staff can also email a member a myPOS payment link for an outstanding charge.
+myPOS is a card payment provider you can use alongside or instead of Stripe. Online, customers are redirected to myPOS's hosted checkout page to enter their card details, then return to 1club once the payment completes. In person, myPOS card terminals take payments at your front desk. myPOS can also collect membership renewals automatically, by a saved card or a payment link. An owner or admin sets it up, and staff can also email a member a myPOS payment link for an outstanding charge.
 
 <Note>
   If your organization trades through more than one company, each company
@@ -39,6 +42,7 @@ Typical uses:
 - **A gym that already banks with myPOS** - paste a **Configuration Pack** from your Checkout Store and take court bookings through hosted checkout, with no Stripe account needed.
 - **Collecting an overdue fee** - when a member's card on file is declined, send a **myPOS payment link** for the overdue charge, and the member pays on their own phone within the 7-day window.
 - **A myPOS terminal at the front desk** - take card payments in person on a myPOS device, while your online payments keep running through Stripe.
+- **Monthly renewals without chasing** - a twelve-month membership paid monthly is charged to the member's saved card each month, or the member is emailed a payment link for each renewal.
 
 ## Before you start
 
@@ -46,7 +50,7 @@ Typical uses:
 - Configuring myPOS requires the **settings.manage.organization** permission. Viewing its settings requires **settings.read.organization**.
 - **Test** mode needs no credentials. 1club ships shared sandbox credentials, so you can run the full hosted checkout with myPOS test cards before signing up for anything.
 - **Live** hosted checkout needs a myPOS merchant account with an **Online (Checkout) Store**. You configure 1club with credentials from that store. See [Where to get your myPOS credentials](#where-to-get-your-mypos-credentials) below.
-- Each company can run only one hosted-checkout provider at a time. If DatecsPay is active for the company, deactivate it first, or use myPOS for terminals only.
+- Each company takes online card payments through one provider at a time: Stripe, myPOS, or DatecsPay. If another one already takes them, turn its online payments off first, or use myPOS for terminals only. See [One online card provider per company](#one-online-card-provider-per-company).
 
 ## Where to get your myPOS credentials
 
@@ -103,7 +107,7 @@ The Checkout Store credentials above cover hosted checkout only. In-person card 
 3. Choose a **Mode**:
    - **Test** - uses the shared myPOS sandbox. No credentials needed.
    - **Live** - uses your own myPOS Checkout Store.
-4. Under **Capabilities**, leave **Online** ticked for hosted checkout and choose a **Checkout form**.
+4. Under **Capabilities**, leave **Online** ticked for hosted checkout and choose a **Checkout form**. **Online** starts unticked, and is greyed out, when another provider already takes the company's online card payments. Tick **Charge renewals to saved cards** only once myPOS has enabled card tokens for your account (see [Automatic membership renewals](#automatic-membership-renewals)).
 5. In **Live** mode, the credential fields appear under **Online**. Supply your credentials one of two ways:
    - Paste your Configuration Pack into **Configuration Pack (recommended)**. This fills in all five values and disables the manual fields.
    - Or, under **Or enter credentials manually**, fill in **Store ID (SID)**, **Client number (Wallet number)**, **Key index**, **RSA private key (PEM)**, and **myPOS public certificate (PEM)**. Fill in **Private key passphrase** only if your key file has one.
@@ -125,6 +129,7 @@ The Checkout Store credentials above cover hosted checkout only. In-person card 
 | **Mode**                             | Always                  | **Test** or **Live**.                                                                                                                  |
 | **Capabilities**                     | Always                  | **Online** and **Terminal**. See [Capabilities](#capabilities).                                                                        |
 | **Checkout form**                    | **Online** is on        | **Minimal - card details only**, or **Full - collect name, address & contact details**. Defaults to **Minimal**.                       |
+| **Charge renewals to saved cards**   | **Online** is on        | Off by default. Saves the member's card when they pay for a renewing membership, and charges renewals to it. myPOS must enable card tokens for your account first. |
 | **Configuration Pack (recommended)** | **Live** and **Online** | Base64 string from myPOS Easy Setup. Supplies all five credentials and disables the manual fields.                                     |
 | **Store ID (SID)**                   | **Live** and **Online** | Your Checkout Store identifier.                                                                                                        |
 | **Client number (Wallet number)**    | **Live** and **Online** | The wallet that receives funds.                                                                                                        |
@@ -182,14 +187,42 @@ To recover:
 
 The **Capabilities** section controls which payment surfaces the integration serves:
 
-- **Online - hosted checkout for members on the web** - hosted checkout for the portal, kiosk, and admin-initiated charges. On by default. Under it, **Checkout form** sets how much the myPOS checkout page asks for, and in **Live** mode your Checkout Store credentials go here.
+- **Online - hosted checkout for members on the web** - hosted checkout for the member portal, the member app, your website, the kiosk, signup forms, and payment links. On by default. Under it, **Checkout form** sets how much the myPOS checkout page asks for, **Charge renewals to saved cards** turns on saved cards, and in **Live** mode your Checkout Store credentials go here.
 - **Terminal - in-person payment terminals at clubs** - myPOS card terminals at your gyms. Off by default. Turning it on reveals the **Merchant client ID** and **Merchant client secret** fields (see [Terminal credentials](#terminal-credentials)). Add and manage the devices themselves under **Settings** > **Sales** > **Payment terminals**, which the **Manage** button opens, alongside any other providers you use.
 
 You can untick **Online** and use myPOS for terminals only. A terminal-only setup needs no Checkout Store credentials, even in **Live** mode, and can run next to Stripe or DatecsPay taking your online payments.
 
-### One hosted-checkout provider per company
+### One online card provider per company
 
-myPOS **Online** and DatecsPay present the same "pay by card" checkout to members, so only one of them can be active for a company. Saving myPOS with **Online** on while DatecsPay is active for that company fails with "DatecsPay is already enabled". Deactivate DatecsPay for that company first. Stripe is not affected by this rule.
+Stripe, myPOS **Online**, and DatecsPay all put the same "pay by card" in front of a member, so only one of them can take a company's online card payments. Whichever is switched on first holds them. While another provider holds them, the **Online** checkbox is greyed out and hovering it names that provider. A save that switches **Online** on anyway is refused with "... already takes online card payments for this company".
+
+To move a company to myPOS, untick **Online** under **Use Stripe for** on the [Stripe](/settings/integrations/stripe#use-stripe-for) page, or deactivate [DatecsPay](/settings/integrations/datecspay), then tick **Online** here. **Terminal** is not affected: a company can run myPOS terminals beside any online provider, and two companies in the same organization can each use a different online provider.
+
+## Where members pay by card
+
+With **Online** on, members pay through myPOS hosted checkout wherever they buy:
+
+- In the member portal and on your website: bookings, classes, events, memberships, the [shop](/sales/products#member-portal-shop), signup forms, and outstanding balances.
+- In the member app: class, area, and instructor bookings, event registrations, memberships, and settling what is left to pay on a booking. The myPOS page opens inside the app, and the member returns to the app with the result. If myPOS takes a moment longer to confirm, the app says so rather than reporting a failure, so nobody pays twice.
+
+The checkout page opens from your gym's own address (your portal, website, or custom domain), so add that address to your Checkout Store's approved websites if your store restricts them.
+
+## Automatic membership renewals
+
+When myPOS takes a company's online card payments, its auto-renewing memberships are collected without the front desk:
+
+- **Without saved cards**, the member is emailed a myPOS payment link for each renewal when it falls due. The link is valid for 7 days.
+- **With Charge renewals to saved cards on**, the member's card is saved when they buy a renewing membership or pay a renewal, and each renewal is charged to it automatically. For a household member without their own card, a guardian's saved card is used. If a card is declined or has expired, the member gets the payment link instead, and paying it saves their new card for the next renewal.
+
+<Note>
+  Ask myPOS to enable card tokens (saved cards) for your Checkout Store before
+  you tick **Charge renewals to saved cards**. Until they do, every saved-card
+  charge is refused and members receive payment links instead.
+</Note>
+
+Each member has at most one saved myPOS card per company, and paying again with a different card replaces it. Members see their card under **My Account** > **Billing** in the member portal, where they can replace or remove it. Staff see it in the **Payment Methods** section of the member's profile, where they can remove it. After a card is removed, renewals go back to payment links until the member saves another.
+
+A failed renewal never cancels the membership. See [Recurring memberships](/sales/overview#recurring-memberships) for how each provider collects renewals.
 
 ## Send a myPOS payment link
 
@@ -225,7 +258,9 @@ You stay on the myPOS page afterwards, with the form reset. Your saved credentia
 
 - **Activate is greyed out** - your organization is on the Free plan or the free trial. Upgrade to a paid plan to activate payments.
 - **Validation fails** - confirm the **Store ID (SID)**, **Client number**, and **Key index** match your myPOS Checkout Store, and that the **RSA private key** is the one paired with the certificate for that key index. If you used a Configuration Pack, regenerate it in myPOS and paste the fresh pack.
-- **"DatecsPay is already enabled"** - only one hosted-checkout provider can be active per company. Deactivate DatecsPay for that company, or untick **Online** if you only need myPOS terminals.
+- **Online is greyed out, or saving says another provider "already takes online card payments"** - only one online card provider can be active per company. Untick **Online** under **Use Stripe for** on the Stripe page, or deactivate DatecsPay for that company, or keep **Online** off here if you only need myPOS terminals.
+- **Members see "Error Code: 25" before they can enter card details** - your Checkout Store only accepts payments from approved websites. Add your portal, website, or custom domain to the store's approved list in myPOS.
+- **Renewals are emailed as payment links even though saved cards are on** - myPOS hasn't enabled card tokens for your account yet, or the member has no usable saved card. Ask myPOS to confirm card tokens are on.
 - **Customers see a signature error on the checkout page** - the public certificate registered with myPOS doesn't match the private key on file. Regenerate the key pair in myPOS, download the new public certificate from the Integration tab, and paste the new private key and certificate here.
 - **Payment succeeded on myPOS but the charge stays unpaid in 1club** - the IPN webhook didn't reach 1club. Confirm the notification URL is allowed in your myPOS store settings, then re-trigger the notification from myPOS.
 - **myPOS refused the terminal credentials and 1club stopped trying** - see [Terminal credential lockout](#terminal-credential-lockout). Fix the client ID or secret, and use **Allow another attempt** only after myPOS confirms your account is not locked.

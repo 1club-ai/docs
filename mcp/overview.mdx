@@ -23,13 +23,13 @@ You connect once, and from then on you can ask an assistant things like "which c
 
 1club exposes **two separate MCP servers**. Each has its own address, and an assistant connected to one never sees the other's tools.
 
-| Server        | Address                | Who it is for                                    | Authentication                             |
-| ------------- | ---------------------- | ------------------------------------------------ | ------------------------------------------ |
-| **Admin**     | `https://mcp.1club.ai` | Your gym's staff and internal systems            | 1club OAuth sign-in, or a Platform API key |
-| **Discovery** | `https://mcp.1club.me` | Anyone searching the public 1club.me marketplace | None                                       |
+| Server        | Address                | Who it is for                                                        | Authentication                                     |
+| ------------- | ---------------------- | -------------------------------------------------------------------- | -------------------------------------------------- |
+| **Admin**     | `https://mcp.1club.ai` | Your gym's staff and internal systems                                | 1club OAuth sign-in, or a Platform API key         |
+| **Discovery** | `https://mcp.1club.me` | Anyone searching the 1club.me marketplace, and members booking there | None to search; a 1club.me sign-in to book         |
 
 - The **admin server** reads and writes your organizations' own data. You sign in to 1club and approve the requested access; the connection works in every organization you are staff of, with what your role allows in each, and every response is limited to the organization the call acts in. This is the one you want for running your business. A developer-managed client that cannot sign in interactively can send a [Platform API key](/settings/api-tokens) as a bearer token instead; OAuth is the recommended path for everyone else.
-- The **discovery server** searches the public marketplace across all listed gyms and finds bookable court times. It is anonymous by design, read-only, and can never reach a single organization's private data.
+- The **discovery server** searches the public marketplace across all listed gyms and independent professionals, and finds bookable times. Anyone can search it without an account. To book, list, or cancel their own bookings, a person signs in with their 1club.me account, and the assistant books for them exactly as 1club.me would. It can never reach a single organization's private data.
 
 Pick the one that matches what you are trying to do, then follow [Connect an assistant](/mcp/connect). In ChatGPT, the admin server is the [1club Admin plugin](https://chatgpt.com/plugins/plugin_asdk_app_6acf0ea6ff448191aed2db046c98e0a5): install it and sign in, with no address to enter.
 
@@ -44,22 +44,21 @@ Pick the one that matches what you are trying to do, then follow [Connect an ass
 
 The admin server covers your operations, your catalogue, and your website:
 
-- **Classes** - list, create, update, and delete class occurrences, and read a class roster.
-- **Areas and availability** - list, create, and edit areas and area types, check when they are free, and block or reopen a court.
-- **Plans** - find, create, update, retire, and delete membership plans, and manage plan categories.
-- **Memberships** - create and update customer memberships.
-- **Bookings** - create, edit, cancel, and inspect bookings and their participants, enrol customers in classes, and quote a booking's price.
-- **Check-ins** - list attendance and check in an existing booking.
-- **Contacts and instructors** - find, create, edit, and archive contacts, read the sales pipeline, and create and edit coaches, instructor types, and pay rate policies.
+- **Classes and progression** - list, create, update, and delete classes, including a whole repeating series in one call, read a class roster, manage class types and programs, and set up progression tracks and promote members after grading.
+- **Areas and availability** - list, create, and edit areas and area types, check when they are free, and block or reopen an area.
+- **Plans and memberships** - find, create, update, retire, and delete membership plans and plan categories, and create, pause, cancel, and adjust customer memberships.
+- **Bookings and check-ins** - create, edit, cancel, and inspect bookings and their players, enrol customers in classes and events, quote a booking's price, waive a cancellation charge, and check members in with or without a booking.
+- **Contacts** - find, create, edit, and archive contacts, read the sales pipeline, tag contacts, keep custom fields, and manage household and company accounts.
+- **Instructors and staff** - create and edit coaches, instructor types, pay rate policies, shifts, rotations, and time off, read the pay ledger, list your staff, change a role, and edit what each role may do.
 - **Products** - search the catalogue, reprice or retire a product, manage categories, and see how many are left to sell.
-- **Website** - read and edit pages, sections, navigation, and custom CSS, then publish or roll back.
-- **Media** - browse the media library, register hosted images and videos, and edit their alt text.
-- **Content** - read, create, update, and delete CMS content such as posts, FAQs, documents, and reusable blocks.
-- **Gyms** - read a gym's details, amenities, and rating.
-- **Transactions** - list and open billing transactions (the records the admin calls [Charges](/sales/charges)).
-- **Invoices and reports** - read invoices and invoice totals, and get revenue, activity, membership, and member reports for a period.
-- **Pricing, policies, and documents** - manage pricing rules, booking policies, and document rules.
+- **Website** - create a website from a template, read and edit pages, sections, navigation, the theme, and custom CSS, then publish or roll back.
+- **Media and content** - browse the media library, register hosted images and videos, and read and edit CMS content such as posts, FAQs, documents, and reusable blocks.
+- **Gyms** - read and edit a gym's profile, opening hours, and booking labels, and work through your setup checklist and Brand Book.
+- **Charges and payments** - list and open the records the admin calls [Charges](/sales/charges), record a payment the desk collected, and manage your own payment methods.
+- **Invoices and reports** - read invoices and invoice totals, and get revenue, activity, membership, member, and tax reports for a period.
+- **Pricing, policies, and documents** - manage pricing rules, booking policies, document rules, and external programs.
 - **Events, forms, templates, and messages** - manage events and forms, edit message templates, and draft messages for you to send.
+- **Notifications, promotions, and competitors** - set each role's notification defaults, read your promotions, and follow your competitors.
 - **Revenue accounts** - read and maintain your chart of accounts.
 
 The full list, with the OAuth scope each tool needs, is on the [Tools reference](/mcp/tools) page.
@@ -72,13 +71,13 @@ The full list, with the OAuth scope each tool needs, is on the [Tools reference]
   `organization:write` scope, and take effect immediately.
 </Note>
 
-The discovery server answers three questions about the public marketplace: when can I play (`find_availability`, which returns priced, dated court times with a link that opens the booking), which clubs match what I am after (`search_clubs`), and what is this place like (`get_club`). It reads only published information and never writes - a booking is completed on 1club.me.
+The discovery server answers the questions someone asks before they book: when can I play (`find_availability`, which returns priced, dated court times with a link that opens the booking), which gyms or independent professionals match what I am after (`search_clubs`, `search_professionals`), and what does this place or person offer (`get_club`, `get_professional`). Signed in with their 1club.me account, a person can also have the assistant book an area, a class, or an instructor, join or leave a waitlist, and list or cancel their own bookings. A booking is used against a membership that covers it, or paid at the gym.
 
 ## Current boundaries
 
-- **There is no member-facing server.** The admin connection acts on an organization. It does not sign in as a member or expose a member's private portal session.
-- **MCP follows the Platform API.** Automations, promotions, payments, access control, and staff administration are not exposed. Messages can be drafted but not sent, and invoices are read-only. Anything absent from the [Tools reference](/mcp/tools) is unreachable through MCP today.
-- **Check-in creation is booking-based.** The assistant can check in an existing booking. Front-desk walk-ins and payment collection remain in 1club.
+- **The admin server acts for staff, the discovery server for members.** The admin connection acts as a member of your staff in an organization. A member who wants an assistant to book for them connects the discovery server and signs in with their 1club.me account, which reaches only their own bookings.
+- **MCP follows the Platform API.** Automations and access control are not exposed. Promotions and invoices are read-only, messages can be drafted but not sent, and a payment can be recorded but never charged to a card. Anything absent from the [Tools reference](/mcp/tools) is unreachable through MCP today.
+- **Staff logins stay in 1club.** An assistant can change a staff member's role, but inviting someone to the admin, or giving a coach a login, happens in 1club.
 - **Stock is read-only.** An assistant can see how many of a product are left to sell, but receiving a delivery, correcting a count, and writing off damage stay in 1club.
 - **Some things are deliberately not deletable.** Contacts (archive them instead), memberships, products, and forms have no delete tool. Retire a product with its update tool instead, which takes it off the till and keeps its sales history.
 
@@ -87,16 +86,16 @@ The discovery server answers three questions about the public marketplace: when 
 - **OAuth keeps credentials out of setup.** You sign in directly on 1club's authorization page. You do not paste a password or API token into the assistant.
 - **Read-only is the default.** A client that requests no scopes gets a read-only connection, and every write capability a client does request is a checkbox on the authorization page that starts unchecked. Approving without ticking anything leaves the assistant able to look things up and nothing more.
 - **Anything beyond reading is a deliberate opt-in, per capability.** Tick only what the assistant actually needs. That covers the writes and the ones that go further - `media:delete` removes a file permanently, `bookings:delete` permanently deletes a booking with its unpaid charges, `transactions:delete` voids or deletes unpaid charges, `website:publish` makes draft edits public, and `organization:write` changes settings such as your languages everywhere at once and immediately, rather than into a draft. Content the assistant reads - a member note, a website page - can contain text that tries to steer it, so these belong only on a connection you supervise.
-- **Scopes are the limit.** An assistant can only use tools its granted scopes allow. A connection with `classes:read` cannot create or update a class. The set cannot be changed after approval: revoke the connection and authorize it again with different boxes ticked.
-- **A connection never outlives the person behind it.** It carries the permission of whoever authorized it. If they lose **settings.manage.organization** or leave the organization, the connection is revoked on its next tool call. A client unused for 90 days is dropped as well.
-- **Revocation is instant.** Revoking a connection under **Settings** > **Artificial Intelligence** > **AI assistants (MCP)** cuts the assistant off immediately.
+- **Scopes and your role are the limit.** An assistant can only use tools its granted scopes allow, and only where your role allows the same action in the admin: it acts as you, gym by gym. A connection with `classes:read` cannot create or update a class, and a front desk login cannot delete a booking whatever it ticked. The scope set cannot be changed after approval: revoke the connection and authorize it again with different boxes ticked.
+- **A connection never outlives the person behind it.** It carries the access of whoever authorized it. If they leave an organization, or their role there loses the **AI assistants (MCP)** permission, the connection stops working in that organization on its next tool call. A client unused for 90 days is dropped as well.
+- **Revocation is instant.** Revoking a connection under **Settings** > **Integrations** > **AI assistants (MCP)** cuts the assistant off from that organization immediately.
 - **Credentials are short-lived and rotated.** An access token is valid for an hour, and each silent refresh issues a fresh pair. A connection left idle for 30 days expires; one in regular use does not. Only hashes are ever stored, and replaying a spent refresh token revokes the entire connection.
 - **Rate limits apply.** MCP calls count against the Platform API's limit of 100 requests per minute per organization.
 
 ## Before you start
 
-- API and MCP access are **paid features**, locked on free plans and during a trial. The discovery server remains public and needs no sign-in.
-- Authorizing a connection requires the **settings.manage.organization** permission. In practice that means admins and owners.
+- API and MCP access are **paid features**, locked on free plans and during a trial. The discovery server remains public and needs no 1club admin account.
+- Connecting an assistant requires the **AI assistants (MCP)** permission. Owners always have it, and administrators hold it by default. To let another role connect assistants, grant it in **Settings** > **Organization** > **Permissions**. See [Roles and permissions](/reference/roles-permissions).
 - Your MCP client must support remote HTTP MCP servers, and OAuth for the recommended setup. A client that can only send a fixed `Authorization` header can use a [Platform API key](/settings/api-tokens) instead. [Connect an assistant](/mcp/connect) covers both.
 
 ## Next steps

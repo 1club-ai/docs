@@ -1,19 +1,19 @@
 ---
 title: "Bookings"
-description: "Create, edit, cancel, and take payment on reservations for areas, classes, and instructors."
+description: "Create, edit, cancel, check in, and take payment on reservations for areas, classes, and instructors - from the bookings list and the booking panel that opens beside any page."
 ---
 
 A booking is the unit of revenue. Every reservation - a member joining a class, renting an area, booking a one-on-one with an instructor, or buying an [event ticket](/events/events) - is stored as a booking row with one or more charges attached. Members book themselves from the app, portal, website, or kiosk, and the front desk and managers create bookings for them in the admin.
 
 ## When to use it
 
-Because every reservation is a booking, staff handle them all the same way: one list, one detail page for payment, check-in, cancellation, and notes, and a full money trail of charges, payments, and refunds per booking. You create bookings in the admin for phone and walk-in reservations, and you open existing ones to take payment, check a member in, or cancel.
+Because every reservation is a booking, staff handle them all the same way: one list, one panel for payment, check-in, cancellation, and notes, and a full money trail of charges, payments, and refunds per booking. You create bookings in the admin for phone and walk-in reservations, and you open existing ones to take payment, check a member in, or cancel.
 
 Typical uses:
 
-- **A padel court booked over the phone** - reception records tonight's court for a regular, collects the balance at the desk when they arrive, and gives each doubles player their own share.
+- **An area booked over the phone** - reception records tonight's padel game for a regular, adds the other three players, and collects the balance at the desk when they arrive.
 - **A personal-training session covered by a plan** - book the coach, then switch the entrance to the member's membership so the booking carries no charge.
-- **A standing weekly court** - reserve the same court every Tuesday at 18:00 for the whole season in one go, then edit or cancel a single week without touching the rest.
+- **A standing weekly booking** - reserve the same area every Tuesday at 18:00 for the whole season in one go, then edit or cancel a single week without touching the rest.
 - **A drop-in class paid in cash** - record the class booking and the payment at the desk, without sending a confirmation email the member doesn't need.
 
 See [Worked examples](#worked-examples) for the steps behind each of these.
@@ -22,7 +22,7 @@ If you haven't picked a check-in flow yet, start with [Check-in models](/referen
 
 ## The list page
 
-The list page lives under **Schedule** > **Bookings** (open it from the calendar's **More actions** menu); the detail page is where you handle payment, check-in, cancellation, and notes.
+The list page lives under **Schedule** > **Bookings** (open it from the calendar's **More actions** menu).
 
 The bookings list has four tabs with live counts: **All**, **Upcoming**, **Past**, and **Cancelled**. Upcoming is the default tab. Each tab is paginated and sortable.
 
@@ -31,19 +31,23 @@ Select rows to act on several bookings at once (shown when you hold the permissi
 - **Check in N** - checks in every selected booking, settling any payment their entrance method requires.
 - **Cancel N** - cancels only the selected bookings; later occurrences of a recurring series are left alone. Bookings nobody paid for owe nothing unless you turn on **Keep the cancellation charge**, and if any were paid you're asked what happens to that money.
 
-The **Cancelled** tab shows each booking's cancellation reason, refund, and who cancelled it. A booking that was released automatically at the end of the day (a pending booking whose start time arrived) can be brought back with **Reinstate** from its row menu or detail page: it returns confirmed and its charge is outstanding again. Cancellations made by a person can't be reinstated, and Reinstate is refused if the slot has since been booked by someone else.
+The **Cancelled** tab shows each booking's cancellation reason, refund, and who cancelled it. A booking that was released automatically at the end of the day (a pending booking whose start time arrived) can be brought back with **Reinstate** from its row menu or its panel: it returns confirmed and its charge is outstanding again. Cancellations made by a person can't be reinstated, and Reinstate is refused if the slot has since been booked by someone else.
 
-Click any row to open the booking detail page. Click **Add booking** in the top right to create one from scratch.
+Click any row to open the booking in the [booking panel](#the-booking-panel). Click **Add** > **Add Booking** in the top right to create one from scratch.
 
 ## Creating a booking
 
-The booking dialog has three sections:
+You open the booking dialog from **Add** > **Booking** on the [calendar](/schedule/calendar), from a click on an empty slot, from **Add** > **Add Booking** on the bookings list, or from **Add Booking** on a class. It has three parts:
 
-- **Contact** - pick the member from your contacts. If the matching [booking policy](/settings/booking-policies) allows anonymous bookings, the contact is optional and admins can record bookings for people who don't have a profile yet.
-- **Type** - pick **Area**, **Class**, or **Instructor**. Each routes to its own selector (gym filter applies). Selecting a class also locks the date/time to the class occurrence.
+- **Contact** - pick the member from your contacts. If the matching [booking policy](/settings/booking-policies) allows anonymous bookings, the field reads **Contact (optional)** and you can record a booking for someone who doesn't have a profile yet.
+- **Booking Type** - pick **Area**, **Class**, or **Instructor**. Each routes to its own selector (gym filter applies). Selecting a class also locks the date and time to the class occurrence.
 - **Schedule** - start time, end time, and notes. The booking duration step from the policy controls how the end time snaps to allowed lengths.
 
-The price breakdown appears below the type section. It shows the line item (area price per hour, instructor price, or class price), any promotion or manual price adjustment, and the total. If membership benefits or external programs cover the booking, that's reflected here.
+When the area or coach takes more than one person, a **Players** picker (or **Who else is coming**, for a coach session with no area) appears under the contact. On an area that offers both, **Singles or doubles** comes first. See [Players and group sessions](/schedule/players-and-groups).
+
+An area booking can also carry a coach. Pick a named instructor, **Any instructor** for a lesson whose coach is not decided yet, or **No instructor**. **Any instructor** needs an area, so pick the area first. See [Area lesson with any available coach](#area-lesson-with-any-available-coach).
+
+The price breakdown appears below. It shows the line item (area price per hour, instructor price, or class price), any pricing rule or promotion, any manual price adjustment, and the total. If a membership or an external program covers the booking, that's reflected here.
 
 At the end of the create form, **Send confirmation email** controls whether the member gets the confirmation. It's checked by default; uncheck it when you're recording a booking that's already been communicated out-of-band. The checkbox is only on create - editing an existing booking does not re-send confirmation.
 
@@ -55,113 +59,156 @@ The booking dialog tells you what a slot crosses before you save, on one line on
 
 - **A rule for members** - the slot is outside the [booking policy](/settings/booking-policies)'s notice, advance-booking, duration, or grid limits, outside the working hours, outside who the area or class is open to, or the member's deposit is short of a deposit rule. These rules bind members booking for themselves, not staff. The note reads like "Members book up to 7 days ahead", the button stays **Add**, and the first click books it. The working hours, the audience, and the deposit are checked when you save, so the confirmation names them if they apply.
 - **The coach's schedule or a blocked area** - the instructor is on time off, on a break, or outside their working hours, or the area is blocked. The note reads like "Instructor on time off", and **Add** books past it on the first click. The booking records the override: who made it, and what it went past.
-- **A genuine conflict** - the court or the coach is already booked for that time. This opens a dialog that names exactly what's being overlapped (an existing booking, a class, a blocked period, time off, or a break) and requires a note before you can save. The note is stored on the booking and shown on its calendar card, so anyone glancing at the schedule can see the overlap was deliberate - useful for something like two half-court groups sharing one tennis court, or a one-off exception the team has agreed to.
+- **A genuine conflict** - the area or the coach is already booked for that time. This opens a dialog that names exactly what's being overlapped (an existing booking, a class, a blocked period, time off, or a break) and requires a note before you can save. The note is stored on the booking and shown on its calendar card, so anyone glancing at the schedule can see the overlap was deliberate - useful for something like two small groups sharing one tennis area, or a one-off exception the team has agreed to.
 
-A live event taking over an area or an instructor is never overridable - that stays a hard stop.
+A live event taking over an area or an instructor counts as one of its bookings. When that fills the area or the instructor, it's a genuine conflict like any other.
 
 <Note>
   Who can book past what:
 
-  - **The coach's schedule** - anyone who can create bookings, including Front Desk and Instructor.
-  - **A blocked area, or an already-taken slot** - only staff who can manage bookings (**Full access** on the Booking module, Club scope or higher). The same split applies to classes, gated by the Classes module instead.
-  - **A slot that has already ended** - only staff who can create bookings at Organization scope, so a past session can be recorded.
+- **The coach's schedule** - anyone who can create bookings, including Front Desk and Instructor.
+- **A blocked area, or an already-taken slot** - only staff who can manage bookings (**Full access** on the Booking module, Club scope or higher). The same split applies to classes, gated by the Classes module instead.
+- **A slot that has already ended** - only staff who can create bookings at Organization scope, so a past session can be recorded.
 
-  When your role can't book past something, the note in the footer turns red and says so before you save, rather than after. See [Roles and permissions](/reference/roles-permissions).
+When your role can't book past something, the note in the footer turns red and says so before you save, rather than after. See [Roles and permissions](/reference/roles-permissions).
+
 </Note>
 
 If something changes after the dialog checked the slot - time off entered a moment ago, say - and your role can book past it, the save still goes through and the confirmation names what it booked past. You are never asked to press the same button twice.
 
-## The booking detail page
+## The booking panel
 
-The detail page header shows the booking title with status chips (confirmed, pending, cancelled, paid/unpaid) and its actions, each shown only when it applies and you hold the permission for it:
+A booking opens in a side panel over whatever page you are on, instead of on a page of its own. Click a booking on the [calendar](/schedule/calendar), in the bookings list, on a member's profile, on an order, on a class roster, or in a report, and the panel slides in from the right. The page underneath stays where it was, so the next booking is one click away. Press **Escape**, click outside the panel, or use its close button to dismiss it.
 
-- **Check In** - takes what is owed and checks the member in, in one step. When money is due, the amount is in the label (for example **Check In · €20**). Available within the [check-in window](/schedule/attendance#check-in-window).
-- **Add Payment** - take payment without checking in, for example for tomorrow's court. It sits in the **More actions** menu when **Check In** is available.
-- **Reinstate** - for a booking released automatically at the end of the day (see [The list page](#the-list-page)).
-- **Confirm Booking** - when the booking is `pending`.
-- **Edit** - area and instructor bookings only. A class booking takes its time and price from the class.
-- **Change people (N)** - for a party booking that hasn't started, release places; each released place is refunded under the cancellation policy.
-- **Cancel**.
+The address of the page you're on gets `?booking=<id>` added while the panel is open, so a reload keeps it open. Old links to `/schedule/bookings/<id>` open the bookings list with that booking's panel.
 
-The **More actions** menu also holds **Message** (opens [Compose](/inbox/compose) addressed to the member), **Assess** when [assessments](/members/assessments) apply, **Change Entrance Method**, and, for the booking's own instructor, **Resend calendar invitation**.
+### The header
 
-The body uses a two-column layout. The left column is the info table: created at, created by with the booking **source** (one of `admin`, `portal`, `app`, `network`, `website`, `kiosk`, `integration`, `api`), customer or coach, recurrence summary, entrance method, and any discount. The right column lists **Players** for area bookings whose area type allows multiple participants (each player can carry their own per-share payment) and shows a yellow note card if the booking has notes.
+The header shows the booking's title (the area, instructor, class, or event), its status chips (confirmed, pending, cancelled, paid or unpaid), and a **Recurring** chip when the booking is part of a series. Under the title is where and when: the gym (when you run more than one), the time, and how the series repeats.
 
-When the booking is part of a multi-line order, the order summary is rendered alongside the info table so you can see the other lines and the order total.
+Three icon buttons sit at the right:
 
-Cancelled bookings show a red alert at the top with the cancellation reason, timestamp, and the user who cancelled.
+- **Message** - opens [Compose](/inbox/compose) addressed to the member, or the booking's participants.
+- **Copy link** - copies a link to the booking that opens it in the bookings list, to share with a colleague.
+- **Close**.
+
+### What the panel shows
+
+Alerts come first when they apply: a red **Cancelled** alert with the reason, the time, and who cancelled; **Managed by** a partner platform for a booking made there (its time, price, and cancellation belong to that platform, so **Edit** and **Cancel** are not offered); and **Due now**, when the member owes money across their charges, with a link to their transactions.
+
+Below the alerts, a strip of facts about the booking:
+
+- **Contact** - the member, with their phone and email. On a booking with players, the contact is listed under **Players** instead.
+- **Instructor** (or the instructor type's name) - linked to the instructor. A lesson still waiting for a coach shows **Any instructor**.
+- **Discount** - add, swap, or take off a promotion code while the booking is unpaid. Not offered once money is taken or the charge is invoiced, nor on a booking covered by a membership or external program, part of a series, or sold through an order.
+- **Entrance Method** - how the visit is paid for (the membership, the external program, **Direct Payment**, **Free**, or **Not set**), with a button to **Change Entrance Method**.
+- **Recurrence** - which occurrence of the series this is.
+- **Order** - the order the booking was sold through and its line total.
+- **Deposit** - a wallet deposit collected with the booking.
+- **Notes**.
+
+Then:
+
+- **Players** (or **People**, for a coach session) - on an area or coach session that takes more than one person. See [Players and group sessions](/schedule/players-and-groups).
+- **Charges** - every charge on the booking, with its payments and refunds. Click a charge to open it in the panel, with its payments and the actions you can take on it; the back arrow returns to the booking.
 
 Event-ticket bookings are titled with the event name, the order line item names the event and ticket type, and the booking's charge reference reads `Event: {title} - {ticket}`. See [Events](/events/events) for the attendee list and check-in.
 
-Below the info layout, three tabs hold the booking's financial and audit history:
+### The actions
 
-- **Charges** - every charge tied to the booking, with payment status and remaining balance.
-- **Payments** - every payment across those charges (most useful for split or partial payments).
-- **Bookings** - only shown for recurring bookings; lists sibling occurrences in the same recurrence series.
+The actions sit at the foot of the panel, each shown only when it applies and you hold the permission for it:
+
+- **Check In** - records the visit and takes whatever is owed in the same step. Available within the [check-in window](/schedule/attendance#check-in-window).
+- **Add Payment** - take payment without checking in, for example for tomorrow's area booking. It takes the main place when the booking can't be checked in yet.
+- **Reinstate** - for a booking released automatically at the end of the day (see [The list page](#the-list-page)).
+- **Confirm Booking** - when the booking is `pending`.
+- **Edit** - area and instructor bookings only. A class booking takes its time and price from the class. Edit opens the booking form over the panel.
+- **Assess** - when [assessments](/members/assessments) apply to a private lesson.
+- **Resend calendar invitation** - for the booking's own instructor.
+- **Change people (N)** - for a party booking that hasn't started, release places; each released place is refunded under the cancellation policy.
+- **Cancel booking** - last, in red.
+
+### The recurring schedule
+
+On a booking that repeats, click the **Recurring** chip to open **Recurring schedule** in the same panel. It lists every occurrence of the series by date, with **Upcoming**, **Past**, and **Cancelled** filters and a count on each. Click an occurrence to open it; the back arrow returns to the booking you came from.
 
 <Note>
   When you switch a booking's entry to a **membership** or an **external
   program**, the booking's total price is reset to 0. A membership has no
   per-booking charge, and an external program bills through its own per-visit
   charge - so the booking itself carries no price. Switching back to a paid
-  entry recalculates the price.
+  entry recalculates the price. On an area with several places, a program pays
+  one place only - see [Players and group
+  sessions](/schedule/players-and-groups#an-external-program-pays-one-place).
 </Note>
 
 ## Paying for a booking
 
-The **Add Payment** action opens the payment dialog. If the booking has one outstanding charge, the amount is editable and defaults to the remaining balance. If the booking has multiple outstanding charges (for example, a recurring series or a multi-line order), the amount is locked to the sum of all remaining balances and the server settles them atomically. Partial multi-charge payments are not supported - use the Charges tab to pay them individually.
+**Add Payment** opens the payment dialog. If the booking has one outstanding charge, the amount is editable and defaults to the remaining balance. If the booking has multiple outstanding charges (for example, an area and an instructor billed separately), the amount is locked to the sum of all remaining balances and the server settles them atomically. Partial multi-charge payments are not supported - open the charges under **Charges** to pay them individually.
+
+A booking that was priced but never given a way to pay has no charge at all. **Add Payment** bills it as a direct payment first, then takes the money.
 
 If the member now qualifies for an auto-apply discount they didn't get when they booked - for example, they were tagged as a member afterwards - the dialog offers it at the top with an **Apply** button before you take the money. **Check In** makes the same offer when the member pays at the door. See [Members who qualify after booking](/sales/promotions#members-who-qualify-after-booking).
 
-The right-click and mobile-tap menus on the [Schedule](/schedule/calendar) page expose the same **Add Payment** action without opening the booking.
+The right-click and mobile-tap menus on the [calendar](/schedule/calendar) expose the same **Add Payment** action without opening the booking.
 
 ## Cancellations
 
-The cancel action opens a dialog where you record a reason. The refund follows the [cancellation rules](/settings/booking-policies) on the matching policy: tiered refund percentages based on how many hours in advance the cancellation happens. If no cancellation rules are configured on the policy, the cancellation refunds 100%.
+**Cancel booking** opens a dialog where you record a reason. The refund follows the [cancellation rules](/settings/booking-policies#cancellation-rules) on the matching policy: tiered refund percentages based on how many hours in advance the cancellation happens. If no cancellation rules are configured on the policy, the cancellation refunds 100%.
 
-The cancellation creates a reversal of the booking's charge (visible on the Charges tab) and emits a cancellation notice to the member. The booking row moves to the **Cancelled** tab.
+The cancellation creates a reversal of the booking's charge (visible under **Charges**) and sends a cancellation notice to the member. The booking moves to the **Cancelled** tab.
 
 ## Recurring bookings
 
 When the booking type is area or instructor, you can set a recurrence pattern in the dialog: how often it repeats, and how the series ends - **Until date**, **After occurrences**, or **Never**. Editing a recurring booking lets you change the current instance only, or apply changes to all future occurrences. Cancelling offers the same choice: **Cancel this booking only** or **Cancel this and all future bookings in the series**.
 
-A series that ends on a date or after a set number of repeats is created in full when you save, so a court held for a season shows as occupied for every one of those dates straight away. **Never** keeps a rolling eight-week horizon instead. A series can cover up to 520 occurrences; see [Repeating schedules](/reference/repeating-schedules).
+A series that ends on a date or after a set number of repeats is created in full when you save, so an area held for a season shows as occupied for every one of those dates straight away. **Never** keeps a rolling eight-week horizon instead. A series can cover up to 520 occurrences; see [Repeating schedules](/reference/repeating-schedules).
 
-Each occurrence is priced and checked for availability on its own date. An occurrence that cannot be placed is skipped rather than double-booked - the court is blocked or already taken at that time, or the class it attends is full or does not run that day.
+Each occurrence is priced and checked for availability on its own date. An occurrence that cannot be placed is skipped rather than double-booked - the area is blocked or already taken at that time, or the class it attends is full or does not run that day.
 
-The **Bookings** tab on the detail page lists every sibling occurrence in the recurrence series.
+A series takes no players, and it can't be paid by an [external program](/settings/external-programs): a program pays one visit at a time.
+
+## How members book
+
+Members book from your member portal, your website, the app, and 1club.me. A few things they see that staff don't:
+
+- **The full-screen checkout.** On a computer, the booking checkout on your portal and website takes the whole screen. What they're booking (the photo, the time, the instructors, and your cancellation terms) stays on one side, and who it's for, how they attend, and how they pay sit on the other, with the total and the confirm button right under them. Every way to attend is listed in full: paying for this visit, a membership they already hold, or a membership or pass they can buy on the spot. On a phone or a tablet, the checkout slides up from the bottom of the screen.
+- **An area with a coaching session.** A member booking a coach on the booking calendar can add an area to the same session, from the areas that suit the coach and are free for the whole session, and pay for both in one checkout. Adding one is optional. The price is the price of the pair, and a coach whose rate already includes the area keeps charging that one rate.
+- **Offers on the calendar.** A time-of-day promotion shows its offer and hours under the booking calendar, and the checkout strikes through the regular price. See [Time-of-day offers on the booking calendar](/sales/promotions#time-of-day-offers-on-the-booking-calendar).
+- **Players.** Members add the people they're playing with while they book. See [Players and group sessions](/schedule/players-and-groups).
 
 ## Worked examples
 
-### Padel court booked over the phone
+### Area booked over the phone
 
-A regular calls to book a court for tonight. Reception opens **Add booking**, picks the contact, sets **Type** to **Area**, selects the court, and sets the hour. The price breakdown shows the court's per-hour rate. Because the booking is admin-created, **At booking** payment enforcement is bypassed - the reservation is recorded and the balance is collected at the desk when they arrive. For a doubles game, add the other players so each guest seat carries its own share.
+A regular calls to book a padel area for tonight. Reception opens **Add** > **Booking** on the calendar (or clicks the free slot), picks the contact, sets **Booking Type** to **Area**, selects the area, and sets the hour. The price breakdown shows the area's per-hour rate. Because the booking is admin-created, **At booking** payment enforcement is bypassed - the reservation is recorded and the balance is collected at the desk when they arrive. Add the other three in **Players**, and each gets their own place to pay.
 
-### Court lesson with any available coach
+### Area lesson with any available coach
 
-A member calls for a lesson on court 3 tonight and doesn't mind which coach teaches it. Reception opens **Add booking**, selects the court, and sets **Instructor** to **Any instructor**. The booking holds the court and is priced as the court alone, and no coach's time is reserved. On the schedule it shows **Any instructor** in its own color, so the desk can see at a glance which lessons still need a coach.
+A member calls for a lesson on area 3 tonight and doesn't mind which coach teaches it. Reception opens the booking dialog, selects the area, and sets **Instructor** to **Any instructor**. The booking holds the area and is priced as the area alone, and no coach's time is reserved. On the schedule it shows **Any instructor** in its own color, so the desk can see at a glance which lessons still need a coach.
 
-The booking's detail page shows **Instructor: Any instructor** until a coach is named. When a coach is free, open the booking, click **Edit**, and pick them under **Instructor**. The booking stops waiting and is re-priced as a court with that coach. If that coach later drops out and is taken off the booking, it goes back to **Any instructor**, because the member still wants a lesson. **No instructor** is the choice for a court booking nobody asked a coach for, and choosing it withdraws the request. **Any instructor** needs a court, so pick the area first.
+The booking panel shows **Instructor: Any instructor** until a coach is named. When a coach is free, open the booking, click **Edit**, and pick them under **Instructor**. The booking stops waiting and is re-priced as an area with that coach. If that coach later drops out and is taken off the booking, it goes back to **Any instructor**, because the member still wants a lesson. **No instructor** is the choice for an area booking nobody asked a coach for, and choosing it withdraws the request.
 
 ### Personal-training session
 
-To book a one-on-one, set **Type** to **Instructor** and pick the coach. The instructor's session price seeds the breakdown. If the member's plan covers PT, switch the entrance to their membership and the booking price resets to 0.
+To book a one-on-one, set **Booking Type** to **Instructor** and pick the coach. The instructor's session price seeds the breakdown. If the member's plan covers PT, switch the entrance to their membership and the booking price resets to 0. For a lesson for two, add the second person under **Who else is coming**.
 
-### Standing weekly court
+### Standing weekly booking
 
-A member wants the same court every Tuesday at 18:00 for the season. Create an **Area** booking, turn on recurrence with a weekly pattern, and set **Ends** to **Until date** with the last Tuesday of the season. Every one of those Tuesdays is reserved when you save, so the court is visibly occupied for the whole season rather than just the next few weeks. The **Bookings** tab lists every occurrence; edit or cancel one week without touching the rest, or apply a change to all future weeks.
+A member wants the same area every Tuesday at 18:00 for the season. Create an **Area** booking, turn on recurrence with a weekly pattern, and set **Ends** to **Until date** with the last Tuesday of the season. Every one of those Tuesdays is reserved when you save, so the area is visibly occupied for the whole season rather than just the next few weeks. Open **Recurring schedule** from the booking's **Recurring** chip to see every occurrence; edit or cancel one week without touching the rest, or apply a change to all future weeks. For a prepaid contract with a volume discount, sell a [season pass](/schedule/season-passes) instead.
 
 ### Recording a class booking that's already paid
 
-A member paid cash at the desk for a drop-in yoga class. Create a **Class** booking, add the payment on the detail page, and uncheck **Send confirmation email** if they were already told in person.
+A member paid cash at the desk for a drop-in yoga class. Create a **Class** booking, uncheck **Send confirmation email** if they were already told in person, then open the booking and take the payment with **Add Payment**.
 
 ## Tips & best practices
 
 - **Use admin bookings for phone and walk-in reservations.** They are not held to upfront-payment enforcement, so you can record the booking now and collect at check-in.
 - **Check the price breakdown before saving.** It's the fastest way to confirm a membership or external program is covering the visit, or that a promotion applied.
-- **Pay multi-charge bookings from the right place.** For a single balance, use **Add Payment**; for individual lines of a recurring series or multi-line order, use the **Charges** tab.
+- **Pay multi-charge bookings from the right place.** For the whole balance, use **Add Payment**; for one charge, open it under **Charges**.
 - **Cancel with a reason.** The reason and refund are recorded and the member is notified automatically, which keeps disputes clean.
 - **Prefer entrance switching over manual price edits.** Setting the entrance to a membership or external program zeroes the price correctly, rather than hand-editing the total.
+- **Share a booking with Copy link.** The link opens the booking for anyone who can see the bookings list.
 
 ## Troubleshooting
 
@@ -179,21 +226,26 @@ A member paid cash at the desk for a drop-in yoga class. Create a **Class** book
 
 **Issue**: A partial payment across several charges was rejected.
 
-**Solution**: Partial multi-charge payments aren't supported from **Add Payment** - it settles all balances atomically. Pay the lines individually from the **Charges** tab instead.
+**Solution**: Partial multi-charge payments aren't supported from **Add Payment** - it settles all balances atomically. Open each charge under **Charges** and pay it on its own.
 
 **Issue**: The member didn't get a confirmation email.
 
-**Solution**: **Send confirmation email** is only offered on create, and editing never re-sends it. If it was unchecked, message the member with **Message** or from [Compose](/inbox/compose).
+**Solution**: **Send confirmation email** is only offered on create, and editing never re-sends it. If it was unchecked, message the member with the **Message** button on the panel or from [Compose](/inbox/compose).
 
 **Issue**: I get "This area is already booked for this slot" (or the instructor equivalent) and can't save over it, or the footer says a blocked area can't be booked.
 
 **Solution**: Booking into an already-taken slot or a blocked area needs **Full access** on Booking (or Classes, for a class) at Club scope or higher - Front Desk and Instructor don't have it by default. Grant it in the [permissions editor](/reference/roles-permissions), or make the change from a Manager or Admin account.
 
+**Issue**: **Edit** and **Cancel booking** are missing from a booking.
+
+**Solution**: The booking shows **Managed by** a partner platform. It was made there, and its time, price, and cancellation are changed there; the change arrives in 1club automatically.
+
 ## Related
 
 - [Booking policies](/settings/booking-policies) - Payment timing, cancellation refunds, lead times.
-- [Schedule](/schedule/calendar) - The calendar where these bookings show up.
-- [Classes](/schedule/classes) - Class-bound bookings have their own list and detail flow.
+- [Calendar](/schedule/calendar) - The calendar where these bookings show up.
+- [Players and group sessions](/schedule/players-and-groups) - More than one person on a booking.
+- [Classes](/schedule/classes) - Class-bound bookings have their own list and roster.
 - [Events](/events/events) - Event tickets become bookings with their own attendee list and check-in.
 - [Payments](/sales/payments) and [Charges](/sales/charges) - Money side of every booking.
 - [Check-in models](/reference/check-in-models) - Entrance method that satisfies payment-at-check-in.

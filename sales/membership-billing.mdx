@@ -1,0 +1,134 @@
+---
+title: Membership billing
+description: How 1club charges membership renewals - by saved card or payment link - the billing day that puts every membership on the same day of the month, the Membership billing tab that lists every renewal charge coming up, and what happens when a renewal fails.
+keywords:
+  [
+    "membership billing",
+    "renewal",
+    "auto-renew",
+    "billing day",
+    "first period",
+    "proration",
+    "next charge",
+    "scheduled charges",
+    "no card on file",
+    "failed renewal",
+    "dunning",
+    "payment link",
+    "saved card",
+    "myPOS renewals",
+  ]
+---
+
+Membership billing is how 1club charges renewing memberships: the renewal engine raises each renewal charge and collects it automatically, on the same day of the month for everyone if you set a billing day. The **Membership billing** tab under **Sales** > **Finance** lists every renewal charge coming up in the next 30 days, so owners and front-desk staff see who will be charged, how much, and when - and which renewals won't go through - before any money moves.
+
+## Why use it
+
+You never need to chase a renewing member by hand while their card works, and you see the problems early.
+
+- **Everyone on the 1st** - a CrossFit box sets its billing day to the 1st. A member who joins on the 15th pays for the 17 days to the 1st, then the full price on the 1st with everyone else.
+- **Checking before the 1st** - two days before the run, the owner opens **Membership billing**, sees three members flagged **No card on file**, and asks them to add a card at their next visit.
+- **A declined card** - a member's card expires. The renewal is marked failed and they keep training. When they save a new card, the failed renewal is charged to it automatically.
+- **No card payments online** - a gym that takes cash only sees every renewal as **Owed - no online payments**, and collects them at the desk.
+
+## How it works
+
+### Who charges a renewal
+
+A renewing membership with auto-renew on is renewed by the renewal engine, which runs every hour. For each renewal it:
+
+1. Raises the renewal charge for the next period, if it isn't there yet.
+2. Collects it when it falls due - a few days before the period starts (the plan's **Renewal Lead Time**, 3 days by default), or on the billing day when the membership has one.
+3. Moves the membership on to the next period.
+
+A renewal that is already paid (for example a payment taken at the desk) is never charged again, and a renewal that costs nothing is settled without a charge.
+
+### How the money is collected
+
+It depends on how the company that sold the membership takes online payments (see [Billing entities](/settings/billing-entities)):
+
+| The company takes online payments through             | What happens at renewal                                                                                                                                              |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Stripe**                                            | The member's saved card is charged. A card saved by a guardian on the member's household is used when the member has none.                                           |
+| **myPOS**, with **Charge renewals to saved cards** on | The member's saved myPOS card is charged. If it is declined or has expired, the member is emailed a payment link instead. See [myPOS](/settings/integrations/mypos). |
+| **myPOS**, without saved cards                        | The member is emailed a payment link for the renewal. Paying it renews the membership.                                                                               |
+| Nothing (no online payments)                          | The renewal is raised and left owed, for you to collect at the desk with **Add Payment**.                                                                            |
+
+### Billing day
+
+By default each membership renews on the anniversary of the day the member joined. Set a **Billing day** under **Settings** > **Billing** > **General** (see [Billing general settings](/settings/billing-general#membership-billing)) and every membership sold from then on renews on that day of the month instead.
+
+- **Which memberships follow it** - renewing memberships with auto-renew on, counted in months: monthly, quarterly, annually, and custom periods in months. Weekly plans, custom periods in days or weeks, one-time plans, plans that don't renew, and [season passes](/schedule/season-passes) keep their anniversary.
+- **The first period** - a member who joins between two billing days first pays for the days up to the next billing day, then the full price from the billing day on. **First period** decides what that first stretch costs: **Charged by the day** (its share of a full period, the default), **Full price**, or **Free until the billing day**. A member who joins on the billing day has no short first period.
+- **Sessions in the first period** - a shorter first period gets the same share of each session limit, rounded up.
+- **Discounts** - a discount on the membership is shared out the same way.
+- **When it is charged** - a membership with a billing day is charged on the billing day itself, not days before.
+- **Existing memberships** - keep their dates. The billing day is stamped on each membership when it is sold, so changing the setting later moves nobody.
+
+The shorter first period is shown before anything is charged: in the admin's **Add Membership** dialog (**First period**, then "Then {amount} from {date}"), at the [Point of Sale](/pos/point-of-sale), where the plan is priced at the first-period amount, and at the member's checkout ("Today covers {period}. Then {price} from {date}.").
+
+Example: your billing day is the 1st and **First period** is **Charged by the day**. A member joins a 100-a-month plan on 15 October. October has 31 days and the first period covers 17 of them, so they pay 54.84 now, then 100 on 1 November.
+
+## The Membership billing tab
+
+Go to **Sales** > **Finance** > **Membership billing** (`/billing/renewals`). The page lists **Scheduled charges**: every renewal charge the engine will take in the next 30 days, for the gym selected at the top of the admin, on the day it will be taken.
+
+The strip at the top sums up:
+
+- **Next 7 days** - the amount, and how many charges.
+- **Next 30 days** - the same for the whole window.
+- **Won't be charged** - renewals with no card on file, or whose company takes no online payments.
+- **Last charge failed** - renewals whose previous charge was declined.
+
+Each row shows:
+
+- **Charge date** - the day the charge is taken. A charge already due shows today.
+- **Member** - links to the member.
+- **Plan**.
+- **Period** - the period the charge pays for.
+- **Amount** - the price with tax, or what is still owed on a renewal already raised.
+- **Payment** - how it will be collected:
+  - **Charged automatically** - a saved card will be charged.
+  - **No card on file** - the company charges saved cards, but the member has none.
+  - **Owed - no online payments** - the company takes no online payments, so it will be owed at the desk.
+  - **Sent as a payment link** - the member will be emailed a myPOS payment link.
+  - **Last charge failed** - the membership's previous renewal charge was declined.
+
+Click a row to open the membership. The list includes active and used memberships with auto-renew on that have started; weekly memberships show each week's charge. A charge after a scheduled cancellation date is left out, and so is a renewal that costs nothing.
+
+The tab needs the **billing.read.club** permission, like the rest of **Finance**.
+
+### The next charge
+
+Each membership's detail page shows its **Next charge** - "{amount} on {date}", for the period it pays for - with the same chip when the renewal won't be charged automatically. See [The membership detail page](/sales/memberships#the-membership-detail-page). Members see their next charge on the membership in their account.
+
+## When a renewal fails
+
+When a renewal charge is declined (or the member has no card at charge time):
+
+- A failed payment is recorded for the attempt, and the renewal charge is marked **Failed**. It shows on the [Charges](/sales/charges) page and on the membership, and counts towards the member's financial [smart tags](/settings/smart-tagging).
+- A payment-failed trigger fires, which you can use in an [automation](/marketing/automations), for example to email "please update your card".
+- On a saved myPOS card, the member is also emailed a payment link.
+- **The membership stays active.** The member keeps their access, and the next period is raised as normal. Cancelling a member who doesn't pay is your decision, never an automatic one.
+
+The engine doesn't retry a failed charge every hour. It charges it again when the member saves a new card: the failed renewals they (or their household) owe are charged to it, as long as the membership still renews and its period has not ended. Otherwise collect it like any other charge, with **Add Payment**, **Charge saved card**, or a payment link from [Charges](/sales/charges). A later payment marks the charge paid.
+
+## Troubleshooting
+
+| What you see                                          | Why                                                                                                                           | What to do                                                                                      |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| A renewal shows **No card on file**                   | The member has no saved card with the company that sold the membership.                                                       | Ask them to add a card in their account, or collect the renewal at the desk.                    |
+| Every renewal shows **Owed - no online payments**     | The company selling the memberships has no online payment provider connected.                                                 | Connect Stripe or myPOS under **Settings** > **Integrations**, or collect renewals at the desk. |
+| A membership isn't in the list                        | Auto-renew is off, the membership hasn't started, it is paused, it ends before its next charge, or the renewal costs nothing. | Open the membership to check its auto-renew and dates.                                          |
+| A new member was charged less than the plan price     | Your organization has a billing day, and their first period runs only to it.                                                  | Expected. They pay the full price from the billing day on.                                      |
+| Changing the billing day didn't move existing members | The billing day is stamped on each membership when it is sold.                                                                | Expected. Only memberships sold after the change follow the new day.                            |
+| A member was declined but can still book              | A failed renewal never ends or pauses a membership.                                                                           | Follow up with the member, or cancel the membership if you choose to.                           |
+
+## Related
+
+- [Memberships](/sales/memberships) - the memberships being renewed, and their next charge.
+- [Plans](/sales/plans) - auto-renew and the renewal lead time are set on the plan.
+- [Billing general settings](/settings/billing-general#membership-billing) - where the billing day is set.
+- [Charges](/sales/charges) - collect a renewal that wasn't charged automatically.
+- [Invoice runs](/sales/bill-runs) - issue invoices for charges; they never take payments.
+- [myPOS](/settings/integrations/mypos) - charge renewals to saved myPOS cards.

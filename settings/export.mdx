@@ -1,10 +1,10 @@
 ---
 title: Export
-description: Download your organization data as CSV, or prep your books for QuickBooks Online.
-keywords: [export, CSV, data export, QuickBooks, QBO, contacts export, bookings export, memberships export, invoices export, payments export, accounting export]
+description: Download your organization data as an Excel workbook or CSV, or prep your books for QuickBooks Online.
+keywords: [export, Excel, xlsx, CSV, data export, QuickBooks, QBO, contacts export, bookings export, memberships export, invoices export, payments export, accounting export]
 ---
 
-Export downloads your organization's data as an Excel workbook or a CSV file: contacts, bookings, memberships, invoices, and payments. There's also a QuickBooks bundle that packages customers, invoices, and payments for handing off to your accountant. Only admins can run exports.
+Export downloads your organization's data as an Excel workbook or a CSV file: contacts, bookings, memberships, invoices, and payments. There's also a QuickBooks bundle that packages customers, invoices, and payments for handing off to your accountant. Owners and admins usually run them; each dataset needs its own export permission.
 
 ## When to use it
 
@@ -71,10 +71,16 @@ For the accounting export, an existing member whose contact record was created y
 
 Choose the format on the **Filters** step:
 
-- **Excel (.xlsx)** - a workbook with dates and amounts already typed, ready to sort and sum. Up to 50,000 rows.
+- **Excel (.xlsx)** - a workbook whose cells carry their real types: amounts are numbers you can sum and format as currency, dates are dates you can sort and filter, and values that only look like numbers (phone numbers, postal codes, invoice references) stay exactly as entered, leading `+` included. The header row is bold and stays visible as you scroll, and columns are sized to their contents. Up to 50,000 rows.
 - **CSV (.csv)** - a plain text file that opens in any spreadsheet app. Up to 500,000 rows.
 
 If an export has more rows than the format allows, the preview says so and you can't download it. Narrow the date range, or switch to CSV.
+
+<Tip>
+Pick Excel when a person will open the file. In languages where Excel expects a semicolon between values, a comma-separated CSV can land entirely in the first column, and every value in it arrives as text. Pick CSV when another system needs to read the file.
+</Tip>
+
+Reports and dashboards in [Analytics](/analytics/overview) offer the same choice from their **Export** button, with Excel as the default.
 
 CSV files are UTF-8 with a byte-order mark (BOM), so Excel and Numbers open them with the correct encoding automatically.
 
@@ -127,9 +133,18 @@ When the import asks how item amounts treat tax, choose **Exclusive of tax**. In
 
 ## Access and permissions
 
-Running exports requires the **admin** role. Managers, instructors, staff, and members cannot access the Export page or the underlying download endpoints.
+The Export page sits in Settings, so opening it needs Settings access, which by default only the **Admin** role holds. Each dataset also needs its own export permission:
 
-If you need to give someone outside the admin role access to a recurring export, the current workaround is to run the export yourself and share the file via your usual channel (email, shared drive). Programmatic access via the public API for non-admin exports is not currently supported.
+| Export | Permission needed |
+|--------|-------------------|
+| Contacts, Memberships | Members **Export** |
+| Bookings | Bookings **Export** at organization scope |
+| Invoices, Payments | Billing **Export** at organization scope |
+| Accounting export | Both Billing **Export** and Members **Export** |
+
+**Full access** to a module includes its export permission. Viewing a module's records is not enough to export them in bulk. See [Roles and permissions](/reference/roles-permissions).
+
+To share a recurring export with someone who has no export access, run it yourself and share the file through your usual channel.
 
 ## Tips & best practices
 
@@ -157,7 +172,7 @@ If you need to give someone outside the admin role access to a recurring export,
 
 ## Related
 
-- [Import](/settings/overview) - The mirror flow for bringing data into 1club.
+- [Data import](/settings/import) - The mirror flow for bringing data into 1club.
 - [Billing overview](/sales/overview) - How invoices and payments work in 1club, useful context when reading the exported files.
 - [Invoices](/sales/invoices) - Invoice fields and statuses you'll see in `invoices-export.csv`.
 - [Payments](/sales/payments) - Payment records and how they link to invoices.

@@ -14,6 +14,8 @@ keywords:
     test mode,
     live mode,
     billing entity,
+    member app,
+    renewals,
   ]
 ---
 
@@ -44,7 +46,7 @@ Typical uses:
 
 - **A paid plan.** DatecsPay is a paid-plan integration. On the Free plan and during the free trial, **Activate** is greyed out until you upgrade.
 - **BORICA credentials for the environment you want.** Both Test and Live need a **Terminal ID (TID)**, a **Merchant ID (MID)**, your **RSA private key**, and **BORICA's public certificate**. BORICA issues a separate set for each environment, so keep the two sets apart.
-- **A free hosted-checkout slot.** Each company can run only one hosted-checkout provider at a time. If myPOS hosted checkout is active for the company, deactivate myPOS first, or untick its **Online** capability if you only use it for terminals.
+- **No other online card provider for the company.** Each company takes online card payments through one provider at a time: Stripe, myPOS, or DatecsPay. While Stripe or myPOS takes them, **Save** is greyed out and hovering it names that provider. Untick **Online** under **Use Stripe for** on the [Stripe](/settings/integrations/stripe#use-stripe-for) page, or untick **Online** on the [myPOS](/settings/integrations/mypos#one-online-card-provider-per-company) page, first. Both can keep running card readers beside DatecsPay.
 
 <Note>
   Configuring DatecsPay requires the **settings.manage.organization**
@@ -102,7 +104,7 @@ Your country and time-zone offset are not part of this form. 1club derives them 
 | **Private key passphrase**          | No                                             | Only if your key file is passphrase-protected. Used once to decrypt the key and never stored.                                                         |
 | **BORICA public certificate (PEM)** | On first save, and when you change environment | BORICA's certificate used to verify gateway responses. Differs between test and production. Leave blank when editing to keep the current certificate. |
 
-Capabilities are limited to **online** hosted checkout, which is always on. There is no in-person terminal option.
+Capabilities are limited to **online** hosted checkout, which is always on. There is no in-person terminal option: for card readers at the desk, use [Stripe or myPOS terminals](/settings/payment-terminals) beside DatecsPay.
 
 ## Test vs. live environment
 
@@ -134,6 +136,14 @@ The **Test configuration** button checks that your saved credentials are complet
 - The payment status and BORICA transaction references are recorded on the 1club payment, and any linked charges and bookings are settled automatically.
 - Every path is matched to the same payment by a unique reference, so a redelivered notification or an overlapping reconciliation never double-charges or double-settles.
 
+## Where members pay by card
+
+Members pay through BORICA's checkout page wherever they buy online: bookings, classes, events, memberships, the [shop](/sales/products#member-portal-shop), signup forms, and outstanding balances in the member portal and on your website. In the member app, the checkout page opens inside the app and the member returns to the app with the result. If the confirmation takes a moment longer, the app says so rather than reporting a failure, so nobody pays twice.
+
+## Membership renewals
+
+DatecsPay doesn't collect renewals on its own: BORICA's checkout needs the member at the page, and there is no saved card to charge. When DatecsPay takes a company's online card payments, each renewal of an auto-renewing membership is raised as a charge and left owed. Collect it at the desk or from an invoice. See [Recurring memberships](/sales/overview#recurring-memberships).
+
 ## Payment links
 
 DatecsPay has no shareable payment link. The **Send myPOS payment link** action on a charge works with myPOS only, so on DatecsPay a member pays through the checkout in the portal, the app, or your website rather than from a link you send them. If sending a pay-by-link is central to how you collect, myPOS is the better fit.
@@ -158,7 +168,7 @@ You stay on the DatecsPay page afterwards, with the form reset. Your stored cred
 - **Customers see a signature error on the checkout page** - the public key registered with BORICA doesn't match the private key on file, or the TID belongs to a different environment. Re-check the key pair registered with BORICA and confirm the TID matches your selected environment.
 - **Payment succeeded on BORICA but the charge stays unpaid in 1club** - this usually resolves on its own: the reconciliation job confirms pending checkouts within a few minutes. If it persists beyond that, re-check that your BORICA certificate is current.
 - **Live payments fail but test works** - confirm you are in the **Live** environment and entered live credentials (a production TID and the production BORICA certificate, not the test ones).
-- **"myPOS is already enabled"** - only one hosted-checkout provider can be active per company. Deactivate myPOS for that company, or untick its **Online** capability, then save DatecsPay again.
+- **Save is greyed out, or saving says another provider "already takes online card payments"** - only one online card provider can be active per company. Untick **Online** on the Stripe or myPOS page for that company, then save DatecsPay again.
 
 ## Worked examples
 
@@ -171,13 +181,15 @@ You stay on the DatecsPay page afterwards, with the form reset. Your stored cred
 - Keep your test and production credential sets clearly separated. The TID, key, and BORICA certificate differ per environment, and mixing them is the most common cause of signature errors.
 - Remember that **Test configuration** is a local check only. It can't confirm BORICA recognizes your terminal, so always follow it with a real test payment.
 - Leave the masked private key and certificate fields blank when editing later. Only paste a value when you are deliberately replacing it.
-- Decide up front whether each company takes online card payments through DatecsPay or myPOS. Only one hosted-checkout provider can run per company.
+- Decide up front whether each company takes online card payments through DatecsPay, myPOS, or Stripe. Only one online card provider can run per company.
+- If you sell monthly memberships, plan how you will collect renewals. DatecsPay leaves each renewal owed, while Stripe and myPOS can collect them automatically.
 
 ## Related
 
 - [Integrations](/settings/integrations) - the full integration catalog and how activation works.
 - [Billing entities](/settings/billing-entities) - the companies you trade through, each with its own payment accounts.
 - [myPOS](/settings/integrations/mypos) - the other hosted-checkout provider (myPOS **Online** can't run alongside DatecsPay for the same company).
+- [Payment terminals](/settings/payment-terminals) - card readers at the front desk, through Stripe or myPOS.
 - [Stripe](/settings/integrations/stripe) - card and wallet payments with test and live modes.
 - [Charges](/sales/charges) - where payable charges live.
 - [Payments](/sales/payments) - the payment records DatecsPay settles.

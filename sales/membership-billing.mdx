@@ -52,7 +52,7 @@ It depends on how the company that sold the membership takes online payments (se
 | **Stripe**                                            | The member's saved card is charged. A card saved by a guardian on the member's household is used when the member has none.                                           |
 | **myPOS**, with **Charge renewals to saved cards** on | The member's saved myPOS card is charged. If it is declined or has expired, the member is emailed a payment link instead. See [myPOS](/settings/integrations/mypos). |
 | **myPOS**, without saved cards                        | The member is emailed a payment link for the renewal. Paying it renews the membership.                                                                               |
-| Nothing (no online payments)                          | The renewal is raised and left owed, for you to collect at the desk with **Add Payment**.                                                                            |
+| **DatecsPay**, or no online card provider             | The renewal is raised and left owed, for you to collect at the desk with **Add Payment**.                                                                            |
 
 ### Billing day
 
@@ -90,7 +90,7 @@ Each row shows:
 - **Payment** - how it will be collected:
   - **Charged automatically** - a saved card will be charged.
   - **No card on file** - the company charges saved cards, but the member has none.
-  - **Owed - no online payments** - the company takes no online payments, so it will be owed at the desk.
+  - **Owed - no online payments** - the company has no online card provider that collects renewals (Stripe or myPOS), for example it uses DatecsPay or none, so it will be owed at the desk.
   - **Sent as a payment link** - the member will be emailed a myPOS payment link.
   - **Last charge failed** - the membership's previous renewal charge was declined.
 
@@ -118,7 +118,7 @@ The engine doesn't retry a failed charge every hour. It charges it again when th
 | What you see                                          | Why                                                                                                                           | What to do                                                                                      |
 | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | A renewal shows **No card on file**                   | The member has no saved card with the company that sold the membership.                                                       | Ask them to add a card in their account, or collect the renewal at the desk.                    |
-| Every renewal shows **Owed - no online payments**     | The company selling the memberships has no online payment provider connected.                                                 | Connect Stripe or myPOS under **Settings** > **Integrations**, or collect renewals at the desk. |
+| Every renewal shows **Owed - no online payments**     | The company selling the memberships has no provider that collects renewals: it uses DatecsPay, or no online card provider.                                                 | Connect Stripe or myPOS under **Settings** > **Integrations**, or collect renewals at the desk. |
 | A membership isn't in the list                        | Auto-renew is off, the membership hasn't started, it is paused, it ends before its next charge, or the renewal costs nothing. | Open the membership to check its auto-renew and dates.                                          |
 | A new member was charged less than the plan price     | Your organization has a billing day, and their first period runs only to it.                                                  | Expected. They pay the full price from the billing day on.                                      |
 | Changing the billing day didn't move existing members | The billing day is stamped on each membership when it is sold.                                                                | Expected. Only memberships sold after the change follow the new day.                            |

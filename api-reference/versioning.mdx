@@ -24,6 +24,10 @@ A breaking change ships as a new version in the path, such as `/v2`, instead of 
 - Changing a field's type or meaning
 - Making an optional parameter required
 
+### Report definitions
+
+The report operations (`/v1/platform/reports/*`) are the one exception. When the rule behind a figure changes, such as which days a comparison covers or how a trend is grouped, the report changes within `v1`, so its figures keep matching the same report in the 1club admin. Each response names the rule it used (`comparison.from`, `comparison.to` and `comparison.basis`, `trend.granularity`, `trend.weekStartsOn`), and every such change is listed, with examples and what to check, on [Report changes](/api-reference/changes).
+
 ## Deprecation
 
 Before an operation is removed, it's deprecated first:
@@ -36,5 +40,6 @@ A deprecated operation keeps working during the notice period. Plan your move aw
 ## Stay up to date
 
 - Check the [changelog](/changelog) for API announcements.
+- If you read reports, check [Report changes](/api-reference/changes) for changes to how they answer.
 - If you generate a client from the [OpenAPI spec](https://docs.1club.ai/openapi-platform.json), look for operations flagged `deprecated` when you regenerate it.
 - Contact [support@1club.ai](mailto:support@1club.ai) if a deprecation affects your integration and you need help planning the move.

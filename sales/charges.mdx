@@ -71,12 +71,14 @@ Each row shows:
 - **Contact** the charge is against.
 - **Amount** - the total, with its tax underneath when it is taxed, and "{amount} still owed" on a partly paid charge.
 - **Status**: **Unpaid** (`pending`), **Paid**, **Partially paid**, **Overdue**, **Failed**, **Void**, **Settled**, **Refunded**, or **Cancelled**.
-- **Reference** - what was charged for, with the type underneath.
+- **Reference** - what was charged for, with the type underneath. It is named from what the charge links to, so it always matches the record: the court or the coach a booking's charge pays for (a court booked with a coach is two charges, each named for its own part) and the session's time, the plan and the period a membership charge pays for, the product, the check-in. A reversal reads **Reversal:** before the name, with the share it gives back. A charge you add by hand shows the description you typed.
 - **Created At**.
 
-A **Type** column is hidden by default; add it from the column chooser. The types are **Booking**, **Booking cancellation**, **Membership**, **Recurring** (a membership renewal), **Price adjustment**, **Signup fee**, **Membership cancellation**, **Early cancellation**, **Product Sale**, **External Program**, **Check-in**, and **Settlement**.
+A **Type** column is hidden by default; add it from the column chooser. The types are **Booking**, **Booking cancellation**, **Membership**, **Membership renewal**, **Price adjustment**, **Signup fee**, **Membership cancellation**, **Early cancellation**, **Product Sale**, **External Program**, **Check-in**, and **Settlement**.
 
 Behind each row, a charge also records its tax rate, its revenue account, the company that sold it, whether it has been put on an invoice, and links to its booking, membership, product, or order. A reversal links back to the charge it reverses.
+
+The same reference names the charge everywhere it appears: the member app and portal, payment receipts, invoices, a myPOS payment page, what a card payment shows the payer, and the QuickBooks export. The names in it stay as you wrote them; the words 1club adds (such as **Reversal**, or a charge's type at the start of an invoice line) are in the reader's language: yours in the dashboard, the member's in the app, the portal and their receipts, and your organization's on invoices and card payments.
 
 Zero-amount charges are marked paid when they are created, so a free booking still has a charge but it never blocks anything.
 
@@ -101,7 +103,7 @@ To record an ad-hoc charge that doesn't correspond to a booking or membership:
 
 1. On **Sales** > **Finance** > **Charges**, click **Add** in the page header.
 2. Set the **Date**, pick the **Contact**, enter the **Amount**, and optionally a **Description** and an **Account** (the revenue account).
-3. Save. The charge is created unpaid (unless the amount is zero, which marks it paid).
+3. Save. The charge is created unpaid (unless the amount is zero, which marks it paid). Its description is its reference, shown exactly as you typed it.
 
 Adding a charge by hand needs the **billing.manage.organization** permission.
 
@@ -203,7 +205,7 @@ When your organization has [myPOS](/settings/integrations/mypos) connected, you 
 The **Send myPOS payment link** row action appears only when myPOS is active and the charge status is `pending`, `overdue`, or `partially_paid`. Closed states (`paid`, `void`, `refunded`, `cancelled`, `failed`, `settled`) don't offer it.
 
 1. From the charge's action menu, choose **Send myPOS payment link**.
-2. The dialog shows the reference (the description, or `#<id>`), the amount, and the contact's name and email.
+2. The dialog shows the reference, the amount, and the contact's name and email.
 3. Click **Send link**. 1club generates a link and emails it to the contact's address on file.
 
 Behind the scenes, sending is a two-step call: the server first generates a stateless link (a JWT-backed `/pay/<token>` URL on your member-facing site) and then emails it. The customer opens the link on any device and pays through myPOS hosted checkout; the myPOS notification (IPN) marks the charge paid. The link is **valid for 7 days**.
@@ -232,7 +234,7 @@ An hourly sweep marks an unpaid charge `overdue` once its due date (or, without 
 
 You run a weekly paid padel clinic. Everyone who booked has a card on file, and you charge the group after the session.
 
-1. On **Sales** > **Finance** > **Charges**, open the **Pending** tab and search for the clinic by description (or filter by the class).
+1. On **Sales** > **Finance** > **Charges**, open the **Pending** tab and search for the clinic by name (search matches the class, court, coach, plan or product a charge is for, and the description of one added by hand), or filter by the class.
 2. Select all the roster's `booking_creation` rows with the checkboxes.
 3. Click **Charge saved card** and confirm.
 4. Read the **Batch Payment Results**: successes flip to `paid`, and any "No payment method on file" or "charge declined" rows tell you exactly who to follow up with.

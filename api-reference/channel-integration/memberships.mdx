@@ -42,6 +42,7 @@ Body fields:
 - `planId` (required) - the plan, from [Plans](/api-reference/channel-integration/plans)
 - `startDate` (optional) - ISO date-time with offset; defaults to now
 - `autoRenew` (optional) - defaults to the plan's setting
+- `classId` (required for a plan with `chargesPerSession`, ignored otherwise) - any session of the recurring class the customer takes a place in, from [Classes](/api-reference/channel-integration/classes). They are booked into every session of it from the start date. Without it the call is refused with `PLAN_REQUIRES_STANDING_PLACE`. See [Per-session plans](/sales/per-session-plans).
 - `payment.status` (required) - `paid` (you collected the money) or `unpaid` (outstanding)
 - `payment.reference` (optional) - your own id for the payment you collected, up to 128 characters. Requires `payment.status: "paid"`.
 - `payment.fee` (optional) - what you kept out of the amount, your commission. Recorded for reconciliation; it does not reduce the sale. Requires `payment.status: "paid"` and an explicit `overrides.amount` it cannot exceed.
@@ -169,7 +170,10 @@ Requires the `memberships:read` scope. Returns one membership by its 1club id,
 including `usesRemaining` - the sessions the customer has left - and `allowances`,
 which lists what it covers (`validFor`), its session count, and what is left. A
 membership sold from a plan with several allowances, such as 5 Yoga + 4 Pilates, has
-one entry for each, each with the `allowanceId` you use to change it.
+one entry for each, each with the `allowanceId` you use to change it. `nextCharge` is
+its next renewal charge. On a [per-session plan](/sales/per-session-plans) it says
+what the charge is made of (the fixed part, the sessions, the discount, and earlier
+months' corrections and credit), and `usesRemaining` is the makeups it owes.
 
 ```bash
 curl "https://api.1club.ai/v1/platform/memberships/7412" \

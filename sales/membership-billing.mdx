@@ -17,6 +17,8 @@ keywords:
     "payment link",
     "saved card",
     "myPOS renewals",
+    "per-session plan",
+    "session corrections",
   ]
 ---
 
@@ -68,6 +70,20 @@ By default each membership renews on the anniversary of the day the member joine
 The shorter first period is shown before anything is charged: in the admin's **Add Membership** dialog (**First period**, then "Then {amount} from {date}"), at the [Point of Sale](/pos/point-of-sale), where the plan is priced at the first-period amount, and at the member's checkout ("Today covers {period}. Then {price} from {date}.").
 
 Example: your billing day is the 1st and **First period** is **Charged by the day**. A member joins a 100-a-month plan on 15 October. October has 31 days and the first period covers 17 of them, so they pay 54.84 now, then 100 on 1 November.
+
+A [per-session plan](/sales/per-session-plans) has no share worked out by the day: its first charge is the full fixed fee plus the sessions up to the billing day.
+
+### Per-session plans
+
+A membership on a [per-session plan](/sales/per-session-plans) is renewed and collected like any other, but each month's amount is worked out at the charge:
+
+- **The fixed fee** - the plan's **Monthly fixed fee**.
+- **The sessions** - every session of the member's class that starts in the month and is not cancelled, each at the price of a seat in it.
+- **The discount** - the best auto-applied promotion the member qualifies for that day, taken off the sessions only.
+- **Corrections** - for up to three earlier months, a credit for each session cancelled as **Club cancelled** or **Injury or illness** after its month was charged, and a charge for each session added.
+- **Carried credit** - credit an earlier charge couldn't use. A charge never goes below zero; the rest carries to the next one.
+
+The charge's reference shows the sums, for example `13 × 34.00 − 44.20 Family discount + 25.00 − 34.00` (€388.80). The **Next charge**, the **Membership billing** tab, and the **Renew** dialog show the amount the month will actually be charged. The last month of a membership that ends is never corrected; settle it by hand.
 
 ## The Membership billing tab
 
@@ -128,6 +144,7 @@ The engine doesn't retry a failed charge every hour. It charges it again when th
 
 - [Memberships](/sales/memberships) - the memberships being renewed, and their next charge.
 - [Plans](/sales/plans) - auto-renew and the renewal lead time are set on the plan.
+- [Per-session plans](/sales/per-session-plans) - monthly charges made of a class's sessions.
 - [Billing general settings](/settings/billing-general#membership-billing) - where the billing day is set.
 - [Charges](/sales/charges) - collect a renewal that wasn't charged automatically.
 - [Invoice runs](/sales/bill-runs) - issue invoices for charges; they never take payments.

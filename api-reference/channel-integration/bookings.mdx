@@ -299,6 +299,7 @@ curl -X POST "https://api.1club.ai/v1/platform/bookings/48213/cancel" \
 The body is optional. Fields:
 
 - `reason` (optional) - why the booking is cancelled, up to 500 characters. Shown to the gym's staff on the cancellation. Defaults to a note naming the API.
+- `reasonCode` (optional) - one of the fixed reasons staff pick in 1club: `member_request`, `club_cancelled`, `rescheduling`, `medical` (injury or illness), or `other`, which needs a `reason`. On a session of a [per-session plan](/sales/per-session-plans), `club_cancelled` and `medical` are credited on the membership's next charge and owe no makeup.
 - `refund.amount` (optional) - what you returned to the customer. `0` records no refund, for example when you kept the whole payment as a cancellation fee. It cannot exceed what was collected (`400` with `code: "AMOUNT_EXCEEDS_REFUNDABLE"`).
 - `refund.reference` (optional) - your own id for the refund, up to 128 characters
 - `notifyCustomer` (optional) - tell the customer the booking was cancelled. Defaults to `false` for a booking this API created.

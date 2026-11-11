@@ -29,9 +29,9 @@ The bookings list has four tabs with live counts: **All**, **Upcoming**, **Past*
 Select rows to act on several bookings at once (shown when you hold the permission for it):
 
 - **Check in N** - checks in every selected booking, settling any payment their entrance method requires.
-- **Cancel N** - cancels only the selected bookings; later occurrences of a recurring series are left alone. Bookings nobody paid for owe nothing unless you turn on **Keep the cancellation charge**, and if any were paid you're asked what happens to that money.
+- **Cancel N** - cancels only the selected bookings; later occurrences of a recurring series are left alone. You can pick a reason, as in the cancel dialog, which applies to every selected booking. Bookings nobody paid for owe nothing unless you turn on **Keep the cancellation charge**, and if any were paid you're asked what happens to that money.
 
-The **Cancelled** tab shows each booking's cancellation reason, refund, and who cancelled it. A booking that was released automatically at the end of the day (a pending booking whose start time arrived) can be brought back with **Reinstate** from its row menu or its panel: it returns confirmed and its charge is outstanding again. Cancellations made by a person can't be reinstated, and Reinstate is refused if the slot has since been booked by someone else.
+The **Cancelled** tab shows each booking's cancellation reason, refund, and who cancelled it. A booking that was released automatically at the end of the day (a pending booking whose start time arrived) can be brought back with **Reinstate** from its row menu or its panel: it returns confirmed and its charge is outstanding again. A session of a [per-session plan](/sales/per-session-plans) cancelled as **Injury or illness** can be reinstated too, and is billed again. Other cancellations made by a person can't be reinstated, and Reinstate is refused if the slot has since been booked by someone else.
 
 Click any row to open the booking in the [booking panel](#the-booking-panel). Click **Add** > **Add Booking** in the top right to create one from scratch.
 
@@ -154,9 +154,19 @@ The right-click and mobile-tap menus on the [calendar](/schedule/calendar) expos
 
 ## Cancellations
 
-**Cancel booking** opens a dialog where you record a reason. The refund follows the [cancellation rules](/settings/booking-policies#cancellation-rules) on the matching policy: tiered refund percentages based on how many hours in advance the cancellation happens. If no cancellation rules are configured on the policy, the cancellation refunds 100%.
+**Cancel booking** opens a dialog that first asks **Why is it being cancelled?**:
 
-The cancellation creates a reversal of the booking's charge (visible under **Charges**) and sends a cancellation notice to the member. The booking moves to the **Cancelled** tab.
+- **Member cancelled** - the member asked. Applies the cancellation policy and notifies the member by default.
+- **Club cancelled** - a closure, a facility issue, or an instructor who can't teach. Gives a full refund and notifies the member by default.
+- **Rescheduling** - the booking moves to another time. Gives a full refund without notifying the member by default.
+- **Injury or illness** - a session the member misses for a reason you excuse. Gives a full refund without notifying the member by default.
+- **Other** - anything else. Needs a note, and you choose the refund.
+
+The reason presets the money and notification choices below it, and you can change them. On a [per-session plan](/sales/per-session-plans), **Club cancelled** and **Injury or illness** take the session off the member's monthly charge (or credit it on the next one) and owe no makeup; any other reason, in time, owes one makeup.
+
+The refund follows the [cancellation rules](/settings/booking-policies#cancellation-rules) on the matching policy: tiered refund percentages based on how many hours in advance the cancellation happens. If no cancellation rules are configured on the policy, the cancellation refunds 100%.
+
+The cancellation creates a reversal of the booking's charge (visible under **Charges**) and, with **Notify the member** on, sends the member a cancellation notice. The booking moves to the **Cancelled** tab.
 
 ## Recurring bookings
 

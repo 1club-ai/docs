@@ -19,6 +19,8 @@ keywords:
   - class pack
   - auto-renew
   - shared with account
+  - per-session plan
+  - makeups owed
 ---
 
 A membership is a [plan](/sales/plans) sold to a specific contact. The plan defines the price, billing frequency, minimum term, and session limits; the membership copies those at the moment of sale and tracks that member's sessions and billing from then on. The front desk sells memberships, managers pause, renew, and cancel them, and members use them to book and check in.
@@ -35,6 +37,7 @@ Typical uses:
 - **A hold for an injury or a holiday** - a jiu-jitsu member tears a ligament, so you pause the membership and they lose none of the time they paid for.
 - **A goodwill session** - a class was cancelled at short notice, so you give each affected member one extra session with **Adjust sessions**.
 - **A 12-month contract** - a strength gym sells a monthly plan with a 12-month minimum term. A member who leaves after five months owes an early cancellation charge, which the front desk can waive.
+- **A place in a class, billed by the session** - a swim school puts a child in the Tuesday 17:00 group, and each month charges the club fee plus that month's sessions. See [Per-session plans](/sales/per-session-plans).
 
 See [Worked examples](#worked-examples) for how each of these is set up.
 
@@ -76,8 +79,8 @@ Each row shows:
 - **Contact** - the member who holds the membership.
 - **Plan** - the plan name, with its kind underneath: **Membership**, **Pass**, or **Drop-In**.
 - **Period** - the current period's dates ("Ongoing" for a renewing membership with no end). Underneath: **Auto-renew: Yes/No** on a renewing membership, and **Minimum term until** a date while the term is still ahead.
-- **Price** - the price at sale, with the billing frequency underneath.
-- **Usage** - one line per session limit, labelled by what it covers, for example "Yoga: 3 / 5 Visits". **Unlimited** when the plan has no cap. See [How sessions are counted](#how-sessions-are-counted).
+- **Price** - the price at sale, with the billing frequency underneath. A [per-session plan](/sales/per-session-plans) reads "€25.00 + per session".
+- **Usage** - one line per session limit, labelled by what it covers, for example "Yoga: 3 / 5 Visits". **Unlimited** when the plan has no cap. A per-session plan shows its makeups instead, for example "1 makeup owed" or "No makeups owed". See [How sessions are counted](#how-sessions-are-counted).
 - **Weekly hours** - a season pass's weekly slots; "-" for anything else.
 - **Status** - the status chip.
 - **Payment Status** - the status of the membership's latest charge, for its sale or its last renewal: for example paid, unpaid, overdue, partially paid, or failed.
@@ -103,8 +106,9 @@ Click **Add** in the page header and choose **Add Membership**. In the dialog:
 5. **Check the minimum term.** On a renewing plan, **Minimum term** defaults to the plan's term, marked "(plan)". Change it to give one member a different commitment, or pick **None**. Under the field you see the date the term is met and how many payments it commits the member to. See [Membership policies](/settings/membership-policies#the-minimum-term-is-set-on-the-plan).
 6. **Check sharing.** **Shared with account** starts from the plan. Turn it on or off for this member: on, everyone on their household or company account can use the membership, all drawing on the same sessions.
 7. **Check the sessions.** The session limits table starts from the plan. You can change what each row covers and how many visits it allows, or add one with **Add session limit**. On a plan with one count you can also set **Uses Remaining**.
-8. **Apply a discount (optional).** Enter a promotion code or pick a discount. The discount lowers the saved price, so renewals keep the reduced amount. Only discount promotions apply here, not vouchers.
-9. **Take payment (optional).** The summary shows the **Total due**. When your organization has a [billing day](/sales/membership-billing#billing-day), it also shows the **First period** with its dates and "Then {amount} from {date}", so you see the shorter first charge before anything is taken. If the plan requires payment upfront, the payment section opens automatically. You can still save without a payment: the amount stays owed, to collect from the member's profile. The signup fee is its own charge and is not reduced by a discount.
+8. **Apply a discount (optional).** Enter a promotion code or pick a discount. The discount lowers the saved price, so renewals keep the reduced amount. Only discount promotions apply here, not vouchers. On a per-session plan, leave it empty: 1club applies the best auto-applied discount at every charge.
+9. **Pick the class (per-session plans only).** On a [per-session plan](/sales/per-session-plans), pick the recurring **Class** the member joins. They are booked into every session of it from the start date, and the summary shows **Sessions this period** with what the first charge comes to.
+10. **Take payment (optional).** The summary shows the **Total due**. When your organization has a [billing day](/sales/membership-billing#billing-day), it also shows the **First period** with its dates and "Then {amount} from {date}", so you see the shorter first charge before anything is taken. If the plan requires payment upfront, the payment section opens automatically. You can still save without a payment: the amount stays owed, to collect from the member's profile. The signup fee is its own charge and is not reduced by a discount.
 
 ## The membership detail page
 
@@ -167,7 +171,7 @@ When you set a resume date, the renewal date, end date, minimum term, and any sc
 
 A booked pause shows on the detail page as **Booked pause**. Use **Call off booked pause** to cancel it before it starts.
 
-A season pass can't be paused.
+A season pass can't be paused, and neither can a membership on a [per-session plan](/sales/per-session-plans): cancel the sessions the member misses as **Injury or illness** instead.
 
 Members can pause their own membership too, today or from a later day, when their membership policy allows it. They can end a pause they started early, or call off one they booked. See [How members pause](/settings/membership-policies#how-members-pause).
 
@@ -178,7 +182,7 @@ Members can pause their own membership too, today or from a later day, when thei
 - If the membership is still within its current period, the new period starts where the current one ends.
 - If it has expired or its end date has passed, the new period starts today.
 
-The dialog previews the **New billing period** and the price. You can renew now and collect later. If the plan requires payment upfront, the dialog says so, and without a payment the new period stays owed. A one-time membership can't be renewed - sell a new one instead.
+The dialog previews the **New billing period** and the price. On a per-session plan the price is the amount the period will actually be charged: its fixed fee, its sessions, any discount, and corrections. You can renew now and collect later. If the plan requires payment upfront, the dialog says so, and without a payment the new period stays owed. A one-time membership can't be renewed - sell a new one instead.
 
 ### Extend
 
@@ -395,6 +399,7 @@ A gym sells "Monthly Membership" at 50 a month with a 12-month minimum term.
 
 - [Plans](/sales/plans) - the plans memberships are sold from.
 - [Membership billing](/sales/membership-billing) - the billing day, the next charge, and every renewal coming up.
+- [Per-session plans](/sales/per-session-plans) - makeups, absences, and changing a member's class.
 - [Membership policies](/settings/membership-policies) - notice periods, early cancellation charges, and what members can cancel and pause themselves.
 - [Member profile](/members/member-profiles) - a member's memberships, on their Memberships tab.
 - [Attendance](/schedule/attendance) - check-ins and the pre-booked-versus-walk-in distinction.

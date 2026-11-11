@@ -24,6 +24,10 @@ keywords:
     delete_booking,
     list_external_programs,
     list_instructor_shifts,
+    list_contact_notes,
+    list_form_submissions,
+    list_reviews,
+    list_automations,
     booking labels,
     availability,
     platform api,
@@ -173,6 +177,7 @@ Over OAuth, the scope is only half of it: the assistant acts as the person who c
 | `add_member_account_member` | Adds a contact to a household or company account | `contacts:write` |
 | `update_member_account_member` | Changes a member's role in an account | `contacts:write` |
 | `remove_member_account_member` | Takes a contact out of an account | `contacts:write` |
+| `list_contact_notes` | Lists the notes your team wrote on contacts, newest first, for one contact or by searching their text | `contacts:read` |
 
 ### Instructors, pay, and the staff roster
 
@@ -335,6 +340,20 @@ Over OAuth, the scope is only half of it: the assistant acts as the person who c
 | `list_promotions` | Lists your discounts and vouchers, with their codes, dates, status, and redemptions | `promotions:read` |
 | `get_promotion` | Opens one promotion | `promotions:read` |
 
+### Reviews
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_reviews` | Lists your reviews, 1club and Google ones, newest first, by gym, rating, or source, or by searching what was written and your replies | `reviews:read` |
+| `get_review` | Opens one review with your reply and any private note the reviewer left for you | `reviews:read` |
+
+### Automations
+
+| Tool | What it does | Scope required |
+| --- | --- | --- |
+| `list_automations` | Lists your automations and whether each is on | `automations:read` |
+| `get_automation` | Opens one automation with what starts it and its steps | `automations:read` |
+
 ### Forms
 
 | Tool | What it does | Scope required |
@@ -344,12 +363,13 @@ Over OAuth, the scope is only half of it: the assistant acts as the person who c
 | `create_form` | Creates a form, live as soon as it is created | `forms:write` |
 | `update_form` | Edits a form | `forms:write` |
 | `set_form_questions` | Sets the questions a fill-in form asks, in order | `forms:write` |
+| `list_form_submissions` | Lists the answers people gave on your forms, each labelled with the question they read, by form, by contact, or by searching the answers | `contacts:read` |
 
 ### Messages and templates
 
 | Tool | What it does | Scope required |
 | --- | --- | --- |
-| `list_messages` | Lists your email, SMS, and WhatsApp messages, newest first | `messages:read` |
+| `list_messages` | Lists your email, SMS, and WhatsApp messages, newest first; search matches the subject, a name, or words in the body | `messages:read` |
 | `get_message` | Opens one message with its recipients and delivery status | `messages:read` |
 | `create_message_draft` | Writes a draft email, SMS, or WhatsApp message for you to send | `messages:write` |
 | `update_message_draft` | Edits a draft message | `messages:write` |
@@ -487,6 +507,10 @@ Over OAuth, the scope is only half of it: the assistant acts as the person who c
   cancellation charge only when the key created that booking itself.
 </Note>
 
+### Searching text
+
+`list_contact_notes`, `list_form_submissions`, `list_reviews` and the body search of `list_messages` match words, not exact phrases: every word you search for must appear, accents are ignored (`cafe` finds `café`), and the start of a word is enough (`knee` finds `knees`). Latin and Cyrillic text are both searchable, each in its own script.
+
 ### Reading the scope table
 
 Scopes follow the `resource:action` format used across the [Platform API](/api-reference/introduction). A connection carrying `bookings:write` does not automatically carry `bookings:read`; authorize both if the assistant should look a booking up as well as create one. Where the table lists two scopes joined by "or", either one is enough.
@@ -572,12 +596,13 @@ The 1club server's tools also carry a small inline interface - club cards, slot 
 
 ## What is not exposed
 
-The admin server is built strictly on the documented Platform API, so anything that API does not cover is unreachable through MCP today. That currently includes automations, access control, and taking card payments.
+The admin server is built strictly on the documented Platform API, so anything that API does not cover is unreachable through MCP today. That currently includes access control and taking card payments.
 
 Some areas are covered only in part:
 
 - **Payments** can be recorded but never taken: `record_payment` records money the desk already collected with one of your own payment methods, such as cash or a bank transfer, and the member gets a receipt. Charging a saved card and card payments stay in 1club.
 - **Promotions** are read-only. Creating and editing discounts and vouchers stays in 1club.
+- **Automations** and **reviews** are read-only. Turning an automation on or off, and replying to a review, stay in 1club.
 - **Messages** can be drafted, edited, and read, but not sent. A draft created with `create_message_draft` is sent from the 1club inbox.
 - **Invoices** are read-only. Issuing, sending, charging, and voiding invoices stay in the 1club dashboard.
 - **Reports** are summaries for a period (`get_revenue_report`, `get_activity_report`, `get_memberships_report`, `get_members_report`, `get_tax_report`), not the full analytics screens.

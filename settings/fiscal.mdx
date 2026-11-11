@@ -1,0 +1,272 @@
+---
+title: Fiscal receipts
+description: Print the legally registered fiscal receipt for every cash and card sale at your desk on a Datecs fiscal device, set up once per company with fiscal rules and fiscal devices
+keywords:
+  [
+    fiscal receipt,
+    fiscal device,
+    fiscal printer,
+    fiscal rule,
+    fiscal group,
+    fiscalization,
+    фискален бон,
+    касов бон,
+    УНП,
+    sale number,
+    Datecs,
+    BlueCash-50,
+    Payment Bridge,
+    fiscal operator,
+    Bulgaria,
+    NRA,
+    waive receipt,
+    issue by hand,
+    till,
+  ]
+---
+
+A fiscal receipt is the legally registered receipt (фискален бон in Bulgaria) that a fiscal device prints for a sale at your desk. 1club sends every cash and card sale taken at the desk to your Datecs fiscal device, so the receipt prints by itself and front-desk staff don't type the sale in twice. An owner or admin sets it up once per company; after that, staff just take the payment.
+
+## When to use it
+
+Use fiscal receipts if your gym trades through a company in a country 1club fiscalizes in. Today that is **Bulgaria**, where every desk sale must be registered on a fiscal device, in cash or by card.
+
+Typical uses:
+
+- **A BlueCash-50 at reception** - a fitness gym charges cards on its Datecs BlueCash-50, and the receipt prints on the same terminal as part of the charge. Cash sales print on it too, with no extra step.
+- **A Stripe reader and a fiscal printer** - a padel gym takes cards on a Stripe reader and keeps a BlueCash-50 on the counter only to print receipts. Card and cash receipts both print on the BlueCash-50.
+- **Two counters, two printers** - reception and the bar each have their own fiscal device. A [till](/settings/tills) on each computer makes sure a sale at the bar prints at the bar.
+- **Two companies under one roof** - the gym and its cafe trade through different companies. Each company has its own fiscal rule and its own device, and a device never prints the other company's sales.
+
+## How it works
+
+Fiscal receipts are set up per company (billing entity), because the company that sold something is the one that owes the receipt. A receipt always follows the company recorded on the payment when it was taken, never the gym or the device.
+
+| Concept            | What it is                                                                                                                                                                                                                             |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Fiscal rule**    | One per company. It maps each tax rate to the fiscal group the device prints it under, plus a default fiscal group for everything else. Without a rule, the company prints no fiscal receipts.                                       |
+| **Fiscal group**   | The letter a fiscal device knows a tax by, such as **Б - 20%** in Bulgaria. Your country's fiscal law defines the groups.                                                                                                             |
+| **Fiscal device**  | The device that prints the receipts: the fiscal module of a Datecs BlueCash-50, reached through the Payment Bridge app on it. It stands at one gym and prints only for that gym's company. It signs in with its own fiscal operator. |
+| **Till**           | An optional checkout position at a gym, with its payment terminals and one fiscal device. It decides which device prints when a gym has more than one. See [Tills](/settings/tills).                                                 |
+| **Fiscal receipt** | The receipt itself. 1club keeps a record of it on the payment it was printed for, with the device's receipt number and the sale number.                                                                                                |
+
+A company prints fiscal receipts when all three of these hold:
+
+1. Its own country, set on its [billing entity](/settings/billing-entities), is one 1club fiscalizes in. A company with no country doesn't take part. 1club never falls back to your organization's country.
+2. **Fiscal** is switched on for it in [DatecsPay](/settings/integrations/datecspay#modules).
+3. It has a fiscal rule.
+
+### What prints where
+
+A desk payment prints a fiscal receipt when it was paid in cash or by card. The device that prints it depends on how the card was taken:
+
+| Paid by                                                               | Prints on                                                     |
+| --------------------------------------------------------------------- | ------------------------------------------------------------- |
+| A card on a BlueCash-50                                               | That terminal's own fiscal device, as part of the card charge |
+| Cash                                                                  | The till's fiscal device                                      |
+| A card on any other reader (Stripe, myPOS)                            | The till's fiscal device, once the card has gone through      |
+| **POS Terminal** (a standalone card machine you record payments from) | The till's fiscal device, as a card payment                   |
+
+Without a till, cash and other card payments print on the gym's fiscal device when the gym has exactly one. A gym with several fiscal devices needs a till to say which one prints.
+
+Other payments print nothing: a bank transfer or another manual method, wallet credit, online card payments, and membership renewals charged to a saved card. Online payments don't need a desk receipt.
+
+### Fiscalization is never enforced
+
+1club never refuses or holds a sale because a receipt can't print. If something stops the device (it is offline, belongs to another company, or has no working operator), the sale goes through and 1club tells the person at the desk to issue the receipt by hand, and why. See [At the desk](#at-the-desk).
+
+## Before you start
+
+- **The company's country.** Set the country on each [billing entity](/settings/billing-entities) that fiscalizes. A company in Bulgaria takes part; one with no country doesn't.
+- **DatecsPay with Fiscal on.** Activate [DatecsPay](/settings/integrations/datecspay) for the company and tick **Fiscal**. Fiscal needs no BORICA credentials, so a company that takes cards on Stripe or myPOS can turn on Fiscal alone.
+- **Your tax rates.** Set up the [tax rates](/settings/billing-general#tax-rates) you charge before you map them to fiscal groups.
+- **A Datecs BlueCash-50** with the Payment Bridge app installed and an **operator code and password** set on the device itself. The operator is the device's own login, and it can differ from device to device.
+
+<Note>
+  Viewing the Fiscal page needs the settings **View** permission at
+  **Extended**. Adding, editing, and removing rules and devices needs the
+  matching **Create**, **Edit**, or **Delete** permission on settings at
+  Extended. See [Roles and permissions](/reference/roles-permissions).
+</Note>
+
+## Open the Fiscal settings
+
+Go to **Settings** > **Sales** > **Fiscal**. The page has two sections: **Fiscal rules** and **Fiscal devices**.
+
+The **Fiscal** item appears only once a company is in a supported country and has **Fiscal** switched on in DatecsPay. If you open the page before then, it tells you which part is missing:
+
+- _Fiscal settings apply to companies in a country 1club issues fiscal receipts in._ Set the country on your billing entities.
+- _Turn on Fiscal in DatecsPay (Settings → Integrations) to issue fiscal receipts._
+
+## Set up a fiscal rule
+
+1. Under **Fiscal rules**, click **Add fiscal rule**.
+2. Choose the **Billing entity**. Each company has one rule, so only companies without one are offered. When every company has a rule, **Add fiscal rule** is greyed out.
+3. Choose the **Default fiscal group**. Lines with a tax rate you haven't mapped, and items with no tax rate at all, print under this group.
+4. Under **Tax rates**, click **Add tax rate** for each rate you charge. 1club adds the next rate you haven't mapped and suggests the fiscal group with the same percentage. Change the group if it doesn't fit.
+5. Click **Save**.
+
+While some active tax rates are still unmapped, a warning lists them: _These tax rates print in the default fiscal group_. In the list, the rule shows the same rates as an **On default** chip. Hover it to see which ones.
+
+To change a rule, open its row menu and choose **Edit**. You can change the default group and the tax rate lines, but not the company.
+
+### Bulgarian fiscal groups
+
+| Group | Rate | Use it for                                                         |
+| ----- | ---- | ------------------------------------------------------------------ |
+| **А** | 0%   | Zero-rated sales, and every sale of a company not registered for VAT |
+| **Б** | 20%  | The standard VAT rate                                              |
+| **В** | 20%  | Fuel                                                               |
+| **Г** | 9%   | The reduced VAT rate                                               |
+
+A company that isn't registered for VAT should set its default fiscal group to **А**.
+
+### Set a fiscal group from the tax rate
+
+When fiscal receipts are on, the [tax rate](/settings/billing-general#tax-rates) dialog has a **Fiscal group for** field for each company with a fiscal rule. Use it to map a new tax rate as you create it, so a new rate doesn't fall back to the default group unnoticed. Leave it on **Default fiscal group** to print the rate under the rule's default.
+
+If the tax rate saves but its fiscal groups don't, 1club says so. Open the tax rate again and set the groups.
+
+### Delete a fiscal rule
+
+Open the rule's row menu, choose **Delete**, and confirm. The company's sales stop printing fiscal receipts right away.
+
+## Add a fiscal device
+
+1. Under **Fiscal devices**, click **Add fiscal device**. The button is greyed out until **Fiscal** is on in DatecsPay for at least one company.
+2. The **Model** is **BlueCash-50**.
+3. Choose how to add it:
+   - **A payment terminal** - for a BlueCash-50 you already use as a Datecs payment terminal. Pick it under **Payment terminal**. Its fiscal module is added without pairing again. If none of your terminals has a fiscal module to add, 1club says so and you pair a new device instead.
+   - **A new device** - for a BlueCash-50 that isn't paired yet, or one you use only as a fiscal printer. Choose the **Club** it sits at.
+4. Give it a **Name** that tells staff where it is, such as _Front desk printer_. A new device needs one; a payment terminal keeps its own name if you leave it blank.
+5. Enter the **Fiscal operator** (one to four digits) and the **Operator password**, exactly as they are set on the device.
+6. Click **Save**, or **Get a pairing code** for a new device.
+
+For a new device, 1club shows a one-time pairing code. Enter it in the Payment Bridge app on the device. The code works once, until the time shown. A device paired this way joins as a fiscal printer only: it doesn't take cards until you also add it under [Payment terminals](/settings/payment-terminals#datecs-terminals).
+
+### The device checks its operator
+
+A fiscal device prints nothing without an operator it accepts, so 1club asks the device to check the operator before it counts as added. The dialog shows _Checking the operator on the device…_ while the Payment Bridge app tries the operator once. Nothing prints during the check.
+
+- **Accepted** - the device is added and starts printing.
+- **Rejected** - _The device rejected this operator._ Correct the code and password and try again. 1club never resends a rejected operator by itself, because repeated wrong passwords count towards the device's lockout.
+- **Couldn't check** - _The device couldn't check the operator: it is busy or offline._ Try again once the device is free.
+- **No answer** - after about 30 seconds the dialog says the device hasn't answered. Check that it is on and the Payment Bridge app is running. Click **Keep waiting**, or close the dialog; the list shows the device as still being checked.
+- **App too old** - update the Payment Bridge app on the device, then try again.
+
+### The fiscal devices list
+
+The list shows each device's:
+
+- **Name** - with its serial number underneath.
+- **Model** - **BlueCash-50**.
+- **Club** - the gym it sits at.
+- **Payment terminal** - the card terminal on the same box, when the device is also one of your payment terminals.
+- **Status** - **Online** or **Offline**, and a chip when its operator needs attention:
+
+| Chip                     | Meaning                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| **Checking operator**    | The device is still checking a new operator.                                    |
+| **Operator rejected**    | The device rejected its operator. Edit the device to correct the code and password. |
+| **Operator not checked** | The device couldn't check its operator. Edit the device to try again.           |
+| **No operator**          | The device has no operator, so it prints nothing until you set one.             |
+
+### Edit a fiscal device
+
+Open the device's row menu and choose **Edit** to change its **Name** or operator. The saved password isn't shown: the field reads **Saved**, and leaving it blank keeps it. A new operator is checked on the device the same way as when you added it. Until the device accepts it, the device keeps printing with the operator it accepted before.
+
+### Remove a fiscal device
+
+Open the device's row menu, choose **Delete**, and confirm with **Remove**. The device stops printing fiscal receipts. If it is also one of your payment terminals, it keeps taking card payments. Removing it from **Payment terminals** is a separate step.
+
+## At the desk
+
+Staff don't do anything extra to print a receipt. After a cash payment at the [point of sale](/pos/point-of-sale) or when completing an order, a message says what happens to the receipt:
+
+- **Printing the fiscal receipt** - the receipt went to the fiscal device. It usually prints in seconds.
+- **Issue the fiscal receipt by hand on the fiscal device** - 1club couldn't send it, and the message says why. Issue the receipt on the device yourself.
+
+A card charged on a BlueCash-50 prints its receipt as part of the charge. If the fiscal device can't print, the charge doesn't go through either, and the card panel says why (for example _The fiscal device is busy with another receipt_). Nothing is charged, so you can try again.
+
+### When a receipt has to be issued by hand
+
+| Reason shown                                                                       | What to do                                                                                        |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| _This till has no fiscal device._                                                  | Give the till a fiscal device under [Tills](/settings/tills), or pick the till that has one.     |
+| _The till's fiscal device belongs to another company._                             | A device prints only for its own gym's company. Issue this sale's receipt on that company's device. |
+| _Fiscal is switched off in DatecsPay for this company._                            | Turn on **Fiscal** in [DatecsPay](/settings/integrations/datecspay#modules) for the company.      |
+| _The fiscal device has no operator set._                                           | [Edit the device](#edit-a-fiscal-device) and set its operator.                                     |
+| _The fiscal device rejected its operator._                                         | Edit the device and correct the operator code and password.                                       |
+| _The fiscal device is offline._                                                    | Check that the device is on and connected, and the Payment Bridge app is running.                 |
+| _Update the Payment Bridge app on the fiscal device._                              | The app is too old to print cash receipts. Update it.                                             |
+| _The fiscal device's serial number or operator is not valid for a fiscal receipt._ | Check the device's serial number and its operator code.                                           |
+
+The same message appears when the gym has no till chosen and more than one fiscal device, because 1club can't tell which one to use. Choose a [till](/settings/tills#choose-the-till-at-the-counter).
+
+### A receipt must print within a minute
+
+A receipt sent to the device prints within a minute of the payment or not at all. If the device went offline or ran out of paper, it retries during that minute. When the minute is up, 1club stops sending it, so a device that comes back online later never prints a stale receipt next to the one you issued by hand. The desk sees:
+
+- **The fiscal receipt was not printed** - issue it by hand on the fiscal device, then record it with **Waive** on the payment.
+- **The fiscal receipt is not confirmed yet** - 1club couldn't confirm whether it printed. Check the device before you issue one by hand, so you don't issue it twice.
+
+### See a payment's receipt
+
+The payment's details show a **Fiscal receipt** line with its state, the device's receipt number (**No.**), and the sale number:
+
+| State                           | Meaning                                                                                       |
+| ------------------------------- | --------------------------------------------------------------------------------------------- |
+| **Printed**                     | The device printed the receipt.                                                               |
+| **Printing the fiscal receipt** | Shown on the screen the sale was just taken on, while the device is still working on it.      |
+| **Not printed**                 | The device didn't print it. If it timed out, the line says _Not printed in time_.             |
+| **Failed**                      | The device reported an error. The device's reason shows underneath.                           |
+| **Issued by hand**              | 1club told the desk to issue it by hand when the payment was taken.                           |
+| **Waived**                      | Someone recorded that the receipt was issued another way. Their reason shows underneath.      |
+
+## Waive a fiscal receipt
+
+When a receipt shows **Not printed** or **Failed** and you have issued it another way, for example by hand on the device, record that in 1club:
+
+1. Open the payment and click **Waive** on its **Fiscal receipt** line.
+2. Under **How was the receipt issued?**, explain what you did, in at least a sentence.
+3. Click **Waive receipt**.
+
+After a waiver, the device never prints that receipt. Waiving is also the only way to release a fiscal device that is stuck on a receipt it can't print.
+
+<Note>
+  Waiving needs the billing **Edit** permission at **Extended**. The button
+  only appears for a payment whose charge went through.
+</Note>
+
+## The sale number
+
+Each fiscal receipt carries a sale number. In Bulgaria that is the УНП, in the form `<device serial>-<operator>-<7 digits>`, for example `DT123456-0001-0004211`. 1club isn't declared to NRA as sales-management software (СУПТО), so the seven digits come from the payment rather than a running counter, which Bulgarian rules allow for undeclared software.
+
+## Limits
+
+- **Bulgaria only.** Companies in other countries see no fiscal settings.
+- **Datecs BlueCash-50 only.** Other fiscal devices aren't supported yet.
+- **One payment per receipt.** Each payment prints its own receipt, so 1club can't combine a card part and a cash part on one receipt. A cash sale is one payment, so it prints one receipt. 1club doesn't record the cash handed over or print change.
+- **No refund (storno) receipts and no X or Z reports.** Run these on the device.
+- **Desk payments only.** Online payments and renewals don't print a fiscal receipt.
+
+## Troubleshooting
+
+| Problem                                                                       | Cause and fix                                                                                                                                                                             |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The **Fiscal** item isn't in Settings                                          | No company is in a supported country with **Fiscal** on. Set the country on the billing entity and tick **Fiscal** in DatecsPay.                                                          |
+| **Add fiscal device** is greyed out                                           | **Fiscal** isn't on in DatecsPay for any company.                                                                                                                                          |
+| A device shows **No operator** or **Operator rejected**                       | Edit the device and enter the operator code and password set on the device.                                                                                                               |
+| Cash sales say to issue the receipt by hand with no fiscal device             | The gym has more than one fiscal device and no till is chosen, or the chosen till has none. Choose a till, or give it a fiscal device.                                                   |
+| A sale printed under the wrong VAT group                                      | Its tax rate isn't mapped in the company's fiscal rule, so it printed under the default group. Add the rate to the rule.                                                                   |
+| Switching **Fiscal** off in DatecsPay is refused                              | A fiscal device still owes a receipt. Wait for it to print, or waive it once you have issued it by hand, then switch Fiscal off.                                                            |
+| A sale at a gym of another company says the device belongs to another company | A fiscal device prints only its own gym's company's sales. Issue the receipt on a device of the selling company.                                                                          |
+
+## Related
+
+- [Tills](/settings/tills) - which terminals and fiscal device each counter uses.
+- [DatecsPay](/settings/integrations/datecspay) - switch on the Fiscal module.
+- [Payment terminals](/settings/payment-terminals) - card readers at the desk, including Datecs terminals.
+- [Billing entities](/settings/billing-entities) - the companies you sell through, and their country.
+- [Billing settings](/settings/billing-general#tax-rates) - tax rates and their fiscal groups.
+- [Hype POS](/settings/integrations/hype) - an alternative where Hype fiscalizes your orders.

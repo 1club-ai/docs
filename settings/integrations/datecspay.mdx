@@ -1,6 +1,6 @@
 ---
 title: DatecsPay
-description: Accept card payments through DatecsPay (BORICA) hosted checkout, with a BORICA-backed test gateway and a live production environment
+description: Connect Datecs and BORICA to 1club with three modules - online card payments through BORICA hosted checkout, card charges on Datecs terminals at the desk, and fiscal receipts on Datecs fiscal devices
 keywords:
   [
     datecspay,
@@ -16,10 +16,19 @@ keywords:
     billing entity,
     member app,
     renewals,
+    modules,
+    pos terminals,
+    datecs terminal,
+    bluecash-50,
+    fiscal,
+    fiscal receipts,
+    fiscal device,
+    card batch close,
+    payment bridge,
   ]
 ---
 
-DatecsPay is a card payment provider you can use instead of Stripe or myPOS, built on BORICA's hosted checkout. When a customer pays for a booking, class, membership, or outstanding balance, they are redirected to BORICA's secure page to enter their card details (with EMV 3-D Secure), then return to 1club once the payment completes. An owner or admin sets it up once with your gym's own BORICA credentials.
+DatecsPay connects 1club to Datecs and BORICA. It has three modules you switch on per company: **Online** takes card payments on BORICA's hosted checkout, **POS Terminals** charges cards on Datecs terminals at your desk, and **Fiscal** prints fiscal receipts on Datecs fiscal devices. An owner or admin sets it up once; any one module can run on its own.
 
 <Note>
   If your organization trades through more than one company, each company
@@ -32,21 +41,36 @@ DatecsPay is a card payment provider you can use instead of Stripe or myPOS, bui
 
 ## When to use it
 
-DatecsPay suits a gym whose bank or acquirer has provisioned a BORICA terminal. Card data never touches 1club servers, and every request is signed with your own RSA key. Payment status comes back on its own: through the cardholder's browser on return, a signed BORICA notification, and a reconciliation sweep that catches anyone who closes the tab early.
+DatecsPay suits a gym in Bulgaria that banks with BORICA, uses Datecs hardware at the desk, or both. Card data never touches 1club servers, and every request is signed with your own RSA key. Payment status comes back on its own: through the cardholder's browser on return, a signed BORICA notification, and a reconciliation sweep that catches anyone who closes the tab early.
 
 Unlike Stripe and myPOS, DatecsPay has no free shared sandbox. Both the **Test** and **Live** environments run against BORICA with your own credentials. Only the terminal and gateway differ between them.
 
 Typical uses:
 
 - **A gym already banking with BORICA** - take card payments online through the BORICA terminal your bank issued, with no Stripe or myPOS account.
+- **A BlueCash-50 at reception** - charge cards on the Datecs terminal from the till, and print each sale's fiscal receipt on the same box. Turn on **POS Terminals** and **Fiscal**.
+- **Fiscal receipts beside a Stripe reader** - keep taking cards on Stripe and use a BlueCash-50 only to print fiscal receipts for cash and card sales. Turn on **Fiscal** alone, with no BORICA credentials.
 - **Rehearsing checkout before going live** - run the full checkout against BORICA's test gateway with your test terminal, where no real money moves, then switch to **Live**.
 - **A member who closes the tab mid-payment** - the membership still settles, because the reconciliation job confirms the charge with BORICA within a few minutes, with no staff action.
+
+## Modules
+
+Each module is a checkbox on the DatecsPay page, switched on per company. Any one can be on alone.
+
+| Module            | What it does                                                                                                                                                       | What it needs                                                                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Online**        | Members pay by card on BORICA's hosted checkout, wherever they buy online.                                                                                         | Your BORICA credentials, entered under the checkbox. No other online card provider for the company.                                                    |
+| **POS Terminals** | Staff charge cards on Datecs terminals, such as the BlueCash-50, from the till. The terminals close their card batch once a day.                                    | A **Daily card batch close** time. You pair the terminals under [Payment terminals](/settings/payment-terminals#datecs-terminals).                       |
+| **Fiscal**        | Datecs fiscal devices print the fiscal receipt for every cash and card sale at the desk, whichever provider's reader took the card.                                | Nothing on this page. You add fiscal rules and fiscal devices under [Fiscal receipts](/settings/fiscal).                                                 |
+
+Datecs terminals and fiscal devices have no cloud connection of their own. They reach 1club through the **Payment Bridge** app that runs on the device, which you pair with a one-time code.
 
 ## Before you start
 
 - **A paid plan.** DatecsPay is a paid-plan integration. On the Free plan and during the free trial, **Activate** is greyed out until you upgrade.
-- **BORICA credentials for the environment you want.** Both Test and Live need a **Terminal ID (TID)**, a **Merchant ID (MID)**, your **RSA private key**, and **BORICA's public certificate**. BORICA issues a separate set for each environment, so keep the two sets apart.
-- **No other online card provider for the company.** Each company takes online card payments through one provider at a time: Stripe, myPOS, or DatecsPay. While Stripe or myPOS takes them, **Save** is greyed out and hovering it names that provider. Untick **Online** under **Use Stripe for** on the [Stripe](/settings/integrations/stripe#use-stripe-for) page, or untick **Online** on the [myPOS](/settings/integrations/mypos#one-online-card-provider-per-company) page, first. Both can keep running card readers beside DatecsPay.
+- **For Online: BORICA credentials for the environment you want.** Both Test and Live need a **Terminal ID (TID)**, a **Merchant ID (MID)**, your **RSA private key**, and **BORICA's public certificate**. BORICA issues a separate set for each environment, so keep the two sets apart. POS Terminals and Fiscal need none of these.
+- **For Online: no other online card provider for the company.** Each company takes online card payments through one provider at a time: Stripe, myPOS, or DatecsPay. While Stripe or myPOS takes them, the **Online** checkbox is locked and says which provider holds it. Untick **Online** under **Use Stripe for** on the [Stripe](/settings/integrations/stripe#use-stripe-for) page, or untick **Online** on the [myPOS](/settings/integrations/mypos#one-online-card-provider-per-company) page, first. Both can keep running card readers beside DatecsPay, and POS Terminals and Fiscal aren't affected.
+- **For Fiscal: the company's country.** Fiscal receipts print only for a company whose [billing entity](/settings/billing-entities) is in Bulgaria.
 
 <Note>
   Configuring DatecsPay requires the **settings.manage.organization**
@@ -55,7 +79,7 @@ Typical uses:
 
 ## Where to get your DatecsPay credentials
 
-DatecsPay credentials come from **BORICA** (through your bank or acquirer), not from 1club. When your DatecsPay/BORICA terminal is provisioned you receive:
+You need these only for the **Online** module. DatecsPay credentials come from **BORICA** (through your bank or acquirer), not from 1club. When your DatecsPay/BORICA terminal is provisioned you receive:
 
 | Credential                          | What it is                                                                                                                                      |
 | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -70,17 +94,16 @@ Generate your key pair and register it with BORICA before you configure 1club, a
 
 1. Go to **Settings** > **Integrations**.
 2. Under **Payments**, click **Activate** next to DatecsPay. 1club opens the DatecsPay page. Nothing is saved until you click **Save**.
-3. Choose an **Environment**:
-   - **Test** - runs against BORICA's test gateway.
-   - **Live** - processes real payments against BORICA production.
-
-   BORICA gives you different credentials for each environment, so enter the set that matches the one you choose.
-
-4. Enter your **Terminal ID (TID)** and **Merchant ID (MID)**.
-5. Check the **Merchant name** and **Merchant website**. 1club pre-fills these from your organization's name and website, but you can edit them if BORICA registered a different name or URL.
-6. Paste your **Merchant private key (PEM)** and **BORICA public certificate (PEM)**. If your key file is protected with a passphrase, enter it in **Private key passphrase**. 1club uses it once to decrypt the key and never stores it.
-7. Click **Save**. The page shows **Active** and the environment, **Test** or **Live**, next to the title.
-8. Click **Test configuration** to check that the stored key and certificate are well-formed. The button is available once DatecsPay is saved.
+3. Tick the modules you want: **Online**, **POS Terminals**, **Fiscal**. **Online** starts ticked, unless another provider already takes the company's online card payments.
+4. If **Online** is ticked:
+   1. Choose an **Environment**: **Test** runs against BORICA's test gateway, and **Live** processes real payments against BORICA production. BORICA gives you different credentials for each, so enter the set that matches.
+   2. Enter your **Terminal ID (TID)** and **Merchant ID (MID)**.
+   3. Check the **Merchant name** and **Merchant website**. 1club pre-fills these from your organization's name and website, but you can edit them if BORICA registered a different name or URL.
+   4. Paste your **Merchant private key (PEM)** and **BORICA public certificate (PEM)**. If your key file is protected with a passphrase, enter it in **Private key passphrase**. 1club uses it once to decrypt the key and never stores it.
+5. If **POS Terminals** is ticked, set the **Daily card batch close** time. See [Daily card batch close](#daily-card-batch-close).
+6. Click **Save**. The page shows **Active** next to the title and, with Online on, the environment, **Test** or **Live**. **Save** stays greyed out until at least one module is ticked.
+7. With Online on, click **Test configuration** to check that the stored key and certificate are well-formed.
+8. Pair your Datecs terminals under [Payment terminals](/settings/payment-terminals#datecs-terminals), and add fiscal rules and fiscal devices under [Fiscal receipts](/settings/fiscal).
 
 <Note>
   The private key and certificate are stored encrypted and shown back to you as
@@ -93,20 +116,40 @@ Your country and time-zone offset are not part of this form. 1club derives them 
 
 ## Configuration fields
 
+The BORICA fields apply only while **Online** is ticked. With Online off, none of them is required.
+
 | Field                               | Required                                       | Notes                                                                                                                                                 |
 | ----------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Environment**                     | Yes                                            | **Test** or **Live**. Your BORICA credentials differ between the two.                                                                                 |
-| **Terminal ID (TID)**               | Yes                                            | Your BORICA terminal identifier; differs per environment.                                                                                             |
-| **Merchant ID (MID)**               | Yes                                            | Your BORICA merchant identifier.                                                                                                                      |
+| **Terminal ID (TID)**               | With Online                                    | Your BORICA terminal identifier; differs per environment.                                                                                             |
+| **Merchant ID (MID)**               | With Online                                    | Your BORICA merchant identifier.                                                                                                                      |
 | **Merchant name**                   | No                                             | Pre-filled from your organization name. Editable.                                                                                                     |
 | **Merchant website**                | No                                             | Pre-filled from your organization website. Editable.                                                                                                  |
 | **Merchant private key (PEM)**      | On first save, and when you change environment | Your RSA private key used to sign requests to BORICA. Stored encrypted. Leave blank when editing to keep the current key.                             |
 | **Private key passphrase**          | No                                             | Only if your key file is passphrase-protected. Used once to decrypt the key and never stored.                                                         |
 | **BORICA public certificate (PEM)** | On first save, and when you change environment | BORICA's certificate used to verify gateway responses. Differs between test and production. Leave blank when editing to keep the current certificate. |
+| **Daily card batch close**          | With POS Terminals                             | When the company's Datecs terminals close their card batch each day, in each terminal's gym's local time. Defaults to 03:00.                          |
 
-Capabilities are limited to **online** hosted checkout, which is always on. There is no in-person terminal option: for card readers at the desk, use [Stripe or myPOS terminals](/settings/payment-terminals) beside DatecsPay.
+## Daily card batch close
+
+With **POS Terminals** on, every Datecs terminal of the company closes its card batch once a day at the time you set. The Payment Bridge app on the terminal runs it, so you don't close the batch by hand. Pick a time when the desk is closed. If a terminal must close its batch before it can take a card and that doesn't go through, the card panel says so and nothing is charged; try again.
+
+The card batch close is not the fiscal day: 1club doesn't run X or Z reports on your fiscal devices.
+
+## Switch a module off
+
+Untick the module and click **Save**:
+
+- **Online** off - members can no longer pay by card through BORICA for that company.
+- **POS Terminals** off - the company's Datecs terminals are retired from [Payment terminals](/settings/payment-terminals). This is refused while one of them has a card charge still being resolved.
+- **Fiscal** off - the company's fiscal devices are removed, and its desk sales tell staff to issue the receipt by hand. This is refused while a fiscal device still owes a receipt: wait for it to print, or [waive it](/settings/fiscal#waive-a-fiscal-receipt) once you have issued it by hand.
+
+A BlueCash-50 that is both a terminal and a fiscal device stays paired while either module still uses it.
 
 ## Test vs. live environment
+
+The environment applies to the **Online** module only. Datecs terminals and fiscal devices work the same way in either.
+
 
 - **Test** runs against BORICA's test gateway with your test terminal. No real money moves, so you can rehearse the full checkout flow.
 - **Live** runs against BORICA production with your live terminal. Real payments are processed and settled to your account.
@@ -126,7 +169,7 @@ The **Test configuration** button checks that your saved credentials are complet
   correct is a successful test payment through hosted checkout.
 </Note>
 
-## What syncs
+## What syncs online
 
 - Payments created in 1club open a BORICA hosted-checkout page that the customer is redirected to.
 - After payment, the status returns to 1club through up to three paths, so a payment settles even if one path fails:
@@ -158,7 +201,7 @@ DatecsPay has no shareable payment link. The **Send myPOS payment link** action 
 2. Click **Deactivate** at the top of the DatecsPay page.
 3. Confirm in the **Deactivate DatecsPay?** dialog. It says DatecsPay stops working and its settings are deleted. With more than one billing entity, it also says the change applies to the selected company only.
 
-You stay on the DatecsPay page afterwards, with the form reset. Your stored credentials for that company are cleared, so activating again means entering them again. If 1club can't deactivate DatecsPay, the reason shows in the dialog.
+Deactivating switches off all three modules at once: the company's Datecs terminals are retired and its fiscal devices are removed. You stay on the DatecsPay page afterwards, with the form reset. Your stored credentials for that company are cleared, so activating again means entering them again. If 1club can't deactivate DatecsPay, for example because a fiscal device still owes a receipt, the reason shows in the dialog.
 
 ## Troubleshooting
 
@@ -168,7 +211,9 @@ You stay on the DatecsPay page afterwards, with the form reset. Your stored cred
 - **Customers see a signature error on the checkout page** - the public key registered with BORICA doesn't match the private key on file, or the TID belongs to a different environment. Re-check the key pair registered with BORICA and confirm the TID matches your selected environment.
 - **Payment succeeded on BORICA but the charge stays unpaid in 1club** - this usually resolves on its own: the reconciliation job confirms pending checkouts within a few minutes. If it persists beyond that, re-check that your BORICA certificate is current.
 - **Live payments fail but test works** - confirm you are in the **Live** environment and entered live credentials (a production TID and the production BORICA certificate, not the test ones).
-- **Save is greyed out, or saving says another provider "already takes online card payments"** - only one online card provider can be active per company. Untick **Online** on the Stripe or myPOS page for that company, then save DatecsPay again.
+- **The Online checkbox is locked, or saving says another provider "already takes online card payments"** - only one online card provider can be active per company. Untick **Online** on the Stripe or myPOS page for that company, then tick **Online** on DatecsPay again.
+- **Save is greyed out** - no module is ticked. Tick at least one, or click **Deactivate** to switch DatecsPay off.
+- **Switching Fiscal off is refused** - a fiscal device still owes a receipt. Wait for it to print, or waive it on the payment once you have issued it by hand, then save again.
 
 ## Worked examples
 
@@ -187,9 +232,11 @@ You stay on the DatecsPay page afterwards, with the form reset. Your stored cred
 ## Related
 
 - [Integrations](/settings/integrations) - the full integration catalog and how activation works.
+- [Fiscal receipts](/settings/fiscal) - fiscal rules and fiscal devices for the Fiscal module.
+- [Tills](/settings/tills) - which terminals and fiscal device each counter uses.
 - [Billing entities](/settings/billing-entities) - the companies you trade through, each with its own payment accounts.
 - [myPOS](/settings/integrations/mypos) - the other hosted-checkout provider (myPOS **Online** can't run alongside DatecsPay for the same company).
-- [Payment terminals](/settings/payment-terminals) - card readers at the front desk, through Stripe or myPOS.
+- [Payment terminals](/settings/payment-terminals) - card readers at the front desk, through Stripe, myPOS, or Datecs.
 - [Stripe](/settings/integrations/stripe) - card and wallet payments with test and live modes.
 - [Charges](/sales/charges) - where payable charges live.
 - [Payments](/sales/payments) - the payment records DatecsPay settles.

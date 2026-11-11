@@ -1,7 +1,7 @@
 ---
 title: Payment terminals
 description: Register the card readers at your front desks, check whether each one is online, and retire readers you no longer use.
-keywords: ["payment terminal", "card reader", "charge card", "card declined", "write off", "simulate tap", "card terminal", "Stripe Terminal", "myPOS terminal", "in-person payment", "tap to pay", "pairing code", "serial number", "retire terminal", "terminal offline"]
+keywords: ["payment terminal", "card reader", "charge card", "card declined", "write off", "simulate tap", "card terminal", "Stripe Terminal", "myPOS terminal", "Datecs terminal", "BlueCash-50", "DatecsPay", "Payment Bridge", "till", "in-person payment", "tap to pay", "pairing code", "serial number", "retire terminal", "terminal offline"]
 ---
 
 A payment terminal is a card reader at one of your gyms that staff can send a sale to. The customer taps, inserts, or swipes their card on the reader, and 1club records the payment automatically. Owners and admins register the readers here; front-desk staff then pick a reader when they take a card payment.
@@ -18,10 +18,11 @@ Typical uses:
 
 ## How it works
 
-Readers come from your payment providers. 1club supports **Stripe Terminal** and **myPOS terminal** readers, and you can mix them across your gyms. Before you can add a reader, the provider has to be connected for the company that bills for that gym:
+Readers come from your payment providers. 1club supports **Stripe Terminal**, **myPOS terminal**, and **Datecs terminal** readers, and you can mix them across your gyms. Before you can add a reader, the provider has to be connected for the company that bills for that gym:
 
 - **Stripe** - connect it under [Stripe](/settings/integrations/stripe) and tick **Terminal** under **Use Stripe for**. Stripe sells readers only in some countries, and in some of them only for one currency.
 - **myPOS** - connect it under [myPOS](/settings/integrations/mypos) and turn on its **Terminal** capability.
+- **Datecs** - activate [DatecsPay](/settings/integrations/datecspay#modules) and tick its **POS Terminals** module. See [Datecs terminals](#datecs-terminals).
 
 Each reader belongs to one gym, and it charges through the payment account of the company that bills for that gym. If you trade through more than one company, see [Billing entities](/settings/billing-entities#connect-each-companys-payment-accounts).
 
@@ -38,7 +39,7 @@ If no connected provider can take in-person payments yet, the page says so and o
 The list shows each reader's:
 
 - **Name** - with its serial number underneath, when known.
-- **Provider** - Stripe Terminal or myPOS terminal.
+- **Provider** - Stripe Terminal, myPOS terminal, or Datecs terminal.
 - **Club** - the gym the reader sits at.
 - **Billing entity** - the company its card payments settle to. Shown only when you have more than one company.
 - **Device** - the reader model, when the provider reports it.
@@ -59,6 +60,21 @@ Status is not refreshed on its own. Click **Refresh status** to ask the provider
 
 If the provider refuses the reader, for example because a pairing code expired or the gym is missing an address, the reason is shown so you can fix it and try again.
 
+## Datecs terminals
+
+A Datecs terminal, such as the BlueCash-50, has no cloud connection of its own. It reaches 1club through the **Payment Bridge** app running on it, so you pair it the other way round: 1club gives you a code, and you enter it on the terminal.
+
+1. Click **Add payment terminal**.
+2. Give it a **Name**, choose **Datecs terminal** as the **Provider**, and choose the **Club** it sits at.
+3. Click **Get a pairing code**.
+4. Enter the code in the Payment Bridge app on the terminal. The code works once, until the time shown. The dialog shows when the terminal has paired.
+
+If the code expires before you use it, close the dialog and get a new one. If the device still asks for a code after the dialog says it paired, someone else used your code: remove what it added and get a new code.
+
+A BlueCash-50 is also a fiscal device. Pairing it here adds only its card side. To print fiscal receipts on it, add it under [Fiscal receipts](/settings/fiscal#add-a-fiscal-device) as **A payment terminal**, with no second pairing. It works the other way too: when a BlueCash-50 is already one of your fiscal devices, **Add payment terminal** offers it under **Add** as _name (BlueCash-50 fiscal device)_. Pick it to turn on its card side without pairing again.
+
+Card charges on a BlueCash-50 print their fiscal receipt on the same box, as part of the charge. Each Datecs terminal closes its card batch once a day at the time set on the [DatecsPay](/settings/integrations/datecspay#daily-card-batch-close) page.
+
 ## Retire a reader
 
 Open the row's menu, choose **Delete**, and confirm with **Retire**. The reader stops accepting payments, and the payments it already took keep their history, so you can still tell which device took a payment months later.
@@ -69,14 +85,16 @@ Retire every reader at a gym before you point that gym at a different company. A
 
 Staff send a sale to a reader wherever they take a payment at the desk: the [point of sale](/pos/point-of-sale#payment-methods), **Complete order** on an [order](/sales/orders), and **Add Payment** on a charge, booking, check-in, or membership.
 
-1. Choose the provider's terminal method, **Stripe Terminal** or **myPOS terminal**, as the payment method. It is offered only at a gym that has an active reader for that provider.
-2. Pick the reader on your counter, then click **Charge card**. The amount appears on its screen.
+1. Choose the provider's terminal method, such as **Stripe Terminal** or **myPOS terminal**, as the payment method. It is offered only at a gym that has an active reader for that provider.
+2. Pick the reader on your counter, then click **Charge card**. The amount appears on its screen. If the computer is set to a [till](/settings/tills), only that till's readers are offered.
 3. Ask the customer to tap, insert, or swipe their card. The dialog follows the payment and stays open until the reader answers. Click **Cancel** to stop a charge the customer hasn't paid yet.
 4. When the payment is approved, it is recorded against what it paid for: the booking is confirmed, the membership starts, or the order completes.
 
 If the card is declined, the dialog shows the provider's reason and the sale stays open, so the customer can **Try again** with another card or pay another way. Nothing is lost if you close the tab, lose the connection, or lock the tablet after the customer taps: 1club keeps checking with the provider and records the payment against the right sale a few minutes later.
 
 On a Stripe test reader, a **Simulate tap** button lets you rehearse the whole flow without a card.
+
+If your company prints [fiscal receipts](/settings/fiscal), a card taken on any reader gets its receipt too: on the BlueCash-50 itself, or on the till's fiscal device for other readers. The payment shows a **Fiscal receipt** line with whether it printed.
 
 ## Permissions
 
@@ -86,7 +104,8 @@ Adding, refreshing, and retiring readers needs permission to manage organization
 
 | What you see | Why | What to do |
 | --- | --- | --- |
-| The page says no provider supports in-person terminals | Neither Stripe nor myPOS terminals are set up for your organization. | Connect Stripe, or connect myPOS and turn on its **Terminal** capability. |
+| The page says no provider supports in-person terminals | No provider's terminals are set up for your organization. | Connect Stripe, connect myPOS and turn on its **Terminal** capability, or activate DatecsPay and tick **POS Terminals**. |
+| A Datecs charge says the fiscal device didn't answer or is busy | A BlueCash-50 prints the fiscal receipt as part of the charge, and its fiscal side couldn't. Nothing was charged. | Check that the device is on and not printing another receipt, then try again. |
 | A provider you connected isn't offered when you add a reader | It isn't connected for the company that bills for the gym you picked. | Connect the provider for that company, or pick a gym that bills through a connected company. |
 | A reader shows **Offline** | The provider can't reach it, usually power or network. | Check the reader's power and connection, then click **Refresh status**. |
 | A reader shows **Unknown** | Its status hasn't been refreshed, or the provider reported a state 1club doesn't recognize. | Click **Refresh status**. |
@@ -98,6 +117,8 @@ Adding, refreshing, and retiring readers needs permission to manage organization
 ## Related
 
 - [Point of sale](/pos/point-of-sale) - where staff send a sale to a reader.
-- [Stripe](/settings/integrations/stripe) and [myPOS](/settings/integrations/mypos) - connect the providers your readers use.
+- [Stripe](/settings/integrations/stripe), [myPOS](/settings/integrations/mypos), and [DatecsPay](/settings/integrations/datecspay) - connect the providers your readers use.
+- [Tills](/settings/tills) - which readers each counter offers.
+- [Fiscal receipts](/settings/fiscal) - fiscal receipts for card and cash sales at the desk.
 - [Payment methods](/settings/payment-methods) - the terminal payment methods your readers record against.
 - [Billing entities](/settings/billing-entities) - which company a reader's payments settle to.

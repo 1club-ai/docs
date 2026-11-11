@@ -171,9 +171,11 @@ including `usesRemaining` - the sessions the customer has left - and `allowances
 which lists what it covers (`validFor`), its session count, and what is left. A
 membership sold from a plan with several allowances, such as 5 Yoga + 4 Pilates, has
 one entry for each, each with the `allowanceId` you use to change it. `nextCharge` is
-its next renewal charge. On a [per-session plan](/sales/per-session-plans) it says
-what the charge is made of (the fixed part, the sessions, the discount, and earlier
-months' corrections and credit), and `usesRemaining` is the makeups it owes.
+its next renewal charge (`chargeDate`, `periodStart`, `periodEnd`, `amount`), or null
+when none is coming. On a [per-session plan](/sales/per-session-plans) its `perSession`
+says what the charge is made of: `fixedAmount`, each of the `sessions` with its price,
+the `discount`, `correctionsAmount` for earlier months and `carriedCreditAmount`. Its
+`usesRemaining` is the makeups it owes.
 
 ```bash
 curl "https://api.1club.ai/v1/platform/memberships/7412" \

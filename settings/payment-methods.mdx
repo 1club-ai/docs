@@ -4,7 +4,7 @@ description: Configure which payment methods your organization accepts at checko
 keywords: [payment method, cash, card, Stripe, wallet, manual payment, checkout, preferred payment method]
 ---
 
-Payment methods are the ways your organization can take money - cash, card via Stripe, in-app wallet credit, and any custom manual method you define. You configure them, control where each one is visible, and choose which method members see preselected when they book in the portal. The front desk picks from them at the point of sale, and members see the ones you make visible to them at checkout.
+Payment methods are the ways your organization can take money - cash, card via Stripe or a payment terminal, in-app wallet credit, and any custom manual method you define. You configure them, control where each one is visible, and choose which method members see preselected when they book in the portal. The front desk picks from them at the point of sale, and members see the ones you make visible to them at checkout.
 
 ## When to use it
 
@@ -30,6 +30,8 @@ Every method belongs to a channel, which determines how a payment is processed:
 A method's channel is fixed. To take card payments you don't create a Stripe method - you use the system **Stripe** method and [connect Stripe](/settings/integrations/stripe) so it can take payments.
 
 Card readers add their own system method too. **Stripe Terminal** and **myPOS terminal** appear in the list only once you have registered an active reader for that provider under [Payment terminals](/settings/payment-terminals).
+
+[myPOS](/settings/integrations/mypos) and [DatecsPay](/settings/integrations/datecspay) online card payments don't appear in this list. The member completes them on the provider's own checkout page, so staff can never record one by hand. Members see them at checkout once the integration is active.
 
 ## The payment methods list
 
@@ -99,7 +101,7 @@ If members top up an in-app wallet and spend it on drop-ins, payments made from 
 It's referenced by at least one existing payment. Set its **Visibility** to **Admin only** to keep it out of the member portal instead of deleting it.
 
 **Members can't pay by card in the portal**
-Connect Stripe under [Integrations](/settings/integrations/stripe). The system **Stripe** method is visible to members by default and can't be edited.
+Connect an online card provider under [Integrations](/settings/integrations): [Stripe](/settings/integrations/stripe), [myPOS](/settings/integrations/mypos), or [DatecsPay](/settings/integrations/datecspay). Each company can take online card payments through one of them at a time. The system **Stripe** method is visible to members by default and can't be edited.
 
 **The Preferred toggle isn't shown for a method**
 Only methods available to member bookings show the toggle. Check that the method's visibility makes it available to members.

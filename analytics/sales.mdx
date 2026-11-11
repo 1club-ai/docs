@@ -1,7 +1,7 @@
 ---
 title: Sales analytics
 sidebarTitle: Sales
-description: The Sales analytics category - memberships sold and revenue on the Sales Dashboard, plan changes and who left on Customer Lifecycle, and which sources, campaigns and salespeople turn leads into members on Leads & Conversion.
+description: The Sales analytics category - memberships sold and revenue on the Sales Dashboard, plan changes, churn and who left on Customer Lifecycle, and which sources, campaigns and salespeople turn leads into members on Leads & Conversion.
 keywords:
   - sales analytics
   - sales dashboard
@@ -16,6 +16,7 @@ keywords:
   - customer lifecycle
   - plan upgrades
   - churn
+  - churn rate
   - retention cohorts
 ---
 
@@ -28,7 +29,7 @@ Use it when you want to know whether the gym is winning new members and keeping 
 - **Which ads bring people who buy?** - a padel gym running [Lead Ads](/settings/integrations/meta#lead-ads) opens **Leads & Conversion**, groups by **Campaign**, and sees that its "Spring trial week" campaign converts twice as many leads as its brand campaign, at a higher first membership revenue.
 - **Why do leads say no?** - a boxing gym reads **Top lost reason** by **Salesperson** and finds most of one coach's lost leads say **Price**, so it gives that coach a starter offer to work with.
 - **Are members moving up or down?** - a reformer studio compares **Plan upgrades** with **Plan downgrades** on **Customer Lifecycle** after a price change, apart from the new memberships sold.
-- **Why are members leaving?** - a CrossFit box reads **Who left** by **Reason** for the last quarter, then by **Plan**, and sees most leavers cancel the off-peak plan over its timetable.
+- **How many members are we losing?** - a CrossFit box reads **Churn rate** on **Customer Lifecycle** for the last quarter against the quarter before, then **Who left** by **Reason** and by **Plan**, and sees most leavers cancel the off-peak plan over its timetable.
 
 See [Worked examples](#worked-examples) for how to read each of these.
 
@@ -45,12 +46,9 @@ The reports read the history of each contact rather than today's snapshot, so a 
 
 Each tab has a date range (default: the last 30 days) and **Compare with**: **None**, **Previous period** or **Same period last year**. With a comparison on, each card shows the change against that period.
 
-Contacts belong to your organization, not to one gym location, so most figures are organization-wide. The gym selected in the breadcrumb narrows only what belongs to a gym:
+Contacts belong to your organization, not to one gym location, so most figures are organization-wide. On the **Sales Dashboard**, the gym selected in the breadcrumb narrows the six membership and revenue cards; everything else, and the whole of **Customer Lifecycle** and **Leads & Conversion**, covers the whole organization. A lead's gym is the gym of the sale that converted them, so on **Leads & Conversion** you see it by grouping by **Club** instead.
 
-- On the **Sales Dashboard**, the six membership and revenue cards.
-- On **Customer Lifecycle**, **Who left**.
-
-**Leads & Conversion** is always organization-wide. A lead's gym is the gym of the sale that converted them, so you see it by grouping by **Club** instead.
+With a comparison on, a figure the compared period does not have (for example paused memberships before pause history was recorded) shows no change rather than a false one.
 
 ### Figure definitions
 
@@ -66,6 +64,9 @@ Each card has an info icon with its definition. The figures this page covers are
 | **Other revenue**            | All other revenue in the period: bookings, passes, drop-ins, products and the rest, ex-tax and net of refunds.                                          |
 | **Plan upgrades**            | Members who moved to a dearer membership plan, by monthly price, within 14 days of leaving their previous one.                                          |
 | **Plan downgrades**          | Members who moved to a cheaper membership plan, by monthly price, within 14 days of leaving their previous one.                                         |
+| **Churned**                  | Contacts whose membership ended in the period with no new membership within 14 days, whatever the reason. Pass and drop-in holders never churn: they lapse. |
+| **Churn rate**               | Of the contacts holding a running membership on the first day of the period, the share who churned in it.                                               |
+| **Frozen**                   | Memberships paused in the period.                                                                                                                       |
 | **Converted**                | Of the period's new leads, those who have since been given a plan or paid for something.                                                                |
 | **Conversion rate**          | Converted leads as a share of new leads.                                                                                                                |
 | **Median days to convert**   | For the converted leads, the middle value of the days from entering the pipeline to converting.                                                         |
@@ -129,7 +130,17 @@ The cards count the period's movements between contact types and plans:
 | **Lapsed**          | Moves from Member or Drop-in to Lapsed. A customer who becomes Staff is not counted as lapsed. |
 | **Won back**        | Moves back to Member or Drop-in by someone who was a customer before.                          |
 
-**New leads** and **New customers** match the same cards on the Sales Dashboard.
+**New leads** and **New customers** match the same cards on the Sales Dashboard. More downgrades and more lapsed customers read red when you compare.
+
+### Churn
+
+Three more cards count who left their membership, kept apart from **Lapsed** above:
+
+- **Churned** - contacts whose membership ended in the period with no new membership within 14 days, whatever the reason. A member who renews a few days late, or moves to another plan the week after, has not churned. Pass and drop-in holders do not churn: they lapse.
+- **Churn rate** - of the contacts holding a running membership on the period's first day, the share who churned in it. It moves in percentage points when you compare.
+- **Frozen** - memberships paused in the period.
+
+**Why they left** breaks churn down by how the membership ended: **Cancelled by the member**, **Cancelled by staff**, **Cancelled at period end**, **Refunded**, **Not renewed** (it simply was not renewed), **Other**, or **Unknown**. These are recorded from the day churn history began. A period before that shows the churn figures with no breakdown, and the chart says from which date reasons are recorded; a period across that date is titled **Why they left, since** that date.
 
 ### Plan upgrades and downgrades
 
@@ -144,19 +155,17 @@ A new membership taken alongside one that keeps renewing is a second plan, not a
 
 ### Who left
 
-**Who left** lists the members who churned in the period: a membership plan ended and no new membership followed within 14 days. A member who renews a few days late, or moves to another plan the week after, has not left. Pass and drop-in holders lapse rather than churn, so they count under **Lapsed** instead.
+**Who left** breaks the same churned members down another way. Group it with the toggle:
 
-Group the list with the toggle:
-
-- **Reason** - the cancellation reason recorded when their membership was cancelled. A membership that ended without one shows under **No reason recorded**.
+- **Reason** - the cancellation reason staff picked when they cancelled the membership. A membership that ended without one shows under **No reason recorded**.
 - **Plan** - the plan they left, or **No plan**.
 - **Source** - the [source](/members/leads#sources) they came from, or **No source**.
 - **Salesperson** - the staff member credited with them, or **Unassigned**.
 
 <Note>
-  Reasons are only recorded for cancellations from 20 October 2026. A period
-  before that date shows how many members left but no breakdown, and a period
-  that spans it breaks down only the ones who left since.
+  Cancellation reasons are only recorded for cancellations from 20 October 2026.
+  A period before that date shows how many members left but no breakdown by
+  reason.
 </Note>
 
 ### Where contacts stand now
@@ -218,7 +227,7 @@ A stage's figures are its own, not a share of the stage before. The stage view h
 
 **Reformer studio after a price change.** The studio raises its unlimited plan. On **Customer Lifecycle** with **Compare with** set to **Previous period**, **Plan downgrades** rises while **Plan upgrades** holds, and **Memberships sold** on the dashboard is flat, so the change moved existing members down rather than stopping new sales.
 
-**CrossFit box reading why members leave.** The owner opens **Customer Lifecycle** for the last quarter and reads **Who left** by **Reason**, then by **Plan**. Most leavers left the off-peak plan and gave the timetable as their reason, so the box adds an evening slot to that plan.
+**CrossFit box reading why members leave.** The owner opens **Customer Lifecycle** for the last quarter with **Compare with** on **Previous period**. **Churn rate** reads 6.2%, up 1.5 points. **Why they left** shows most were cancelled by the member, and **Who left** by **Reason**, then by **Plan**, shows most leavers left the off-peak plan and gave the timetable as their reason, so the box adds an evening slot to that plan.
 
 ## Tips and best practices
 
@@ -232,11 +241,12 @@ A stage's figures are its own, not a share of the stage before. The stage view h
 
 | Symptom                                                                 | Cause                                                                                                       | Fix                                                                                    |
 | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| The **Sales** category is missing                                       | Your role lacks `analytics.read.club` or `members.read.organization`                                        | Ask an admin to grant both. See [Roles and permissions](/reference/roles-permissions). |
+| The **Sales** category is missing                                       | Your role lacks `analytics.read.club` or the member read permission (`members.read.standard`)               | Ask an admin to grant both. See [Roles and permissions](/reference/roles-permissions). |
 | **New leads** is 0 although the board has leads                         | The range counts leads that entered the pipeline in that range, not leads sitting in it                     | Widen the range, or open the [Leads](/members/leads) board for where leads stand now.  |
 | **Conversion rate** shows "-"                                           | No leads entered the pipeline in the period                                                                 | Widen the range.                                                                       |
 | Many leads fall under **No club yet**                                   | Those leads have not converted yet, and a lead's gym is the gym of the sale that converted them             | This is expected. The row shrinks as leads convert.                                    |
-| Choosing a gym in the breadcrumb does not change **Leads & Conversion** | That report is organization-wide                                                                            | Group by **Club** instead.                                                             |
+| Choosing a gym in the breadcrumb does not change **Leads & Conversion** or **Customer Lifecycle** | Those reports are organization-wide                                                  | On **Leads & Conversion**, group by **Club** instead.                                  |
+| **Why they left** has no breakdown                                      | The period is before churn history began to be recorded                                                     | Pick a later period; the chart says from which date reasons are recorded.              |
 | **Who left** shows no reasons                                           | The period is before 20 October 2026, when reasons began to be recorded, or the cancellations had no reason | Pick a later period. Recording a reason on every cancellation fills it in.             |
 | A plan change does not show under **Plan upgrades**                     | The plan was changed in place on the same membership, or it bills on a custom period                        | This is expected. Only a move from one membership to another is seen.                  |
 | **Paused memberships** shows "-"                                        | The period ends before pause history was recorded                                                           | Pick a later period.                                                                   |

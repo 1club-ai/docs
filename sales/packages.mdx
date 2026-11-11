@@ -1,7 +1,7 @@
 ---
 title: Packages
 description: Bundle plans and products into a single fixed-price offer you can sell on the POS and signup forms, with revenue split back to each component.
-keywords: ["package", "bundle", "fixed price", "plan bundle", "product bundle", "revenue split", "order form", "point of sale", "starter pack", "trial bundle"]
+keywords: ["package", "bundle", "bookable package", "party", "private hire", "team building", "slot", "fixed price", "plan bundle", "product bundle", "revenue split", "order form", "point of sale", "starter pack", "trial bundle"]
 ---
 
 A package bundles one or more plans and products into a single fixed-price offer. Instead of selling a membership and a starter product separately, you wrap them into one package at one price, and 1club splits the revenue back out to the underlying items so each is still recorded against its own account. You build packages in the admin, the front desk sells them on the point of sale, and members buy them on signup forms.
@@ -76,6 +76,15 @@ Turn on **Bookable** for parties, team building, and private hire. Buyers then p
 - **Days it runs** - the weekdays the package is offered. Leave empty to allow any day.
 - **Slots** - the start times you run the package at. Type a **Time** and click **Add**. A slot is either taken or free, so once someone books a slot on a given date, nobody else can.
 
+If you pick a **Club**, the slots run on that gym's clock.
+
+How a bookable package sells:
+
+- **On a form only.** The buyer picks a date and one of the free slots next to the package while they choose what to buy, and confirms the date on the review screen before paying. Days the package doesn't run are greyed out, and a slot already sold for that date isn't offered. If two buyers race for the same slot, the second is told it has gone.
+- **Not at the till.** The point of sale, the admin, and the platform API have no slot picker, so they refuse a bookable package rather than take money for a date nobody reserved.
+- **The date travels with the order.** Staff see the booked date and time on the package line of the [order](/sales/orders), and the buyer sees it in their order confirmation email.
+- **Cancelling frees the slot.** When you cancel the order, its date and time go straight back on sale.
+
 <Note>
 Packages are categorized and priced at the package level; the components keep their own revenue accounts. There's no separate tax field on a package - tax is applied per component at sale time using your organization's tax settings (see [How the revenue split works](#how-the-revenue-split-works)).
 </Note>
@@ -84,11 +93,15 @@ Packages are categorized and priced at the package level; the components keep th
 
 ### Point of sale
 
-Packages appear in their own **Packages** tab on the point of sale. Adding a package to the cart records it as a package line that expands into its component plans and products on completion.
+Packages appear in their own **Packages** tab on the point of sale. Adding a package to the cart records it as a package line that expands into its component plans and products on completion. Bookable packages are the exception: they can only be sold on a form (see [Bookable packages](#bookable-packages)).
 
 ### Forms
 
-Attaching packages to a [form](/marketing/forms) turns it into an **order form** where members can add or remove packages during signup. You can also attach optional [products](/sales/products) as add-ons alongside, with a running order summary as the member builds their order.
+Attaching packages to a [form](/marketing/forms) turns it into an **order form** where members can add or remove packages during signup. You can also attach optional [products](/sales/products) as add-ons alongside, with a running order summary as the member builds their order. The buyer pays at the end of the form like any other checkout and receives an itemized order confirmation email once it is paid.
+
+### Invoices and pro-formas
+
+When you [issue an invoice or pro-forma from the order](/sales/orders#issuing-an-invoice-or-pro-forma-for-an-order), a package shows as the package the customer bought, with its items listed under it, rather than as separate lines for each component.
 
 ## Worked examples
 
@@ -139,6 +152,10 @@ You want new members to join and walk away kitted out.
 **Issue**: A package doesn't appear on the POS or signup form.
 
 **Solution**: Confirm the package is **Active** and its **Visibility** allows it in that context. On signup forms, the package also has to be attached to the form.
+
+**Issue**: The till refuses a package with "is booked for a date and time, so it can't be sold from here yet".
+
+**Solution**: The package is **Bookable**, so it needs a date and slot that only a form can collect. Sell it through a [form](/marketing/forms), or turn **Bookable** off if you don't need buyers to pick a time.
 
 **Issue**: The component revenue amounts don't look round.
 

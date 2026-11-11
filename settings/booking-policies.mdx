@@ -14,7 +14,8 @@ Typical uses:
 - **A drop-in yoga studio** - walk-ins are welcome, the front desk collects payment at check-in, and a trial visitor with no member account can still be checked in.
 - **A strict class-based gym** - classes are paid online at booking, and any booking not checked in by the end of the day is marked as a no-show.
 - **Personal training booked over the phone** - a policy scoped to personal training lets admins book callers who haven't signed up yet.
-- **Courts with a cancellation deadline** - a policy scoped to your padel court area type refunds in full up to 24 hours ahead, half up to 4 hours ahead, and nothing after that.
+- **Areas with a cancellation deadline** - a policy scoped to your padel area type refunds in full up to 24 hours ahead, half up to 4 hours ahead, and nothing after that.
+- **Refund terms for events** - an event policy refunds tickets in full up to a week out and half up to two days out, and lets members cancel their own tickets within those terms.
 
 See [Worked examples](#worked-examples) for the settings behind the first three.
 
@@ -22,7 +23,7 @@ If you're picking a model for the first time, read [Check-in Models](/reference/
 
 ## Rules for members, warnings for staff
 
-Most booking rules exist to shape what a member may book or do for themselves. They apply in full wherever members act on their own: the portal, the mobile app, your website, the marketplace, the kiosk, and the check-in app.
+Most booking rules exist to shape what a member may book or do for themselves. They apply in full wherever members act on their own: the portal, the mobile app, your website, the 1club network, the kiosk, and the check-in app.
 
 Staff are not held to them. When an admin, manager, front desk, or instructor books or checks someone in from the admin dashboard or the instructor portal, these rules never refuse them. A short note names the rule, the button stays the same, and the first click goes through. The same applies to bookings made by the in-app assistant and booking imports.
 
@@ -43,7 +44,7 @@ Nothing is recorded as an override for these, because nothing was overridden. A 
 Two kinds of rule still apply to staff:
 
 - **Staff-only switches.** **Allow anonymous bookings** and **Allow anonymous check-ins** decide whether staff may book or check in someone with no contact at all. Only staff can do either, so they stay enforced.
-- **Facts about the schedule.** A coach on time off, on a break, or outside their hours, a blocked area, and a court or coach that is already taken. The booking dialog names these before you save, and you book past them with the same click when your role allows it. See [Bookings](/schedule/bookings#warnings-and-scheduling-conflicts).
+- **Facts about the schedule.** A coach on time off, on a break, or outside their hours, a blocked area, and an area or coach that is already taken. The booking dialog names these before you save, and you book past them with the same click when your role allows it. See [Bookings](/schedule/bookings#warnings-and-scheduling-conflicts).
 
 ## Managing booking policies
 
@@ -90,7 +91,7 @@ repeats, is created in full the moment you save it (see
 [Repeating schedules](/reference/repeating-schedules)), so every occurrence in it has to
 fit the window.
 
-With **Max. ahead** set to 14 days, a weekly court booking repeating "after 52 times"
+With **Max. ahead** set to 14 days, a weekly area booking repeating "after 52 times"
 reaches nearly a year out and is refused. The same booking repeating "after 2 times" ends
 inside the window and is created normally.
 
@@ -163,7 +164,7 @@ When on, any booking that isn't checked in by the end of the booking day is auto
 
 > Booked members are checked in without staff action.
 
-When on, the system automatically checks the member in at the booking start time without staff action. Useful for venues where staff don't physically scan members in (e.g. self-service court reservations).
+When on, the system automatically checks the member in at the booking start time without staff action. Useful for venues where staff don't physically scan members in (e.g. self-service area reservations).
 
 ### Allow anonymous bookings
 
@@ -199,7 +200,7 @@ This is off by default - turn it on per policy when you want to let new visitors
 
 ## Scope
 
-Use the **General** section to control which bookings the policy applies to. What a policy covers and who it covers combine, so one policy can say "Gold members, on padel courts".
+Use the **General** section to control which bookings the policy applies to. What a policy covers and who it covers combine, so one policy can say "Gold members, on padel areas".
 
 - **Clubs** - Leave it on **All clubs**, or pick specific gyms.
 - **What it applies to** - **Bookings** or **Events**.
@@ -250,7 +251,7 @@ Once a member is booking a specific slot, the policy is shown as the **deadlines
 - 50% refund until Saturday, Sep 12 at 11:00 AM
 - No refund after that
 
-Deadlines are shown in the gym's timezone. A band whose deadline has already passed is left out, so a member booking a court an hour before it starts is told plainly that there is no refund rather than being shown a tier they cannot reach. Where no specific booking is in context, the notice periods are shown instead.
+Deadlines are shown in the gym's timezone. A band whose deadline has already passed is left out, so a member booking an area an hour before it starts is told plainly that there is no refund rather than being shown a tier they cannot reach. Where no specific booking is in context, the notice periods are shown instead.
 
 Policies with no rules at all say so too: under **Free cancellation** a member reads "Full refund at any time" on the confirmation before they pay, and again when they open the cancellation.
 
@@ -268,6 +269,17 @@ Members see a single line on the booking confirmation and in their account: "No 
 <Note>
   If you previously faked non-refundable bookings with a very large **Hours in Advance** value (such as 9999 hours at 100% refund), switch the policy to **Non-refundable** and save. The old setup refunds nothing in practice, but members reading the booking confirmation are told to cancel 9999 hours ahead for a full refund.
 </Note>
+
+## Event cancellation policies
+
+A policy whose **What it applies to** is **Events** sets the refund terms for event tickets. It has **Cancellation rules** only: booking rules and options don't apply to tickets, and it has no audience.
+
+- **Which events** - pick events in **Events** to give them their own terms, such as a non-refundable gala, or leave the list empty for a policy that covers every event.
+- **Without an event policy**, members can cancel a free ticket themselves, so a seat they won't use goes back to someone who will. A paid ticket they can't cancel: they're told to contact you, and refunds stay your decision. Ticket bookings never fall back to your booking policies, since those were written for areas and classes.
+- **With an event policy**, members see exactly what cancelling returns and can cancel their own tickets while it refunds something. Once the policy refunds nothing for that point, they're told to contact you instead, because cancelling would only lose them their seat.
+- **Group orders** - cancelling one ticket of a multi-ticket purchase releases every ticket in it, so the seats go back on sale together.
+
+Staff cancelling a ticket from the admin aren't held to the policy. **Cancel event** on an event cancels every ticket without refunding anyone automatically. See [Events](/events/events#ticket-cancellations).
 
 ## Worked examples
 

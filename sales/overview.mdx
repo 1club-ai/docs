@@ -1,8 +1,8 @@
 ---
 title: Sales overview
 sidebarTitle: Overview
-description: How the Sales section is organized - Plans, Products, Promotions, Memberships, Orders, Finance, and Cash - and how plans, orders, charges, invoices, and payments fit together.
-keywords: ["sales", "revenue", "billing", "finance", "cash", "charge", "transaction", "payment", "invoice", "bill run", "plan", "product", "package", "promotion", "membership", "order", "wallet"]
+description: How the Sales section is organized - Plans, Products, Promotions, Memberships, Orders, Finance, and Cash - how plans, orders, charges, invoices, and payments fit together, and how membership renewals are collected.
+keywords: ["sales", "revenue", "billing", "finance", "cash", "charge", "transaction", "payment", "invoice", "bill run", "invoice run", "membership billing", "statements", "renewal", "plan", "product", "package", "promotion", "membership", "order", "wallet"]
 ---
 
 **Sales** is where you set up what your gym sells and follow the money it brings in. It replaces the old **Revenue** menu and also holds **Promotions** (formerly under **Marketing**) and **Memberships** (formerly under **Members**). Owners and managers set up the catalog here, and front-desk staff and bookkeepers use it to review orders, chase what is owed, and reconcile the till.
@@ -35,16 +35,20 @@ Go to **Sales** in the left rail (`/sales`). It opens on the first tab you can a
 
 ### Finance
 
-**Sales** > **Finance** (`/finance`) gathers everything about money that has moved into one tab, with its own sub-tabs. It opens on **Charges**.
+**Sales** > **Finance** (`/finance`) gathers everything about money that has moved, and the renewals about to move it, into one tab with its own sub-tabs. It opens on **Charges**.
 
 | Sub-tab | What it lists |
 | --- | --- |
 | [Charges](/sales/charges) | Everything owed: what someone owes you, one row per thing sold |
+| **Membership billing** | The membership renewals coming up, and how each one will be collected |
 | [Payments](/sales/payments) | Every payment: how money came in, and who recorded it |
 | [Invoices](/sales/invoices) | Numbered invoice and pro-forma documents |
-| [Bill Runs](/sales/bill-runs) | Batches that sweep a period of charges into invoices |
+| [Invoice Runs](/sales/bill-runs) | Batches that sweep a period of charges into invoices |
+| **Statements** | A month's statements for your members, printed for everyone at once |
 | [Wallet](/sales/wallet) | Each member's store-credit balance |
 | **Wallet movements** | Every credit and debit across all wallets |
+
+The sub-tabs keep their own addresses under `/billing` (for example `/billing/charges` and `/billing/invoices`), so older bookmarks and links in emails still open the right page.
 
 ### Cash
 
@@ -69,31 +73,36 @@ This separation is why you can record a payment without ever issuing an invoice 
 The typical flow for a paid activity is:
 
 1. A booking, membership, or signup fee is created. 1club writes a **charge** with `paymentStatus = pending` (or `paid` if the amount is zero).
-2. Either the system or an admin collects payment. That can happen up front (Stripe Payment Element in the member portal, or an admin recording a manual payment), at check-in if the booking policy says so, or later from an invoice.
+2. Either the member or your staff pays it. That can happen up front (card checkout in the member portal or app, through [Stripe](/settings/integrations/stripe), [myPOS](/settings/integrations/mypos), or [DatecsPay](/settings/integrations/datecspay)), at the desk (the [point of sale](/pos/point-of-sale), **Add Payment**, or a [payment terminal](/settings/payment-terminals)), at check-in if the booking policy says so, or later from an invoice.
 3. When the payment succeeds, 1club creates a **payment** row, links it to the charge(s), and flips the charge's status to `paid`. Pending bookings tied to that charge are confirmed.
 
 Invoices are optional. They get created when:
 
-- You manually invoice a charge from its details page.
-- You run a [bill run](/sales/bill-runs), which sweeps every pending non-void charge for a period and groups them into invoices.
-- A scheduled bill run fires on a cron (configured under **Settings** > **Billing** > **Automated Billing**).
+- You issue one from a charge, or straight from an [order](/sales/orders#issuing-an-invoice-or-pro-forma-for-an-order).
+- You run an [invoice run](/sales/bill-runs), which takes every charge in a period that is not void and not yet invoiced, paid ones included, and groups them into invoices.
+- A scheduled invoice run fires (configured under **Settings** > **Billing** > **Automated Invoicing**).
 
 ## Recurring memberships
 
-For recurring plans, an hourly job (`recurring-transactions`) does three things:
+For recurring plans, an hourly job raises each renewal charge a few days before the new period starts (three by default) and then collects it in the way the company that sold the membership takes card payments online:
 
-- Creates the next `membership_recurrence` charge when a billing period rolls over.
-- For memberships flagged **Require payment upfront**, it attempts to charge the contact's default Stripe payment method when the recurrence becomes due. If no default method is on file or the card payment fails, the charge stays `pending`.
-- Marks any `pending` charge whose due date is in the past as `overdue`.
+| The company takes online card payments through | What happens to a renewal |
+| --- | --- |
+| Stripe | The member's saved card is charged. |
+| myPOS, with **Charge renewals to saved cards** on | The member's saved myPOS card is charged. If it is declined or has expired, the member is emailed a payment link instead. |
+| myPOS, without saved cards | The member is emailed a payment link for the renewal. |
+| DatecsPay, or no online card provider | Nothing is charged. The renewal stays owed for you to collect at the desk or from an invoice. |
 
-It does not send invoices and it does not retry failed charges. Retries are manual: open the charge or invoice and use **Charge saved card** or **Add Payment**. See [Plans](/sales/plans) for how a plan's fields drive this behavior.
+A failed renewal never deactivates the membership: the charge is marked failed and staff decide what to do. When the member saves a new card, 1club tries their failed renewals again with it. The same job also marks any `pending` charge whose due date has passed as `overdue`. See [Automatic membership renewals](/settings/integrations/mypos#automatic-membership-renewals) for the myPOS side, and [Plans](/sales/plans) for how a plan's fields drive renewals.
 
 ## Settings for Sales
 
-Setup that you do once lives under **Settings**, in two categories:
+Setup that you do once lives under **Settings**:
 
-- **Settings** > **Sales** - **Point of Sale**, **Inventory Management**, **Rentals**, **Cash Registry & Expenses**, and **Payment terminals**. The switches here turn the matching tabs and register features on, and **Payment terminals** connects the card readers the register takes payment on.
-- **Settings** > **Billing** - **General** (currency, [billing entities](/settings/billing-entities), tax rates, revenue accounts, [payment methods](/settings/payment-methods), [external programs](/settings/external-programs)), [**Pricing Rules**](/settings/pricing-rules), [**Seasons**](/settings/seasons), [**Membership Policies**](/settings/membership-policies), and **Automated Billing** (scheduled [bill runs](/sales/bill-runs#scheduled-bill-runs)).
+- **Settings** > **Sales** - **Point of Sale**, **Inventory Management**, **Rentals**, **Cash Registry & Expenses**, and **Payment terminals**. The switches here turn the matching tabs and register features on, and [**Payment terminals**](/settings/payment-terminals) connects the card readers you take payment on.
+- **Settings** > **Billing** - **General** (currency, [billing entities](/settings/billing-entities), tax rates, revenue accounts, [payment methods](/settings/payment-methods), [external programs](/settings/external-programs)), [**Membership Policies**](/settings/membership-policies), and **Automated Invoicing** (scheduled [invoice runs](/sales/bill-runs#automated-invoicing)).
+- **Settings** > **Bookings** - [**Pricing Rules**](/settings/pricing-rules) and [**Seasons**](/settings/seasons), which set what bookings cost.
+- **Settings** > **Integrations** - the card payment providers: [Stripe](/settings/integrations/stripe), [myPOS](/settings/integrations/mypos), and [DatecsPay](/settings/integrations/datecspay), plus [Hype](/settings/integrations/hype) for fiscal receipts.
 
 ## Related
 
@@ -105,4 +114,4 @@ Setup that you do once lives under **Settings**, in two categories:
 - [Payments](/sales/payments)
 - [Invoices](/sales/invoices)
 - [Payment methods](/settings/payment-methods)
-- [Export](/settings/export) - CSV and QuickBooks bundle for accounting handoff.
+- [Export](/settings/export) - Excel or CSV downloads and the QuickBooks bundle for accounting handoff.

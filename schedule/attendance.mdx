@@ -34,7 +34,7 @@ Before you start: how strict your check-in flow is depends on your booking polic
 ## Viewing the attendance log
 
 <Note>
-Attendance lives under **Schedule** > **Attendance** (`/schedule/attendance`). The full list of check-ins is **Schedule** > **Check-ins** (`/schedule/checkins`), and individual check-in records open under it. Check-ins are not under Members.
+Attendance lives under **Schedule** > **Attendance** (`/schedule/attendance`). The full list of check-ins is **Schedule** > **Check-ins** (`/schedule/checkins`). A check-in opens in a side panel over the page you're on. Check-ins are not under Members.
 </Note>
 
 ### Open the log
@@ -63,24 +63,24 @@ Each row is one check-in. The columns are:
 - **Entry method** - How the member entered: **Direct Payment**, **Membership**, or **External Program**. Shown as `-` when none was recorded.
 - **Actions** - Delete the check-in (requires the `checkin.delete.club` permission).
 
-Click any row to open its [check-in detail page](#the-check-in-detail-page). Click a member's name to jump to their profile.
+Click any row to open the check-in in [its panel](#the-check-in-panel). Click a member's name to jump to their profile.
 
 ## The check-ins list
 
-The **Attendance Log** answers "how busy have we been lately": it loads a date window and charts the trend. When you need to browse the whole record instead, use the **Check-ins** page at `/schedule/checkins`. Find it by searching for "Check-ins" in global search, or through the **Check-ins** breadcrumb on any check-in detail page.
+The **Attendance Log** answers "how busy have we been lately": it loads a date window and charts the trend. When you need to browse the whole record instead, use the **Check-ins** page at `/schedule/checkins`. Find it by searching for "Check-ins" in global search.
 
 The check-ins list:
 
 - Shows every check-in in your organization, paged and searched on the server, so it stays fast however far back your history goes.
 - Sorts by the day the attendance is for, newest first, so a back-dated check-in sits on its own day rather than at the top.
-- Uses the same columns as the attendance grid (**Member**, **Date**, **Time**, **Reference**, **Entry method**), and a row opens the check-in detail page.
-- Has the same **Add Check-in** and **Scan QR** buttons, shown when you hold the `checkin.create.club` permission.
+- Uses the same columns as the attendance grid (**Member**, **Date**, **Time**, **Reference**, **Entry method**), and a row opens the check-in panel.
+- Has the same **Add** > **Add Check-in** and **Scan QR** buttons, shown when you hold the `checkin.create.club` permission.
 
 Opening the page needs at least the `checkin.read.own` permission.
 
 ## Recording a check-in
 
-From the attendance log, click **Add Check-in** (top right) to open the check-in dialog. What you see depends on the member's bookings and your booking policy.
+From the attendance log, click **Add** > **Add Check-in** (top right) to open the check-in dialog. You can also use **Add** > **Checkin** on the [calendar](/schedule/calendar), or **Check In** on a booking or a class. What you see depends on the member's bookings and your booking policy.
 
 <Steps>
   <Step title="Select the member">
@@ -115,13 +115,15 @@ A booking can be checked in from 1 hour before it starts until the end of the bo
 
 Checking someone in outside the window - a booking days ahead, or a day that has already closed - needs the Check-ins **Create** permission at **Organization** scope, which only Admins hold by default. On a class page, **Check In** is disabled outside the window for everyone else, with a note saying why.
 
+On a booking with players or a group, each person is checked in on their own place, from the **Players** section of the booking panel. See [Players and group sessions](/schedule/players-and-groups#check-in-one-person-at-a-time).
+
 Checking in a booking that was already marked as a no-show is different: it can undo the no-show fee, so it needs **Full access** on Check-ins at **Organization** scope (Admins by default). See [Roles and permissions](/reference/roles-permissions#check-ins).
 
 After you record a check-in, a banner offers **Undo** for a few seconds. Undo removes the check-in as if it never happened. It isn't offered when the visit was paid by card, through the POS terminal, or from the wallet - refund the payment and delete the check-in instead.
 
-## The check-in detail page
+## The check-in panel
 
-Click a row in the attendance grid or the check-ins list to open the check-in at **Schedule** > **Check-ins**. The detail page shows the date and time, when it was created, the entrance method, the member (or **Anonymous**), the club, and full references to the linked booking, class, area, and membership (with links to each and the membership's remaining usage).
+Click a row in the attendance grid or the check-ins list to open the check-in in a side panel, laid out like the [booking panel](/schedule/bookings#the-booking-panel). It shows the member (or **Anonymous**), the instructor, the **Entrance Method**, the membership's remaining usage, the class or booking it was for, the gym, and the time. It also lists the doors the visit opened (**Door access**), a walk-in's own charges, the member's review of the visit, and who recorded it and from where (**Recorded by**). A check-in for a booking opens that booking in the same panel.
 
 From here you can:
 
@@ -134,7 +136,7 @@ There is no general "edit" for a recorded check-in beyond changing its entrance 
 
 ## Deleting a check-in
 
-Delete a check-in from the **Actions** column in the grid, or from the **Delete** action on its detail page. You need the `checkin.delete.club` permission. Confirm in the dialog to proceed.
+Delete a check-in from the **Actions** column in the grid, or from the **Delete** action on its panel. You need the `checkin.delete.club` permission. Confirm in the dialog to proceed.
 
 Deleting reverses everything the check-in did, in one all-or-nothing transaction:
 
@@ -150,19 +152,19 @@ You cannot delete a check-in that has a paid charge attached. 1club blocks it wi
 
 ## Anonymous check-ins
 
-When a club runs in flexible check-in mode, you can log a visit without selecting a member - useful for trial visitors and guests who do not yet have a profile. The **Contact** field becomes optional (**Contact (optional)**), and leaving it empty records the check-in as **Anonymous** in the grid and on the detail page.
+When a club runs in flexible check-in mode, you can log a visit without selecting a member - useful for trial visitors and guests who do not yet have a profile. The **Contact** field becomes optional (**Contact (optional)**), and leaving it empty records the check-in as **Anonymous** in the grid and on its panel.
 
 Anonymous check-ins are controlled by the booking policy and the club's check-in mode in [Access control](/settings/access-control) - turn **Check-in Mode** to **Flexible** to allow them. See [Check-in models](/reference/check-in-models) for the full picture.
 
 ## QR code check-in
 
-Click **Scan QR** on the attendance log to open the scanner. Scanning a member's check-in code validates it and checks the member in to the current club, so busy front desks can process arrivals without opening the full dialog.
+Click **Scan QR** on the attendance log to open the scanner. It isn't offered to an independent instructor's organization, which has no door. Scanning a member's check-in code validates it and checks the member in to the current club, so busy front desks can process arrivals without opening the full dialog.
 
 ## Worked examples
 
-### Padel court booked and paid online
+### Padel game booked and paid online
 
-A member books and pays for a padel court in advance. When they arrive, open **Add Check-in**, select the member, and pick their booking for today. Because payment was collected at booking, there is nothing to charge - confirm the check-in and the booking flips to attended.
+A member books and pays for a padel area in advance. When they arrive, open **Add** > **Add Check-in**, select the member, and pick their booking for today. Because payment was collected at booking, there is nothing to charge - confirm the check-in and the booking flips to attended.
 
 ### Brazilian jiu-jitsu drop-in on a class pass
 

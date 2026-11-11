@@ -1,0 +1,32 @@
+---
+title: "Report changes"
+description: "Changes to what the Platform API's report operations answer, newest first, with what to check in your integration."
+keywords: [changes, reports, breaking changes, comparison, granularity, week start, members report, revenue report]
+---
+
+New endpoints, parameters and response fields don't affect an integration that ignores what it doesn't recognize (see [Versioning and deprecation](/api-reference/versioning)). This page lists the changes to what an existing report operation answers for the same request, newest first, so you can check your integration against each one.
+
+Every report response says which choices it made: the compared days (`comparison.from`, `comparison.to`, `comparison.basis`), the step of its trend (`trend.granularity`) and the weekday its weeks start on (`trend.weekStartsOn`, 0 is Sunday). Read those fields rather than assuming a rule.
+
+## November 2026: the members report's steps, weeks and age bands
+
+Applies to `get_members_report` (`GET /v1/platform/reports/members`).
+
+- **Automatic step.** Without `granularity`, the trend steps by the period's length, as every report does: by day up to 31 days, by week up to 90, by month beyond. A period of 91 to 366 days that came back by week now comes back by month. Pass `granularity=week` to keep weekly points.
+- **Week start.** A weekly point starts on the organization's first weekday, from its country: Sunday for a gym in the US or Mexico, Monday for most others. It was always Monday. The response names it in `trend.weekStartsOn`.
+- **Last point.** When a period ends partway through a week or month, its last point is the count at the end of the period's last day.
+- **New:** `granularity=month` (each point the count at the end of that month), the `ageBands` parameter (the counts, contact types, new customers and trend narrowed to the contacts in those bands on the period's last day; `lifecycle` and `churn` stay for everyone), and `ageBands` in the response (the bands applied, empty for everyone).
+
+## November 2026: comparisons, revenue streams and buckets
+
+Applies to every report operation, and to `get_revenue_report` where named.
+
+- **Comparison.** `compare=previous_period` compares a calendar month with the month before, and a period still running with the same elapsed part of the one before. Any other run of days is compared with as many days just before it. September 2026 was compared with 2-31 August and is now compared with 1-31 August. October asked on 22 October was compared with 31 August - 30 September and is now compared with 1-22 September. Every compared response returns `comparison.from`, `comparison.to` and `comparison.basis` (the days of the period itself that were compared). `comparison` is null while the period's first day is not over.
+- **Automatic step.** Without `granularity`, trends are daily up to 31 days, weekly up to 90 and monthly beyond (weekly used to run to 184 days). On the revenue, activity and memberships reports weeks start on the organization's first weekday (`trend.weekStartsOn`).
+- **Revenue streams.** `get_revenue_report`'s `byStream` lists every stream, zero rows included, and gains `external_programs` (a programme's per-visit fee) and `settlements` (revenue a partner collected outside 1club and reported as one sum). Cancellation charges count under `bookings`, so `other` is smaller. Totals don't change.
+- **Scope.** `get_revenue_report` needs `analytics:read`. A key or connection holding only `transactions:read` is refused.
+- **Refused days.** A day that is not a calendar day is refused with `Invalid from: Expected a calendar day as YYYY-MM-DD` on every report.
+
+## November 2026: people reports
+
+New operations, not a change to existing ones: `get_at_risk_report`, `get_renewals_report`, `get_promotion_eligibility_report` and `get_cancellations_report`. They all list people the same way: every row starts with `contactId`, `name` (null when the contact has none) and `email`, then the report's own figures. The figures need `analytics:read`; the people need `contacts:read` as well. Without it, `rows` and `total` are null and `rowsScope` names the scope that unlocks them.

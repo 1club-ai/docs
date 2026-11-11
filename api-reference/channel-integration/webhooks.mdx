@@ -1,18 +1,21 @@
 ---
 title: "Webhooks"
-description: "Receive real-time availability changes so your calendar stays live."
+description: "Get notified when availability, contacts, memberships or charges change."
 ---
 
-Webhooks push availability changes to your app in near real time, so you can show
-a live calendar instead of discovering conflicts only when a booking is rejected.
-1club sends a signed HTTP `POST` to your endpoint whenever a court's
-bookable availability changes on **any** channel - your app, the club's own tools,
-another partner, a class, or an event.
+Webhooks push changes to your app in near real time. 1club sends a signed HTTP
+`POST` to your endpoint when something you subscribed to changes, whichever channel
+made the change: your app, the gym's own tools, another partner, a job or an import.
 
-Webhooks are the low-latency signal; the [change feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed)
+There are two kinds of webhook events:
+
+- **Availability** (`availability.changed`): a court's bookable availability changed. Use it to show a live calendar instead of discovering conflicts only when a booking is rejected.
+- **Contacts, memberships and charges** (`contact.updated`, `membership.paused`, `charge.paid`, ...): a record was created, changed or deleted. Use them to keep a CRM, a data warehouse or a billing system in step with the gym. See [Contact, membership and charge events](#contact-membership-and-charge-events).
+
+For availability, webhooks are the low-latency signal and the [change feed](/api-reference/channel-integration/areas-and-availability#availability-change-feed)
 is the correctness backstop. Build for both (see [Staying in sync](/api-reference/channel-integration/overview#staying-in-sync)).
 
-## Quickstart
+## Quickstart: a live calendar
 
 Build a live calendar in five steps:
 
@@ -28,12 +31,17 @@ Steps 3-4 keep the calendar fresh in seconds; steps 1 and 5 keep it correct even
 
 ## Register an endpoint
 
-In the admin dashboard under **Settings** > **Organization** > **APIs & webhooks**, add a webhook endpoint:
-an HTTPS URL to receive events. On creation you get a **signing secret**
+In the admin dashboard under **Settings** > **Integrations** > **APIs & webhooks**, add a webhook endpoint:
+an HTTPS URL to receive events, and the event types it receives. On creation you get a **signing secret**
 (`whsec_...`) shown **once** - store it securely; you'll use it to verify every
-delivery. You can rotate the secret or disable the endpoint at any time. An
-organization can have up to 10 endpoints, and managing them requires the
-**settings.manage.organization** permission.
+delivery. You can rotate the secret, change its event types or disable the endpoint
+at any time. An organization can have up to 10 endpoints, and managing them requires
+the **settings.manage.extended** permission.
+
+A new endpoint starts with `availability.changed` only. Tick each contact, membership
+and charge type you want: subscribe only to the types your integration handles, because
+a type your endpoint keeps rejecting counts as failed deliveries and can get the
+endpoint disabled (see [Reliability](#reliability)).
 
 <Note>
   Webhooks are part of the paid API feature. Endpoints must use `https`.
@@ -41,7 +49,7 @@ organization can have up to 10 endpoints, and managing them requires the
 
 ## The `availability.changed` event
 
-The only event today. Its payload is a **thin invalidation**: it names the area and
+Its payload is a **thin invalidation**: it names the area and
 window that changed and why - not the new availability itself. On receipt, re-pull
 [`GET /availability`](/api-reference/channel-integration/areas-and-availability) for
 that area/window to get the authoritative state. This keeps 1club the source of truth
@@ -97,6 +105,90 @@ don't parse them into a JS `number` - compare as strings of equal length, or as
 | `version` | one area | availability read (`version`, and the `ETag`) | tell whether a read already reflects a given `sequence` |
 | `cursor` | whole org | grid `cursor`, change-feed `cursor` | your reconciliation checkpoint |
 
+## Contact, membership and charge events
+
+These events tell you that a record changed, not what it now holds. The payload names
+the record and carries its ids and statuses, never a person's details. On receipt,
+read the record itself with your API key:
+
+- a contact: [`GET /v1/platform/contacts/{id}`](/api-reference/channel-integration/contacts#open-a-contact) (`contacts:read`)
+- a membership: [`GET /v1/platform/memberships/{id}`](/api-reference/channel-integration/memberships#get-a-membership) (`memberships:read`)
+- a charge: `GET /v1/platform/transactions/{id}` (`transactions:read`). Charges are called transactions in the API.
+
+They come from every place a record can change: the admin, the member portal and
+app, the check-in desk, imports, scheduled renewals and the platform API itself.
+
+### Event types
+
+| Type | Sent when |
+| --- | --- |
+| `contact.created` | A contact is added. |
+| `contact.updated` | The contact's name, email, phone, address, date of birth, gender or contact type changes. |
+| `contact.suspended` | The gym suspends the contact. |
+| `contact.reinstated` | The suspension is lifted. |
+| `contact.deleted` | The contact is deleted, for example when it is merged into another one. |
+| `membership.created` | A membership is sold or added. |
+| `membership.activated` | The membership becomes active, for example once it is paid. |
+| `membership.paused` | The membership is paused. |
+| `membership.resumed` | A paused membership is active again. |
+| `membership.cancelled` | The membership is cancelled. |
+| `membership.expired` | The membership reaches its end date. |
+| `membership.used` | A pass uses up its last session. |
+| `membership.updated` | Its plan, holder, gym, dates, renewal, price, billing frequency, scheduled cancellation, commitment or pause end changes, or its status moves to one no other type names (such as pending). |
+| `membership.deleted` | The membership is deleted. |
+| `charge.created` | A charge is raised. |
+| `charge.paid` | The charge is paid in full. |
+| `charge.failed` | A payment for the charge failed. |
+| `charge.refunded` | The charge is refunded in full. |
+| `charge.voided` | The charge is voided or cancelled. |
+| `charge.updated` | Its amount, tax, date, due date, description, revenue account, or the contact, membership or booking it belongs to changes, or its status moves to one no other type names (such as partially paid or overdue). |
+| `charge.deleted` | The charge is deleted. |
+
+A change sends one event. A record created already in a named status sends two: a
+sale paid at the till sends `charge.created`, then `charge.paid`. A write that
+changes none of the fields above sends nothing.
+
+### Payload
+
+```json
+{
+  "id": "evt_5e5619c8c24d48ceb8bcc7d4bd9335c0",
+  "type": "membership.paused",
+  "occurredAt": "2026-11-08T10:44:52.311Z",
+  "sequence": "33",
+  "organizationId": 8,
+  "data": {
+    "object": "membership",
+    "id": 41,
+    "contactId": 15,
+    "planId": 4,
+    "status": "paused",
+    "previousStatus": "active",
+    "changedFields": ["status"]
+  }
+}
+```
+
+- **`id`** - unique per event, and the same on every endpoint the event goes to. Deduplicate on it.
+- **`sequence`** - orders the events of one record: a later change to the same record always has a higher `sequence`, whatever order retries deliver them in. It is not a change-feed cursor. Like availability's, it is an integer sent as a string.
+- **`data.object`** and **`data.id`** - the record: `contact`, `membership` or `charge`, and its id.
+- **`data.changedFields`** - on an update, the names of the fields that changed. Never their values.
+- **Memberships** also carry `contactId`, `planId`, `status` and, when the status changed, `previousStatus` (`null` when the membership was created in that status).
+- **Charges** also carry `contactId`, `membershipId`, `bookingId`, `paymentStatus` and, when the status changed, `previousPaymentStatus` (`null` when the charge was created in that status).
+
+<Note>
+  A partial refund leaves the charge partly paid, so it arrives as `charge.updated`
+  with the new `paymentStatus`. Only a full refund sends `charge.refunded`.
+</Note>
+
+### Recorded only while you subscribe
+
+1club records these events only while one of the organization's endpoints
+subscribes to the type. A change made before you ticked a type is never sent. There
+is no change feed for these events yet, so after an outage longer than the retry
+window, or while an endpoint was disabled, re-read the contacts, memberships and
+charges you keep with the list endpoints to catch up.
+
 ## Verify the signature
 
 Every delivery includes a timestamped HMAC-SHA256 signature over the raw request
@@ -108,7 +200,7 @@ Headers:
 | --- | --- |
 | `1Club-Signature` | `t=<unix-seconds>,v1=<hex>` |
 | `1Club-Event-Id` | The event `id` (also in the body) |
-| `1Club-Event-Type` | `availability.changed` |
+| `1Club-Event-Type` | The event `type`, such as `availability.changed` or `charge.paid` |
 | `1Club-Delivery-Attempt` | Attempt number, starting at 1 |
 
 The `v1=` element is the signature-scheme version. If a future scheme is added it
@@ -157,11 +249,11 @@ be what stops a double-booking.
 
 ### Reliability
 
-- **Respond within 10 seconds.** Any `2xx` marks the delivery successful. A non-`2xx`, a connection error, or a response slower than the **10-second** timeout counts as a failure. Do the minimum synchronously (verify, enqueue, ack) and re-pull availability asynchronously.
-- **At-least-once.** You may receive the same `id` more than once. Deduplicate on `id` and make handling idempotent (re-pulling availability already is).
+- **Respond within 10 seconds.** Any `2xx` marks the delivery successful. A non-`2xx`, a connection error, or a response slower than the **10-second** timeout counts as a failure. Do the minimum synchronously (verify, enqueue, ack) and re-pull availability or the changed record asynchronously.
+- **At-least-once.** You may receive the same `id` more than once. Deduplicate on `id` and make handling idempotent (re-reading availability or a record already is).
 - **Retries with backoff.** A failed delivery is retried up to **7 attempts total** - the first immediately, then after roughly 1m, 5m, 30m, 2h, 6h, and 24h (about **33 hours** end to end). Each attempt runs on the next tick of the 30-second dispatch worker, so it can arrive up to about half a minute after its scheduled time.
-- **Auto-disable.** After the 7th attempt fails, the endpoint is **disabled automatically** and the reason is shown under **Settings** > **Organization** > **APIs & webhooks**. While an endpoint is disabled, new changes are not queued for it. Re-enable it (and rotate the secret if needed) once healthy, then reconcile with the change feed to catch up on everything that changed while it was down.
-- **Ordering is not guaranteed.** Use `sequence` if you need to order or detect gaps; because events are invalidations you re-pull for, exact order rarely matters.
+- **Auto-disable.** After the 7th attempt fails, the endpoint is **disabled automatically** and the reason is shown under **Settings** > **Integrations** > **APIs & webhooks**. While an endpoint is disabled, new changes are not queued for it. Re-enable it (and rotate the secret if needed) once healthy, then catch up on everything that changed while it was down: availability from the change feed, contacts, memberships and charges by re-reading them (see [Reconcile after downtime](#reconcile-after-downtime)).
+- **Ordering is not guaranteed.** Use `sequence` if you need to order events: for availability it also detects gaps, and for contacts, memberships and charges it orders one record's events. Because every event is an invalidation you re-read for, exact order rarely matters.
 
 ## Reconcile after downtime
 
@@ -171,7 +263,7 @@ from your last stored `cursor`, apply the changes, and store the new cursor. Pol
 the feed on a slow timer (e.g. every few minutes) in addition to webhooks means your
 calendar self-heals from any missed delivery.
 
-**First sync (no cursor yet):** do the baseline grid pull ([Quickstart](#quickstart)
+**First sync (no cursor yet):** do the baseline grid pull ([Quickstart](#quickstart-a-live-calendar)
 step 1) and start from the `cursor` it returns - don't start from `0` for a live
 club, or you'll replay the entire history.
 
@@ -180,8 +272,14 @@ is older than the retained history, the feed can't close the whole gap - discard
 the cursor and re-baseline with a full grid pull, exactly like first sync. When in
 doubt, a full grid re-pull is always a safe way to resynchronise.
 
+**Contacts, memberships and charges** have no change feed yet. Missed events are not
+replayed, so after downtime re-read the records you keep: list the contacts and
+memberships you sync, and open the charges you track. A failed delivery is still
+retried for about 33 hours, so a short outage loses nothing.
+
 ## Troubleshooting
 
-- **Deliveries stopped arriving.** The endpoint was likely auto-disabled after repeated failures - check **Settings** > **Organization** > **APIs & webhooks** for the disable reason, fix your endpoint, re-enable it, then reconcile from your last `cursor`.
+- **Deliveries stopped arriving.** The endpoint was likely auto-disabled after repeated failures - check **Settings** > **Integrations** > **APIs & webhooks** for the disable reason, fix your endpoint, re-enable it, then reconcile from your last `cursor` and re-read the records you keep.
+- **A contact, membership or charge event never arrives.** Check that its type is ticked on the endpoint, and that the change touched a field the event covers (see [Event types](#event-types)). Changes made before you ticked the type are never sent.
 - **Signature always fails.** You're almost certainly hashing a re-serialized body - verify against the exact bytes received (see the note above), and confirm you're using the current secret (rotating it invalidates the old one immediately).
 - **Correlate and dedupe on your side.** Log the `1Club-Event-Id` and `1Club-Delivery-Attempt` headers: the event id lets you dedupe, and the attempt number tells first deliveries apart from retries.

@@ -1,10 +1,10 @@
 ---
 title: Users
-description: Invite admin staff, assign one of six roles, reset passwords, and manage invitations from Settings > Organization > Users.
-keywords: [users, staff, invite user, roles, permissions, owner, admin access, password reset, instructor]
+description: Invite admin staff, assign roles per club, reset passwords, and manage invitations from Settings > Organization > Users.
+keywords: [users, staff, invite user, roles, permissions, owner, admin access, password reset, instructor, club access, club roles]
 ---
 
-Users are the people who can sign into your 1club admin, and every organization user holds exactly one of six roles that decides what they can do once they are in. Owners and admins invite and manage them here, and managers manage staff from the **Staff** section. A role is a default bundle of permissions, not a hard-coded wall - what an operation allows is decided by the permission it requires, and an admin can fine-tune each role's permissions in the permission editor. See [Roles and permissions](/reference/roles-permissions) for the full model.
+Users are the people who can sign into your 1club admin, and each one holds a role that decides what they can do once they are in. Administrators reach every gym; everyone else holds a role at each gym they work at, which can differ from gym to gym. Owners and admins invite and manage them here, and managers manage staff from the **Staff** section. A role is a default bundle of permissions, not a hard-coded wall - what an operation allows is decided by the permission it requires, and an admin can fine-tune each role's permissions in the permission editor. See [Roles and permissions](/reference/roles-permissions) for the full model.
 
 Staff can sign into the admin dashboard with **Google**, **Apple**, **Facebook**, or an email and password. See [Signing in](/reference/sign-in) for all supported methods and how to add a password to an account that was created with a social provider.
 
@@ -17,6 +17,7 @@ Typical uses:
 - **Onboarding a receptionist** - a climbing gym invites new front-of-house staff as **Front desk**, so they can take bookings, check climbers in, and run point of sale, but not open organization settings or analytics.
 - **Bringing in a guest coach** - a muay-thai gym adds a visiting coach as **Instructor**, either with an admin login to see their own schedule or as a bookable resource only.
 - **Promoting from within** - a padel gym manager promotes a trusted front desk lead to **Manager** without needing an admin.
+- **Splitting roles across locations** - a coach who runs one location is **Manager** there and **Instructor** at the second gym, where they only teach.
 - **Handing over ownership** - a yoga studio founder makes the incoming owner an **Administrator** with **Account Owner** on, and can be removed once the handover is complete.
 
 See [Worked examples](#worked-examples) for the steps behind each of these.
@@ -41,6 +42,18 @@ The full module-by-module matrix lives in [Roles and permissions](/reference/rol
 <Note>
 An admin can customise what each role can do in **Settings** > **Organization** > **Permissions** (a per-role permission editor). The six role names are fixed and you cannot add another, but the permissions inside a role are adjustable. The permission editor is admin-only.
 </Note>
+
+### Roles per club
+
+Every role except **Administrator** and **Member** is held per gym. When you invite someone as **Manager**, **Front Desk**, **Sales**, or **Instructor**, you choose the **Clubs** they get that role in, and at least one is required. Afterwards, **Club access** in the row's actions menu sets their role at each gym separately: **Instructor**, **Front Desk**, **Sales**, **Manager**, or **No access**.
+
+- A gym set to **No access** is unavailable to them: it does not appear in their club switcher, and they cannot work in it.
+- **Administrators** have full access to every current and future gym, so there is nothing to set for them. The same goes for account owners.
+- Member profiles are shared across the organization, but a member's activity (bookings, check-ins, and so on) stays limited to the gyms the staff member can access.
+- Records shared by the whole organization follow the combined permissions of all their roles. Someone who is Manager at one gym and Instructor at another gets the Manager's access to shared records; change every gym to Instructor and that Manager access goes too.
+- When you change an Administrator to another role, the dialog asks which gyms they keep it at.
+
+You cannot change your own roles here. Managers set roles only at the gyms they manage. See [Roles and permissions](/reference/roles-permissions) for how roles at several gyms combine.
 
 ### Owner flag
 
@@ -72,7 +85,7 @@ Click **Invite** in the top right. The **Add staff member** dialog opens with a 
 - **Add new user** - enter first name, last name, and email (plus optional contact details).
 - **Select existing contact** - pick someone who already exists in your contact list.
 
-Then choose a **Role** from the six above. If you pick **Administrator**, an **Account Owner** toggle appears - turn it on only if this person should be allowed to delete the organization. Click **Send Invitation**, and 1club sends an invitation email. The user appears in the table with status **Invited** until they accept.
+Then choose a **Role** from the six above. For **Manager**, **Front Desk**, **Sales**, or **Instructor**, also choose the **Clubs** the role applies at; the list shows only gyms where you can manage staff. If you pick **Administrator**, an **Account Owner** toggle appears - turn it on only if this person should be allowed to delete the organization. Click **Send Invitation**, and 1club sends an invitation email. The user appears in the table with status **Invited** until they accept.
 
 If you pick **Instructor**, the mode toggle disappears and the dialog shows the instructor fields inline, so the profile is created in the same step. This is so an instructor always has a profile to attach classes, bookings, and schedule slots to. For an instructor you can also toggle **Allow Admin Portal Access** to decide whether they get a login and invitation email (**Create and Invite**) or exist only as a bookable resource (**Create**).
 
@@ -84,6 +97,7 @@ For any role other than Instructor, the dialog also shows **Can also teach as in
 
 From the row's actions menu:
 
+- **Club access** - Set the person's role at each gym, as described in [Roles per club](#roles-per-club). Not shown for administrators, owners, or your own row.
 - **Send Invitation** / **Resend** - **Send Invitation** appears for users in **Pending invite** state (no email sent yet); **Resend** appears for users still **Invited** or **Expired**. Both send a fresh email after you confirm.
 - **Reset password** - Sends a password reset link to another active user, so they can set a new password from it. This does not set a password directly for them, and their current password and sessions keep working until they complete the reset. On this page it is available to admins, for active users other than themselves.
 - **Delete invitation** - Cancels an unaccepted invite.
@@ -100,7 +114,7 @@ From the row's actions menu:
 
 Roles replace each other - there is no permission delta or stacking. When you move someone from Front desk to Manager, their old permissions are dropped and the Manager set is applied wholesale. The owner flag is preserved across role changes, but the owner flag still requires the Admin role.
 
-Existing sessions pick up the new role on their next request. There is no force sign-out button - if you need someone out immediately, **Remove user**.
+A role or club access change reaches the person's open sessions within about 15 minutes, when their session next refreshes. There is no force sign-out button - if you need someone out immediately, **Remove user**.
 
 ## Who can manage whom
 
@@ -147,6 +161,10 @@ The studio founder is stepping back. An admin who is also the owner invites the 
 **Issue**: A manager cannot edit or remove another manager or an admin.
 
 **Solution**: This is by design. Managers can only manage roles below manager and promote up to manager. Ask an admin or owner to make the change.
+
+**Issue**: A staff member cannot see one of our gyms.
+
+**Solution**: They have **No access** at that gym. Open **Club access** from their row's actions menu and give them a role there.
 
 **Issue**: The Account Owner toggle disappeared.
 

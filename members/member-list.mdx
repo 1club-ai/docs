@@ -8,14 +8,15 @@ The Member list is the contacts grid: every person tracked in your org - members
 
 ## When to use it
 
-Open the Member list when you need to find someone, pull out a group of contacts, or act on many of them together. Tabs split the list by contact type, the filter drawer narrows by tag, status, missing details, plan, or progression level, and bulk actions invite, merge, or archive contacts. It is also where you add new members, leads, children, memberships, and accounts, and where your sales pipeline lives on the **Leads** tab.
+Open the Member list when you need to find someone, pull out a group of contacts, or act on many of them together. Tabs split the list by contact type, the filter drawer narrows by tag, status, missing details, plan, or progression level, and bulk actions invite, promote, merge, or archive contacts. It is also where you add new members, leads, children, memberships, and accounts, and where your sales pipeline lives on the **Leads** tab.
 
 Typical uses:
 
 - **Nudge members who never set up their portal** - filter by plan and **Unregistered** status, then invite everyone in one batch.
 - **Sign up a family** - add a parent at a martial-arts gym, then add each child as a dependent on the household.
 - **Clear out cold leads** - move the leads from a padel open day that never converted to **Cold** in one go.
-- **Chase payments before a bill run** - check the **Unpaid** tab for anyone who owes money that is not past due yet.
+- **Chase payments before an invoice run** - check the **Unpaid** tab for anyone who owes money that is not past due yet.
+- **Promote after a grading** - filter by the **Eligible for Promotion** smart tag and move everyone up one belt at once.
 
 See [Worked examples](#worked-examples) for the steps.
 
@@ -39,22 +40,23 @@ Tabs filter the grid. **All** and **Leads** are always present. The others only 
 
 **Members**, **Drop-ins**, and **Lapsed** describe membership history, so they only appear for staff who can read memberships. Staff without that access land on **All**.
 
+Use the **Board** and **List** icons in the toolbar to switch views. The board has a column per [pipeline](/members/leads#board) stage, then **Drop-ins**, **Members** and **Lapsed**, and **Lost** last, and the tab you are on narrows who is in its columns. One view applies to every tab and is remembered in this browser; until you choose, the **Leads** tab opens on the board and the others on the list.
+
 Each tab shows a count badge from the server. The page remembers the last tab you used per browser. The former **Households** tab was renamed to **Accounts**, so old `?tab=households` links redirect there automatically.
 
 ## Columns
 
 The grid shows, by default:
 
-- **Name** with avatar, plus email below. An alert icon sits at the end of the cell when the contact has something to resolve, such as an amount due or an unsigned required document: red for an error, orange for warnings only. Hover it to see the list.
+- **Name** with avatar, plus age and email below. An alert icon sits at the end of the cell when the contact has something to resolve, such as an amount due or an unsigned required document: red for an error, orange for warnings only. Hover it to see the list.
 - **Phone**, with a WhatsApp badge when the number is WhatsApp-verified.
-- **Age** computed from date of birth.
-- **User Status** - whether the contact has a member-portal account. When they have an account, it shows its status chip (`invited`, `incomplete`, `active`, `inactive`, or `suspended`). When they have none, staff who can update members see an **Invite** button. The button is disabled, with a tooltip explaining why, when the contact has neither an email address nor a phone number. Staff without that permission see **unregistered**.
+- **User Status** - whether the contact has a member-portal account, with the [source](/members/leads#sources) they came from underneath. When they have an account, it shows its status chip (`invited`, `incomplete`, `active`, `inactive`, or `suspended`). When they have none, staff who can update members see an **Invite** button. The button is disabled, with a tooltip explaining why, when the contact has neither an email address nor a phone number. Staff without that permission see **unregistered**.
 - **Type** chip (member, lead, drop-in, etc.).
 - **Memberships** - active membership plan names (shows "No memberships" when none).
 - **Account** - household and company accounts the contact belongs to, each a link, with the account type underneath.
 - **Level** - skill and level per progression track the contact is on.
 - **Rating** - when ratings are enabled, the contact's strongest sport rating, with the rest in a tooltip.
-- **Member Engagement** - latest engagement score and level (see [Engagement analytics](/analytics/engagement)). Only shown when at least one contact in the current view has a score.
+- **Member Engagement** - latest [engagement score](/settings/smart-tagging#engagement-scoring) and level. Only shown when at least one contact in the current view has a score.
 - **Tags** - manual and smart tags as chips.
 
 **Type** and **Memberships** describe membership history, so they only show for staff who can read memberships.
@@ -80,9 +82,9 @@ The drawer loads its in-use option lists the first time you open it, so early on
 
 Members carry two kinds of tags: **manual tags** that you add per contact, and **smart tags** that the system applies automatically based on rules. Both appear as chips and both work as filters here, in automation entry conditions, and in promotion segments.
 
-Each tag can have an optional color, set as a hex code in **Settings** > **Members** > **Smart Tags**. Text color is auto-picked for contrast.
+Each tag can have a color, set under **Settings** > **Members** > **Smart Tags** or **Manual Tags**. Text color is picked for contrast.
 
-Smart tags ship with default rules in categories such as **Attendance** (All-Star, Regular, Casual, Low Activity, Inactive), **Financial** (Unpaid, Past Due, Overdue), **Lifecycle**, **Membership**, and **Loyalty** (Legend, Champion, Pro, Rising Star, Beginner). See [Smart tagging](/settings/smart-tagging) for the full list and rule editor.
+Smart tags come from rules in categories such as **Attendance** (Not Started, All-Star, Regular, Casual, Low Activity, Inactive), **Declining**, **At Risk**, **Financial** (Unpaid, Past Due, Overdue), **Lifecycle**, **Membership**, **Birthday**, **Top Spender**, and **Progression** (Eligible for Promotion and more). See [Smart tagging](/settings/smart-tagging) for the full list and rule editor.
 
 ## Adding a member
 
@@ -124,10 +126,10 @@ The three-dot overflow menu (next to the **+** button) links to related pages. E
 
 Click a row to open the member's [profile](/members/member-profiles). The row action menu also offers:
 
-- **View** - open the profile (needs `members.read.organization`).
-- **Edit** - open the contact edit dialog (needs `members.update.organization`).
-- **Archive** - soft-delete the contact. The action shows for staff with `members.update.organization`, and the archive itself needs `members.delete.organization`. See [Suspend and archive](/members/suspend-and-archive).
-- **Merge** - open the merge dialog with this contact on one side, then pick the duplicate (needs `members.delete.organization`). See [Duplicates and merging](/members/merge-duplicates).
+- **View** - open the profile (needs Members **View**).
+- **Edit** - open the contact edit dialog (needs Members **Edit**).
+- **Archive** - soft-delete the contact. The action shows for staff with Members **Edit**, and the archive itself needs Members **Delete**. See [Suspend and archive](/members/suspend-and-archive).
+- **Merge** - open the merge dialog with this contact on one side, then pick the duplicate (needs Members **Delete**). See [Duplicates and merging](/members/merge-duplicates).
 
 If the contact is also an instructor who still teaches upcoming classes or recurring series, archiving opens **Reassign classes before archiving** first. Choose **Reassign to another instructor** and pick one, or **Leave unassigned**, then click **Reassign and archive**.
 
@@ -137,11 +139,12 @@ Members permissions are organization-wide: there is no per-**Club** access to th
 
 Select rows with the checkboxes. The bulk action bar appears with the count of selected contacts and its actions. Bulk actions are not available on the **Leads** board view; switch to the list to select leads.
 
-- **Move to stage** and **Assign to** - on the **Leads** tab only, for staff with `members.update.organization`. See [Leads and pipeline](/members/leads#bulk-moves-and-assignment).
+- **Move to stage** and **Assign to** - on the **Leads** tab only, for staff with Members **Edit**. See [Leads and pipeline](/members/leads#bulk-moves-and-assignment).
 
-- **Invite** - opens the invite dialog, where you choose how the invitation travels, then sends it to every selected contact who is eligible (reachable on that channel, and either unregistered or holding an expired invite). The info icon shows how many of your selection are eligible. Invitations go out in a single request that the server governs against your gym's daily invite budget; it reports back how many were invited, how many each channel carried, and how many failed, were throttled, skipped, could not be reached on your chosen channel, or were ineligible, so a problem with one contact never hides another. Invite is offered for any selection. When nobody selected can be invited, the dialog says why. It needs `members.update.organization`.
-- **Merge** - appears when exactly two contacts are selected. Opens the merge dialog for the pair. It needs `members.delete.organization`. See [Duplicates and merging](/members/merge-duplicates).
-- **Archive** - archives each selected contact after you confirm. Contact records are never hard-deleted, so financial history and audit trails stay intact. Archiving runs one request per contact and reports partial success if some fail. If a contact was archived but some of their memberships or bookings could not be cancelled, the result says so: archive them again to finish the job. The action shows for staff with `members.update.organization`, and the archive itself needs `members.delete.organization`.
+- **Invite** - opens the invite dialog, where you choose how the invitation travels, then sends it to every selected contact who is eligible (reachable on that channel, and either unregistered or holding an expired invite). The info icon shows how many of your selection are eligible. Invitations go out in a single request that the server governs against your gym's daily invite budget; it reports back how many were invited, how many each channel carried, and how many failed, were throttled, skipped, could not be reached on your chosen channel, or were ineligible, so a problem with one contact never hides another. Invite is offered for any selection. When nobody selected can be invited, the dialog says why. It needs Members **Edit**.
+- **Promote** - moves each selected member up one level on a progression track, earned today, and can tell each of them about their promotion. Shown when at least one track is enabled, except on the **Leads** tab, and needs Members **Edit**. See [Promote a selection of members](/settings/progression#promote-a-selection-of-members).
+- **Merge** - appears when exactly two contacts are selected. Opens the merge dialog for the pair. It needs Members **Delete**. See [Duplicates and merging](/members/merge-duplicates).
+- **Archive** - archives each selected contact after you confirm. Contact records are never hard-deleted, so financial history and audit trails stay intact. Archiving runs one request per contact and reports partial success if some fail. If a contact was archived but some of their memberships or bookings could not be cancelled, the result says so: archive them again to finish the job. The action shows for staff with Members **Edit**, and the archive itself needs Members **Delete**.
 
 Archived contacts disappear from the list. To get back to them, use **Settings** > **Data Tools** > **Archive**.
 
@@ -221,7 +224,7 @@ Your open day generated a batch of leads that never converted.
 
 1. Open the **Unpaid** tab (visible when the system Unpaid tag exists) to see who owes money that is not past due yet.
 2. For charges already late, go back to **All** and filter **Tags** by **Past Due** or **Overdue**.
-3. Follow up before the next [bill run](/sales/bill-runs).
+3. Follow up before the next [invoice run](/sales/bill-runs).
 
 ## Tips & best practices
 

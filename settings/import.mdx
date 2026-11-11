@@ -1,12 +1,12 @@
 ---
 title: Data import
-description: Import members, memberships, plans, classes, bookings, invoices, and charges from CSV under Settings > Data Tools > Import, with AI-assisted column mapping, a validated preview, and a controlled execute step.
-keywords: [data import, CSV import, import members, AI import, field mapping, bulk import, migrate from legacy system, preview import]
+description: Import members, accounts, plans, memberships, charges, classes, bookings, invoices, and products from CSV under Settings > Data Tools > Import, with AI-assisted column mapping, a validated preview, and a controlled execute step.
+keywords: [data import, CSV import, import members, import products, import accounts, AI import, field mapping, bulk import, migrate from legacy system, preview import]
 ---
 
 Data import brings your existing records into 1club from CSV files - usually when you move your gym over from another system or a spreadsheet. It runs as a four-step wizard: pick what you are importing, upload the file, review a validated preview, then execute. An AI analyzer can detect the record type and map your columns for you, so a file exported from another system usually imports without hand-editing the headers.
 
-You can import seven record types: members (contacts), memberships, plans, classes, bookings, invoices, and charges. Files must be CSV and up to 10 MB.
+You can import nine record types: members (contacts), accounts (households and companies), plans, memberships, charges, classes, bookings, invoices, and products. Files must be CSV and up to 10 MB.
 
 ## When to use it
 
@@ -18,6 +18,7 @@ Typical uses:
 - **Plans first, then the people on them** - a martial-arts gym imports its belt-progression plans, then a members file that references those plans by name so each student lands on the right package.
 - **Carrying over class credits** - a Pilates studio imports one-time class-pack memberships with the pack size, so their remaining class credits carry over.
 - **Bringing in past sales** - a climbing gym imports its past day-pass charges, keyed by the member's email.
+- **Stocking the shop** - a padel club exports its product list from its old till, with prices, VAT rates, barcodes, and quantities, and imports it as the shop's catalog and opening stock.
 
 See [Worked example: migrating from a legacy system](#worked-example-migrating-from-a-legacy-system) and [Other vertical examples](#other-vertical-examples) for the details.
 
@@ -30,13 +31,14 @@ Import lives under **Settings** > **Data Tools** > **Import**. The wizard has fo
 Because records reference each other, import them in dependency order. The wizard states it on the first step:
 
 1. Members (contacts)
-2. Plans
-3. Memberships
-4. Classes
-5. Bookings
-6. Invoices
+2. Accounts
+3. Plans
+4. Memberships
+5. Classes
+6. Bookings
+7. Invoices
 
-Charges can be imported on their own or created as part of a chained member import. Before importing, make sure your **Clubs**, **Areas**, and **Instructors** already exist, because classes and bookings reference them by name or email.
+Charges can be imported on their own or created as part of a chained member import. Products don't depend on anything else and can be imported at any time. Before importing, make sure your **Clubs**, **Areas**, and **Instructors** already exist, because classes and bookings reference them by name or email.
 
 ### Step 1 - Select entity
 
@@ -50,7 +52,7 @@ You have two paths on this step.
 
 If the detection looks right, continue and the mapping is applied automatically. If it is off, you can still pick the record type manually below.
 
-**Manual selection.** Choose one of the record-type cards (Members, Memberships, Invoices, Classes, Plans, Bookings, Charges, Products). Each card shows a short description of what it imports.
+**Manual selection.** Choose one of the record-type cards: **Members (Contacts)**, **Accounts**, **Plans**, **Memberships**, **Charges**, **Classes**, **Bookings**, **Invoices**, or **Products**. Each card shows a short description of what it imports.
 
 For **Products**, pick a **Stock location (club)**. Quantities in the file are imported as opening stock for that gym; products without a quantity are imported without stock.
 
@@ -60,7 +62,7 @@ If you uploaded through the AI card, your file carries over and the wizard notes
 
 ### Step 3 - Preview
 
-The preview validates every row against the selected record type without saving anything. You get three counts: **Total Rows**, **Valid Rows**, and **Invalid Rows**. Filter tabs let you view **All**, **Invalid**, or **Valid** rows, and each invalid row lists its specific validation errors. You can download the previewed rows (with their status and errors) as a CSV to fix them offline.
+The preview validates every row against the selected record type without saving anything. You get three counts: **Total Rows**, **Valid Rows**, and **Invalid Rows**. Filter tabs let you view **All**, **Invalid**, **Duplicates**, or **Valid** rows, and each invalid row lists its specific validation errors. Rows that already exist, in 1club or earlier in the same file, are marked **Duplicate** and are skipped on import. For a large file the table shows a sample of rows, but the counts cover the whole file: every row is checked, and every valid one is imported. You can download the previewed rows (with their status and errors) as a CSV to fix them offline.
 
 <Warning>
 Invalid rows are never imported. Only valid rows are written when you execute, so a preview with invalid rows will import fewer records than the file contains. Fix the flagged rows and re-upload if you need all of them.
@@ -68,7 +70,9 @@ Invalid rows are never imported. Only valid rows are written when you execute, s
 
 ### Step 4 - Import
 
-Executing writes the valid rows to your organization. The results screen reports **Total Rows**, **Imported**, **Skipped**, and **Errors**, and lists the first several row-level errors if any occurred. Use **Import another** to start a fresh import.
+Click **Execute Import** to write the valid rows to your organization. A large file is sent in batches, and the page shows how many rows are done; leave the tab open until it finishes. The results screen reports **Total Rows**, **Imported**, **Skipped**, and **Errors**, lists the first five row-level errors, and offers **Download all errors (CSV)** for the rest. Use **Import Another File** to start a fresh import.
+
+If a batch fails part-way, the import stops and tells you the row it stopped at. When the server declined the batch, nothing from that row onwards was written: fix the problem and run the file again. When the connection was lost, some rows from that point may already be in 1club, so check that range before re-running.
 
 For **membership** imports, executing first opens an **Import Memberships** dialog asking how their charges should be recorded:
 
@@ -81,13 +85,15 @@ Each record type has a fixed set of expected fields. The template download gives
 
 | Record type | Key expected columns |
 | --- | --- |
-| Members (contacts) | `firstName`, `lastName`, `name`, `email`, `phone`, `address`, `city`, `state`, `country`, `postalCode`, `dateOfBirth`, `tags`, `gender`, `notes`, `club` (plus chained columns, below) |
+| Members (contacts) | `firstName`, `lastName`, `name`, `email`, `phone`, `address`, `city`, `state`, `country`, `postalCode`, `dateOfBirth`, `tags`, `createdAt`, `createdBy`, `gender`, `notes`, `guardianEmail` (plus chained columns, below) |
 | Plans | `clubName`, `name`, `description`, `price`, `billingFrequency`, `signupFee`, `maxUses`, `validityPeriod`, `sports`, `isActive` |
-| Memberships | `contactName`, `contactEmail`, `planName`, `startDate`, `endDate`, `status`, `price`, `billingFrequency`, `autoRenew`, `signupFee`, `maxUses`, `used`, `usesRemaining` |
+| Memberships | `contactName`, `contactEmail`, `createdBy`, `planName`, `startDate`, `endDate`, `status`, `price`, `billingFrequency`, `autoRenew`, `signupFee`, `maxUses`, `used`, `usesRemaining` |
 | Classes | `clubName`, `instructorEmail`, `name`, `description`, `price`, `maxCapacity`, `startTime`, `endTime`, `sport`, `status`, `isFree` |
-| Bookings | `contactEmail`, `clubName`, `areaName`, `className`, `startTime`, `endTime`, `status`, `totalPrice`, `notes` |
+| Bookings | `contactEmail`, `contactName`, `clubName`, `areaName`, `className`, `instructorName`, `startTime`, `endTime`, `status`, `totalPrice`, `paymentStatus`, `paymentMethod`, `notes` |
 | Invoices | `contactEmail`, `invoiceNumber`, `invoiceDate`, `dueDate`, `status`, `subtotal`, `taxAmount`, `totalAmount`, `notes`, `description`, `quantity`, `unitPrice` |
 | Charges | `contactEmail`, `amount`, `date`, `description`, `paymentStatus`, `transactionType`, `currency`, `taxAmount`, `totalAmount` |
+| Accounts | `accountName`, `accountType`, `contactEmail`, `contactName`, `role`, `isPrimary`, `legalName`, `taxNumber`, `registrationNumber`, `billingEmail`, `notes` |
+| Products | `name`, `sku`, `barcode`, `category`, `brand`, `revenueAccount`, `description`, `price`, `costPrice`, `taxRatePercent`, `quantity`, `isActive` |
 
 Useful conventions the importer follows:
 
@@ -96,6 +102,22 @@ Useful conventions the importer follows:
 - **Tags** - `tags` takes a comma-separated list, for example `Open day, Lead`. A tag that does not exist yet is created as a manual tag, so you do not have to set your tags up before importing. To tag a whole upload at once, put the same value in the `tags` column of every row.
 - **Dates** - accepted formats are `dd.MM.yyyy`, `dd.MM.yyyy HH:mm:ss`, `yyyy-MM-dd`, `yyyy-MM-dd HH:mm:ss`, and ISO-8601. A row with an unparseable date is flagged in the preview.
 - **Charges default to paid**, using your organization currency when none is given.
+- **Bookings** - each row books one slot for one customer. `paymentStatus` is paid or unpaid, and `paymentMethod` names how a paid row was collected. Leave `totalPrice` empty to price the slot from the area and instructor rate, or use `0` for a free or membership-covered booking. `clubName` can be left out in a single-club organization, and the club, area, class, and instructor columns accept a name (or an email for people).
+- **Accounts** - one row per member of a household or company account, naming an existing member by `contactEmail` (preferred) or `contactName`. `accountType` is `household` or `company`. `role` is `owner`, `adult`, or `dependent` for a household and `admin` or `employee` for a company; left blank, a household's first member becomes its owner and everyone else an adult, and every company member is an employee. `isPrimary` (yes or no) picks the account's primary contact, otherwise the first member is.
+
+## Product import
+
+A product import brings in your shop catalog, for example an export from your previous till. The AI analyzer recognises common English and Bulgarian headers (such as `Име артикул`, `Продажна цена`, `ДДС %`, and `Количество`).
+
+- **Stock location (club)** - Choose a club on the first step. Quantities in the file become that club's opening stock. Products without a quantity, or every product when no club is chosen, are imported without stock.
+- **VAT rate** - `taxRatePercent` is a percentage such as `20`. Each rate is created once and then used at the point of sale, so a product is taxed at its own rate whatever its revenue account.
+- **Category and brand** - A category or brand that does not exist yet is created for you.
+- **Revenue account** - Matched by name to a [revenue account](/settings/billing-general#revenue-accounts) you already have. If no account matches, the product is imported without one, for you to set later. An import never creates revenue accounts.
+- **Cost price and SKU** - `costPrice` feeds margin reporting, and `sku` is the product code alongside the `barcode`.
+- **Duplicates** - A product with a barcode matches an existing product with that barcode. Without a barcode, it matches on name and price, so the same item at two prices imports as two products. Matches are skipped, so you can re-run a file safely.
+- **Active** - `isActive` accepts yes or no (also in Bulgarian).
+
+Importing products needs permission to create products, manage inventory, and manage billing (because it can create tax rates), which in practice means an Admin.
 
 ## Chained member import
 
@@ -104,7 +126,9 @@ A member import is more than contacts. When the extra columns are present on a m
 - **A charge** - `transactionAmount`, `transactionDate`, `transactionDescription`, `transactionPaymentStatus`, `transactionType`, `transactionCurrency`, `transactionTaxAmount`, `transactionTotalAmount`.
 - **A membership** - `planName`, `membershipStartDate`, `membershipEndDate`, `membershipStatus`, `membershipPrice`, `membershipBillingFrequency`, `membershipAutoRenew`, `membershipSignupFee`, plus session totals `membershipMaxUses`, `membershipUsed`, `membershipUsesRemaining`.
 - **A wallet credit** - `wallet`, a decimal amount credited to the member's wallet.
-- **Household dependents** - `dependent`, a comma-separated list of dependent names (for example children or minors) added under this member's household.
+- **Household dependents** - two ways, never both on one row:
+  - `guardianEmail` (preferred) - the row describes the child, with their own date of birth and gender, and `guardianEmail` is the parent's email. The child is added to the parent's household.
+  - `dependent` - a comma-separated list of dependent names added under this member's household. Use it only when your file has no row per child, because names alone give the children no date of birth or gender.
 
 ### How duplicates are handled
 
@@ -137,7 +161,7 @@ Because members were matched by email, running the same file again would reuse e
 ## Tips and best practices
 
 - **Let the AI analyzer go first.** It maps most legacy exports correctly, and you can still override the record type manually.
-- **Import in dependency order** (members, plans, memberships, classes, bookings, invoices) so references resolve.
+- **Import in dependency order** (members, accounts, plans, memberships, classes, bookings, invoices) so references resolve.
 - **Set up clubs, areas, and instructors before importing** classes and bookings, which reference them by name or email.
 - **Use the preview as a linter.** Download the invalid rows, fix them in your source file, and re-upload rather than editing inside 1club.
 - **Re-running is safe for members.** Email matching means a second run reuses members and only adds missing memberships or dependents.
@@ -156,6 +180,9 @@ Because members were matched by email, running the same file again would reuse e
 | Re-import did not re-add charges | The member already exists (matched by email) | Expected behavior - existing members are reused and their charges and notes are not re-run |
 | The `tags` column did not tag anyone | Those members already existed, so the row's tags were skipped | Tags apply only to members the import creates. Add the tags from the member's profile, or use a smart tag rule for an ongoing group |
 | Contact import blocked | Bulk contact import requires a paid plan (trials are allowed) | Upgrade your 1club plan, or import during your trial |
+| Product import is refused with a permission error | Product import needs product, inventory, and billing permissions | Ask an Admin to run it |
+| Product quantities did not arrive as stock | No **Stock location (club)** was chosen | Re-run the file with a club selected; products already imported are skipped as duplicates |
+| The import stopped part-way | A batch failed, and the import stopped at the row it names | Follow the message: re-run the rest if the server declined it, or check that range first if the connection was lost |
 | Membership import blocked | It would exceed your active-member quota | Free up capacity or upgrade your 1club plan |
 | A class or booking row cannot find its club, area, or instructor | The referenced record does not exist yet | Create the club, area, or instructor first, then re-import |
 

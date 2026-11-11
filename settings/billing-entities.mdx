@@ -15,19 +15,20 @@ Each company keeps its own legal details, invoice and pro-forma numbering, bank 
 Add one when money legally belongs to a different business, not merely to a different place or department. Typical cases:
 
 - **A company per venue** - each venue is its own registered company, so each must invoice under its own name and number series and be paid into its own bank account.
-- **A separate company for the bar or shop** - your classes and courts sit in one company while the bar, the shop, or the physio room sits in another.
+- **A separate company for the bar or shop** - your classes and areas sit in one company while the bar, the shop, or the physio room sits in another.
 - **A gym you have taken over** - it keeps trading under its own company for now.
 
 If you only want to see what each venue earns, you do not need a second company - the club filter on your reports already does that.
 
 ## Set up a company
 
-1. Go to **Settings** > **Billing** > **General**. The **Billing entities** section lists the companies you have, with the default marked, the clubs that bill through each, and the payment providers each has connected.
+1. Go to **Settings** > **Billing** > **General**. The **Billing entities** section lists your companies with their **Name**, **Legal Business Name**, **Tax Number**, a **Default** chip on the default one, the **Clubs** that bill through each ("Every club that names no other" for the default), and the **Payment providers** each has connected (or "None connected").
 2. Click **Add billing entity**.
 3. Give it a **Name**. This is an internal label - members never see it.
-4. Fill in what should print on its documents: **Legal Business Name**, **Tax Number**, **Registration Number**, **Registered Address**, and bank details.
-5. Set its **Invoice Numbering Template** and **Pro-forma Numbering Template**. Each company numbers its own documents, so give each a distinct prefix - `INV-` for one and, say, `BAR-` for another - or both companies will produce a document numbered `INV-1`.
-6. Save. To edit a company later, click its row.
+4. Fill in what should print on its documents: **Legal Business Name**, **Tax Number**, **Registration Number**, and **Registered Address**.
+5. Set its **Invoice Numbering Template** and **Pro-forma Numbering Template**. Use `[id]` for the number. Each company numbers its own documents, so give each a distinct prefix - `INV-[id]` for one and, say, `BAR-[id]` for another - or both companies will produce a document numbered `INV-1`.
+6. Fill in its bank details: **Bank**, **Account Holder**, **Account number** with the **Routing number**, **Sort code**, or **BSB** your country uses, and **IBAN** and **BIC / SWIFT**.
+7. Save. To edit a company later, click its row. The row menu also has **Edit**, **Make default**, and **Delete**.
 
 The **Billing entities** section is shown only to staff with organization settings access. Staff who can open billing settings without it, such as managers, don't see it.
 
@@ -57,7 +58,7 @@ The revenue account decides first, then the gym, then your default company.
 
 | The sale                                                       | Bills through            |
 | -------------------------------------------------------------- | ------------------------ |
-| A court booking at a gym pointed at Company B                   | Company B                |
+| An area booking at a gym pointed at Company B                  | Company B                |
 | A drink whose revenue account is pointed at Company C           | Company C, at any gym    |
 | A membership at a gym that names no company                     | Your default company     |
 
@@ -77,21 +78,21 @@ Re-pointing a gym at a different company is refused while that gym still has car
 
 Invoices and pro-formas carry the legal name, tax number, registered address, and bank details of the company that sold, and draw their number from that company's own series. Two companies therefore number independently, and both can have a document numbered 1 on the same day. That is normal: each company keeps its own sequence, which is why distinct prefixes are worth setting up front.
 
-Bill runs group by company before they issue, so "one invoice per customer" never puts two companies on one document. A member who bought from two of your companies in the same period gets one invoice from each.
+[Invoice runs](/sales/bill-runs) group by company before they issue, so "one invoice per customer" never puts two companies on one document. A member who bought from two of your companies in the same period gets one invoice from each.
 
-Raising an invoice by hand is the one place nothing else names the company for you, so the invoice form asks. Leave it alone and your default company issues it.
+An invoice you create by hand on the **Invoices** page is issued by your default company. An invoice issued from a sale or from its charges comes from the company that made the sale.
 
 See [Invoices](/sales/invoices) for the rest of the invoicing flow.
 
 ## Two things that stay whole
 
-**A basket cannot mix companies.** If someone tries to pay for a court booking that bills through one company and a drink that bills through another in a single checkout, the sale is refused and the two companies are named. Sell them separately: one payment goes to one company, and one invoice comes from one company.
+**A basket cannot mix companies.** If someone tries to pay for an area booking that bills through one company and a drink that bills through another in a single checkout, the sale is refused. In the admin the message names both companies; members are only told the items can't be paid together, and to check some of them out first. Sell them separately: one payment goes to one company, and one invoice comes from one company.
 
 **Wallet credit belongs to your default company.** Members can only spend credit on that company's sales, it is only offered at checkout for those sales, and a refund goes back to the wallet only when the original payment was taken by it. Cancelling a booking sold by another company leaves the refund owed instead of crediting the wallet, so you can return it from the payment - see [Payments](/sales/payments).
 
 ## Reporting per company
 
-The revenue and charges reports carry a **Billing entity** filter next to the club filter, and the invoice list carries one too. Narrowing the report narrows its export, and the exported file names the company.
+A **Billing entity** filter sits next to the club filter on the revenue dashboard and revenue report, the payments report, the invoices dashboard, the amount due report, and the [Tax report](/analytics/finance#tax), and on the invoice list. Narrowing a report narrows its export.
 
 The accounting export under **Settings** > **Data Tools** > **Export** can be narrowed the same way, which is usually what your bookkeeper wants: one file per company, per period.
 
@@ -101,7 +102,7 @@ The filter only appears once you have more than one company.
 
 Deactivate a company when it stops trading: open it and turn off **Active**. The default company can't be deactivated - make another company the default first. A deactivated company takes no new sales and is no longer offered when you point a gym or a revenue account at one, while its history, documents, and numbering stay exactly as they were.
 
-Before you can deactivate it, re-point anything that still sells through it. 1club tells you what is left - gyms or revenue accounts - rather than quietly moving those sales to another company.
+Before you can deactivate it, re-point anything that still sells through it. Until you do, 1club refuses with "Clubs or revenue accounts still bill through this entity. Point them at another entity first." rather than quietly moving those sales to another company.
 
 Deleting is only possible for a company that isn't the default, that no gym or revenue account points at, and that has no invoices, payments, or payment integrations recorded against it. Anything with history is deactivated instead.
 
@@ -109,12 +110,12 @@ Deleting is only possible for a company that isn't the default, that no gym or r
 
 | What you see                                                                  | Why                                                                                   | What to do                                                                                              |
 | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| "These items are billed by different billing entities"                        | The basket mixes companies.                                                            | Sell the items in separate sales.                                                                      |
+| "These items are sold by different billing entities and cannot be paid together." | The basket mixes companies.                                                         | Sell the items in separate orders.                                                                     |
 | Two companies both issued a document numbered 1                               | Each company has its own series.                                                       | Give each company a distinct numbering prefix.                                                             |
 | Wallet is missing at checkout                                                 | The sale bills through a company other than your default.                              | Take another payment method; wallet credit is your default company's.                                      |
 | A card reader stops working after a change                                    | The gym was re-pointed, or the reader was registered before its company was connected. | Connect that company's payment account, then register the reader again.                                    |
 | A member's saved card is not offered for a renewal                            | The card is saved with a different company than the one billing the renewal.           | Ask the member to pay once through the right company, or to add a card for it; the card is then saved there. |
-| You cannot deactivate a company                                               | Gyms or revenue accounts still bill through it.                                        | Re-point them first; the message says how many of each.                                                    |
+| You cannot deactivate a company                                               | Gyms or revenue accounts still bill through it.                                        | Re-point them first, under **Settings** > **Clubs** and **Revenue Accounts**.                              |
 
 ## What members see
 

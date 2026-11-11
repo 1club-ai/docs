@@ -17810,9 +17810,29 @@
           {
             "type": "object",
             "properties": {
+              "entryCondition": {
+                "type": "object",
+                "nullable": true,
+                "additionalProperties": true,
+                "description": "Who may enter a run, beyond the trigger; null when anyone the trigger fires for may"
+              },
+              "goal": {
+                "type": "object",
+                "nullable": true,
+                "additionalProperties": true,
+                "description": "What ends a run as achieved; null when it has none"
+              },
+              "exitEvents": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "description": "Events that stop a run still in progress"
+              },
               "steps": {
                 "type": "array",
-                "description": "In flow order: by parent step, then position",
+                "description": "In flow order: the top-level steps by position, then the steps inside each branch, by parent step and position",
                 "items": {
                   "type": "object",
                   "properties": {
@@ -30876,7 +30896,7 @@
               "type": "string",
               "maxLength": 120
             },
-            "description": "Match on subject, a recipient name, the sender name or words in the body"
+            "description": "Match on subject, a recipient name, the sender name or words in the body; the body search reads at most the 1000 newest matches"
           },
           {
             "in": "query",
@@ -42260,7 +42280,7 @@
               "type": "string",
               "maxLength": 120
             },
-            "description": "Words in the note. Every word must appear; accents ignored; word starts match"
+            "description": "Words in the note. Every word must appear; accents ignored; word starts match; a search reads at most the 1000 newest matches"
           },
           {
             "in": "query",
@@ -42364,7 +42384,7 @@
               "type": "string",
               "maxLength": 120
             },
-            "description": "Words in the answers. Every word must appear; accents ignored; word starts match"
+            "description": "Words in the answers. Every word must appear; accents ignored; word starts match; a search reads at most the 1000 newest matches"
           },
           {
             "in": "query",
@@ -43507,7 +43527,7 @@
               "type": "string",
               "maxLength": 120
             },
-            "description": "Words in the review, reply, private note or author name. Every word must appear; accents ignored; word starts match"
+            "description": "Words in the review, reply, private note or author name. Every word must appear; accents ignored; word starts match; a search reads at most the 1000 newest matches"
           },
           {
             "in": "query",

@@ -26,17 +26,17 @@ You connect once, and from then on you can ask an assistant things like "which c
 | Server        | Address                | Who it is for                                                        | Authentication                                     |
 | ------------- | ---------------------- | -------------------------------------------------------------------- | -------------------------------------------------- |
 | **Admin**     | `https://mcp.1club.ai` | Your gym's staff and internal systems                                | 1club OAuth sign-in, or a Platform API key         |
-| **Discovery** | `https://mcp.1club.me` | Anyone searching the 1club network, and members booking there | None to search; a 1club.me sign-in to book         |
+| **1club**     | `https://mcp.1club.me` | Anyone searching the 1club network, and members booking there | None to search; a 1club.me sign-in to book         |
 
 - The **admin server** reads and writes your organizations' own data. You sign in to 1club and approve the requested access; the connection works in every organization you are staff of, with what your role allows in each, and every response is limited to the organization the call acts in. This is the one you want for running your business. A developer-managed client that cannot sign in interactively can send a [Platform API key](/settings/api-tokens) as a bearer token instead; OAuth is the recommended path for everyone else.
-- The **discovery server** searches the 1club network across all listed gyms and independent professionals, and finds bookable times. Anyone can search it without an account. To book, list, or cancel their own bookings, a person signs in with their 1club.me account, and the assistant books for them exactly as 1club.me would. It can never reach a single organization's private data.
+- The **1club server** searches the 1club network across all listed gyms and independent professionals, and finds bookable times. Anyone can search it without an account. To book, list, or cancel their own bookings, a person signs in with their 1club.me account, and the assistant books for them exactly as 1club.me would. It can never reach a single organization's private data.
 
 Pick the one that matches what you are trying to do, then follow [Connect an assistant](/mcp/connect). In ChatGPT, the admin server is the [1club Admin plugin](https://chatgpt.com/plugins/plugin_asdk_app_6acf0ea6ff448191aed2db046c98e0a5): install it and sign in, with no address to enter.
 
 <Note>
   The admin server used to be at `https://mcp.1club.ai/admin`. An assistant you
   connected there keeps working and does not need to be reconnected; use
-  `https://mcp.1club.ai` for new connections. The discovery server's old address,
+  `https://mcp.1club.ai` for new connections. The 1club server's old address,
   `https://mcp.1club.ai/discovery`, no longer works: use `https://mcp.1club.me`.
 </Note>
 
@@ -71,11 +71,11 @@ The full list, with the OAuth scope each tool needs, is on the [Tools reference]
   `organization:write` scope, and take effect immediately.
 </Note>
 
-The discovery server answers the questions someone asks before they book: when can I play (`find_availability`, which returns priced, dated free times with a link that opens the booking), which gyms or independent professionals match what I am after (`search_clubs`, `search_professionals`), and what does this place or person offer (`get_club`, `get_professional`). Signed in with their 1club.me account, a person can also have the assistant book an area, a class, or an instructor, join or leave a waitlist, and list or cancel their own bookings. A booking is used against a membership that covers it, or paid at the gym.
+The 1club server answers the questions someone asks before they book: when can I play (`find_availability`, which returns priced, dated free times with a link that opens the booking), which gyms or independent professionals match what I am after (`search_clubs`, `search_professionals`), and what does this place or person offer (`get_club`, `get_professional`). Signed in with their 1club.me account, a person can also have the assistant book an area, a class, or an instructor, join or leave a waitlist, and list or cancel their own bookings. A booking is used against a membership that covers it, or paid at the gym.
 
 ## Current boundaries
 
-- **The admin server acts for staff, the discovery server for members.** The admin connection acts as a member of your staff in an organization. A member who wants an assistant to book for them connects the discovery server and signs in with their 1club.me account, which reaches only their own bookings.
+- **The admin server acts for staff, the 1club server for members.** The admin connection acts as a member of your staff in an organization. A member who wants an assistant to book for them connects the 1club server and signs in with their 1club.me account, which reaches only their own bookings.
 - **MCP follows the Platform API.** Automations and access control are not exposed. Promotions and invoices are read-only, messages can be drafted but not sent, and a payment can be recorded but never charged to a card. Anything absent from the [Tools reference](/mcp/tools) is unreachable through MCP today.
 - **Staff logins stay in 1club.** An assistant can change a staff member's role, but inviting someone to the admin, or giving a coach a login, happens in 1club.
 - **Stock is read-only.** An assistant can see how many of a product are left to sell, but receiving a delivery, correcting a count, and writing off damage stay in 1club.
@@ -94,7 +94,7 @@ The discovery server answers the questions someone asks before they book: when c
 
 ## Before you start
 
-- API and MCP access are **paid features**, locked on free plans and during a trial. The discovery server remains public and needs no 1club admin account.
+- API and MCP access are **paid features**, locked on free plans and during a trial. The 1club server remains public and needs no 1club admin account.
 - Connecting an assistant requires the **AI assistants (MCP)** permission. Owners always have it, and administrators hold it by default. To let another role connect assistants, grant it in **Settings** > **Organization** > **Permissions**. See [Roles and permissions](/reference/roles-permissions).
 - Your MCP client must support remote HTTP MCP servers, and OAuth for the recommended setup. A client that can only send a fixed `Authorization` header can use a [Platform API key](/settings/api-tokens) instead. [Connect an assistant](/mcp/connect) covers both.
 

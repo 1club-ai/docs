@@ -1,7 +1,7 @@
 ---
 title: Promotions
 description: Create vouchers and discounts with schedules, codes, audience targeting, and usage caps
-keywords: [promotions, vouchers, discounts, promo codes, coupons, discount codes, auto-apply, trials, intro offers, wallet credit, happy hour, off-peak offer, buy one get one, 2 for 1, time of day discount, booking calendar, members price, tagged after booking, discount at payment, add payment]
+keywords: [promotions, tag rate, group discount, coaches discount, staff discount, league discount, vouchers, discounts, promo codes, coupons, discount codes, auto-apply, trials, intro offers, wallet credit, happy hour, off-peak offer, buy one get one, 2 for 1, time of day discount, booking calendar, members price, tagged after booking, discount at payment, add payment]
 ---
 
 Promotions are time-bound offers. They come in two flavours - **Vouchers** credit a member's wallet when the member redeems a code, and **Discounts** reduce the price of a booking or product order at checkout. Both share the same controls for scheduling, codes, redemption caps, audience targeting and scope. Owners and managers create promotions, staff can apply them on a member's behalf, and members redeem them in the portal or at checkout.
@@ -16,8 +16,9 @@ Typical uses:
 - **Fill quiet area hours** - a padel gym gives a second hour free on 2-hour daytime area bookings, and the booking calendar advertises the offer to members.
 - **Bring lapsed members back** - target a "lapsed" tag with a voucher code that adds credit to the member's wallet.
 - **Reward group bookings** - a discount that applies only when someone books a class for three or more people.
+- **Give a group a standing rate** - tag your coaches, a league team or your staff, and one auto-apply discount for that tag takes money off every booking they make, with nobody applying it by hand.
 
-See [Auto-apply](#auto-apply-trials-and-intro-offers) for trials and [Example: 2 hours for the price of 1 on daytime areas](#example-2-hours-for-the-price-of-1-on-daytime-areas) for the area offer.
+See [Auto-apply](#auto-apply-trials-and-intro-offers) for trials, [Example: 2 hours for the price of 1 on daytime areas](#example-2-hours-for-the-price-of-1-on-daytime-areas) for the area offer, and [Example: a standing discount for a tagged group](#example-a-standing-discount-for-a-tagged-group) for a group rate.
 
 ## Vouchers vs. discounts
 
@@ -130,6 +131,21 @@ From then on, anyone buying one of those plans **for the first time** automatica
 With **First purchase only** on, the discount only fires for a contact who has **no prior membership** on any of the targeted plans - active, expired, or cancelled. Once they've ever held a membership on one of those plans, they no longer qualify. This prevents the same person re-triggering an intro offer by signing up again. Turn **First purchase only** off for a standing price, such as a members' rate for a tag.
 
 When more than one auto-apply promotion could fire for the same plan and contact, the one with the **largest computed savings** wins. Only one applies.
+
+### Example: a standing discount for a tagged group
+
+Many gyms give a group a lasting discount: coaches pay 20% less for courts, a league team gets 15% off, staff play for half price, or regulars get a "20OFF" deal. Instead of applying a promotion to each of their bookings, tag the people once and create one auto-apply discount for that tag. Anyone carrying the tag gets the discount on every booking, and taking the tag off stops it.
+
+1. Create a manual tag that names the group, for example **Thursday League**, and add it to the people in it.
+2. Create a **Discount** promotion named for the people, for example "Thursday League - 15% off courts", and set **Amount**.
+3. Toggle **Auto-apply** on and set **Visibility** to **Admin only**, so the rate reaches people by their tag and is never listed as an offer.
+4. Under **Audience**, set **Tags** to the group's tag.
+5. Leave **Applies to** on **Bookings only**, set **Valid for** to **Selected bookings**, and pick what the rate covers: your area types for courts, instructor types for coach sessions, or class types. To discount plans too, pick them under **Selected plans** and turn **First purchase only** off, or the discount comes off a first purchase only.
+6. Leave the dates and **Uses per member** empty. The rate lasts until the tag comes off.
+
+The discount then comes off by itself wherever a tagged member is booked: when they book online, when staff add a booking on the calendar (the discount is pre-selected and can be removed), and when the [admin copilot](/reference/ai-assistants#guided-setups) books for them. Each discounted booking counts as a redemption in the promotion's analytics. Bookings made before someone was tagged keep their price: put the discount on them with **Add discount** on the booking, or see [Members who qualify after booking](#members-who-qualify-after-booking).
+
+You can also ask the admin copilot to set it up, for example "Our league team gets 15% off every court booking - can you make that automatic?". It creates the tag and the promotion, tags the people, and offers to put the discount on the bookings they already hold. See [Guided setups](/reference/ai-assistants#guided-setups).
 
 ### Members who qualify after booking
 

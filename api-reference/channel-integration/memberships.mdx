@@ -42,6 +42,7 @@ Body fields:
 - `planId` (required) - the plan, from [Plans](/api-reference/channel-integration/plans)
 - `startDate` (optional) - ISO date-time with offset; defaults to now
 - `autoRenew` (optional) - defaults to the plan's setting
+- `classId` (required for a plan with `chargesPerSession`, ignored otherwise) - any session of the recurring class the customer takes a place in, from [Classes](/api-reference/channel-integration/classes). They are booked into every session of it from the start date. Without it the call is refused with `PLAN_REQUIRES_STANDING_PLACE`. See [Per-session plans](/sales/per-session-plans).
 - `payment.status` (required) - `paid` (you collected the money) or `unpaid` (outstanding)
 - `payment.reference` (optional) - your own id for the payment you collected, up to 128 characters. Requires `payment.status: "paid"`.
 - `payment.fee` (optional) - what you kept out of the amount, your commission. Recorded for reconciliation; it does not reduce the sale. Requires `payment.status: "paid"` and an explicit `overrides.amount` it cannot exceed.
@@ -169,7 +170,13 @@ Requires the `memberships:read` scope. Returns one membership by its 1club id,
 including `usesRemaining` - the sessions the customer has left - and `allowances`,
 which lists what it covers (`validFor`), its session count, and what is left. A
 membership sold from a plan with several allowances, such as 5 Yoga + 4 Pilates, has
-one entry for each, each with the `allowanceId` you use to change it.
+one entry for each, each with the `allowanceId` you use to change it. `nextCharge` is
+its next renewal charge (`chargeDate`, `periodStart`, `periodEnd`, `amount`), or null
+when none is coming. On a [per-session plan](/sales/per-session-plans) its `perSession`
+says what the charge is made of, before tax: `totalAmount` (what the parts add up to),
+`fixedAmount`, each of the `sessions` with its price,
+the `discount`, `correctionsAmount` for earlier months and `carriedCreditAmount`. Its
+`usesRemaining` is the makeups it owes.
 
 ```bash
 curl "https://api.1club.ai/v1/platform/memberships/7412" \
@@ -187,7 +194,7 @@ curl -X PATCH "https://api.1club.ai/v1/platform/memberships/7412" \
   -d '{ "status": "cancelled", "cancelMode": "end_of_period" }'
 ```
 
-Two kinds of change, and they cannot be combined:
+Three kinds of change, and they cannot be combined:
 
 **A status transition** - `status` on its own, optionally with the field that
 configures it:
@@ -208,6 +215,9 @@ configures it:
 - `sessionUnit` - `booking` or `hour`. A change recounts what is left in the new unit.
 - `sessionLengthMinutes` - how long one visit lasts at the door, from its first entry; `null` lasts until the end of the gym's day. It applies only to a membership that counts sessions per booking.
 - `shareWithAccount` - whether the people on the holder's account can use it too
+
+**A move to another class** - `classId` on its own, for a membership on a
+[per-session plan](/sales/per-session-plans). See [Move to another class](#move-to-another-class).
 
 `cancelMode` only applies to a cancellation and `resumeAt` only to a pause; sending
 either with the wrong status is a `400` rather than being quietly ignored.
@@ -245,6 +255,25 @@ These requests return a `400` instead of being stored and not acted on:
 | `sessionLengthMinutes` on an unlimited membership or one counted in hours | `MEMBERSHIP_NOT_SESSION_PASS`    |
 
 A type id from another organization is also a `400`.
+
+### Move to another class
+
+A membership on a per-session plan holds a seat in every session of one recurring class.
+`classId` moves it to another: send any session of the new class, from
+[Classes](/api-reference/channel-integration/classes). From that session on, the member
+holds a seat in every session of the new class. Their place in the old class ends just
+before it: those sessions are cancelled, are not billed, and owe no makeup. The next
+monthly charge settles a month that was already charged.
+
+```bash
+curl -X PATCH "https://api.1club.ai/v1/platform/memberships/7412" \
+  -H "Authorization: Bearer 1club_sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "classId": 90311 }'
+```
+
+A membership on any other plan is refused with `STANDING_PLACE_NOT_PER_SESSION`, and a
+class that does not repeat with `STANDING_PLACE_NEEDS_RECURRING_CLASS`.
 
 ### Change one of several allowances
 

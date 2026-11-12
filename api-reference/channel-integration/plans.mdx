@@ -117,13 +117,15 @@ curl -X POST "https://api.1club.ai/v1/platform/plans" \
   }'
 ```
 
-Only `name` and `price` are required. The other fields are `description`, `clubId`, `planCategoryId`, `revenueAccountId`, `signupFee`, `billingFrequency` (`one_time`, `weekly`, `monthly`, `quarterly`, `annually`, or `custom`), `customPeriod`, `customPeriodUnit` (`days`, `weeks`, or `months`), `isActive`, `maxUses`, `sessionUnit` (`booking` or `hour`), `validityPeriod`, `autoRenews`, `renewalDaysInAdvance` (0 to 60), `requirePaymentUpfront`, `sports`, `features`, `visibility` (`Private`, `Member_only`, or `Public`), and `validFor`.
+Only `name` and `price` are required. The other fields are `description`, `clubId`, `planCategoryId`, `revenueAccountId`, `signupFee`, `billingFrequency` (`one_time`, `weekly`, `monthly`, `quarterly`, `annually`, or `custom`), `customPeriod`, `customPeriodUnit` (`days`, `weeks`, or `months`), `isActive`, `maxUses`, `sessionUnit` (`booking` or `hour`), `validityPeriod`, `autoRenews`, `renewalDaysInAdvance` (0 to 60), `requirePaymentUpfront`, `sports`, `features`, `visibility` (`Private`, `Member_only`, or `Public`), `validFor`, and `chargesPerSession`.
 
 `validFor.scopes` controls which booking resources the plan can cover. Omit a type list to cover every type in that scope. For example, `scopes: ["classes"]` covers every class type. Add `classTypes: [3, 7]` to limit it to those class type IDs.
 
 An empty `validFor` creates a generic plan for direct gym entry. It does not make class, area, or instructor bookings free.
 
 For a custom billing frequency, send both `customPeriod` and `customPeriodUnit`.
+
+`chargesPerSession: true` makes a [per-session plan](/sales/per-session-plans): `price` is the fixed part of each month, and each month also charges every session of the class the customer holds a place in. It must be `monthly`, have no `maxUses`, cover `classes` in `validFor`, and have no season. A membership on it is created with a `classId`.
 
 ## Update or retire a plan
 

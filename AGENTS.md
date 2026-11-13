@@ -50,6 +50,24 @@ Where this does not apply: section landing pages (`*/overview.mdx`, which orient
 
 When you edit an existing page that doesn't follow this order, restructure the opening if your change touches it. Don't rewrite pages you aren't otherwise changing.
 
+## Screenshots
+
+Screenshots help readers find their way on screen. Search engines and AI assistants read only the text and the alt text, so every step and setting must also be written out in the text. A screenshot only illustrates it.
+
+- **Use them sparingly.** Add one where a screen is dense or hard to find (lists, editors, dialogs), not for every page or every step. Each screenshot has to be re-taken when the UI changes, and an outdated screenshot is worse than none.
+- **Demo data only.** Capture from the Lumina Yoga demo organization. Never show a real customer, a 1club teammate, or a real email address or phone number. Swap them for `example.com` and `+1-555-01xx` placeholders before you capture.
+- **Format.** WebP, saved under `images/<section>/<name>.webp` (for example `images/schedule/add-booking-dialog.webp`). Use a light theme and a 1440 px wide browser window. Crop to the panel or dialog when that is what the text is about.
+- **Embed.** Put the screenshot right after the paragraph or list that describes that screen:
+
+  ```mdx
+  <Frame caption="The **Add Booking** dialog.">
+    <img src="/images/schedule/add-booking-dialog.webp" alt="Add Booking dialog with contact, booking type, and date and time fields" />
+  </Frame>
+  ```
+
+- **Alt text** says what the screen shows in one plain sentence. Keep captions short.
+- **When you change a page's UI text, check its screenshots.** Re-take or remove any that no longer match.
+
 ## Content boundaries
 
 <!-- Define what should and shouldn't be documented -->

@@ -33,6 +33,7 @@ Body fields:
 - `contactId` - the customer, resolved through [Contacts](/api-reference/channel-integration/contacts)
 - `customer` - an inline customer matched to a contact by email, instead of `contactId`
 - `instructorId` (optional) - the coach leading the session, from [Instructors](/api-reference/channel-integration/instructors)
+- `instructorIds` (optional) - every coach, when two or more run the session together (2 to 8 ids), in place of `instructorId`
 - `payment.status` (required) - `paid` (you collected the money) or `unpaid` (outstanding)
 - `payment.amount` (optional) - the price the customer paid, before any fee you kept; defaults to the computed price for the slot (max 1,000,000)
 - `payment.reference` (optional) - your own id for the payment you collected, up to 128 characters. Requires `payment.status: "paid"`.
@@ -85,6 +86,8 @@ The inline `customer` object remains supported for integrations that never hold 
 ### Adding a coach
 
 Pass `instructorId` when the session is coached rather than a bare court hire. The coach must be active in your organization. Their `bookability` setting does not block an API booking, because your key acts for the gym, but their own calendar is respected, so a booking that would double-book them is rejected. Attaching a coach also feeds the gym's instructor pay records automatically.
+
+When two or more coaches run the session together, send `instructorIds` (2 to 8 ids) instead. It needs an `areaId`. Every coach's calendar is respected, each coach's hourly rate is added to the price as a charge of its own, and the booking comes back with `instructorIds` listing all of them. `instructorId` in the response then names one of them.
 
 ### How the amount is calculated
 

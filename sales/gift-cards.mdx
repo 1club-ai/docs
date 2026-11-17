@@ -1,0 +1,128 @@
+---
+title: Gift cards
+description: Sell gift cards online and at the desk. The recipient redeems the code into their wallet and spends it on anything your gym sells.
+keywords:
+  [
+    "gift card",
+    "gift cards",
+    "gift card code",
+    "redeem gift card",
+    "sell gift card",
+    "gift card expiry",
+    "gift card liability",
+    "outstanding gift cards",
+    "import gift cards",
+    "void gift card",
+  ]
+---
+
+A gift card is prepaid money with a code. Someone buys it for another person, the recipient enters the code, and the whole amount lands in their [wallet](/sales/wallet). From there it pays for anything the wallet pays for: classes, memberships, court time, and products. Owners set gift cards up, the front desk sells and redeems them, and members buy and redeem them online.
+
+## When to use it
+
+- **Sell a present before the holidays** - a customer buys a card on your gift card page, writes a message, and picks the day it arrives by email.
+- **Sell at the desk** - a walk-in pays cash or card and leaves with a printed code.
+- **Move from another system** - import the cards you already issued, with their codes and remaining balances, so holders can keep using them.
+
+Gift cards are not [vouchers](/sales/promotions). A voucher is a promotion you give away, and money spent from it is not revenue. A gift card is money a customer paid, so it counts as revenue when it is spent.
+
+## How it works
+
+1. **Sale.** The buyer pays for the card. The payment is recorded, but it is not revenue and carries no tax yet: you owe the holder that amount.
+2. **Delivery.** The recipient gets an email with the amount, the code, the expiry date, and how to use it. The buyer gets a payment receipt. With a delivery date, the email goes out on that day.
+3. **Redeem.** The holder enters the code and the whole card moves into their wallet at once. Each code works once.
+4. **Spend.** The holder pays from the wallet as usual. Revenue and tax are recorded on what they buy, when they buy it.
+5. **Expiry.** The holder gets a reminder 30 days before the card expires. At expiry, an unredeemed card stops working, and anything left from a redeemed card is removed from the wallet. Other wallet money is not touched.
+
+A gift card cannot be bought with wallet money.
+
+<Note>
+The wallet belongs to your gym's default company. If you run [several companies](/settings/billing-entities), gift cards are sold by and spent at the default company only.
+</Note>
+
+## Turn gift cards on
+
+Go to **Settings** → **Billing** → **Gift cards**.
+
+- **Sell gift cards** - turns the feature on for your gift card page and the point of sale.
+- **Amounts** - the amounts buyers pick from.
+- **Allow a custom amount** - lets the buyer type an amount between the **Minimum** and the **Maximum**.
+- **Expires after (months)** - how long a card is valid from the day it is sold. The default is 36 months, which meets the three-year minimum in Australia. Check the rules where you trade before you lower it.
+
+## Selling a gift card
+
+### Online
+
+Members buy from the gift card page in your member portal (`/gift-cards`), which they also reach from the **Buy a gift card** link in their wallet, and from your gym's gift card page on 1club.me. The buyer signs in, picks or types an amount, enters the recipient's name and email, and can add a message and a delivery date. They pay by card.
+
+### At the desk
+
+In the **Point of sale**, select the customer, click **Gift card**, and choose the amount and how they pay. With cash or your own card terminal the card is issued at once: read out or print the code, or enter the recipient's email to send it. You can also sell from **Sales** → **Finance** → **Gift cards** with **Sell gift card**.
+
+## Redeeming a gift card
+
+- **Members** enter the code in their wallet with **Add voucher or gift card**, or in the code field at checkout. The amount is added to their wallet, not taken off that one purchase.
+- **Staff** redeem a code for a member from the member's profile (**+** → **Gift card**) or from the card's row in the gift cards list.
+
+Codes are not case sensitive, and spaces and hyphens are ignored. After too many wrong codes in a short time, further attempts are blocked for a few minutes.
+
+## The gift cards list
+
+**Sales** → **Finance** → **Gift cards** lists every card with its code, amount, what is left, status, sale date, expiry date, buyer, and holder.
+
+- **Outstanding** is what you still owe on gift cards today: unredeemed cards in full, plus what redeemed cards have left in wallets.
+- **Expired** is what lapsed in the period you filter by.
+
+Filter by status and date, search by code or name, and export the list as CSV. Open a card to see its usage: every purchase paid from it, and anything that expired.
+
+| Status   | Meaning                                                            |
+| -------- | ------------------------------------------------------------------ |
+| Active   | Sold or imported, not redeemed yet                                 |
+| Redeemed | Moved into a member's wallet. **Remaining** shows what is left     |
+| Expired  | Passed its expiry date before anyone redeemed it                   |
+| Void     | Taken back by staff                                                |
+
+### Resend, void, and refund
+
+- **Resend** emails the card again, to the same address or a new one.
+- **Void** cancels a card nobody has redeemed and refunds the buyer through the original payment. Turn the refund off to cancel the card without returning money.
+- A redeemed card cannot be voided. Refund what is left from the member's wallet with **Refund** in their wallet history, as for any top-up.
+
+## Importing gift cards from another system
+
+Go to **Settings** → **Data** → **Import** and choose **Gift cards**. Download the template and fill one row per card:
+
+| Column             | Required | Notes                                                              |
+| ------------------ | -------- | ------------------------------------------------------------------ |
+| `code`             | Yes      | Kept as issued, so printed and emailed codes keep working          |
+| `remainingBalance` | Yes      | What is left on the card. A card with nothing left is not imported |
+| `originalAmount`   | No       | The amount the card was sold for                                   |
+| `issueDate`        | No       | When it was sold                                                   |
+| `expiryDate`       | No       | When empty, the issue date plus your **Expires after** setting         |
+| `recipientEmail`   | No       | Used for the expiry reminder                                       |
+| `conditions`       | No       | Free text shown to staff on the card                               |
+
+Each row becomes an active card worth its remaining balance. No payment is recorded, and the cards count in **Outstanding** from the day you import them. A code that already exists is skipped, so you can run the same file again safely. Imported cards are not emailed.
+
+## Permissions
+
+| Action                                            | Permission                 |
+| ------------------------------------------------- | -------------------------- |
+| See the gift cards list                           | Gift cards - View          |
+| Sell, import, resend, and redeem for a member     | Gift cards - Create        |
+| Void a card and refund its sale                   | Gift cards - Edit          |
+| Turn gift cards on and change the amounts         | Settings - Edit            |
+
+Only administrators hold the gift card permissions by default. Grant them to other roles in **Settings** → **Permissions**.
+
+## Troubleshooting
+
+- **The code is refused.** It was already redeemed, has expired, was voided, or belongs to another gym. Find the card in the gift cards list to see which.
+- **The recipient did not get the email.** Open the card and use **Resend**, with a corrected address if needed.
+- **The gift card page says gift cards are not available.** Turn them on in **Settings** → **Billing** → **Gift cards**, and make sure an online payment method is active.
+
+## Related
+
+- [Wallet](/sales/wallet)
+- [Promotions](/sales/promotions)
+- [Point of sale](/pos/point-of-sale)

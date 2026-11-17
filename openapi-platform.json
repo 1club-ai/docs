@@ -20695,6 +20695,15 @@
                     "type": "integer",
                     "description": "Instructor leading the session (from GET /v1/platform/instructors), or the whole booking when no `areaId` is sent. Must be bookable for one-on-one sessions."
                   },
+                  "instructorIds": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 8,
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Every instructor on the session when two or more coach it together, all on the same level. Each one's rate is added to the price as a charge of its own. Needs an `areaId`. With `recurrence`, every occurrence carries all of them. `instructorId` is not needed with it.\n"
+                  },
                   "instructorLocationId": {
                     "type": "integer",
                     "description": "Where a session with an instructor and no area happens, for an instructor who works at several places: one of the instructor's current `locations` (from GET /v1/platform/instructors/{id}). Left out, an instructor with exactly one place is booked there. Refused with `INSTRUCTOR_LOCATION_NOT_FOUND` when it is not a current location of that instructor, and with `INSTRUCTOR_LOCATION_NOT_APPLICABLE` alongside an `areaId` or without an `instructorId`.\n"
@@ -20870,7 +20879,7 @@
             "schema": {
               "type": "integer"
             },
-            "description": "Only bookings led by this instructor"
+            "description": "Only bookings led by this instructor, alone or with other instructors"
           },
           {
             "in": "query",

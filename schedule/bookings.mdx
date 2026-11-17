@@ -51,6 +51,8 @@ When the area or coach takes more than one person, a **Players** picker (or **Wh
 
 An area booking can also carry a coach. Pick a named instructor, **Any instructor** for a lesson whose coach is not decided yet, or **No instructor**. **Any instructor** needs an area, so pick the area first. See [Area lesson with any available coach](#area-lesson-with-any-available-coach).
 
+An area booking can carry two or more coaches. Once an area is chosen, the **Instructor** field takes several names, and nobody is the lead. Each coach's rate is added to the price as its own line, and the booking holds every coach's time. See [Area session with two coaches](#area-session-with-two-coaches).
+
 The price breakdown appears below. It shows the line item (area price per hour, instructor price, or class price), any pricing rule or promotion, any manual price adjustment, and the total. If a membership or an external program covers the booking, that's reflected here.
 
 At the end of the create form, **Send confirmation email** controls whether the member gets the confirmation. It's checked by default; uncheck it when you're recording a booking that's already been communicated out-of-band. The checkbox is only on create - editing an existing booking does not re-send confirmation.
@@ -103,7 +105,7 @@ Alerts come first when they apply: a red **Cancelled** alert with the reason, th
 Below the alerts, a strip of facts about the booking:
 
 - **Contact** - the member, with their phone and email. On a booking with players, the contact is listed under **Players** instead.
-- **Instructor** (or the instructor type's name) - linked to the instructor. A lesson still waiting for a coach shows **Any instructor**.
+- **Instructor** (or the instructor type's name) - linked to the instructor. A booking with several coaches lists each one. A lesson still waiting for a coach shows **Any instructor**.
 - **Discount** - add, swap, or take off a promotion code while the booking is unpaid. Not offered once money is taken or the charge is invoiced, nor on a booking covered by a membership or external program, part of a series, or sold through an order.
 - **Entrance Method** - how the visit is paid for (the membership, the external program, **Direct Payment**, **Free**, or **Not set**), with a button to **Change Entrance Method**.
 - **Recurrence** - which occurrence of the series this is.
@@ -180,6 +182,8 @@ A series that ends on a date or after a set number of repeats is created in full
 
 Each occurrence is priced and checked for availability on its own date. An occurrence that cannot be placed is skipped rather than double-booked - the area is blocked or already taken at that time, or the class it attends is full or does not run that day.
 
+A series can carry several coaches. Every occurrence gets all of them, and a date one of them can't take is skipped. Editing one occurrence, or this and all future ones, changes the coaches and re-prices those dates. To turn a single booking into a series and change its coaches, change the coaches first and save, then add the recurrence.
+
 A series takes no players, and it can't be paid by an [external program](/settings/external-programs): a program pays one visit at a time.
 
 ## How members book
@@ -202,6 +206,14 @@ A regular calls to book a padel area for tonight. Reception opens **Add** > **Bo
 A member calls for a lesson on area 3 tonight and doesn't mind which coach teaches it. Reception opens the booking dialog, selects the area, and sets **Instructor** to **Any instructor**. The booking holds the area and is priced as the area alone, and no coach's time is reserved. On the schedule it shows **Any instructor** in its own color, so the desk can see at a glance which lessons still need a coach.
 
 The booking panel shows **Instructor: Any instructor** until a coach is named. When a coach is free, open the booking, click **Edit**, and pick them under **Instructor**. The booking stops waiting and is re-priced as an area with that coach. If that coach later drops out and is taken off the booking, it goes back to **Any instructor**, because the member still wants a lesson. **No instructor** is the choice for an area booking nobody asked a coach for, and choosing it withdraws the request.
+
+### Area session with two coaches
+
+A group of four books area 2 for a clinic that two coaches run together. Reception opens the booking dialog, selects the area, and picks both coaches under **Instructor**. With an area at 24 an hour and coaches at 40 and 35, the breakdown shows three lines and a total of 99.
+
+The booking then has three charges: one for the area and one for each coach, each named for its coach. Both coaches see the session as their own, both get the calendar invitation, and the schedule shows it in each coach's lane. Each is paid on their own charge under their [pay rate](/staff/pay-rates). To take a coach off later, open the booking, click **Edit**, and remove them. The price and the charges follow.
+
+Several coaches need an area, and only staff can book them. A member booking for themselves picks one coach.
 
 ### Personal-training session
 

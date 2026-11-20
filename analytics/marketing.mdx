@@ -7,7 +7,6 @@ keywords:
   - email delivery
   - unsubscribed contacts
   - promotion redemptions
-  - voucher analytics
   - web traffic
 ---
 
@@ -21,7 +20,7 @@ Lead conversion moved to the **Sales** category. Where leads come from, how many
 
 Use it to see whether your marketing lands: whether your emails get delivered and opened, who redeems your promotions, and how people use your website and portal. Typical questions it answers:
 
-- **Is an intro offer bringing in new members?** - a jiu-jitsu academy checks how many redeemers of its "first month free" voucher were **New Users**, not existing members.
+- **Is an intro offer bringing in new members?** - a jiu-jitsu academy checks how many redeemers of its "first month free" discount code were **New Users**, not existing members.
 - **Did a win-back email land without costing you subscribers?** - a yoga studio reads **Delivered** and **Opened** against **Total Sent** for the week, and watches the **Unsubscribed Contacts** table.
 - **Which pages and portal actions get used?** - a climbing gym reads **Web Traffic** to compare website and member portal events after a site redesign.
 
@@ -71,7 +70,7 @@ The status cards count the period's emails by how far each has got today, so an 
 
 ## Promotions
 
-This dashboard measures how your [promotions](/sales/promotions) (vouchers and discounts) get redeemed, across the whole organization. The period filters on when each redemption happened, not when the promotion was created. Redemptions tied to a voided or refunded charge are excluded, so the totals reflect settled activity only.
+This dashboard measures how your [promotions](/sales/promotions) (discounts) get redeemed, across the whole organization. The period filters on when each redemption happened, not when the promotion was created. Redemptions tied to a voided or refunded charge are excluded, so the totals reflect settled activity only.
 
 ### Summary metrics
 
@@ -79,12 +78,9 @@ This dashboard measures how your [promotions](/sales/promotions) (vouchers and d
 | --- | --- |
 | **Active Promotions** | Promotions currently within their start/end window, shown as `active / total`. |
 | **Total Redemptions** | Count of settled redemptions in the range. |
-| **Wallet funds added** | Amount added to member wallets by voucher redemptions. |
-| **Discounts Given** | Amount taken off orders at checkout, including vouchers applied as a booking discount rather than wallet credit. |
-| **Voucher redemptions** | Redemptions in the range for voucher-type promotions, with the configured voucher count in parentheses. |
-| **Discount redemptions** | Redemptions in the range for discount-type promotions, with the configured discount count in parentheses. |
-
-A voucher applied directly as money off a booking counts under **Discounts Given**, not **Wallet funds added**, because no wallet was credited. Only a voucher that actually credits a wallet counts there.
+| **Wallet funds added** | Amount vouchers added to member wallets. Vouchers were retired, so this is zero for periods after that. A redeemed [gift card](/sales/gift-cards) is not a promotion and is not counted here. |
+| **Discounts Given** | Amount taken off orders at checkout. |
+| **Discount redemptions** | Redemptions in the range, with the number of discounts in parentheses. |
 
 ### Charts and tables
 
@@ -107,7 +103,7 @@ Under **Filters**, narrow it by **Event type** and by **Source** (**Portal Event
 
 ## Worked examples
 
-**Jiu-jitsu academy validating an intro-offer voucher.** The academy issues a "first month free" voucher and wants to know whether it brings in new members rather than rewarding existing ones. On **Promotions**, the **Per-Promotion Summary** row for that voucher shows **New Users** alongside **Uses**, so they can see how many redeemers were genuinely new, and **Revenue** shows the order value those redemptions carried.
+**Jiu-jitsu academy validating an intro offer.** The academy shares a "first month free" discount code and wants to know whether it brings in new members rather than rewarding existing ones. On **Promotions**, the **Per-Promotion Summary** row for that discount shows **New Users** alongside **Uses**, so they can see how many redeemers were genuinely new, and **Revenue** shows the order value those redemptions carried.
 
 **Yoga studio checking a re-engagement email.** After sending a win-back email to lapsed members, the studio opens the **Email analytics dashboard** for the matching week, reads **Delivered** and **Opened** against **Total Sent**, and watches the **Unsubscribed Contacts** table to make sure the campaign is not costing them their list.
 
@@ -123,7 +119,6 @@ Under **Filters**, narrow it by **Event type** and by **Source** (**Portal Event
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| **Wallet funds added** looks lower than expected while **Discounts Given** is high | Vouchers applied as money off a booking count as discounts, not wallet credit | This is expected; only wallet-crediting voucher redemptions count there. |
 | Promotion totals seem to miss older redemptions in a wide range | The aggregation reads the most recent 10,000 redemptions | Narrow the date range so the window fits under the cap. |
 | A dashboard stays empty | No records match the period, or you lack `analytics.read.club` | Widen the period; confirm your role grants the analytics read permission. |
 | The chart's **Delivered** is smaller than the **Delivered** card | The card includes emails later opened or clicked; the chart counts each recipient once, at the furthest step | This is expected. Read the cards for rates and the chart for the funnel. |
@@ -133,5 +128,5 @@ Under **Filters**, narrow it by **Event type** and by **Source** (**Portal Event
 
 - [Analytics overview](/analytics/overview) - All analytics categories and how the hub works.
 - [Sales analytics](/analytics/sales) - Lead conversion, lead sources, and the customer lifecycle.
-- [Promotions](/sales/promotions) - Vouchers and discounts measured on the Promotions dashboard.
+- [Promotions](/sales/promotions) - The discounts measured on the Promotions dashboard.
 - [Automations](/marketing/automations) - Event-driven emails whose sends appear in the Email dashboard.

@@ -17542,6 +17542,34 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "createdBy": {
+            "type": "object",
+            "nullable": true,
+            "description": "The staff member who wrote the note. Null when no staff author is recorded: notes written before authors were recorded, notes imported from another system, copies in a cloned organization, the note an automatic merge writes, and notes whose author account was deleted.",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "Their user id"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "updatedBy": {
+            "type": "object",
+            "nullable": true,
+            "description": "The last colleague other than the author who changed the text. Null while nobody else has; the author editing their own note never appears here.",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "Their user id"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
           }
         }
       },

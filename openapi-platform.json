@@ -6728,6 +6728,22 @@
             "type": "boolean",
             "description": "False for a retired instructor: hidden from the list by default, not bookable, history kept."
           },
+          "bio": {
+            "type": "string",
+            "nullable": true,
+            "description": "About them, as their public profile shows it: plain text, a blank line between paragraphs."
+          },
+          "experience": {
+            "type": "string",
+            "nullable": true,
+            "description": "Their coaching background, as their public profile shows it."
+          },
+          "certifications": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "locations": {
             "type": "array",
             "description": "Where a Professional (an independent instructor) teaches. Pass an `id` as `instructorLocationId` to schedule a class there. Empty for a coach at a club.",
@@ -6867,6 +6883,27 @@
           "isActive": {
             "type": "boolean",
             "description": "False retires the instructor: they leave the listings and stop being bookable, and their history is kept. There is no delete."
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 5000,
+            "description": "About them, shown on their public profile. Plain text: each paragraph, separated by a blank line, becomes one. Writes the organization's own language; null clears it."
+          },
+          "experience": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000,
+            "description": "Their coaching background, shown on their public profile. null clears it."
+          },
+          "certifications": {
+            "type": "array",
+            "maxItems": 30,
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": "Qualifications shown on their public profile. Replaces the whole list."
           }
         }
       },
@@ -6938,6 +6975,27 @@
           "isActive": {
             "type": "boolean",
             "description": "False retires the instructor: they leave the listings and stop being bookable, and their history is kept. There is no delete."
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 5000,
+            "description": "About them, shown on their public profile. Plain text: each paragraph, separated by a blank line, becomes one. Writes the organization's own language; null clears it."
+          },
+          "experience": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000,
+            "description": "Their coaching background, shown on their public profile. null clears it."
+          },
+          "certifications": {
+            "type": "array",
+            "maxItems": 30,
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": "Qualifications shown on their public profile. Replaces the whole list."
           }
         }
       },
@@ -17358,6 +17416,11 @@
             ],
             "description": "For quote and announcement: the photo darkened with white type, or washed out with dark type"
           },
+          "backgroundColor": {
+            "type": "string",
+            "nullable": true,
+            "description": "For bold: the poster's colour, a hex colour such as #1d4ed8 or rgb(), saved as #rrggbb. null draws it on the Brand Book's background colour."
+          },
           "headline": {
             "type": "string",
             "maxLength": 120,
@@ -17568,6 +17631,11 @@
               "light"
             ],
             "description": "For quote and announcement: the photo darkened with white type, or washed out with dark type"
+          },
+          "backgroundColor": {
+            "type": "string",
+            "nullable": true,
+            "description": "For bold: the poster's colour, a hex colour such as #1d4ed8 or rgb(), saved as #rrggbb. null draws it on the Brand Book's background colour."
           },
           "headline": {
             "type": "string",
@@ -20059,11 +20127,13 @@
                     },
                     "amount": {
                       "type": "number",
-                      "description": "What the renewal asks now, before tax"
+                      "description": "What the renewal asks now",
+                      "before tax": null
                     },
                     "newAmount": {
                       "type": "number",
-                      "description": "What it asks once the plan changes, before tax"
+                      "description": "What it asks once the plan changes",
+                      "before tax": null
                     }
                   }
                 }
@@ -28365,7 +28435,7 @@
       "patch": {
         "operationId": "updateEvent",
         "summary": "Update an event",
-        "description": "Edits an event in any state. Send only what changes; an empty body is refused. Wall-clock times are read in the timezone of the club the event will belong to after the edit. A live event's change of time or areas takes effect on the schedule at once.\n\n`tickets`, `instructorIds` and `areaIds` each **replace** the whole set when sent, so read the event first. Resend every ticket you keep with its `id`; a ticket without one is new, and an `id` the event does not have is refused (`EVENT_TICKET_NOT_ON_EVENT`). A ticket left out is retired: deactivated when it has bookings, so they keep it, deleted when it has none. Changing the title changes the slug, and with it `publicUrl`.\n",
+        "description": "Edits an event in any state. Send only what changes; an empty body is refused. Wall-clock times are read in the timezone of the club the event will belong to after the edit. A live event's change of time or areas takes effect on the schedule at once.\n\n`tickets`, `instructorIds` and `areaIds` each **replace** the whole set when sent, so read the event first. Resend every ticket you keep with its `id`; a ticket without one is new, and an `id` the event does not have is refused (`EVENT_TICKET_NOT_ON_EVENT`). A ticket left out is retired: deactivated when it has bookings, so they keep it, deleted when it has none. Changing the title of a draft that was never published changes its slug, and with it `publicUrl`; once published, the slug stays.\n",
         "tags": [
           "Events"
         ],

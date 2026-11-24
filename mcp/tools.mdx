@@ -337,8 +337,11 @@ Over OAuth, the scope is only half of it: the assistant acts as the person who c
 
 | Tool | What it does | Scope required |
 | --- | --- | --- |
-| `list_promotions` | Lists your discounts and vouchers, with their codes, dates, status, and redemptions | `promotions:read` |
+| `list_promotions` | Lists your discounts, with their codes, dates, status, and redemptions | `promotions:read` |
 | `get_promotion` | Opens one promotion | `promotions:read` |
+| `create_promotion` | Creates a discount, live as soon as its dates allow | `promotions:write` |
+| `update_promotion` | Changes a discount, or ends it by setting its end date | `promotions:write` |
+| `delete_promotion` | Deletes a discount nobody has used yet | `promotions:write` |
 
 ### Reviews
 
@@ -601,7 +604,6 @@ The admin server is built strictly on the documented Platform API, so anything t
 Some areas are covered only in part:
 
 - **Payments** can be recorded but never taken: `record_payment` records money the desk already collected with one of your own payment methods, such as cash or a bank transfer, and the member gets a receipt. Charging a saved card and card payments stay in 1club.
-- **Promotions** are read-only. Creating and editing discounts and vouchers stays in 1club.
 - **Automations** and **reviews** are read-only. Turning an automation on or off, and replying to a review, stay in 1club.
 - **Messages** can be drafted, edited, and read, but not sent. A draft created with `create_message_draft` is sent from the 1club inbox.
 - **Invoices** are read-only. Issuing, sending, charging, and voiding invoices stay in the 1club dashboard.

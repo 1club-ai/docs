@@ -15,6 +15,7 @@ Typical uses:
 - **A strict class-based gym** - classes are paid online at booking, and any booking not checked in by the end of the day is marked as a no-show.
 - **Personal training booked over the phone** - a policy scoped to personal training lets admins book callers who haven't signed up yet.
 - **Areas with a cancellation deadline** - a policy scoped to your padel area type refunds in full up to 24 hours ahead, half up to 4 hours ahead, and nothing after that.
+- **Treatment rooms that need turning around** - a policy scoped to your red light therapy area type keeps each bed free for 15 minutes after every session, so it can be cleaned before the next client.
 - **Refund terms for events** - an event policy refunds tickets in full up to a week out and half up to two days out, and lets members cancel their own tickets within those terms.
 
 See [Worked examples](#worked-examples) for the settings behind the first three.
@@ -45,6 +46,8 @@ Two kinds of rule still apply to staff:
 
 - **Staff-only switches.** **Allow anonymous bookings** and **Allow anonymous check-ins** decide whether staff may book or check in someone with no contact at all. Only staff can do either, so they stay enforced.
 - **Facts about the schedule.** A coach on time off, on a break, or outside their hours, a blocked area, and an area or coach that is already taken. The booking dialog names these before you save, and you book past them with the same click when your role allows it. See [Bookings](/schedule/bookings#warnings-and-scheduling-conflicts).
+
+The [reset time](#reset-time) after a booking binds staff too, because the room or the coach really does need it. Booking inside one asks you to confirm with a note, and the override is recorded on the booking.
 
 ## Managing booking policies
 
@@ -112,6 +115,26 @@ Two things to know:
   measure, and it is written a rolling eight weeks at a time, so each occurrence lands
   inside the window when it is created. Use **Never** for a standing weekly booking at a
   gym that also sets a short **Max. ahead**.
+
+### Reset time
+
+**After each booking** (minutes) - How long an area, and its instructor if the booking has one, stays unavailable after each booking made under this policy. Use it when a room, a bed or a therapist needs time between sessions, for example 15 minutes to clean a red light therapy bed or to turn a massage room around. Leave blank for none. The maximum is 120 minutes.
+
+With a 15-minute reset time and a booking from 10:00 to 11:00:
+
+- The next booking on that area or coach can start at 11:15 at the earliest. 11:00 is not offered.
+- A new booking's own reset counts too. A 9:00 to 10:00 booking is refused, because its reset would run to 10:15. One from 8:30 to 9:30 is fine.
+- Members book on the policy's **Step**, so with a 30 min step the next start they see after 11:00 is 11:30. Staff can book 11:15 from the admin dashboard.
+
+How it behaves:
+
+- **Members never see it.** They book and pay for their own session only (10:00 to 11:00), and times inside a reset are simply not offered in the portal, the mobile app, your website or the 1club network.
+- **Area and instructor bookings only.** Classes and events never keep a reset time, and they are not held to one.
+- **Shared areas.** In an area that takes several bookings at once, a reset takes up only the place its own booking used.
+- **Each booking keeps its own.** A booking keeps the reset time of the policy it was made under. Changing the policy only affects new bookings, and moving a booking keeps the reset it already had.
+- **Closing time.** A reset can run past the gym's or the area's closing time.
+
+Staff are held to it as well. Booking inside a reset from the admin dashboard asks you to confirm with a note, then goes through, and the override is recorded on the booking. Moving an existing booking into a reset is refused, the same as moving it onto an area that is already taken.
 
 ### Waitlist claim
 
@@ -351,6 +374,10 @@ You let admins book PT for callers who haven't signed up yet.
 the series (an earlier end date or fewer repeats), raise **Max. ahead**, or set it to
 repeat with no end. Staff creating the series from the admin dashboard are not held to
 **Max. ahead**.
+
+**Issue**: A time right after a booking isn't offered, or a booking that ends just before another one is refused.
+
+**Solution**: The matching policy has a **Reset time**. Each booking keeps its area and coach free for that many minutes after it ends, and a new booking's own reset has to finish before the next booking starts. Lower or clear **Reset time** for new bookings, or book from the admin dashboard and confirm with a note if this one has to go through. See [Reset time](#reset-time).
 
 **Issue**: Cancellations are giving full refunds when I expected partial 
 

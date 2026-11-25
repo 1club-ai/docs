@@ -1,7 +1,7 @@
 ---
 title: "Contacts"
-description: "Search, open, create, update, and archive the customers your bookings belong to."
-keywords: [contacts, customers, crm, search, contactId, platform api]
+description: "Search, open, create, update, and archive the customers your bookings belong to, and get a member invitation link to send yourself."
+keywords: [contacts, customers, crm, search, contactId, platform api, invitation, invite link, onboarding]
 ---
 
 Every booking belongs to a **contact** in the gym's 1club CRM. Use these endpoints to
@@ -177,6 +177,61 @@ Nothing is destroyed. The contact is archived: they drop out of search, their hi
 - **Paid future bookings.** When the cancellation policy would keep money from a paid future booking, pass `keepCancellationCharge`: `false` refunds it in full, and `true` applies the policy. Without it, such an archive is refused with `409` and `code: "CANCELLATION_CHARGE_DECISION_REQUIRED"`, and nothing changes.
 - **Refused contacts.** A staff member or owner who can reach the admin portal, an instructor whose profile still has upcoming classes, and a contact paying part of a split bill on a future booking are refused with `409` and `code: "CONFLICT"`. Resolve those in 1club first.
 - **Partial release.** If a membership or booking fails to release, the contact is still archived, and the response is `409` with `code: "ARCHIVE_INCOMPLETE"` and the unreleased items in `details.outstanding`. Repeat the same request to finish the job. Read `code` to tell this apart from a refusal: one means nothing happened, the other means the archive did.
+
+## Get a member invitation link
+
+Requires the `contacts:write` scope.
+
+Invites the contact to the gym as a member and returns the invitation link instead of sending it. Use it to welcome people in your own emails, messages, or onboarding flow. 1club doesn't send the invitation.
+
+```bash
+curl -X POST "https://api.1club.ai/v1/platform/contacts/300/invitation-link" \
+  -H "Authorization: Bearer 1club_sk_live_..."
+```
+
+Response:
+
+```json
+{
+  "contactId": 300,
+  "url": "https://yourgym.portal.1club.ai/accept-invitation?token=4f1c...",
+  "expiresAt": "2026-12-02T12:57:00.965Z"
+}
+```
+
+- `url` - the gym's own page for accepting the invitation. It works once and expires after 7 days.
+- `expiresAt` - when the link stops working.
+
+<Warning>
+  The link accepts the invitation, so treat it like a password. Send it only to
+  the person it is for, and keep it out of logs and URLs you share.
+</Warning>
+
+### Asking again
+
+Calling again while the link is still live returns the same link and expiry, so a link you already sent keeps working. You can call it every time you send a reminder.
+
+A new link is issued when the earlier one has expired, or when the gym has since sent the person an invitation from 1club. The earlier link then stops working. Each new link counts against the organization's daily invitation limit.
+
+### What the person sees
+
+1club can't tell where you sent the link, so opening it proves nothing about who the person is. Their path depends on whether they already have a 1club account:
+
+- **New to 1club** - they set a password on the gym's page and become a member.
+- **Already has a 1club account** - they sign in to it, with their password or the Google or Apple account they use. The link never opens an existing account on its own.
+- **A phone number but no email** - they accept with a code sent to that phone. This needs phone sign-in to be on for the gym.
+
+Only members can be invited this way. Staff are invited in 1club.
+
+### Errors
+
+| Status | `code` | Meaning |
+| --- | --- | --- |
+| `400` | `CONTACT_NOT_REACHABLE` | The contact has no email or phone, or only a phone while phone sign-in is off. Add an email first. |
+| `404` | `NOT_FOUND` | No contact with that id exists in your organization. |
+| `409` | `NOT_INVITABLE` | The contact is archived, already a member or staff, or their 1club account belongs to another contact in the gym. |
+| `409` | `PHONE_NOT_VERIFIED_ON_ACCOUNT` | The contact has only a phone, and it is not the number verified on their existing 1club account. Add their email first. |
+| `429` | `INVITE_LIMIT_REACHED` | The organization's daily invitation limit is reached. Try again tomorrow. |
 
 ## Pipeline stages and contact sources
 

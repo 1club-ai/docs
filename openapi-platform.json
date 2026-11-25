@@ -26754,6 +26754,110 @@
         }
       }
     },
+    "/v1/platform/contacts/{id}/invitation-link": {
+      "post": {
+        "operationId": "createContactInvitationLink",
+        "summary": "Get a member invitation link",
+        "description": "Invites the contact to the club as a member and returns the invitation's link instead of sending it, so you can deliver it in your own emails and flows. 1club sends nothing. The link opens the club's own accept page, where the person sets a password (or signs in, if the email already has a 1club account) and becomes a member. It works once and expires after 7 days.\n\nCalling it again while the link is still live returns the **same** link, so one you have already sent keeps working. Once it has expired, or after the club has sent the person an invitation from 1club, a new link is issued and the earlier one stops working. Each new link counts against the organization's daily invitation limit.\n\nBecause 1club cannot tell where the link went, accepting it proves nothing about the person's email or phone: it sets a password only on an account nobody has signed into yet, and someone who already has a 1club account joins by signing in to it. A contact with no email accepts with a code sent to their phone, which needs phone sign-in to be on for the organization. Member invitations only: staff are invited in 1club.\n",
+        "tags": [
+          "Contacts"
+        ],
+        "security": [
+          {
+            "customerApiAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "1club contact id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The invitation link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "contactId",
+                    "url",
+                    "expiresAt"
+                  ],
+                  "properties": {
+                    "contactId": {
+                      "type": "integer"
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "The link to send. It accepts the invitation, so treat it as a secret.",
+                      "example": "https://yourclub.portal.1club.ai/accept-invitation?token=4f1c..."
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The contact cannot be reached (`CONTACT_NOT_REACHABLE`): it has neither an email nor a phone, or only a phone while phone sign-in is off for the organization.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/PlatformUnauthorized"
+          },
+          "403": {
+            "description": "API key is missing the required `contacts:write` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/PlatformNotFound"
+          },
+          "409": {
+            "description": "No invitation was issued. `NOT_INVITABLE`: the contact is archived, already a member or staff, or their 1club account belongs to another contact here. `PHONE_NOT_VERIFIED_ON_ACCOUNT`: the contact has only a phone, and it is not the one verified on their existing 1club account.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited, or the organization's daily invitation limit is reached (`INVITE_LIMIT_REACHED`; try again tomorrow).\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/platform/content": {
       "get": {
         "operationId": "listContent",

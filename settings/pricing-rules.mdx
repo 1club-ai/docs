@@ -1,7 +1,7 @@
 ---
 title: "Pricing rules"
 description: "Configure dynamic pricing for bookings - publish an hourly rate per time band, layer peak surcharges and off-peak discounts, give plan holders their own member rate, and scope any rule to a gym, area, instructor, or class type."
-keywords: ["pricing rules", "dynamic pricing", "peak pricing", "off-peak discount", "surcharge", "pricing sheet", "price per hour", "absolute price", "rate card", "price list", "rule priority", "member rate", "plan rate", "padel peak hours", "court with coach discount", "booked with an instructor", "number of instructors", "rate per coach", "several coaches", "weekend premium", "conditional pricing", "percentage adjustment", "fixed amount", "per-gym pricing"]
+keywords: ["pricing rules", "dynamic pricing", "peak pricing", "off-peak discount", "surcharge", "pricing sheet", "price per hour", "absolute price", "rate card", "price list", "rule priority", "member rate", "plan rate", "padel peak hours", "court with coach discount", "semi-private lesson", "lesson for two", "group lesson on a court", "booked with an instructor", "number of instructors", "rate per coach", "several coaches", "weekend premium", "conditional pricing", "percentage adjustment", "fixed amount", "per-gym pricing"]
 ---
 
 Pricing rules decide what a booking costs. Each rule defines an adjustment (a percentage, a fixed amount, or an outright price per hour), a scope (which gyms, areas, instructors, or class types it applies to), and a set of conditions (time of day, day of week, booking timing, demand, duration, date range, plan, group size, number of instructors, or whether a coach is booked with the area). When a booking's context matches a rule, that rule is applied to the resource's base price. You set rules up once, and members and the front desk see the result as the price under each slot on the booking calendar, in booking search, and at checkout.
@@ -78,7 +78,11 @@ Conditions further restrict when a rule fires. Add as many as you need - **all**
 - **Duration Threshold** - fire only when the booking is at least a **Minimum duration (hours)**, and optionally at most a **Maximum duration (hours)**. Set both to the same value to target one length. The duration is always the whole booking's, even when another rule splits it into segments.
 - **Date Range** - fire only between a **Start Date** and **End Date** (interpreted as whole days in your organization's timezone), for seasonal pricing.
 - **Plan** - fire only for members on the selected plans (leave empty for all plans). Bookings with no active plan do not match a plan-restricted rule. A rule with a Plan condition is a **member rate**; see [Member rates](#member-rates) for how two plans are resolved.
-- **Number of people** - fire only when a session with an instructor and no area is booked for at least a **Minimum people** count, and optionally at most a **Maximum people** count. The person booking is included, and areas and classes always count as one. Pair it with an **Instructors** scope, for example to make a private lesson for two cost 50% more. Without such a rule, each person pays the full price.
+- **Number of people** - fire only when a session with an instructor is booked for at least a **Minimum people** count, and optionally at most a **Maximum people** count. The person booking is included. It counts two kinds of session:
+  - **A coach with no area** - the group the session is booked for. Without such a rule, each person pays the full price.
+  - **An area and one coach on one booking** - the people the lesson is sold to: the organizer and the players they add. Without such a rule, the lesson costs what it costs one person, split between them. The rule moves only the coach's part of the price, so the area keeps its own price and the coach is left the rest; see [Semi-private lesson on an area](#semi-private-lesson-on-an-area).
+
+  An area booked without a coach, an area with two or more coaches, and a class always count as one. Pair it with an **Instructors** scope, for example to make a private lesson for two cost 50% more.
 - **Number of instructors** - fire only when the booking has at least a **Minimum instructors** count of coaches on it, and optionally at most a **Maximum instructors** count (both inclusive). Use it to price a session differently when several coaches teach it; see [Rate per coach on a co-coached booking](#rate-per-coach-on-a-co-coached-booking).
 - **Booked with an instructor** - fire only when the area is booked together with an instructor (leave the selector empty for any instructor). Pair it with an **Areas** scope: the rule then adjusts the area's price whether staff book the area and the coach as one booking or a member books them together. It never changes the instructor's own price, and an area booked alone keeps its normal price. On an area booked with several coaches, the adjustment still lands on the area's charge alone, so every coach's fee and pay stay whole.
 
@@ -142,6 +146,7 @@ The price is built from a base rate and then adjusted by the matching rules.
 - **Area** bookings use the area's **price per hour** multiplied by the duration.
 - **Instructor** bookings use the instructor's **hourly rate**.
 - If a booking has both an area and an instructor, their hourly rates are **summed**.
+- If an area and an instructor whose rate includes the area are booked together, the instructor's rate is the price and the area is not charged on top. Its share of the rate is the area's charge, on the area's revenue account.
 - If an area is booked with two or more instructors, each coach's hourly rate is added to the area's price, unless a coach's rate already includes the area, in which case the area is not charged on top.
 - **Class** bookings use the class's own price as a fixed base.
 - If no rate is set, the base is zero.
@@ -242,6 +247,22 @@ Take 2 off the area whenever it is booked together with a coach, at any hour.
 - **Conditions**: Booked with an instructor - leave empty for any instructor.
 
 The discount stacks with your other area rules: an area that costs 28 in a weekday off-peak band costs 26 when a coach is booked with it. The coach is still charged their full rate, and on the booking's charges the discount appears on the area's line.
+
+### Semi-private lesson on an area
+
+Sell a private lesson at the coach's rate and a lesson for two at a lower price per person, while the area always earns its own price. A tennis academy whose court costs 50 an hour and whose coach charges 100 an hour with the court included, sells a lesson for two at 55 each:
+
+- **Adjustment Type**: Absolute price, **Price per hour** 110.
+- **Scope**: Instructors - the coach. Add one rule per coach when each coach has their own price for two.
+- **Conditions**: Number of people - minimum 2, maximum 2.
+
+A member books the coach with the court and adds their partner at checkout, or staff add the partner as a player in the booking dialog. It stays one booking with the court and the coach, sold to two people:
+
+- **The price** - 110 for the hour, so each person pays 55 for their own place, unless the organizer pays for both.
+- **The area** - keeps 50. Tax on the area's revenue account is charged on its own price, so with an 8.875% sales tax each person also pays 2.22.
+- **The coach** - is left the rest, 60. A [pay rate](/staff/pay-rates) with **Percentage of** set to **Coach's own charge** pays the coach a share of that 60, never of the area hire.
+
+Booked alone, the same lesson costs the coach's 100 with the court inside it, because the rule needs two people to fire.
 
 ### Rate per coach on a co-coached booking
 

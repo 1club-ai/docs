@@ -13,6 +13,7 @@ keywords:
   - early cancellation charge
   - minimum term
   - booked pause
+  - pause billing
   - adjust sessions
   - session limits
   - next charge
@@ -22,6 +23,8 @@ keywords:
   - per-session plan
   - makeups owed
 ---
+
+import { PauseCalculator } from '/snippets/pause-calculator.jsx';
 
 A membership is a [plan](/sales/plans) sold to a specific contact. The plan defines the price, billing frequency, minimum term, and session limits; the membership copies those at the moment of sale and tracks that member's sessions and billing from then on. The front desk sells memberships, managers pause, renew, and cancel them, and members use them to book and check in.
 
@@ -169,6 +172,31 @@ The **Pause Membership** dialog offers:
 If the pause goes against the membership's [policy](/settings/membership-policies) - longer than its **Longest pause**, or past its **Pauses per year** - the dialog warns you before you confirm. The pause still goes through.
 
 When you set a resume date, the renewal date, end date, minimum term, and any scheduled cancellation move forward by the pause length as soon as the pause starts. For a pause with no resume date, they move when you **Resume** (only from **Paused**). Either way the member gets back exactly the time they paid for. The resume dialog previews the new **Next Billing Date** and **End Date** before you confirm. Resuming creates no charge by itself; the next renewal is charged from the moved date.
+
+#### What a pause does to the next charge
+
+A pause moves the next charge by the number of days paused. The member keeps every day they paid for: the days before the pause, and the rest after it.
+
+For example, a member is on a weekly plan at 99, charged every Monday. On Tuesday they pause for 7 days:
+
+| Day | What happens |
+| --- | --- |
+| Monday | 99 is charged for Monday to Sunday. The next charge is due the following Monday. |
+| Tuesday | The pause starts. Access stops, and the next charge moves 7 days, to the Monday after. |
+| Tuesday, a week later | The membership resumes. The member has 6 paid days left, Tuesday to Sunday. |
+| Monday | 99 is charged, and the member is billed on Mondays again. |
+
+The member got 7 days for their 99: the Monday before the pause and the 6 days after it.
+
+- **A pause that isn't whole weeks moves the billing day for good.** Pause for 10 days from that Tuesday and the next charge falls on a Thursday. The member is billed on Thursdays from then on. Monthly plans work the same way: a member billed on the 5th who pauses for 10 days is billed on the 15th from then on.
+- **Ending early moves the charge only by the days actually paused.** If the member plans 7 days but comes back on Friday, after 3 days, the next charge moves 3 days, to Thursday.
+- **A part day counts as a whole day.** A pause from Tuesday at 10:00 to Sunday at 09:00 counts as 5 days.
+- **A renewal charge already raised is voided.** If the next charge was raised before the pause, the pause voids it and a new one is raised from the moved date.
+- **The pause fee is separate.** A [pause fee](/settings/membership-policies#the-pause-fee) is charged while the membership is paused and doesn't change when the next charge falls.
+
+Try it with your own numbers:
+
+<PauseCalculator />
 
 A booked pause shows on the detail page as **Booked pause**. Use **Call off booked pause** to cancel it before it starts.
 

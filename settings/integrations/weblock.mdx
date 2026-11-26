@@ -1,7 +1,7 @@
 ---
 title: WebLock
 description: Open WebLock (Valnes) doors and switch on area lights from 1club bookings and check-ins, set up per gym and per area.
-keywords: ["weblock", "valnes", "access control", "door access", "physical access", "pin", "access card", "door groups", "light devices", "access buffer", "light buffer", "business id", "plan door access"]
+keywords: ["weblock", "valnes", "access control", "door access", "physical access", "pin", "access card", "door groups", "light devices", "access buffer", "light buffer", "business id", "plan door access", "door access page"]
 ---
 
 The WebLock integration connects 1club to the Valnes WebLock access control system. You link each area in a gym to WebLock door groups, and optionally to light devices, so a booking or check-in in that area opens the right doors and switches on the lights for its time window. An owner or admin sets it up for each gym once. Members then get in with the PIN or access card on their 1club account.
@@ -57,30 +57,42 @@ Valnes API credentials are held at the platform level, so you do not enter a use
 
 ## Set up a gym
 
+Setting up a gym takes two pages. The WebLock page holds the connection: the gym's Business ID. The **Door access** page holds everything the gym does with its doors.
+
+### Connect the gym
+
 1. Go to **Settings** > **Integrations** and click **Activate** next to WebLock, under **Access control**. 1club activates WebLock and opens its page. Once it is active, you reach the page from **Configure** under **Active Integrations**.
 2. Pick the gym in the **Clubs** list. The list shows how many gyms are live and where each one stands: **Live**, **Setting up**, **Off**, **Not set up**, **No areas**, or **Uses** another door system. If the gym has no active area, the page asks you to create one and links to **Manage areas**.
-3. Under **Connection**, enter your **Business ID** and save. The door group and light device lists load from WebLock once the Business ID is saved.
-4. Set the two buffers:
+3. Under **Connection**, enter your **Business ID** and save.
+4. Click **Test connection** to confirm 1club can reach WebLock with the Business ID.
+5. Click **Set up doors**. The **Door access** page opens on this gym.
+
+### Set up the gym's doors
+
+On **Settings** > **Check-in & Access** > **Door access**, with the gym selected:
+
+1. Under **When access opens and closes**, set the two buffers:
    - **Access buffer (minutes)** (0-120, default 15) - how long before a booking starts the door opens, and how long after it ends it stays open.
    - **Light buffer (minutes)** (0-120, default 5) - how long before and after a booking the area's lights are on.
-5. Under **Areas**, choose for each area:
+2. Under **Areas**, choose for each area:
    - **Door groups** - the WebLock door groups that access to this area opens. You can pick several. An area with no door group shows **No doors** and opens nothing; one with a door group shows **Ready**.
    - **Light devices (optional)** - the devices whose lights follow access to this area.
-6. Save your changes.
-7. Click **Test connection** to confirm 1club can reach WebLock with the Business ID.
-8. Turn on **Door access through WebLock** and confirm with **Turn on**. Members with a booking or check-in get door access within a few minutes.
+3. Save your changes with the save bar at the bottom.
+4. Turn on **Door access through WebLock** at the top and confirm with **Turn on**. Members with a booking or check-in get door access within a few minutes.
 
-Until the gym is live, a **Before you turn it on** checklist shows what is left: entering the business ID and saving, and choosing a door group for at least one area. The switch stays greyed out until both are done.
+The door group and light device lists load from WebLock once the Business ID is saved. Until the gym is live, a **Before you turn it on** checklist shows what is left: **Connect WebLock**, and choosing a door group for at least one area. The switch stays greyed out until both are done.
+
+WebLock doesn't report entries back to 1club, so the **Door access** page has no **Check-in doors** section for a WebLock gym. For everything else on the page, see [The Door access page](/settings/access-control-settings#the-door-access-page).
 
 **Test connection** and **Sync now** are available once the gym is saved, and only while there are no unsaved changes.
 
 ### Activity
 
-Next to the switch, the page shows **Members with access**, **Pending updates** (changes 1club still has to send to WebLock) and **Last door update**. The **Activity** section lists any members whose access couldn't be updated, with the reason. These retry automatically. Access syncs every 5 minutes; click **Sync now** to update the gym straight away.
+On the **Door access** page, next to the switch, the page shows **Members with access**, **Pending updates** (changes 1club still has to send to WebLock) and **Last door update**. The **Activity** section lists any members whose access couldn't be updated, with the reason. These retry automatically. Access syncs every 5 minutes; click **Sync now** to update the gym straight away.
 
 ### Switching from the earlier setup
 
-If a gym was set up before WebLock worked per area, the page shows a warning until you save it on the current setup. 1club pre-fills each area's door group and light device from the gym's earlier settings where it safely can. Check every area before you save.
+If a gym was set up before WebLock worked per area, the **Door access** page shows a warning until you save the gym there on the current setup. 1club pre-fills each area's door group and light device from the gym's earlier settings where it safely can. Check every area before you save.
 
 <Warning>
   Configure every area before you switch. After the switch, access comes from area access: a booking or check-in in that area, or a plan that opens it as a walk-in area. If several gyms share the same WebLock business, save every one of them on the current setup before you sync. 1club refuses to sync a shared business until all of its gyms are switched.
@@ -104,7 +116,7 @@ A Pilates studio links its studio area to the studio door group and leaves light
 
 ### Two gyms on one business
 
-A climbing group runs two gyms on one WebLock business. It sets up both gyms on the WebLock page with the same Business ID, saves both, then syncs. A member who books at both gyms is one WebLock user, and each booking opens only its own gym's door groups.
+A climbing group runs two gyms on one WebLock business. It enters the same Business ID for both gyms on the WebLock page, sets up each gym's door groups on the **Door access** page, saves both, then syncs. A member who books at both gyms is one WebLock user, and each booking opens only its own gym's door groups.
 
 ## Tips and best practices
 
@@ -119,10 +131,10 @@ A climbing group runs two gyms on one WebLock business. It sets up both gyms on 
 | --- | --- | --- |
 | **Test connection** fails | The Business ID is wrong, or your WebLock account has no API access | Confirm the Business ID with your WebLock administrator, save it, and retry |
 | The door group or light device lists are empty | The Business ID isn't saved or is wrong, or nothing is set up in the WebLock console | Save the correct Business ID, and check the WebLock console |
-| An area opens no doors | No door group is selected for it | Pick at least one **Door group** for the area and save |
+| An area opens no doors | No door group is selected for it | On the **Door access** page, pick at least one **Door group** for the area and save |
 | A member can't open the door | They have no PIN or access card, they owe a required entry document, or they are outside their access window | Check their credential on [Access cards](/members/member-cards) and their documents, or raise the **Access buffer** |
 | Lights don't come on for a booking | No light device is linked to the area, or the **Light buffer** is shorter than expected | Pick a **Light device** for the area and check the **Light buffer** |
-| Syncing is refused for a shared business | Another gym on the same WebLock business is still on the earlier setup | Open that gym on the WebLock page and save it |
+| Syncing is refused for a shared business | Another gym on the same WebLock business is still on the earlier setup | Open that gym on the **Door access** page, check its areas, and save it |
 | Changing the Business ID is refused | The gym still has door access on, or cleanup hasn't finished | Turn off **Door access through WebLock**, wait for cleanup, then change it |
 | A member on a plan can't get in | The area isn't a walk-in area, the time is outside the plan's hours, or the plan is a pass with sessions | Read **Door access from plans** on the member's profile. Members on a pass check in first |
 | The switch is greyed out | The checklist isn't finished, or the gym uses another door system | Finish **Before you turn it on**, or turn the other door system off for the gym |
@@ -130,7 +142,7 @@ A climbing group runs two gyms on one WebLock business. It sets up both gyms on 
 
 ## Turn a gym off
 
-Turn off **Door access through WebLock** and confirm with **Turn off**. Members lose door access through WebLock within a few minutes. Your settings stay saved, so you can turn it back on later.
+On the **Door access** page, turn off **Door access through WebLock** and confirm with **Turn off**. Members lose door access through WebLock within a few minutes. Your settings stay saved, so you can turn it back on later.
 
 ## Deactivate
 
@@ -143,7 +155,7 @@ Deactivating removes WebLock from every gym in your organization at once.
 
 ## Related
 
-- [Physical access control](/settings/access-control-settings) - access grants and how door systems read them.
+- [Physical access control](/settings/access-control-settings) - access grants, how door systems read them, and [the Door access page](/settings/access-control-settings#the-door-access-page).
 - [Access control](/settings/access-control) - per-gym check-in modes and identification methods.
 - [Access cards](/members/member-cards) - the PINs and access cards members use at the door.
 - [Areas](/settings/areas) - the areas you link to door groups and light devices.

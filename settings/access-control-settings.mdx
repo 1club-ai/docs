@@ -1,10 +1,10 @@
 ---
 title: Physical access control
-description: How 1club turns bookings, check-ins and plans into door access - areas, walk-in areas, credentials, access grants, the access buffer, session passes at the door, and the door access integrations that open real doors.
-keywords: [physical access control, door access, door, area access, walk-in area, default area, plan door access, session length, check-in locks, credential, RFID, NFC, QR code, PIN, access grant, manual access grant, revoke access, access buffer, access event, WebLock, Impro, Salto KS, door hardware]
+description: How 1club turns bookings, check-ins and plans into door access - areas, walk-in areas, credentials, access grants, the access buffer, session passes at the door, the Door access page where each gym's doors are set up, and the door access integrations that open real doors.
+keywords: [physical access control, door access, door, area access, walk-in area, default area, plan door access, memberships open the doors, door access page, session length, check-in doors, check-in locks, credential, RFID, NFC, QR code, PIN, access grant, manual access grant, revoke access, access buffer, access event, WebLock, Impro, Salto KS, door hardware]
 ---
 
-Physical access control is how 1club opens real doors. It gives a member a time-bound **access grant** to one **area** of a gym, derived from their booking, their check-in, or the plan they hold, and a door access integration ([Impro](/settings/integrations/access-bridge), [WebLock](/settings/integrations/weblock), or [Salto KS](/settings/integrations/salto)) keeps that gym's door system in step with those grants. Owners and admins set up the integration once per gym, staff can add or withdraw access by hand, and members get in with their [credential](/members/member-cards): an access card, QR code, PIN, or a digital key on their phone.
+Physical access control is how 1club opens real doors. It gives a member a time-bound **access grant** to one **area** of a gym, derived from their booking, their check-in, or the plan they hold, and a door access integration ([Impro](/settings/integrations/access-bridge), [WebLock](/settings/integrations/weblock), or [Salto KS](/settings/integrations/salto)) keeps that gym's door system in step with those grants. Owners and admins connect the door system on its integration page and set up each gym's doors on the **Door access** page, staff can add or withdraw access by hand, and members get in with their [credential](/members/member-cards): an access card, QR code, PIN, or a digital key on their phone.
 
 <Note>
 This page is different from [Access control](/settings/access-control), which covers **check-in modes** (walk-ins, anonymous check-ins, payment enforcement) and how members **identify themselves** at the front desk. This page is about door hardware and the grants that drive it.
@@ -40,9 +40,87 @@ Only one door access integration can be on for a gym at a time.
 1. Go to **Settings** > **Check-in & Access** > **Door access** and turn on **Access Control** for the gym, so members can register credentials. Choose the **Enabled Identification Methods** you accept. See [Access control](/settings/access-control#member-identification-methods-per-club).
 2. Make sure the gym has at least one active area, under **Settings** > **Clubs** > **Areas**. See [Areas](/settings/areas).
 3. On each area, set **How members use it**: **Walk-in, no booking** for the areas members should enter on their plan, **Booked by the hour** for the rest. On the area list, use **Make default** on the open floor, so a general plan and a bare check-in know where to land. See [Walk-in areas and the Default Area](#walk-in-areas-and-the-default-area).
-4. Set up the gym's door system under **Settings** > **Integrations**: [Impro](/settings/integrations/access-bridge), [WebLock](/settings/integrations/weblock), or [Salto KS](/settings/integrations/salto). Each integration page explains how to connect the gym's areas to its doors and set the access buffer.
+4. Connect the gym's door system under **Settings** > **Integrations**: [Impro](/settings/integrations/access-bridge), [WebLock](/settings/integrations/weblock), or [Salto KS](/settings/integrations/salto). The integration page holds only the connection, such as the Salto site, the Impro address and key, or the WebLock business ID.
+5. Set up the gym's doors on **Settings** > **Check-in & Access** > **Door access**: which doors each area opens, the access buffer, which doors count a visit, and the switch that turns door access on. See [The Door access page](#the-door-access-page).
 
 Until a door access integration is enabled for a gym, no grants are created there, and **Add access grant** is refused.
+
+## The Door access page
+
+**Settings** > **Check-in & Access** > **Door access** is where you set up a gym's doors, whichever door system runs them. It shows one gym at a time. The connection to the door system stays on that system's integration page, and the **Set up doors** button there opens this page for the gym.
+
+### Pick a gym
+
+The **Clubs** list shows every gym, how many are live, and where each one stands:
+
+| Status | What it means |
+| --- | --- |
+| **Live** | Door access is on for the gym. |
+| **Setting up** | The door system is connected, but the checklist isn't finished. |
+| **Off** | The checklist is done, and door access is turned off. |
+| **Not set up** | The gym has no door system yet. The page links to **Settings** > **Integrations** to connect one. |
+| **No areas** | The gym has no active area. The page links to **Manage areas**. |
+
+With more than eight gyms, use **Search clubs** to find one. On a phone, the list sits above the settings, and picking a gym scrolls down to it.
+
+### The switch and the checklist
+
+At the top, under the gym's name, the switch **Door access through** the gym's door system turns door access on and off. It applies on its own, behind a confirmation, and doesn't wait for the save bar:
+
+- **Turn on** - members with a booking or check-in get door access within a few minutes.
+- **Turn off** - members lose door access through that system within a few minutes. Your settings stay saved, so you can turn it back on later.
+
+Next to the switch, the page shows **Members with access**, **Pending updates** (changes 1club still has to send to the door system) and **Last door update**.
+
+Until the gym is live, a **Before you turn it on** checklist shows what is left, for example **Connect Salto KS** and **Sync areas to Salto**. The switch stays greyed out until the checklist is done, while the gym has no active area, or while another door system is live for it.
+
+### Door system
+
+Shows which door system the gym uses, and whether it is **Connected**. Click **Connection settings** to open its integration page. When a gym is set up on more than one system, for example ahead of a switch-over, pick which one to show here.
+
+### When access opens and closes
+
+The door system's timing settings:
+
+- **Access buffer (minutes)** - how early members can get in before a booking, and how long after it ends they keep access. 15-120 minutes on Impro and Salto KS, 0-120 on WebLock.
+- **Light buffer (minutes)** - WebLock only. How early the lights switch on before a booking, and how long they stay on after it.
+- **Limit access to opening hours** and **Suspend members when their access ends** - Salto KS only. See [Salto KS](/settings/integrations/salto#how-it-works).
+
+### Areas
+
+How each area of the gym reaches its doors. This depends on the door system:
+
+- **Salto KS and Impro** - choose the **Doors** each area opens. Click **Refresh doors** to read the doors from the door system, then **Sync areas** to send the areas to it. Each area shows whether it is ready. See the [Salto KS](/settings/integrations/salto#set-up-the-gyms-doors) and [Impro](/settings/integrations/access-bridge#set-up-the-gyms-doors) pages.
+- **WebLock** - choose the **Door groups** and optional **Light devices** each area opens. See [WebLock](/settings/integrations/weblock#set-up-the-gyms-doors).
+
+An area's doors are saved as you choose them. A door that the door system no longer lists is marked **missing**, and one that is out of contact is marked **offline**.
+
+### Check-in doors
+
+On door systems that report entries back to 1club (Impro and Salto KS, not WebLock), **Check-in doors** decides which entries count a visit. An entry through a counting door records a check-in for the member, and on a pass with sessions it uses a session. See [Passes with sessions](#passes-with-sessions).
+
+For each door, choose:
+
+- **Automatic** - a door in exactly one area counts for that area. A door shared by several areas only opens. The option says which applies, for example **Automatic: Bouldering hall** or **Automatic: only opens**.
+- **An area** - the door counts visits for that area, even if it is shared.
+- **Only opens** - the door never counts a visit.
+
+A door shows here once an area uses it. Each choice is saved as you make it.
+
+### Activity
+
+Shows any members whose access couldn't be updated, with the reason. These retry automatically, so fix the cause shown or check the connection. Members whose PIN wasn't sent to the door system are listed separately, with a note on each row. Access syncs every 5 minutes. Click **Sync now** to update the gym straight away.
+
+On Impro, this section is called **People**, with **Sync people** instead of **Sync now**. See [Impro](/settings/integrations/access-bridge#sync-people).
+
+### How members get in
+
+The card at the bottom holds the gym's member settings:
+
+- **Memberships open the doors** - on by default. Off, a plan no longer opens a door by itself, and members get in once checked in at the gym or with a booking. See [Require a check-in instead](#require-a-check-in-instead).
+- **Access Control** and **Enabled Identification Methods** - whether members can register an access card, NFC device or PIN, and which of **QR Code**, **Access Card** and **PIN Code** the gym accepts. See [Access control](/settings/access-control#member-identification-methods-per-club).
+
+Changes to the timing, the WebLock door groups and these member settings are saved together from the save bar at the bottom. **Sync areas** and **Sync now** are available only while there are no unsaved changes.
 
 ## Door access from plans
 
@@ -75,10 +153,21 @@ An area booked by the hour is never opened by a plan, so those areas stay bookin
 A pass that counts sessions per booking opens the door too, while it has a session left, at a gym that runs [Impro](/settings/integrations/access-bridge) or [Salto KS](/settings/integrations/salto). These door systems report each entry back to 1club, and every visit through an area's own door uses one session.
 
 - **Session length.** A visit lasts the plan's **Session length** from the first entry, so coming back in within it uses nothing more. Leave it empty and a visit lasts the rest of the gym's day. A session never runs past the end of that day. Session length is set on the plan, and you can change it on one member's membership. The field only appears on a plan with a session limit that is not counted in hours, once door access is on at one of your gyms.
-- **Which doors count.** An entry counts when it comes through a check-in lock: a lock that opens exactly one area. A lock shared by several areas, such as the front entrance to the gym, sauna and pool, only opens. Set this per lock under **Check-in locks** on the integration page.
+- **Which doors count.** An entry counts when it comes through a check-in door: by default, a door that opens exactly one area. A door shared by several areas, such as the front entrance to the gym, sauna and pool, only opens. Set this per door under [Check-in doors](#check-in-doors) on the **Door access** page.
 - **The last session.** The door stays open until the visit's window closes, even when that visit used the last session.
 
 At a gym on WebLock, and for a pass counted in hours, the member still enters through a check-in, because the door cannot count the visit.
+
+### Require a check-in instead
+
+A gym with a front desk can stop plans from opening the door by themselves. On the **Door access** page, under **How members get in**, turn off **Memberships open the doors** and confirm with **Require check-in**.
+
+- Plans stop opening the doors almost at once. Members get in once they are checked in at the gym, or with a booking.
+- Staff, the kiosk and the check-in tablet check members in as before, and a booking still checks the member in. A check-in opens its area until the end of the gym's day.
+- Members can't check themselves in on a plan alone, from the member portal, the website or their phone at the door. They check in at reception.
+- At a Salto KS gym with **Suspend members when their access ends** on, a member's phone key works only during a visit.
+
+Turn it back on to let plans open walk-in areas again.
 
 ### Seeing which doors a member's plans open
 
@@ -87,6 +176,7 @@ On the member's [profile](/members/member-profiles), click their name to open **
 | Reason | What it means |
 | --- | --- |
 | **Not active today** | The membership has not started, has ended, or is paused |
+| **Enters through a check-in or a booking** | The gym has **Memberships open the doors** turned off. See [Require a check-in instead](#require-a-check-in-instead) |
 | **Counts sessions, so enters through a check-in** | A pass at a gym whose door system cannot count visits, or a pass counted in hours |
 | **No sessions left** | The pass has used all its sessions |
 | **Covers no walk-in area** | The plan covers no area that is walk-in, or covers classes or instructors only |
@@ -110,7 +200,7 @@ You manage access cards and PINs on the **Cards** page, from the three-dot menu 
 - **Removing a card deletes it.** There is no suspended or revoked state: a card taken off a member stops working at once, and scanning the same card again later issues it fresh.
 
 <Note>
-When access control is on for a gym and **PIN Code** is an enabled method, a member who needs door access but has no card is given a random 6-digit PIN as their main card automatically. QR codes are not provisioned this way, because the member's app QR already identifies them.
+When access control is on for a gym and **PIN Code** is an enabled method, a member who needs door access but has no card is given a random 6-digit PIN as their main card automatically. At a gym on Salto KS, a member who has an access card but no PIN is given one too, next to their card. QR codes are not provisioned this way, because the member's app QR already identifies them.
 </Note>
 
 ## Access grants
@@ -146,7 +236,7 @@ Adding, revoking, and restoring grants needs permission to manage operations at 
 
 Door systems can report each tap, scan, or PIN entry back to 1club as an access event, with the credential, a result (`granted` or `denied`), a timestamp, and, when the system knows it, the area. Events are matched against grants by area and time, and an event that doesn't match is flagged as a discrepancy, for example a credential 1club has never seen or access granted with no matching grant. Events without an identifiable area can't confirm that a particular door was authorized.
 
-At a gym on Impro or Salto KS, entries through a check-in lock are also what count a session pass's visits: an entry that uses a session records a check-in, which shows in [Check-ins](/schedule/check-ins) like any other.
+At a gym on Impro or Salto KS, a member's entry through a [check-in door](#check-in-doors) also records a visit: a check-in that shows in [Check-ins](/schedule/check-ins) like any other. On a pass with sessions, it uses a session. On an unlimited plan, it uses nothing and never runs past the plan's hours. Entering again during the same visit records nothing more.
 
 Access events are available through the access-control API. There is no admin screen for browsing the raw event log; front-desk attendance is reviewed on [Check-ins](/schedule/check-ins).
 
@@ -173,7 +263,7 @@ Access events are available through the access-control API. There is no admin sc
 ### A 10-visit pass at a Salto KS gym
 
 - On the pass's plan, set **Session length** to 180 minutes.
-- On the Salto KS page, check that the bouldering hall's own lock counts under **Check-in locks**, and that the shared front entrance only opens.
+- On the **Door access** page, check that the bouldering hall's own door counts under **Check-in doors**, and that the shared front entrance only opens.
 - A member enters at 10:00, which uses one session. Leaving for lunch and coming back at 12:30 uses nothing more. Coming back at 18:00 uses a second session.
 
 ### Letting in a coach with no booking
@@ -198,7 +288,10 @@ Access events are available through the access-control API. There is no admin sc
 **Cause / fix**: A pass opens the door only at a gym on Impro or Salto KS, and only while it has a session left. At a gym on WebLock, or for a pass counted in hours, the member checks in first.
 
 **Issue**: A pass used a session when the member walked through the front entrance.
-**Cause / fix**: That lock counts visits for an area. Under **Check-in locks** on the integration page, set it to **Only opens**.
+**Cause / fix**: That door counts visits for an area. Under **Check-in doors** on the **Door access** page, set it to **Only opens**.
+
+**Issue**: A member's plan reads **Enters through a check-in or a booking**.
+**Cause / fix**: The gym has **Memberships open the doors** turned off, so members check in at reception first. See [Require a check-in instead](#require-a-check-in-instead).
 
 **Issue**: A booking was confirmed but no grant appeared.
 **Cause / fix**: The gym has no door access integration enabled, the booking has no area, or the booking has no contact. Grants are only created for gyms with an enabled door access integration.

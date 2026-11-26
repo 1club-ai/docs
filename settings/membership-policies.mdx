@@ -13,6 +13,7 @@ keywords:
   - freeze membership
   - pause fee
   - freeze fee
+  - minimum pause length
   - booked pause
   - cancellation reason
 ---
@@ -133,15 +134,16 @@ The charge is added to what the member owes, like any other balance, and staff c
 
 ## Pauses
 
+- **Shortest pause** (days) - the shortest a single pause may last. Members can't pause for less online, and staff are warned. A new policy starts at 7 days; leave it on **No limit** for pauses of any length from a day.
 - **Longest pause** (days) - the longest a single pause may last. Members can't pause for longer online, and staff are warned. Leave it on **No limit** for any length.
 - **Pauses per year** - how many times a membership may be paused in any 12 months. Staff pauses and booked pauses count too. Once the limit is reached, members can't pause online, and staff are warned. Leave it on **No limit** for no cap.
 
 - **Fee while paused** - what each week or month of a pause costs: the amount, then **per week** or **per month** beside it. Leave the amount empty for free pauses. See [The pause fee](#the-pause-fee).
 - **Pause fee revenue account** - the revenue account pause fees post to. Leave it on **The plan's account** to post them with the plan's other income.
 
-The two limits only matter while **Members can pause online** is on, or as warnings for staff. The fee applies to every pause, whoever starts it.
+The limits only matter while **Members can pause online** is on, or as warnings for staff. The fee applies to every pause, whoever starts it.
 
-Every pause moves the membership's next charge by the days paused, so the two limits also cap how far a member can push their billing in a year. See [What a pause does to the next charge](/sales/memberships#what-a-pause-does-to-the-next-charge).
+Every pause moves the membership's next charge by the days paused, so **Longest pause** and **Pauses per year** also cap how far a member can push their billing in a year. See [What a pause does to the next charge](/sales/memberships#what-a-pause-does-to-the-next-charge).
 
 ## The pause fee
 
@@ -206,7 +208,7 @@ When the membership can't be cancelled online, the member is told why: the gym o
 
 ### How members pause
 
-1. The member clicks **Pause membership** and picks **Pause from** (today, or a later day up to 90 days ahead) and **Resume on** (up to the **Longest pause**).
+1. The member clicks **Pause membership** and picks **Pause from** (today, or a later day up to 90 days ahead) and **Resume on** (from the **Shortest pause** up to the **Longest pause**).
 2. Before confirming, they see the pauses they have left ("Pauses used this year: 1 of 2") and where their next payment, end date, and minimum term move. When the policy sets a [pause fee](#the-pause-fee), they also see the fee and the total for the dates they picked, for example "Pausing costs 10.00 a week, charged at the start of each week: 30.00 for 3 weeks.".
 3. They confirm with **Pause membership**, or **Book pause** for a pause that starts later.
 
@@ -222,7 +224,7 @@ Staff are never blocked by a membership policy. The policy governs self-service,
 
 - **Cancel** - The [cancel dialog](/sales/memberships#cancel) asks **Why is the membership ending?**, then offers every date in **Membership ends**: **Today (ends immediately)** and each coming period end. A date that carries an early cancellation charge shows it, with **Waive the charge** to record the cancellation without it. Ending today forfeits the rest of the paid period, so it counts the same remaining payments as ending when that period does.
 - **Pause** - The [pause dialog](/sales/memberships#pause-and-resume) offers any length, starting today or on a later day. When the policy sets a pause fee, the dialog shows it in **Weekly pause fee** or **Monthly pause fee**. Staff who can cancel memberships can change it for this one pause, or set it to 0 to waive it.
-- **Warnings** - When a change goes against the policy, the dialog says so before you confirm. For example: "This membership has a minimum commitment until 1 January 2028, so this ends it early.", or that the policy asks for 30 days of notice, allows pauses of up to 30 days, or allows 2 pauses a year. The change still goes through.
+- **Warnings** - When a change goes against the policy, the dialog says so before you confirm. For example: "This membership has a minimum commitment until 1 January 2028, so this ends it early.", or that the policy asks for 30 days of notice, requires pauses of at least 7 days, allows pauses of up to 30 days, or allows 2 pauses a year. The change still goes through.
 
 The self-service switches themselves (**Members can cancel online** and **Members can pause online**) never produce a warning, because they only decide what members can do on their own.
 
@@ -252,6 +254,10 @@ Integrations that cancel or pause through the [Memberships API](/api-reference/c
 **Issue**: Members can't pause, even though **Members can pause online** is on.
 
 **Solution**: The membership has reached **Pauses per year** (staff pauses and booked pauses count), or it already has a pause booked. Only active memberships can be paused.
+
+**Issue**: A member can't pick a resume date soon after the pause starts.
+
+**Solution**: The policy sets a **Shortest pause**, so the earliest resume date is that many days after the pause starts. Lower it or set it to **No limit**, or pause the membership for them as staff.
 
 **Issue**: Two policies seem to cover the same membership.
 

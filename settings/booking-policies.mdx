@@ -88,9 +88,12 @@ Staff booking a slot outside these limits see a note such as "Members book on a 
 ### Booking window
 
 - **Min. notice** (hours) - Members must book at least this many hours ahead. Leave blank for no limit.
-- **Max. ahead** (days) - Members can only see and book up to this many calendar days ahead. Leave blank for no limit.
+- **Max. ahead** (days) - Members can only see and book up to this many days ahead. Leave blank for no limit.
+- **Counted** - How the days of **Max. ahead** are counted: **Whole days** or **Rolling**. You can choose once **Max. ahead** is set.
 
-Staff can book outside the window. The booking dialog shows a note such as "Members book up to 7 days ahead", and **Add** books it on the first click.
+With **Whole days**, the default, the last day stays open until midnight. With **Rolling**, it stays open until the current time of day, so at 10:00 on Monday, 7 days runs to next Monday at 10:00. Past the window, members don't see classes, and court and coach times aren't offered. **Rolling** needs at least 1 day.
+
+Staff can book outside the window. The booking dialog shows a note such as "Members book up to 7 days ahead" (with **Rolling**, "Bookings open for members 7 days before the start time"), and **Add** books it on the first click.
 
 To let latecomers join a class that is already running, turn on **Keep booking open when the class has attendees** in the **Options** panel. Once someone has booked the class, others can still join inside the **Min. notice** period until it ends.
 
@@ -100,7 +103,8 @@ To let latecomers join a class that is already running, turn on **Keep booking o
 create, not just the first one. A series that ends on a date, or after a set number of
 repeats, is created in full the moment you save it (see
 [Repeating schedules](/reference/repeating-schedules)), so every occurrence in it has to
-fit the window.
+fit the window. With **Rolling**, the start time of that last occurrence counts too, not
+only its date.
 
 With **Max. ahead** set to 14 days, a weekly area booking repeating "after 52 times"
 reaches nearly a year out and is refused. The same booking repeating "after 2 times" ends
@@ -371,6 +375,10 @@ You let admins book PT for callers who haven't signed up yet.
 **Issue**: Two policies seem to apply to the same booking 
 
 **Solution**: The more specific policy wins. A policy attached to the gym beats an all-gyms policy, then a policy with both a coverage and an audience beats one with only one of them. Open both policies and check their **General** sections, then compare them against the order in [Scope](#scope).
+
+**Issue**: A class or a court time a week away isn't offered to members yet, although other times that day are.
+
+**Solution**: The policy counts **Max. ahead** as **Rolling**, so a time opens exactly that many days before its start time. An 18:00 class 7 days out opens at 18:00. Set **Counted** to **Whole days** to open the whole day at midnight instead.
 
 **Issue**: A repeating booking is refused for being too far in advance, but its first session is next week.
 

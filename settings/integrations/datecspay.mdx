@@ -25,6 +25,11 @@ keywords:
     fiscal device,
     card batch close,
     payment bridge,
+    private key,
+    borica certificate,
+    mpi ow apgw,
+    test connection,
+    access denied,
   ]
 ---
 
@@ -68,7 +73,7 @@ Datecs terminals and fiscal devices have no cloud connection of their own. They 
 ## Before you start
 
 - **A paid plan.** DatecsPay is a paid-plan integration. On the Free plan and during the free trial, **Activate** is greyed out until you upgrade.
-- **For Online: BORICA credentials for the environment you want.** Both Test and Live need a **Terminal ID (TID)**, a **Merchant ID (MID)**, your **RSA private key**, and **BORICA's public certificate**. BORICA issues a separate set for each environment, so keep the two sets apart. POS Terminals and Fiscal need none of these.
+- **For Online: BORICA credentials for the environment you want.** Both Test and Live need a **Terminal ID (TID)**, a **Merchant ID (MID)**, your **private key**, and **BORICA's certificate**. See [Get your BORICA files](#get-your-borica-files) for which file is which. BORICA issues a separate set for each environment, so keep the two sets apart. POS Terminals and Fiscal need none of these.
 - **For Online: no other online card provider for the company.** Each company takes online card payments through one provider at a time: Stripe, myPOS, or DatecsPay. While Stripe or myPOS takes them, the **Online** checkbox is locked and says which provider holds it. Untick **Online** under **Use Stripe for** on the [Stripe](/settings/integrations/stripe#use-stripe-for) page, or untick **Online** on the [myPOS](/settings/integrations/mypos#one-online-card-provider-per-company) page, first. Both can keep running card readers beside DatecsPay, and POS Terminals and Fiscal aren't affected.
 - **For Fiscal: the company's country.** Fiscal receipts print only for a company whose [billing entity](/settings/billing-entities) is in Bulgaria.
 
@@ -77,18 +82,25 @@ Datecs terminals and fiscal devices have no cloud connection of their own. They 
   permission. Viewing its settings requires **settings.read.organization**.
 </Note>
 
-## Where to get your DatecsPay credentials
+## Get your BORICA files
 
-You need these only for the **Online** module. DatecsPay credentials come from **BORICA** (through your bank or acquirer), not from 1club. When your DatecsPay/BORICA terminal is provisioned you receive:
+You need these only for the **Online** module. They come from **BORICA** (through Datecs or your bank), not from 1club, and BORICA issues a separate set for **Test** and for **Live**.
 
-| Credential                          | What it is                                                                                                                                      |
-| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Terminal ID (TID)**               | The identifier of your BORICA terminal. You get a separate TID for the test gateway and for production.                                         |
-| **Merchant ID (MID)**               | Your BORICA merchant identifier.                                                                                                                |
-| **RSA private key (PEM)**           | The private half of your signing key pair, used to sign requests to BORICA. You generate the key pair and register the public half with BORICA. |
-| **BORICA public certificate (PEM)** | BORICA's certificate, used to verify the responses coming back from the gateway. The test and production certificates are different.            |
+Setting up a terminal leaves you with several files that look alike. Only two of them go into 1club:
 
-Generate your key pair and register it with BORICA before you configure 1club, and download the matching BORICA certificate for the environment you are setting up.
+| File                                                                           | Goes into 1club? | What it is                                                                                                                                                                                  |
+| ------------------------------------------------------------------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Your private key**, named like `V12345678_20261119_P_private.key`             | Yes              | Saved on your computer when the certificate request was made with BORICA's key tool. `P` is for Live and `T` for Test. It may be protected with a passphrase you chose at the time. |
+| **BORICA's certificate**, `MPI OW APGW` (a `.cer`, or a `.pem` public key)       | Yes              | BORICA's own certificate. It's the same for every merchant, and differs only between Test and Live.                                                                                       |
+| **Your terminal's certificate**, named like `V12345678-yourgym.bg-P.cer`        | No               | The certificate BORICA issued for your terminal. BORICA keeps its own copy.                                                                                                                |
+| **Your terminal's public key**, named like `V12345678-yourgym.bg-P.pub`         | No               | The public half of your private key. BORICA keeps its own copy.                                                                                                                            |
+| **The certificate request**, a `.csr`                                           | No               | What was sent to BORICA to get your terminal's certificate.                                                                                                                                |
+
+You also need your **Terminal ID (TID)**, such as `V12345678`, and your **Merchant ID (MID)**. Both are in the letter or email that came with your terminal, and the TID is also in your file names.
+
+<Warning>
+  Only the private key made together with the request BORICA signed works. BORICA's key tool makes a new key every time it runs, so if the request was made more than once, use the key saved with the last one sent. A lost private key can't be recovered: make a new request with BORICA's key tool and ask Datecs for a new certificate.
+</Warning>
 
 ## Activate DatecsPay
 
@@ -99,10 +111,10 @@ Generate your key pair and register it with BORICA before you configure 1club, a
    1. Choose an **Environment**: **Test** runs against BORICA's test gateway, and **Live** processes real payments against BORICA production. BORICA gives you different credentials for each, so enter the set that matches.
    2. Enter your **Terminal ID (TID)** and **Merchant ID (MID)**.
    3. Check the **Merchant name** and **Merchant website**. 1club pre-fills these from your organization's name and website, but you can edit them if BORICA registered a different name or URL.
-   4. Paste your **Merchant private key (PEM)** and **BORICA public certificate (PEM)**. If your key file is protected with a passphrase, enter it in **Private key passphrase**. 1club uses it once to decrypt the key and never stores it.
+   4. Paste your private key file into **Private key (..._private.key)** and BORICA's certificate into **BORICA certificate (MPI OW APGW)**. Open each file in a text editor and copy everything, from `-----BEGIN` to `-----END`. If your key file is protected with a passphrase, enter it in **Private key passphrase**. 1club uses it once to open the key and never stores it. **Where to get these files** above the fields opens [Get your BORICA files](#get-your-borica-files).
 5. If **POS Terminals** is ticked, set the **Daily card batch close** time. See [Daily card batch close](#daily-card-batch-close).
 6. Click **Save**. The page shows **Active** next to the title and, with Online on, the environment, **Test** or **Live**. **Save** stays greyed out until at least one module is ticked.
-7. With Online on, click **Test configuration** to check that the stored key and certificate are well-formed.
+7. With Online on, click **Test connection**. 1club asks BORICA with your saved key and terminal, and checks BORICA's reply with your saved certificate. See [Test connection](#test-connection).
 8. Pair your Datecs terminals under [Payment terminals](/settings/payment-terminals#datecs-terminals), and add fiscal rules and fiscal devices under [Fiscal receipts](/settings/fiscal).
 
 <Note>
@@ -125,9 +137,9 @@ The BORICA fields apply only while **Online** is ticked. With Online off, none o
 | **Merchant ID (MID)**               | With Online                                    | Your BORICA merchant identifier.                                                                                                                      |
 | **Merchant name**                   | No                                             | Pre-filled from your organization name. Editable.                                                                                                     |
 | **Merchant website**                | No                                             | Pre-filled from your organization website. Editable.                                                                                                  |
-| **Merchant private key (PEM)**      | On first save, and when you change environment | Your RSA private key used to sign requests to BORICA. Stored encrypted. Leave blank when editing to keep the current key.                             |
+| **Private key (..._private.key)**   | On first save, and when you change environment | Your private key, used to sign requests to BORICA. Stored encrypted. Leave blank when editing to keep the current key.                                |
 | **Private key passphrase**          | No                                             | Only if your key file is passphrase-protected. Used once to decrypt the key and never stored.                                                         |
-| **BORICA public certificate (PEM)** | On first save, and when you change environment | BORICA's certificate used to verify gateway responses. Differs between test and production. Leave blank when editing to keep the current certificate. |
+| **BORICA certificate (MPI OW APGW)** | On first save, and when you change environment | BORICA's own certificate, used to check BORICA's replies. Differs between Test and Live. Leave blank when editing to keep the current certificate. |
 | **Daily card batch close**          | With POS Terminals                             | When the company's Datecs terminals close their card batch each day, in each terminal's gym's local time. Defaults to 03:00.                          |
 
 ## Daily card batch close
@@ -158,16 +170,19 @@ There is no credential-free sandbox. Both environments need a full credential se
 
 DatecsPay keeps one credential set per company, for the environment you saved. When you switch **Environment**, the page clears the **Terminal ID (TID)**, key, passphrase, and certificate fields. To save, enter the TID, private key, and BORICA certificate issued for the new environment. If you leave the key or certificate blank, the page asks for the one issued for that environment. Your saved set for the old environment is replaced, so keep a copy if you plan to switch back.
 
-## Test configuration
+## Test connection
 
-The **Test configuration** button checks that your saved credentials are complete and well-formed: that the private key and BORICA certificate are valid and the gateway for your environment resolves. It records the time of the last successful check. On success it shows "DatecsPay configuration looks valid".
+The **Test connection** button asks BORICA about your latest card payment of the day (or a made-up one, if there isn't one yet), using your saved private key and TID, and checks BORICA's signed reply with your saved BORICA certificate. It charges nothing and changes nothing at BORICA, so it's safe to run in **Live**. On success it shows "BORICA accepted the key and certificate" and records the time.
 
-<Note>
-  This check runs locally and does **not** contact BORICA or move any money. It
-  catches a malformed key or a missing field, but it can't confirm that BORICA
-  recognizes your TID or merchant. The first real proof that credentials are
-  correct is a successful test payment through hosted checkout.
-</Note>
+When it fails, it says which part is wrong:
+
+| Message                                                    | What to do                                                                                                                                                                                                   |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **BORICA refused the private key for terminal ...**         | The saved private key isn't the one BORICA holds for this terminal, or the TID belongs to the other environment. Save the private key made with this terminal's certificate request. See [Get your BORICA files](#get-your-borica-files). |
+| **BORICA's reply does not verify with the saved BORICA certificate** | The certificate field holds something other than BORICA's own certificate, or the one for the other environment. Save BORICA's `MPI OW APGW` certificate for the environment you selected.               |
+| **BORICA did not answer**                                   | BORICA's gateway didn't respond. Try again in a minute.                                                                                                                                                      |
+
+Run it after every change to the key, the certificate or the TID. A setup that fails it can't take payments: BORICA may still charge the card, but 1club can't confirm the payment.
 
 ## What syncs online
 
@@ -206,10 +221,13 @@ Deactivating switches off all three modules at once: the company's Datecs termin
 ## Troubleshooting
 
 - **Activate is greyed out** - your organization is on the Free plan or the free trial. Upgrade to a paid plan to activate payments.
-- **Test configuration fails** - confirm the **Merchant private key (PEM)** and **BORICA public certificate (PEM)** are valid PEM and that you pasted the certificate for the environment you selected (test and production certificates differ).
+- **Test connection fails** - the message says whether BORICA refused the key or its reply didn't verify with the certificate. See [Test connection](#test-connection).
+- **Save says the private key is a certificate or a public key** - you pasted your terminal's `.cer` or `.pub` into **Private key**. Paste the `..._private.key` file instead. See [Get your BORICA files](#get-your-borica-files).
+- **Save says the certificate is your own public key** - you pasted your terminal's `.cer` or `.pub` into **BORICA certificate**. Paste BORICA's `MPI OW APGW` certificate instead.
+- **Save says the private key is passphrase-protected, or the passphrase is incorrect** - enter the passphrase chosen when the key was made in **Private key passphrase**.
 - **Save asks for the key and certificate again** - you changed **Environment**. BORICA issues a separate set per environment, so paste the key and certificate for the environment you selected.
-- **Customers see a signature error on the checkout page** - the public key registered with BORICA doesn't match the private key on file, or the TID belongs to a different environment. Re-check the key pair registered with BORICA and confirm the TID matches your selected environment.
-- **Payment succeeded on BORICA but the charge stays unpaid in 1club** - this usually resolves on its own: the reconciliation job confirms pending checkouts within a few minutes. If it persists beyond that, re-check that your BORICA certificate is current.
+- **Customers see a signature error on the checkout page** - the private key on file isn't the one BORICA holds for your terminal, or the TID belongs to the other environment. Run **Test connection**, which says which.
+- **Payment succeeded on BORICA but the charge stays unpaid in 1club** - this usually resolves on its own: the reconciliation job confirms pending checkouts within a few minutes. If it persists, run **Test connection**: 1club can confirm a payment only while BORICA accepts your key and its reply verifies with your certificate. BORICA keeps a payment for about a day, so fix the setup within that time, or record the payment by hand.
 - **Live payments fail but test works** - confirm you are in the **Live** environment and entered live credentials (a production TID and the production BORICA certificate, not the test ones).
 - **The Online checkbox is locked, or saving says another provider "already takes online card payments"** - only one online card provider can be active per company. Untick **Online** on the Stripe or myPOS page for that company, then tick **Online** on DatecsPay again.
 - **Save is greyed out** - no module is ticked. Tick at least one, or click **Deactivate** to switch DatecsPay off.
@@ -217,14 +235,15 @@ Deactivating switches off all three modules at once: the company's Datecs termin
 
 ## Worked examples
 
-**Bulgarian gym already banking with BORICA.** A fitness gym whose bank issued it a BORICA e-commerce terminal generates an RSA key pair, registers the public key with BORICA, and downloads the production certificate. It activates DatecsPay, selects **Live**, enters its TID and MID, pastes the private key and certificate, saves, and runs **Test configuration**. One real area booking confirms hosted checkout settles the charge.
+**Bulgarian gym already banking with BORICA.** A fitness gym whose bank issued it a BORICA e-commerce terminal makes its key and certificate request with BORICA's key tool, receives its terminal's certificate, and downloads BORICA's production certificate. It activates DatecsPay, selects **Live**, enters its TID and MID, pastes its `..._P_private.key` and BORICA's `MPI OW APGW` certificate, saves, and runs **Test connection**. One real area booking confirms hosted checkout settles the charge.
 
 **A member who closes the tab mid-payment.** A member pays for a membership on BORICA's page but closes the browser before returning to 1club, so the payment briefly shows as pending. Within a few minutes the reconciliation job checks the status with BORICA, confirms the charge, and settles the membership, with no staff action needed.
 
 ## Tips & best practices
 
 - Keep your test and production credential sets clearly separated. The TID, key, and BORICA certificate differ per environment, and mixing them is the most common cause of signature errors.
-- Remember that **Test configuration** is a local check only. It can't confirm BORICA recognizes your terminal, so always follow it with a real test payment.
+- Run **Test connection** after every change to the key, certificate or TID, before members pay.
+- Keep your private key files somewhere safe. BORICA never sees them, so nobody can send you a lost one.
 - Leave the masked private key and certificate fields blank when editing later. Only paste a value when you are deliberately replacing it.
 - Decide up front whether each company takes online card payments through DatecsPay, myPOS, or Stripe. Only one online card provider can run per company.
 - If you sell monthly memberships, plan how you will collect renewals. DatecsPay leaves each renewal owed, while Stripe and myPOS can collect them automatically.
